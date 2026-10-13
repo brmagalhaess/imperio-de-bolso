@@ -1,0 +1,96 @@
+[
+  {
+    "id": "water_cart_lv02",
+    "model": "ideogram/v4.0",
+    "variations": 2,
+    "input": {
+      "prompt": "Create a single original game-ready asset for a colorful 2D isometric mobile business tycoon game. Subject: the same water cart upgraded to level 2: sturdier cart with metal trims, two blue coolers full of water bottles and coconuts, a bigger striped parasol, small hanging lights; keep the same wood palette and camera angle as the reference. Consistent 2:1 isometric viewpoint seen from the front-right, soft upper-left lighting, clean readable silhouette, subtle dark outline, playful Brazilian tropical neighborhood aesthetic, vibrant but harmonious colors, same rendering style as the reference. No lettering, no logo, no watermark. Centered isolated object, fully visible with margin, on a plain solid pure white background, no ground, no shadow, no scenery.",
+      "aspect_ratio": "1:1",
+      "rendering_speed": "DEFAULT",
+      "image_url": "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/bec0b4fb-2f08-4d35-a74c-83066acfd64e.png",
+      "image_weight": 45
+    }
+  },
+  {
+    "id": "water_cart_lv03",
+    "model": "ideogram/v4.0",
+    "variations": 2,
+    "input": {
+      "prompt": "Create a single original game-ready asset for a colorful 2D isometric mobile business tycoon game. Subject: the same water cart upgraded to level 3 deluxe: a small premium beverage kiosk on wheels with a glass-front fridge of water bottles, coconut display, wide striped awning, potted plant; keep the same palette and camera angle as the reference. Consistent 2:1 isometric viewpoint seen from the front-right, soft upper-left lighting, clean readable silhouette, subtle dark outline, playful Brazilian tropical neighborhood aesthetic, vibrant but harmonious colors, same rendering style as the reference. No lettering, no logo, no watermark. Centered isolated object, fully visible with margin, on a plain solid pure white background, no ground, no shadow, no scenery.",
+      "aspect_ratio": "1:1",
+      "rendering_speed": "DEFAULT",
+      "image_url": "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/bec0b4fb-2f08-4d35-a74c-83066acfd64e.png",
+      "image_weight": 35
+    }
+  },
+  {
+    "id": "tree_tropical",
+    "model": "ideogram/v4.0",
+    "variations": 2,
+    "input": {
+      "prompt": "Create a single original game-ready asset for a colorful 2D isometric mobile business tycoon game. Subject: a small stylized tropical tree for a city sidewalk, round lush canopy with a few yellow ipê flowers, short trunk, compact footprint. Consistent 2:1 isometric viewpoint seen from the front-right, soft upper-left lighting, clean readable silhouette, subtle dark outline, playful Brazilian tropical neighborhood aesthetic, vibrant but harmonious colors, same rendering style as the reference. No lettering, no logo, no watermark. Centered isolated object, fully visible with margin, on a plain solid pure white background, no ground, no shadow, no scenery.",
+      "aspect_ratio": "1:1",
+      "rendering_speed": "DEFAULT"
+    }
+  },
+  {
+    "id": "bench_park",
+    "model": "ideogram/v4.0",
+    "variations": 2,
+    "input": {
+      "prompt": "Create a single original game-ready asset for a colorful 2D isometric mobile business tycoon game. Subject: a small wooden park bench with green painted metal legs. Consistent 2:1 isometric viewpoint seen from the front-right, soft upper-left lighting, clean readable silhouette, subtle dark outline, playful Brazilian tropical neighborhood aesthetic, vibrant but harmonious colors, same rendering style as the reference. No lettering, no logo, no watermark. Centered isolated object, fully visible with margin, on a plain solid pure white background, no ground, no shadow, no scenery.",
+      "aspect_ratio": "1:1",
+      "rendering_speed": "DEFAULT"
+    }
+  },
+  {
+    "id": "vendor_character",
+    "model": "ideogram/v4.0",
+    "variations": 2,
+    "input": {
+      "prompt": "Create a single original game-ready asset for a colorful 2D isometric mobile business tycoon game. Subject: a friendly cartoon street vendor character standing, wearing a cap, apron and colorful t-shirt, waving, original design not resembling any real person, full body, small game character scale. Consistent 2:1 isometric viewpoint seen from the front-right, soft upper-left lighting, clean readable silhouette, subtle dark outline, playful Brazilian tropical neighborhood aesthetic, vibrant but harmonious colors, same rendering style as the reference. No lettering, no logo, no watermark. Centered isolated object, fully visible with margin, on a plain solid pure white background, no ground, no shadow, no scenery.",
+      "aspect_ratio": "1:1",
+      "rendering_speed": "DEFAULT"
+    }
+  },
+  {
+    "id": "tile_grass",
+    "model": "ideogram/v4.0",
+    "variations": 2,
+    "input": {
+      "prompt": "Seamless tileable game texture, strictly top-down orthographic view, no perspective, no horizon. short lush tropical grass with tiny subtle variation in green tones. Flat even soft lighting, no shadows from objects, vibrant but harmonious colors, stylized hand-painted mobile game look, fills the entire frame edge to edge. No lettering, no logo, no watermark, no objects.",
+      "aspect_ratio": "1:1",
+      "rendering_speed": "DEFAULT"
+    }
+  },
+  {
+    "id": "tile_asphalt",
+    "model": "ideogram/v4.0",
+    "variations": 2,
+    "input": {
+      "prompt": "Seamless tileable game texture, strictly top-down orthographic view, no perspective, no horizon. clean gray city asphalt road surface with fine grain, no lane markings. Flat even soft lighting, no shadows from objects, vibrant but harmonious colors, stylized hand-painted mobile game look, fills the entire frame edge to edge. No lettering, no logo, no watermark, no objects.",
+      "aspect_ratio": "1:1",
+      "rendering_speed": "DEFAULT"
+    }
+  },
+  {
+    "id": "tile_calcada",
+    "model": "ideogram/v4.0",
+    "variations": 2,
+    "input": {
+      "prompt": "Seamless tileable game texture, strictly top-down orthographic view, no perspective, no horizon. Brazilian portuguese-style sidewalk pavement made of small irregular cream and black stones in a wave pattern. Flat even soft lighting, no shadows from objects, vibrant but harmonious colors, stylized hand-painted mobile game look, fills the entire frame edge to edge. No lettering, no logo, no watermark, no objects.",
+      "aspect_ratio": "1:1",
+      "rendering_speed": "DEFAULT"
+    }
+  },
+  {
+    "id": "neighborhood_reference",
+    "model": "ideogram/v4.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Concept art reference for a colorful 2D isometric mobile business tycoon game, portrait screen. A cheerful small Brazilian tropical neighborhood block seen in 2:1 isometric view: a street with a water cart, popcorn cart, ice cream shop, snack bar and small market on empty lots, palm trees, benches, portuguese-style wave sidewalk, soft upper-left lighting, vibrant but harmonious colors, clean readable shapes. No lettering, no logos, no watermark, no UI.",
+      "aspect_ratio": "9:16",
+      "rendering_speed": "DEFAULT"
+    }
+  }
+]

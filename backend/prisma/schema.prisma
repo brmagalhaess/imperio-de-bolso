@@ -1,0 +1,116 @@
+// Império de Bolso — esquema do banco (PostgreSQL).
+// A API é a autoridade econômica: saldos em BIGINT, toda mudança passa pelo ledger.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  runtime             = "nodejs"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Currency {
+  COINS
+  GEMS
+}
+
+model Player {
+  id              String   @id @default(uuid()) @db.Uuid
+  guestId         String   @unique @map("guest_id") @db.Uuid
+  guestSecretHash String   @map("guest_secret_hash")
+  displayName     String   @map("display_name")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  wallet      PlayerWallet?
+  businesses  PlayerBusiness[]
+  ledger      WalletLedger[]
+  idempotency IdempotencyRecord[]
+
+  @@map("players")
+}
+
+model PlayerWallet {
+  playerId  String   @id @map("player_id") @db.Uuid
+  coins     BigInt   @default(0)
+  gems      BigInt   @default(0)
+  version   Int      @default(0)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@map("player_wallets")
+}
+
+model WalletLedger {
+  id             BigInt   @id @default(autoincrement())
+  playerId       String   @map("player_id") @db.Uuid
+  currency       Currency
+  delta          BigInt
+  balanceAfter   BigInt   @map("balance_after")
+  reason         String
+  // Único globalmente: "<player_id>:<chave>" impede crédito/débito duplicado.
+  idempotencyKey String?  @unique @map("idempotency_key")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@index([playerId, createdAt])
+  @@map("wallet_ledger")
+}
+
+model BusinessDefinition {
+  id            Int    @id @default(autoincrement())
+  slug          String @unique
+  name          String
+  sortOrder     Int    @map("sort_order")
+  cost          BigInt
+  revenue       BigInt
+  operatingCost BigInt @default(0) @map("operating_cost")
+  cycleSeconds  Int    @map("cycle_seconds")
+  maxLevel      Int    @default(100) @map("max_level")
+  config        Json   @default("{}")
+
+  players PlayerBusiness[]
+
+  @@map("business_definitions")
+}
+
+model PlayerBusiness {
+  playerId         String    @map("player_id") @db.Uuid
+  businessId       Int       @map("business_id")
+  level            Int       @default(1)
+  managerUnlocked  Boolean   @default(false) @map("manager_unlocked")
+  // Ciclo manual: início do ciclo em andamento (null = parado aguardando ação).
+  cycleStartedAt   DateTime? @map("cycle_started_at") @db.Timestamptz(3)
+  // Reservados para gerentes/offline (Etapa 2).
+  carrySeconds     Int       @default(0) @map("carry_seconds")
+  lastSettlementAt DateTime  @default(now()) @map("last_settlement_at") @db.Timestamptz(3)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  player   Player             @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  business BusinessDefinition @relation(fields: [businessId], references: [id])
+
+  @@id([playerId, businessId])
+  @@map("player_businesses")
+}
+
+// Respostas de comandos econômicos, para repetir a mesma resposta quando o
+// cliente reenviar o mesmo Idempotency-Key (rede instável, toque duplo).
+model IdempotencyRecord {
+  playerId     String   @map("player_id") @db.Uuid
+  key          String
+  route        String
+  requestHash  String   @map("request_hash")
+  statusCode   Int      @map("status_code")
+  responseBody Json     @map("response_body")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, key])
+  @@map("idempotency_records")
+}

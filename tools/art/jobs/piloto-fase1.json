@@ -1,0 +1,20 @@
+[
+  {
+    "id": "water_cart_lv01",
+    "model": "ideogram/v4.0",
+    "variations": 3,
+    "input": {
+      "prompt": "Create a single original game-ready asset for a colorful 2D isometric mobile business tycoon game. Subject: a small street vendor water cart, level 1 humble starter version: a simple wooden pushcart with a blue cooler box full of water bottles, a small striped parasol and two wheels. Consistent 2:1 isometric viewpoint seen from the front-right, soft upper-left lighting, clean readable silhouette, subtle dark outline, playful Brazilian tropical neighborhood aesthetic, vibrant but harmonious colors. No lettering, no logo, no watermark, no people. Centered isolated object, fully visible with margin, on a plain solid pure white background, no ground, no shadow, no scenery.",
+      "aspect_ratio": "1:1",
+      "rendering_speed": "DEFAULT"
+    }
+  },
+  {
+    "id": "water_cart_lv01_soul",
+    "model": "higgsfield-ai/soul/v2/standard",
+    "variations": 3,
+    "input": {
+      "prompt": "Create a single original game-ready asset for a colorful 2D isometric mobile business tycoon game. Subject: a small street vendor water cart, level 1 humble starter version: a simple wooden pushcart with a blue cooler box full of water bottles, a small striped parasol and two wheels. Consistent 2:1 isometric viewpoint seen from the front-right, soft upper-left lighting, clean readable silhouette, subtle dark outline, playful Brazilian tropical neighborhood aesthetic, vibrant but harmonious colors. No lettering, no logo, no watermark, no people. Centered isolated object, fully visible with margin, on a plain solid pure white background, no ground, no shadow, no scenery."
+    }
+  }
+]

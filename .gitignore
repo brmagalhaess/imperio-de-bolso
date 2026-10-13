@@ -1,0 +1,22 @@
+# Sistema
+.DS_Store
+
+# Segredos — nunca versionar
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+export_credentials.cfg
+
+# Node
+node_modules/
+dist/
+coverage/
+backend/src/generated/
+
+# Godot
+game/.godot/
+game/build/

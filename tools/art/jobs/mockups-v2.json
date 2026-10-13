@@ -1,0 +1,22 @@
+[
+  {
+    "id": "mockup_praia",
+    "model": "ideogram/v4.0",
+    "variations": 2,
+    "input": {
+      "prompt": "Mobile game screenshot mockup for 'Império de Bolso', an idle business tycoon game set in Brazil. Starting level on a tropical Brazilian beach: a compact isometric diorama island block of golden sand surrounded by turquoise sea with gentle waves, palm trees, a small wooden boardwalk, beach umbrellas and towels, a cute water vendor cart with a parasol and a cooler as the main business, a coconut water kiosk with straw roof, a popcorn cart and an ice cream cart, tiny cheerful customers walking and buying, a seller character, locked empty lots with a padlock sign waiting to be bought. Bright cartoon vibrant mobile game art style like top idle tycoon and city builder games: saturated cheerful colors, chunky rounded shapes, clean soft outlines, soft shadows, polished casual game look, 2:1 isometric camera, portrait phone screenshot 9:16, the scene fills the whole screen, zoomed in so buildings look big and readable. Game UI overlay: a rounded top bar with a gold coin counter and a smaller green 'per second' income counter, small floating rounded income bubbles with coin icons above each business, a bottom bar with 4 round icon buttons. Original design, no real brands, no logos, no watermark.",
+      "aspect_ratio": "9:16",
+      "rendering_speed": "DEFAULT"
+    }
+  },
+  {
+    "id": "mockup_cidade",
+    "model": "ideogram/v4.0",
+    "variations": 2,
+    "input": {
+      "prompt": "Mobile game screenshot mockup for 'Império de Bolso', an idle business tycoon game set in Brazil. Later stage: a dense lively colorful Brazilian city district built on an isometric diorama block next to the beach: colorful houses with clay tile roofs, a snack bar, a small market, an ice cream shop, a restaurant, a supermarket, a gym, a hotel and a small shopping mall, streets with tiny cars and pedestrians, portuguese wave-pattern sidewalks, palm trees and ipê trees, construction crane on a new lot. Bright cartoon vibrant mobile game art style like top idle tycoon and city builder games: saturated cheerful colors, chunky rounded shapes, clean soft outlines, soft shadows, polished casual game look, 2:1 isometric camera, portrait phone screenshot 9:16, the scene fills the whole screen, zoomed in so buildings look big and readable. Game UI overlay: a rounded top bar with a gold coin counter and a smaller green 'per second' income counter, small floating rounded income bubbles with coin icons above each business, a bottom bar with 4 round icon buttons. Original design, no real brands, no logos, no watermark.",
+      "aspect_ratio": "9:16",
+      "rendering_speed": "DEFAULT"
+    }
+  }
+]

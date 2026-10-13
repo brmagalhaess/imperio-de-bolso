@@ -1,0 +1,96 @@
+# Status de implementação
+
+Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
+
+## 2026-10-12 — Direção visual v2: Ilha da Praia (Fase 1 jogável)
+
+- **Por quê:** o titular rejeitou o visual v1. Referências originais (conversa ChatGPT): Idle Town
+  Billionaire + SimCity/Township, começo na praia, cartoon vibrante. Decisão em ADR 0004.
+- **Mockups (US$0,24):** 4 telas-conceito; escolhidos cena A + interface B + cidade D.
+- **Arte da ilha (Grok Image 2.0 com o mockup como referência):** cenário da ilha vazia, 4 negócios
+  × 3 níveis, placa de cadeado, guarda-sol, 6 personagens e 7 ícones de interface.
+  Gasto acumulado de arte: **US$3,13** (teto autorizado US$4,15). 3 gerações falharam/moderadas
+  sem cobrança. Testes que não serviram (remix Ideogram, ilha remixada) estão no catálogo.
+- **Jogo:** nova cena com a ilha fixa preenchendo a tela, lotes com placa/nome/preço, arte por
+  nível (1–9/10–24/25+), bolha de moeda tocável que coleta, "+N" subindo, clientes andando,
+  vendedor ao lado do carrinho, pulinho ao comprar/evoluir; interface do mockup B (avatar,
+  saldo, renda/s, Construir/Loja/Mapa/Perfil, painel do negócio, lista Construir, Mapa).
+  Loja/Perfil/Configurações mostram "em breve". Fonte Fredoka (OFL).
+- **Backend:** `lanchonete` → `quiosque_coco` (migração), nomes "Carrinho de Pipoca".
+- **Testes:** backend 30/30; jogo unitários 24/24; integração com API 35/35; roteiro de
+  demonstração (`tests/demo_runner.tscn`) com capturas reais de coleta, painel e lista.
+- **Pendente:** Fase 2 (Cidade-maquete, ~US$2,40, aguarda aprovação); APK não regerado após v2;
+  termos de uso comercial da API Higgsfield; aprovação visual do titular.
+
+## 2026-10-12 — Piloto de arte Higgsfield (integrado)
+
+- **Acesso:** o MCP Higgsfield (conta do app, 0,06 crédito) não enxerga o saldo da plataforma de
+  API (open.higgsfield.ai, US$26). Geração feita pela **API oficial** com `HF_KEY` no `.env`
+  (fora do Git), script `tools/art/hf_generate.mjs` com teto de gasto e idempotência.
+- **Custo autorizado:** até US$1,30. **Gasto real: US$1,212** (23 requisições únicas, todas
+  concluídas, sem cobrança duplicada — conferido no `tools/art/generations.jsonl`).
+- **Fase 1 (estilo):** 3× Ideogram 4.0 vs 3× Soul v2 do carrinho nível 1. Escolhido Ideogram v03
+  (perspectiva isométrica, contorno discreto, fundo limpo). Soul descartado (sombra/ângulo/contorno grosso).
+- **Fase 2:** carrinho nível 2 e 3 (remix do nível 1 aprovado), árvore, banco, vendedor,
+  texturas de grama/asfalto/calçada portuguesa e composição de referência do bairro.
+- **Tratamento:** `tools/art/process_assets.py` remove fundo (flood fill da borda), recorta e
+  salva em 2×; texturas viram losangos 2:1. Originais em `game/assets/source/` (`.gdignore`).
+- **Integração:** `scripts/city.gd` desenha pisos texturizados, decoração ordenada por
+  profundidade e o carrinho por faixa de nível (1–9, 10–24, 25+) com o vendedor ao lado.
+  Demais negócios seguem com blocos PLACEHOLDER.
+- **Testes:** unitários do jogo 21/21 (inclui troca de arte por nível); capturas reais nos
+  níveis 1, 12 e 30 sem frestas entre tiles nem halo branco nos recortes.
+- **Pendente:** aprovação visual do titular antes de produzir em lote; confirmar termos de uso
+  comercial da API Higgsfield; avaliar Git LFS para os originais (69 MB hoje).
+
+## 2026-10-12 — Etapa 0 + primeira fatia da Etapa 1
+
+Branch: `feature/etapa-0-fundacao` (local, ainda sem commit/push — aguarda autorização).
+
+### Objetivo
+Fundação do monorepo e um vertical slice jogável: conta convidada, catálogo de 10 negócios,
+carteira com ledger, compra/upgrade/coleta no servidor e cidade Godot integrada à API.
+
+### Entregue (executável)
+- **Backend** (`backend/`): Fastify 5 + Prisma 7 + PostgreSQL 17.
+  - Rotas: `GET /health`, `POST /api/v1/auth/guest`, `GET /player/state`, `GET /businesses`,
+    `POST /businesses/purchase`, `POST /businesses/upgrade`, `POST /production/collect`.
+  - Economia: BIGINT + `CHECK` no banco, lock por carteira, ledger, `Idempotency-Key`,
+    relógio do servidor, fórmulas da doc (ADR 0002). Ciclo manual sem gerente (ADR 0003).
+  - Migração inicial + seed do catálogo; Dockerfile (migra, semeia e sobe).
+- **Jogo** (`game/`): Godot 4.7.2, retrato 720×1280, GL Compatibility.
+  - Autoloads `Api` (cliente HTTP, convidado salvo em `user://`, retry com a mesma chave) e
+    `GameState` (estado do servidor, contagem por relógio monotônico).
+  - Cidade isométrica 2:1 com 10 lotes, arraste para navegar, toque para selecionar;
+    HUD com saldo, painel do negócio, comprar/melhorar/coletar, avisos e tela de erro/repetir.
+  - **Arte é PLACEHOLDER** (polígonos desenhados em código), não é a arte final.
+  - Preset Android e APK de debug gerado.
+- **Infra/Docs**: Docker Compose local, CI GitHub Actions, `AGENTS.md`, `CLAUDE.md`, ADRs,
+  backlog, contrato da API, setup, checklist de publicação, perguntas em aberto.
+
+### Testes executados (macOS, 2026-10-12)
+| Comando | Resultado |
+|---|---|
+| `npm test` (backend, PostgreSQL real) | 30/30 passaram (3 execuções seguidas) |
+| `npm run typecheck`, `format:check`, `build` | ok |
+| `docker compose --profile api up --build` + `GET /health` | ok (migrou, semeou, respondeu) |
+| Godot unitários (`test_runner.tscn`) | 17/17 |
+| Godot integração com API local (`IMPERIO_TEST_API=1`) | 28/28 (convidado, compra, recusa sem saldo, coleta antecipada recusada, reconexão na mesma conta, cena principal com saldo do servidor) |
+| Captura real do jogo (`--write-movie`) | cidade, saldo, painel de compra e negócio comprado com ciclo renderizados |
+| Export Android debug | APK 54 MB, `br.com.imperiodebolso.game`, targetSdk 36, arm64+x86_64 |
+
+### Não validado
+- **Instalação do APK** em aparelho/emulador (nenhum disponível ainda). Em Android a URL da
+  API aponta para `10.0.2.2` (emulador); HTTP sem TLS pode exigir ajuste de *cleartext* no manifesto.
+- **iOS**: export/Xcode não testado — falta conectar a conta Apple no Xcode (Team ID).
+- **CI**: workflow escrito, mas só roda depois do primeiro push.
+- Toque real em tela (testado com mouse emulando toque).
+
+### Bloqueios (dependem do titular)
+1. ~~Higgsfield sem créditos~~ — resolvido pela API (ver seção do piloto de arte acima).
+2. Conta Apple no Xcode (Settings → Accounts) para o build iOS.
+3. Autorização para commit/push e criação da branch `develop` no GitHub.
+
+### Próxima etapa
+Etapa 2: gerentes + ganhos offline até 4h com testes de relógio adulterado; tutorial;
+rate limiting. Em paralelo, quando houver créditos: piloto de arte Higgsfield integrado no Godot.

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "g_characters2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Using the exact character art style of this family-friendly mobile game image (cute chibi cartoon people, big heads, glossy, saturated colors), draw a character sheet of 6 different cute chibi characters standing in a single row, evenly spaced with wide white space between them, full body, fully clothed in casual summer clothes: a street vendor with a yellow cap and apron, a woman in a colorful summer dress and sun hat, a boy in a t-shirt and shorts holding a beach ball, a grandma with sunglasses and a floral shirt, a tourist with a camera and backpack, a kid in a t-shirt holding an ice cream cone. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png"
+      ],
+      "quality": "medium",
+      "resolution": "2k",
+      "aspect_ratio": "16:9"
+    }
+  }
+]

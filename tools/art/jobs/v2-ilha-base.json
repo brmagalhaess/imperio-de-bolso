@@ -1,0 +1,14 @@
+[
+  {
+    "id": "island_base",
+    "model": "ideogram/v4.0",
+    "variations": 3,
+    "input": {
+      "prompt": "The same tropical sand island diorama and turquoise sea as the reference image, same camera and same glossy cartoon art style, but completely EMPTY: remove every cart, kiosk, hut, person, umbrella, sign, padlock, coin bubble, number and all user interface. Keep only the golden sand island with soft shore waves, lush palm trees and tropical bushes around the outer edges, a few rocks, and a winding wooden boardwalk path across the sand connecting four flat open sandy spots where shops will be placed later. The center of the island is open and uncluttered. No text, no letters, no UI, no logo, no watermark.",
+      "image_url": "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+      "image_weight": 55,
+      "aspect_ratio": "9:16",
+      "rendering_speed": "DEFAULT"
+    }
+  }
+]

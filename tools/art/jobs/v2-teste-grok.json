@@ -1,0 +1,30 @@
+[
+  {
+    "id": "g_island_base",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Edit this image: remove ALL the user interface (top bar, coin counters, title, bottom buttons), remove every cart, kiosk, hut, stall, person, umbrella, towel, sign, padlock, coin bubble and number. Keep exactly the same camera, the same sand island shape, turquoise sea with shore waves, palm trees, bushes and rocks around the edges, and the wooden boardwalk path, in exactly the same art style. Fill the removed areas with clean matching sand. The result is an empty beach island ready for buildings. No text anywhere.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png"
+      ],
+      "quality": "medium",
+      "resolution": "2k",
+      "aspect_ratio": "9:16"
+    }
+  },
+  {
+    "id": "g_water_cart_lv1",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Using the exact art style of this mobile game image (glossy cartoon, saturated colors, chunky rounded shapes, soft outlines, same isometric camera), draw ONLY the water vendor cart with the red and white striped parasol as a single isolated game asset: a cute small wooden pushcart with a cooler full of water bottles. Centered, fully visible with margin, on a plain solid pure white background. No people, no sand, no ground, no shadow, no sign, no text, no letters, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  }
+]
