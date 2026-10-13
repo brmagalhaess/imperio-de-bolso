@@ -48,7 +48,8 @@ estrito em `/auth/guest`), corpo máximo de 16 KB, logs sem corpo/query/Authoriz
   `nginx-proxy` (jwilder) com o `letsencrypt-nginx-proxy-companion`. A API e o admin entram na
   rede `nginx-proxy` com `VIRTUAL_HOST`/`LETSENCRYPT_HOST` e ganham HTTPS automaticamente.
   DNS: curinga `*.crowntech.com.br` → 169.58.235.246 (Cloudflare, sem proxy).
-- Domínios: `api-imperio.crowntech.com.br` (jogo Android) e `admin-imperio.crowntech.com.br`.
+- Domínios: `api-imperio.crowntech.com.br` (jogo), `admin-imperio.crowntech.com.br` (painel) e
+  `imperio.crowntech.com.br` (site + políticas; dados da empresa como build args no compose).
 
 ## Backups (plano §24)
 

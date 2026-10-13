@@ -77,6 +77,28 @@ services:
       - default
       - proxy
 
+  # Site do jogo (landing + políticas das lojas). Dados da empresa são públicos (CNPJ).
+  landing:
+    build:
+      context: ../landing
+      args:
+        SITE_LEGAL_NAME: ${SITE_LEGAL_NAME:-CROWN TECH LTDA}
+        SITE_CNPJ: ${SITE_CNPJ:-65.586.793/0001-18}
+        SITE_CITY: ${SITE_CITY:-Maricá/RJ}
+        SITE_EMAIL: ${SITE_EMAIL:-suporte-imperio@crowntech.com.br}
+        SITE_GOOGLE_PLAY_URL: ${SITE_GOOGLE_PLAY_URL:-}
+        SITE_APP_STORE_URL: ${SITE_APP_STORE_URL:-}
+    restart: unless-stopped
+    environment:
+      VIRTUAL_HOST: ${LANDING_DOMAIN:-imperio.crowntech.com.br}
+      VIRTUAL_PORT: "80"
+      LETSENCRYPT_HOST: ${LANDING_DOMAIN:-imperio.crowntech.com.br}
+    expose:
+      - "80"
+    networks:
+      - default
+      - proxy
+
   backup:
     build:
       context: ./backup
