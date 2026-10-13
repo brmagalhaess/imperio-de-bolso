@@ -1,39 +1,34 @@
 ## Interface no estilo do mockup B (docs/ADRs/0004-direcao-visual-v2.md): cartão do topo com
 ## avatar e saldo, renda por segundo, barra inferior Construir/Loja/Mapa/Perfil, painel do
-## negócio selecionado, listas e telas de carregamento/erro. Textos via tr() para i18n.
+## negócio selecionado, menus modais e telas de carregamento/erro. Textos via tr() para i18n.
 extends Control
 
 signal retry_requested
 signal business_requested(slug: String)
+signal district_requested(id: String)
 
 const Fmt := preload("res://scripts/fmt.gd")
 const Layout := preload("res://scripts/layout.gd")
 const UiFont := preload("res://scripts/ui_font.gd")
-
-const CREAM := Color("fff6e3")
-const CREAM_DARK := Color("f1e2c2")
-const TEAL := Color("0f8f8a")
-const TEAL_DARK := Color("0b5f5c")
-const INK := Color("3a2a14")
-const GREEN := Color("37c06a")
-const ORANGE := Color("ff9f1c")
-const MIN_TOUCH := 88  # px na resolução base (~48 dp)
+const Style := preload("res://scripts/ui_style.gd")
+const MenuModal := preload("res://scripts/menu_modal.gd")
 
 var slug := ""
+var current_district := "praia"
 
 var _coins_label: Label
 var _rate_label: Label
+var _district_label: Label
 var _sheet: PanelContainer
 var _title: Label
 var _info: Label
 var _progress: ProgressBar
 var _action_button: Button
 var _collect_button: Button
-var _list_panel: PanelContainer
-var _list_title: Label
-var _list_box: VBoxContainer
+var _modal: Control
 var _toast: Label
 var _toast_timer: Timer
+var _fader: ColorRect
 var _overlay: ColorRect
 var _overlay_label: Label
 var _retry_button: Button
@@ -46,8 +41,10 @@ func _ready() -> void:
 	_build_top()
 	_build_bottom_bar()
 	_build_sheet()
-	_build_list_panel()
+	_modal = MenuModal.new()
+	add_child(_modal)
 	_build_toast()
+	_build_fader()
 	_build_overlay()
 
 	GameState.state_changed.connect(_refresh)
@@ -57,7 +54,6 @@ func _ready() -> void:
 
 func show_business(new_slug: String) -> void:
 	slug = new_slug
-	_list_panel.visible = false
 	_refresh()
 
 
@@ -83,6 +79,15 @@ func show_toast(text: String) -> void:
 	_toast_timer.start(2.5)
 
 
+## Escurece (true) ou clareia (false) a tela; usado na troca de distrito.
+func fade(to_dark: bool) -> void:
+	_fader.visible = true
+	var tween := create_tween()
+	tween.tween_property(_fader, "modulate:a", 1.0 if to_dark else 0.0, 0.22)
+	await tween.finished
+	_fader.visible = to_dark
+
+
 func _process(_delta: float) -> void:
 	if _sheet.visible and slug != "":
 		_update_cycle(GameState.business(slug))
@@ -93,6 +98,7 @@ func _refresh() -> void:
 		return
 	_coins_label.text = Fmt.coins(GameState.coins())
 	_rate_label.text = Fmt.rate(GameState.income_per_second())
+	_district_label.text = Layout.title(current_district)
 
 	var b := GameState.business(slug)
 	_sheet.visible = not b.is_empty()
@@ -110,8 +116,12 @@ func _refresh() -> void:
 			_action_button.disabled = GameState.busy or not GameState.can_afford(b.nextUpgradeCost)
 	else:
 		_info.text = tr("Lucro %s a cada %s") % [Fmt.coins(b.profitPerCycle), Fmt.duration(b.cycleSeconds)]
-		_action_button.text = tr("Comprar  %s") % Fmt.coins(b.cost)
-		_action_button.disabled = GameState.busy or not GameState.can_afford(b.cost)
+		if GameState.district_unlocked(str(b.get("district", "praia"))):
+			_action_button.text = tr("Comprar  %s") % Fmt.coins(b.cost)
+			_action_button.disabled = GameState.busy or not GameState.can_afford(b.cost)
+		else:
+			_action_button.text = tr("Complete a praia")
+			_action_button.disabled = true
 	_update_cycle(b)
 
 
@@ -135,115 +145,77 @@ func _on_action_pressed() -> void:
 		return
 	if b.owned:
 		await GameState.upgrade(slug)
-	elif await GameState.purchase(slug):
-		show_toast(tr("%s é seu!") % b.name)
+		return
+	var city_was_open := GameState.district_unlocked("cidade")
+	if await GameState.purchase(slug):
+		if not city_was_open and GameState.district_unlocked("cidade"):
+			show_toast(tr("A Cidade foi liberada! Abra o Mapa."))
+		else:
+			show_toast(tr("%s é seu!") % b.name)
 
 
 func _on_collect_pressed() -> void:
 	await GameState.collect(slug)
 
 
-func _open_build_list() -> void:
-	_list_title.text = tr("Construir")
-	_clear_list()
-	for b in GameState.businesses():
-		var on_island := Layout.is_island(b.slug)
-		var status := ""
-		if not on_island:
-			status = tr("Cidade · em breve")
-		elif b.owned:
-			status = tr("Nível %d") % int(b.level)
-		else:
-			status = Fmt.coins(b.cost)
-		var row := _list_row(b.name, status, on_island)
-		if on_island:
-			row.pressed.connect(func(): business_requested.emit(b.slug))
-	_list_panel.visible = true
+func open_build_menu() -> void:
 	_sheet.visible = false
+	_modal.open(tr("Construir"))
+	for id in Layout.DISTRICT_ORDER:
+		_modal.add_section(Layout.title(id))
+		var unlocked := GameState.district_unlocked(id)
+		for b in GameState.businesses():
+			if Layout.district_of(b.slug) != id:
+				continue
+			var state := "owned" if b.owned else ("buy" if unlocked else "locked")
+			var target: String = b.slug
+			_modal.add_business(b, state, func(): business_requested.emit(target))
 
 
-func _open_map() -> void:
-	_list_title.text = tr("Mapa")
-	_clear_list()
-	_list_row(tr("Ilha da Praia"), tr("Você está aqui"), false)
-	_list_row(tr("Cidade"), tr("Chega na próxima etapa"), false)
-	_list_panel.visible = true
+func open_map_menu() -> void:
 	_sheet.visible = false
-
-
-func _clear_list() -> void:
-	for c in _list_box.get_children():
-		c.queue_free()
-
-
-func _list_row(name_text: String, status: String, enabled: bool) -> Button:
-	var b := Button.new()
-	b.custom_minimum_size.y = 76
-	b.disabled = not enabled
-	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	b.text = "  %s   ·   %s" % [name_text, status]
-	b.add_theme_stylebox_override("normal", _box(CREAM_DARK, 22))
-	b.add_theme_stylebox_override("hover", _box(CREAM_DARK, 22))
-	b.add_theme_stylebox_override("pressed", _box(Color("e6d0a4"), 22))
-	b.add_theme_stylebox_override("disabled", _box(Color(0.93, 0.89, 0.8, 0.6), 22))
-	b.add_theme_color_override("font_color", INK)
-	b.add_theme_color_override("font_disabled_color", Color(INK, 0.55))
-	b.add_theme_font_size_override("font_size", 28)
-	_list_box.add_child(b)
-	return b
+	_modal.open(tr("Mapa"))
+	for id in Layout.DISTRICT_ORDER:
+		var unlocked := GameState.district_unlocked(id)
+		var total := 0
+		var owned := 0
+		for b in GameState.businesses():
+			if Layout.district_of(b.slug) == id:
+				total += 1
+				owned += 1 if b.owned else 0
+		var status := tr("%d de %d negócios") % [owned, total]
+		if id == current_district:
+			status = tr("Você está aqui · ") + status
+		elif not unlocked:
+			status = tr("Compre os 4 negócios da praia")
+		var target: String = id
+		_modal.add_district(id, status, id == current_district, unlocked,
+				func(): district_requested.emit(target))
 
 
 # --- Construção da interface -------------------------------------------------
-
-func _box(color: Color, radius: int, border := Color.TRANSPARENT, border_w := 0) -> StyleBoxFlat:
-	var s := StyleBoxFlat.new()
-	s.bg_color = color
-	s.set_corner_radius_all(radius)
-	s.set_content_margin_all(16)
-	if border_w > 0:
-		s.border_color = border
-		s.set_border_width_all(border_w)
-	s.shadow_color = Color(0, 0, 0, 0.18)
-	s.shadow_size = 6
-	s.shadow_offset = Vector2(0, 4)
-	return s
-
 
 func _build_theme() -> Theme:
 	var t := Theme.new()
 	t.default_font = UiFont.bold()
 	t.default_font_size = 30
-	t.set_color("font_color", "Label", INK)
-	t.set_stylebox("panel", "PanelContainer", _box(CREAM, 36, TEAL, 5))
-
-	var normal := _box(GREEN, 26, Color("1f8c48"), 4)
-	normal.shadow_size = 0
-	normal.border_width_top = 0
-	normal.border_width_left = 0
-	normal.border_width_right = 0
-	normal.border_width_bottom = 7
-	var pressed := normal.duplicate()
-	pressed.bg_color = Color("2ea95c")
-	pressed.border_width_bottom = 2
-	var disabled := normal.duplicate()
-	disabled.bg_color = Color("c9bfae")
-	disabled.border_color = Color("a99f8e")
-	t.set_stylebox("normal", "Button", normal)
-	t.set_stylebox("hover", "Button", normal)
-	t.set_stylebox("pressed", "Button", pressed)
-	t.set_stylebox("disabled", "Button", disabled)
+	t.set_color("font_color", "Label", Style.INK)
+	t.set_stylebox("panel", "PanelContainer", Style.box(Style.CREAM, 36, Style.TEAL, 5))
+	t.set_stylebox("normal", "Button", Style.toy_button(Style.GREEN, Style.GREEN_DARK))
+	t.set_stylebox("hover", "Button", Style.toy_button(Style.GREEN.lightened(0.05), Style.GREEN_DARK))
+	t.set_stylebox("pressed", "Button", Style.toy_button(Style.GREEN, Style.GREEN_DARK, 26, true))
+	t.set_stylebox("disabled", "Button", Style.toy_button(Style.GREY, Style.GREY_DARK))
 	t.set_stylebox("focus", "Button", StyleBoxEmpty.new())
-	t.set_color("font_color", "Button", Color.WHITE)
-	t.set_color("font_pressed_color", "Button", Color.WHITE)
-	t.set_color("font_hover_color", "Button", Color.WHITE)
-	t.set_color("font_disabled_color", "Button", Color(1, 1, 1, 0.85))
+	for c in ["font_color", "font_pressed_color", "font_hover_color", "font_focus_color"]:
+		t.set_color(c, "Button", Color.WHITE)
+	t.set_color("font_disabled_color", "Button", Color(1, 1, 1, 0.9))
 	t.set_color("font_outline_color", "Button", Color(0, 0, 0, 0.25))
 	t.set_constant("outline_size", "Button", 4)
 
-	var bar_bg := _box(Color(0, 0, 0, 0.18), 12)
-	bar_bg.shadow_size = 0
-	var bar_fill := _box(Color("ffd34d"), 12)
-	bar_fill.shadow_size = 0
+	var bar_bg := Style.box(Color(0, 0, 0, 0.18), 12, Color.TRANSPARENT, 0, false)
+	var bar_fill := Style.box(Color("ffd34d"), 12, Color.TRANSPARENT, 0, false)
+	bar_bg.set_content_margin_all(0)
+	bar_fill.set_content_margin_all(0)
 	t.set_stylebox("background", "ProgressBar", bar_bg)
 	t.set_stylebox("fill", "ProgressBar", bar_fill)
 	return t
@@ -281,13 +253,20 @@ func _build_top() -> void:
 	avatar.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	avatar.custom_minimum_size = Vector2(72, 72)
 	row.add_child(avatar)
+	var titles := VBoxContainer.new()
+	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	titles.alignment = BoxContainer.ALIGNMENT_CENTER
+	titles.add_theme_constant_override("separation", -6)
+	row.add_child(titles)
 	var title := Label.new()
 	title.text = tr("Império de Bolso")
-	title.add_theme_font_size_override("font_size", 38)
-	title.add_theme_color_override("font_color", TEAL_DARK)
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	row.add_child(title)
+	title.add_theme_font_size_override("font_size", 36)
+	title.add_theme_color_override("font_color", Style.TEAL_DARK)
+	titles.add_child(title)
+	_district_label = Label.new()
+	_district_label.add_theme_font_size_override("font_size", 22)
+	_district_label.add_theme_color_override("font_color", Style.INK_SOFT)
+	titles.add_child(_district_label)
 	row.add_child(_icon_button("icon_help", 68, func(): show_toast(
 			tr("Compre negócios, toque na moeda para coletar e melhore para lucrar mais!"))))
 	row.add_child(_icon_button("icon_settings", 68, func(): show_toast(tr("Configurações em breve"))))
@@ -306,8 +285,8 @@ func _build_top() -> void:
 
 func _money_pill(is_coins: bool) -> PanelContainer:
 	var pill := PanelContainer.new()
-	pill.add_theme_stylebox_override("panel", _box(CREAM if is_coins else Color("d9f7c8"), 32,
-			ORANGE if is_coins else GREEN, 4))
+	pill.add_theme_stylebox_override("panel", Style.box(Style.CREAM if is_coins else Color("d9f7c8"), 32,
+			Style.ORANGE if is_coins else Style.GREEN, 4))
 	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
@@ -342,9 +321,9 @@ func _build_bottom_bar() -> void:
 	row.add_theme_constant_override("separation", 18)
 	bar.add_child(row)
 	for item in [
-		["icon_build", tr("Construir"), _open_build_list],
+		["icon_build", tr("Construir"), open_build_menu],
 		["icon_shop", tr("Loja"), func(): show_toast(tr("Loja em breve"))],
-		["icon_map", tr("Mapa"), _open_map],
+		["icon_map", tr("Mapa"), open_map_menu],
 		["icon_profile", tr("Perfil"), func(): show_toast(tr("Perfil em breve"))],
 	]:
 		var col := VBoxContainer.new()
@@ -357,7 +336,7 @@ func _build_bottom_bar() -> void:
 		var label := Label.new()
 		label.text = item[1]
 		label.add_theme_font_size_override("font_size", 24)
-		label.add_theme_color_override("font_color", TEAL_DARK)
+		label.add_theme_color_override("font_color", Style.TEAL_DARK)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		col.add_child(label)
 
@@ -377,17 +356,10 @@ func _build_sheet() -> void:
 	col.add_child(head)
 	_title = Label.new()
 	_title.add_theme_font_size_override("font_size", 38)
-	_title.add_theme_color_override("font_color", TEAL_DARK)
+	_title.add_theme_color_override("font_color", Style.TEAL_DARK)
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(_title)
-	var close := Button.new()
-	close.text = "✕"
-	close.custom_minimum_size = Vector2(64, 64)
-	close.add_theme_stylebox_override("normal", _box(Color("ff6b6b"), 32))
-	close.add_theme_stylebox_override("hover", _box(Color("ff6b6b"), 32))
-	close.add_theme_stylebox_override("pressed", _box(Color("e85555"), 32))
-	close.pressed.connect(func(): _sheet.visible = false)
-	head.add_child(close)
+	head.add_child(Style.close_button(func(): _sheet.visible = false))
 
 	_info = Label.new()
 	_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -403,61 +375,18 @@ func _build_sheet() -> void:
 	buttons.add_theme_constant_override("separation", 14)
 	col.add_child(buttons)
 	_collect_button = _make_button(buttons, _on_collect_pressed)
-	_collect_button.add_theme_stylebox_override("normal", _orange_box())
-	_collect_button.add_theme_stylebox_override("hover", _orange_box())
+	Style.style_button(_collect_button, Style.ORANGE, Style.ORANGE_DARK)
 	_action_button = _make_button(buttons, _on_action_pressed)
-
-
-func _orange_box() -> StyleBoxFlat:
-	var s := _box(ORANGE, 26, Color("c46f00"), 0)
-	s.shadow_size = 0
-	s.border_color = Color("c46f00")
-	s.border_width_bottom = 7
-	return s
 
 
 func _make_button(parent: Control, handler: Callable) -> Button:
 	var b := Button.new()
-	b.custom_minimum_size.y = MIN_TOUCH
+	b.custom_minimum_size.y = Style.MIN_TOUCH
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b.add_theme_font_size_override("font_size", 32)
 	b.pressed.connect(handler)
 	parent.add_child(b)
 	return b
-
-
-func _build_list_panel() -> void:
-	_list_panel = PanelContainer.new()
-	_list_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE, Control.PRESET_MODE_MINSIZE, 20)
-	_list_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_list_panel.offset_bottom = -200
-	_list_panel.visible = false
-	add_child(_list_panel)
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 10)
-	_list_panel.add_child(col)
-	var head := HBoxContainer.new()
-	col.add_child(head)
-	_list_title = Label.new()
-	_list_title.add_theme_font_size_override("font_size", 38)
-	_list_title.add_theme_color_override("font_color", TEAL_DARK)
-	_list_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(_list_title)
-	var close := Button.new()
-	close.text = "✕"
-	close.custom_minimum_size = Vector2(64, 64)
-	close.add_theme_stylebox_override("normal", _box(Color("ff6b6b"), 32))
-	close.add_theme_stylebox_override("hover", _box(Color("ff6b6b"), 32))
-	close.pressed.connect(func(): _list_panel.visible = false)
-	head.add_child(close)
-	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size.y = 560
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	col.add_child(scroll)
-	_list_box = VBoxContainer.new()
-	_list_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_list_box.add_theme_constant_override("separation", 10)
-	scroll.add_child(_list_box)
 
 
 func _build_toast() -> void:
@@ -469,7 +398,7 @@ func _build_toast() -> void:
 	_toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_toast.add_theme_color_override("font_color", Color.WHITE)
-	_toast.add_theme_color_override("font_outline_color", TEAL_DARK)
+	_toast.add_theme_color_override("font_outline_color", Style.TEAL_DARK)
 	_toast.add_theme_constant_override("outline_size", 12)
 	_toast.visible = false
 	add_child(_toast)
@@ -477,6 +406,15 @@ func _build_toast() -> void:
 	_toast_timer.one_shot = true
 	_toast_timer.timeout.connect(func(): _toast.visible = false)
 	add_child(_toast_timer)
+
+
+func _build_fader() -> void:
+	_fader = ColorRect.new()
+	_fader.color = Color("0c6f6b")
+	_fader.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_fader.modulate.a = 0.0
+	_fader.visible = false
+	add_child(_fader)
 
 
 func _build_overlay() -> void:
@@ -508,6 +446,6 @@ func _build_overlay() -> void:
 	box.add_child(_overlay_label)
 	_retry_button = Button.new()
 	_retry_button.text = tr("Tentar novamente")
-	_retry_button.custom_minimum_size = Vector2(360, MIN_TOUCH)
+	_retry_button.custom_minimum_size = Vector2(360, Style.MIN_TOUCH)
 	_retry_button.pressed.connect(func(): retry_requested.emit())
 	box.add_child(_retry_button)

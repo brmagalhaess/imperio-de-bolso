@@ -12,7 +12,10 @@ Segue `docs/GUIA_ARTE_HIGGSFIELD.md`. Nenhuma geração paga sem autorização d
 5. **Escolher** a variação em `tools/art/process_assets.py` e rodar
    `python3 tools/art/process_assets.py` → `game/assets/optimized/` (fundo removido, recorte,
    2× o tamanho de exibição; texturas viram losangos 2:1).
-6. **Integrar e testar** no Godot (`scripts/city.gd`), capturar tela real e atualizar
+6. **Catálogo:** `python3 tools/art/build_catalog.py` regera `docs/ASSET_CATALOG.csv` a partir
+   do log e do mapeamento do passo 5. Para reusar uma imagem como referência:
+   `sh tools/art/hf_url.sh <tag>` imprime o link (válido ~7 dias).
+7. **Integrar e testar** no Godot (`scripts/city.gd`), capturar tela real e atualizar
    `docs/ASSET_CATALOG.csv` e `docs/IMPLEMENTATION_STATUS.md`.
 
 Modelo padrão (direção v2): `xai/grok-imagine-image-2.0` em modo edição — `image_urls` com o

@@ -306,3 +306,41 @@ describe("barreiras no banco", () => {
     await expect(setCoins(ctx.db, guest.playerId, -1n)).rejects.toThrow();
   });
 });
+
+describe("distritos", () => {
+  it("cidade começa bloqueada e o estado informa os distritos", async () => {
+    const guest = await newGuest(ctx.app);
+    const state = (await get(ctx.app, guest, "/player/state")).json();
+    expect(state.districts).toEqual([
+      { id: "praia", unlocked: true, requires: null },
+      { id: "cidade", unlocked: false, requires: "praia" },
+    ]);
+    expect(state.businesses.find((b: { slug: string }) => b.slug === "mercadinho").district).toBe(
+      "cidade",
+    );
+  });
+
+  it("não deixa comprar na cidade antes de completar a praia, mesmo com saldo", async () => {
+    const guest = await newGuest(ctx.app);
+    await setCoins(ctx.db, guest.playerId, 100_000n);
+    const res = await post(ctx.app, guest, "/businesses/purchase", { businessSlug: "mercadinho" });
+    expect(res.statusCode).toBe(409);
+    expect(res.json().error).toMatchObject({
+      code: "DISTRICT_LOCKED",
+      details: { district: "cidade", requires: "praia" },
+    });
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(100_000n);
+  });
+
+  it("com os 4 negócios da praia a cidade libera e a compra passa", async () => {
+    const guest = await newGuest(ctx.app);
+    await setCoins(ctx.db, guest.playerId, 100_000n);
+    for (const slug of ["agua", "pipoca", "sorveteria", "quiosque_coco"]) {
+      const r = await post(ctx.app, guest, "/businesses/purchase", { businessSlug: slug });
+      expect(r.statusCode).toBe(201);
+    }
+    const res = await post(ctx.app, guest, "/businesses/purchase", { businessSlug: "mercadinho" });
+    expect(res.statusCode).toBe(201);
+    expect(res.json().state.districts[1]).toMatchObject({ id: "cidade", unlocked: true });
+  });
+});

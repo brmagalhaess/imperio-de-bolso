@@ -6,7 +6,7 @@
 - Sprites: remove o fundo claro ligado às bordas (flood fill com tolerância),
   suaviza a borda, recorta e redimensiona.
 - Folhas (personagens, ícones): remove o fundo e separa cada item pelos vãos vazios.
-- Cenário: a ilha vira o fundo da tela em 1080×1920 (JPEG).
+- Cenários (ilha, cidade): viram o fundo da tela em 1080×1920 (JPEG).
 
 Originais ficam em game/assets/source/ (intocados); saídas em game/assets/optimized/.
 Sprites ficam em 2× o tamanho de exibição na resolução base 720×1280.
@@ -37,6 +37,25 @@ SPRITES = {
     "coconut_kiosk_lv2": ("g_coconut_kiosk_lv2/g_coconut_kiosk_lv2_v01.jpeg", {"width": 280}),
     "coconut_kiosk_lv3": ("g_coconut_kiosk_lv3/g_coconut_kiosk_lv3_v01.jpeg", {"width": 310}),
     "lot_lock": ("g_lot_lock/g_lot_lock_v01.jpeg", {"width": 130}),
+    # Cidade-maquete (mockup D)
+    "market_lv1": ("g_market_lv1/g_market_lv1_v01.jpeg", {"width": 280}),
+    "market_lv2": ("g_market_lv2/g_market_lv2_v01.jpeg", {"width": 290}),
+    "market_lv3": ("g_market_lv3_r2/g_market_lv3_r2_v01.jpeg", {"width": 300}),
+    "restaurant_lv1": ("g_restaurant_lv1_r2/g_restaurant_lv1_r2_v01.jpeg", {"width": 280}),
+    "restaurant_lv2": ("g_restaurant_lv2/g_restaurant_lv2_v01.jpeg", {"width": 290}),
+    "restaurant_lv3": ("g_restaurant_lv3/g_restaurant_lv3_v01.jpeg", {"width": 300}),
+    "supermarket_lv1": ("g_supermarket_lv1/g_supermarket_lv1_v01.jpeg", {"width": 280}),
+    "supermarket_lv2": ("g_supermarket_lv2_r2/g_supermarket_lv2_r2_v01.jpeg", {"width": 290}),
+    "supermarket_lv3": ("g_supermarket_lv3/g_supermarket_lv3_v01.jpeg", {"width": 310}),
+    "gym_lv1": ("g_gym_lv1/g_gym_lv1_v01.jpeg", {"width": 280}),
+    "gym_lv2": ("g_gym_lv2/g_gym_lv2_v01.jpeg", {"width": 290}),
+    "gym_lv3": ("g_gym_lv3/g_gym_lv3_v01.jpeg", {"width": 310}),
+    "hotel_lv1": ("g_hotel_lv1_r2/g_hotel_lv1_r2_v01.jpeg", {"width": 270}),
+    "hotel_lv2": ("g_hotel_lv2/g_hotel_lv2_v01.jpeg", {"width": 280}),
+    "hotel_lv3": ("g_hotel_lv3/g_hotel_lv3_v01.jpeg", {"width": 290}),
+    "mall_lv1": ("g_mall_lv1_r2/g_mall_lv1_r2_v01.jpeg", {"width": 290}),
+    "mall_lv2": ("g_mall_lv2/g_mall_lv2_v01.jpeg", {"width": 300}),
+    "mall_lv3": ("g_mall_lv3/g_mall_lv3_v01.jpeg", {"width": 320}),
     "beach_umbrella": ("g_beach_umbrella/g_beach_umbrella_v01.jpeg", {"width": 150}),
 }
 
@@ -54,7 +73,10 @@ SHEETS = {
 }
 SHEET_OVERRIDES = {"icon_coin": {"width": 96}}
 
-ISLAND = ("g_island_base/g_island_base_v01.png", (1080, 1920))
+SCENES = {
+    "island_base": ("g_island_base/g_island_base_v01.png", (1080, 1920)),
+    "city_base": ("g_city_base/g_city_base_v01.png", (1080, 1920)),
+}
 
 BG_TOLERANCE = 30  # distância máxima de cor até o fundo (0–441)
 
@@ -162,10 +184,10 @@ def main() -> None:
             out.save(OUT / f"{name}.png", optimize=True)
             print(f"folha  {name}: {out.size[0]}×{out.size[1]}")
 
-    rel, size = ISLAND
-    island = Image.open(SRC / rel).convert("RGB").resize(size, Image.LANCZOS)
-    island.save(OUT / "island_base.jpg", quality=88, optimize=True)
-    print(f"cena   island_base: {size[0]}×{size[1]}")
+    for name, (rel, size) in SCENES.items():
+        scene = Image.open(SRC / rel).convert("RGB").resize(size, Image.LANCZOS)
+        scene.save(OUT / f"{name}.jpg", quality=88, optimize=True)
+        print(f"cena   {name}: {size[0]}×{size[1]}")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
-## Ilha da Praia: fundo, lotes, decoração e clientes, com ordem de pintura por altura (y-sort).
-## Toque na bolha de moeda coleta; toque no lote abre o painel do negócio.
+## Um distrito do mapa (Ilha da Praia, Cidade): cenário, lotes, decoração e pessoas, com
+## ordem de pintura por altura (y-sort). Toque na moeda coleta; toque no lote abre o painel.
 extends Node2D
 
 signal lot_selected(slug: String)
@@ -12,22 +12,32 @@ const Fmt := preload("res://scripts/fmt.gd")
 
 const TAP_MAX_DRAG := 16.0
 
+var district := ""
+var config: Dictionary
 var lots := {}  # slug → BusinessLot
-var selected_slug := ""
 var _sorted: Node2D
+var _vendor: Sprite2D
 var _press_pos := Vector2.ZERO
 
 
+func _init(p_district: String) -> void:
+	district = p_district
+	name = p_district.capitalize()
+	config = Layout.DISTRICTS[p_district]
+
+
 func _ready() -> void:
-	var sea := ColorRect.new()
-	sea.color = Layout.SEA_COLOR
-	sea.position = Vector2(-1000, -1000)
-	sea.size = Vector2(2720, 3280)
-	sea.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(sea)
+	# Cores do cenário estendidas para telas mais altas que 9:16.
+	for half in [[config.top_color, -1000.0], [config.bottom_color, 640.0]]:
+		var fill := ColorRect.new()
+		fill.color = half[0]
+		fill.position = Vector2(-1000, half[1])
+		fill.size = Vector2(2720, 1640)
+		fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(fill)
 
 	var bg := Sprite2D.new()
-	bg.texture = load("res://assets/optimized/island_base.jpg")
+	bg.texture = load("res://assets/optimized/%s" % config.base)
 	bg.centered = false
 	bg.scale = Vector2(720, 1280) / bg.texture.get_size()
 	add_child(bg)
@@ -36,7 +46,7 @@ func _ready() -> void:
 	_sorted.y_sort_enabled = true
 	add_child(_sorted)
 
-	for d in Layout.DECOR:
+	for d in config.decor:
 		var s := Sprite2D.new()
 		s.texture = Layout.texture(d[0])
 		s.scale = Vector2.ONE * Layout.ART_SCALE
@@ -44,45 +54,44 @@ func _ready() -> void:
 		s.position = d[1]
 		_sorted.add_child(s)
 
-	for slug in Layout.ISLAND_LOTS:
+	for slug in config.lots:
 		var lot := BusinessLot.new(slug)
-		lot.position = Layout.ISLAND_LOTS[slug]
+		lot.position = config.lots[slug]
 		_sorted.add_child(lot)
 		lots[slug] = lot
 
-	for i in Layout.WALKERS.size():
-		_sorted.add_child(Walker.new(Layout.WALKERS[i], Layout.WAYPOINTS[i * 2 % Layout.WAYPOINTS.size()]))
+	for i in config.walkers.size():
+		_sorted.add_child(Walker.new(config.walkers[i], config.waypoints, i * 2, config.char_scale))
 
-	# Vendedor fixo ao lado do carrinho de água (aparece quando comprado).
-	var vendor := Sprite2D.new()
-	vendor.name = "Vendor"
-	vendor.texture = Layout.texture("char_vendor")
-	vendor.scale = Vector2.ONE * Layout.CHAR_SCALE
-	vendor.offset = Vector2(0, -vendor.texture.get_height() / 2.0)
-	vendor.position = Layout.ISLAND_LOTS["agua"] + Vector2(-78, 16)
-	vendor.visible = false
-	_sorted.add_child(vendor)
-
-	var camera: Camera2D = get_node_or_null("../Camera2D")
-	if camera:
-		camera.position = Layout.CAMERA_CENTER
-		camera.zoom = Vector2.ONE * Layout.CAMERA_ZOOM
+	if not config.vendor.is_empty():
+		_vendor = Sprite2D.new()
+		_vendor.texture = Layout.texture("char_vendor")
+		_vendor.scale = Vector2.ONE * config.char_scale
+		_vendor.offset = Vector2(0, -_vendor.texture.get_height() / 2.0)
+		_vendor.position = config.lots[config.vendor[0]] + config.vendor[1]
+		_vendor.visible = false
+		_sorted.add_child(_vendor)
 
 	GameState.state_changed.connect(_sync)
 	GameState.collected.connect(_on_collected)
 	_sync()
 
 
+## Posiciona a câmera para enquadrar este distrito.
+func frame(camera: Camera2D) -> void:
+	camera.position = config.camera_center
+	camera.zoom = Vector2.ONE * config.zoom
+
+
 func _sync() -> void:
 	for b in GameState.businesses():
 		if lots.has(b.slug):
 			lots[b.slug].update_from(b)
-	var agua := GameState.business("agua")
-	_sorted.get_node("Vendor").visible = agua.get("owned", false)
+	if _vendor:
+		_vendor.visible = GameState.business(config.vendor[0]).get("owned", false)
 
 
 func select(slug: String) -> void:
-	selected_slug = slug
 	for s in lots:
 		lots[s].selected = s == slug
 	lot_selected.emit(slug)
@@ -96,6 +105,8 @@ func _on_collected(items: Array) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not is_visible_in_tree():
+		return
 	if event is InputEventScreenTouch:
 		if event.pressed:
 			_press_pos = event.position

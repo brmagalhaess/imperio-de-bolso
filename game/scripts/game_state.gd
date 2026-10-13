@@ -20,6 +20,7 @@ const MESSAGES := {
 	"NETWORK_ERROR": "Sem conexão com o servidor.",
 	"UNAUTHORIZED": "Sessão expirada. Tentando reconectar…",
 	"COMING_SOON": "Em breve!",
+	"DISTRICT_LOCKED": "Compre os 4 negócios da praia para abrir a cidade.",
 }
 
 var state: Dictionary = {}
@@ -95,6 +96,14 @@ func cycle_progress(b: Dictionary) -> float:
 	if not b.get("owned", false):
 		return 0.0
 	return clamp(1.0 - seconds_remaining(b) / total, 0.0, 1.0)
+
+
+## true se o servidor já liberou o distrito (todos os negócios do anterior comprados).
+func district_unlocked(id: String) -> bool:
+	for d in state.get("districts", []):
+		if d.id == id:
+			return d.unlocked
+	return id == "praia"
 
 
 ## Renda potencial por segundo dos negócios comprados (lucro do ciclo ÷ duração).

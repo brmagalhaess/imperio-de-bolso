@@ -1,3 +1,5 @@
+import type { District } from "./districts.js";
+
 // Catálogo inicial (docs/README.md §6). Valores de nível 1; balanceamento futuro
 // altera estes números e roda o seed novamente — o banco é a fonte em runtime.
 // No MVP, "Lucro/ciclo" da documentação = receita, com custo operacional zero.
@@ -6,6 +8,7 @@ export interface BusinessSeed {
   slug: string;
   name: string;
   sortOrder: number;
+  district: District;
   cost: bigint;
   revenue: bigint;
   operatingCost: bigint;
@@ -31,6 +34,7 @@ export const BUSINESS_CATALOG: readonly BusinessSeed[] = [
   slug: slug as string,
   name: name as string,
   sortOrder: i + 1,
+  district: i < 4 ? "praia" : "cidade",
   cost: cost as bigint,
   revenue: revenue as bigint,
   operatingCost: 0n,

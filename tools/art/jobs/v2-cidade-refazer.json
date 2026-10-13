@@ -1,0 +1,73 @@
+[
+  {
+    "id": "g_market_lv3_r2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines). Draw a clearly BIGGER and more modern level 3 version of this grocery store: a wide two-story modern neighborhood market with large glass storefront windows, a flat roof with a green rooftop garden, two long striped awnings, shopping carts and fruit stands at the entrance, keeping the same blue, yellow and red color palette. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/5610e260-3090-4e3f-95c4-a48575f433aa.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_restaurant_lv1_r2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines). Draw a SMALLER and simpler level 1 version of this restaurant: a small one-story cozy restaurant with the same yellow walls and red awning, a single small outdoor table with an umbrella, no terrace and no second floor, no fruit crates. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/62906b44-f67d-447c-bd25-af571d408a81.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_supermarket_lv2_r2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines). Draw the middle level 2 version between these two supermarkets: a wider one-and-a-half-story green and white supermarket with a flat roof, big glass entrance doors, a row of shopping carts, solar panels on the roof and a small loading dock, no clay tile roof. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/52b46d09-6710-4b3e-bea5-0d913310e1a1.jpeg",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/185b6857-5b44-4f16-862b-e2ad6d99d081.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_hotel_lv1_r2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines). Draw a SMALLER and simpler level 1 version of this hotel: a charming two-story pastel pink beach guesthouse (pousada) with small balconies, a clay tile roof and one palm tree, no pool, no fruit crates. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/2f8f09a3-b44f-4d4d-80b0-5125dcb2b770.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_mall_lv1_r2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines). Draw a SMALLER and simpler level 1 version of this shopping mall: a one-story long shopping gallery with three small colorful shop fronts side by side, each with its own little awning, flat roof, no glass atrium, no fruit crates. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/e654a2d3-0048-4d10-95ec-9ff4c424fc2f.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  }
+]

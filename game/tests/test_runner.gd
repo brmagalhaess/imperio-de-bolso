@@ -50,23 +50,29 @@ func _unit_tests() -> void:
 	check(Layout.visual_tier(1) == 1 and Layout.visual_tier(9) == 1, "arte nível 1 (1–9)")
 	check(Layout.visual_tier(10) == 2 and Layout.visual_tier(24) == 2, "arte nível 2 (10–24)")
 	check(Layout.visual_tier(25) == 3 and Layout.visual_tier(100) == 3, "arte nível 3 (25+)")
-	check(Layout.ISLAND_LOTS.size() == 4, "4 lotes na ilha")
+	var praia: Dictionary = Layout.DISTRICTS.praia.lots
+	var cidade: Dictionary = Layout.DISTRICTS.cidade.lots
+	check(praia.size() == 4 and cidade.size() == 6, "4 lotes na praia e 6 na cidade")
+	check(Layout.district_of("agua") == "praia" and Layout.district_of("shopping") == "cidade",
+			"distrito de cada negócio")
 	var all_art := true
-	for slug in Layout.ISLAND_LOTS:
+	for slug in Layout.BUSINESS_ART:
 		for level in [1, 10, 25]:
 			all_art = all_art and ResourceLoader.exists(Layout.art_path(slug, level))
-	check(all_art, "arte dos 3 níveis existe para os 4 negócios da ilha")
-	check(Layout.art_path("shopping", 1) == "", "negócio da cidade ainda sem arte")
+	check(all_art and Layout.BUSINESS_ART.size() == 10, "arte dos 3 níveis existe para os 10 negócios")
 	var lots_apart := true
-	var points: Array = Layout.ISLAND_LOTS.values()
-	for i in points.size():
-		for j in range(i + 1, points.size()):
-			lots_apart = lots_apart and points[i].distance_to(points[j]) > 180
+	for lots in [praia, cidade]:
+		var points: Array = lots.values()
+		for i in points.size():
+			for j in range(i + 1, points.size()):
+				lots_apart = lots_apart and points[i].distance_to(points[j]) > 150
 	check(lots_apart, "lotes afastados entre si")
 	var ui_ok := true
 	for name in ["icon_build", "icon_shop", "icon_map", "icon_profile", "icon_coin",
-			"icon_settings", "icon_help", "lot_lock", "char_vendor"] + Layout.WALKERS:
+			"icon_settings", "icon_help", "lot_lock", "char_vendor"] + Layout.DISTRICTS.praia.walkers:
 		ui_ok = ui_ok and ResourceLoader.exists("res://assets/optimized/%s.png" % name)
+	for id in Layout.DISTRICT_ORDER:
+		ui_ok = ui_ok and ResourceLoader.exists("res://assets/optimized/%s" % Layout.DISTRICTS[id].base)
 	check(ui_ok, "ícones e personagens existem")
 
 	var key: String = Api.new_idempotency_key()

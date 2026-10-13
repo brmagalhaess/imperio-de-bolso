@@ -1,24 +1,66 @@
-## Planta da Ilha da Praia (direção visual v2 — docs/ADRs/0004-direcao-visual-v2.md).
-## Coordenadas na resolução base 720×1280, medidas sobre assets/optimized/island_base.jpg.
-## Cada posição de lote é o ponto de apoio (centro da base) do negócio na areia.
+## Planta dos distritos (direção visual v2 — docs/ADRs/0004-direcao-visual-v2.md).
+## Coordenadas na resolução base 720×1280, medidas sobre os cenários em assets/optimized/.
+## Cada posição de lote é o ponto de apoio (centro da base) do negócio no chão.
 extends RefCounted
 
-const SEA_COLOR := Color("017272")
-## Os sprites ficam em 2× o tamanho de exibição; negócios e pessoas um pouco maiores
-## para lerem bem no celular (como no mockup aprovado).
+## Os sprites ficam em 2× o tamanho de exibição; negócios um pouco maiores para lerem bem
+## no celular (como no mockup aprovado).
 const ART_SCALE := 0.5
 const BUILDING_SCALE := 0.6
-const CHAR_SCALE := 0.6
-## Câmera: centro e zoom que fazem a ilha ocupar a tela.
-const CAMERA_CENTER := Vector2(370, 615)
-const CAMERA_ZOOM := 1.12
 
-## Negócios da ilha, na ordem do catálogo.
-const ISLAND_LOTS := {
-	"agua": Vector2(250, 560),
-	"pipoca": Vector2(490, 545),
-	"sorveteria": Vector2(235, 845),
-	"quiosque_coco": Vector2(505, 840),
+## Ordem de desbloqueio igual à do servidor (backend/src/economy/districts.ts).
+const DISTRICT_ORDER := ["praia", "cidade"]
+
+const DISTRICTS := {
+	"praia": {
+		"title": "Ilha da Praia",
+		"base": "island_base.jpg",
+		"top_color": Color("017272"),
+		"bottom_color": Color("017272"),
+		"camera_center": Vector2(370, 615),
+		"zoom": 1.12,
+		"char_scale": 0.6,
+		"lots": {
+			"agua": Vector2(250, 560),
+			"pipoca": Vector2(490, 545),
+			"sorveteria": Vector2(235, 845),
+			"quiosque_coco": Vector2(505, 840),
+		},
+		"waypoints": [
+			Vector2(330, 470), Vector2(420, 455), Vector2(370, 600), Vector2(290, 700),
+			Vector2(520, 690), Vector2(410, 790), Vector2(340, 880), Vector2(560, 640),
+			Vector2(200, 700), Vector2(450, 900), Vector2(600, 760), Vector2(380, 520),
+		],
+		"decor": [["beach_umbrella", Vector2(175, 790)], ["beach_umbrella", Vector2(600, 905)]],
+		"walkers": ["char_woman", "char_boy", "char_grandma", "char_tourist", "char_kid"],
+		## Vendedor fixo ao lado deste negócio, quando comprado.
+		"vendor": ["agua", Vector2(-78, 16)],
+	},
+	"cidade": {
+		"title": "Cidade",
+		"base": "city_base.jpg",
+		"top_color": Color("006f9a"),
+		"bottom_color": Color("082b17"),
+		"camera_center": Vector2(360, 690),
+		"zoom": 1.0,
+		"char_scale": 0.42,
+		"lots": {
+			"mercadinho": Vector2(205, 655),
+			"restaurante": Vector2(560, 685),
+			"supermercado": Vector2(390, 760),
+			"academia": Vector2(155, 835),
+			"hotel": Vector2(560, 855),
+			"shopping": Vector2(345, 950),
+		},
+		"waypoints": [
+			Vector2(300, 470), Vector2(355, 568), Vector2(420, 598), Vector2(250, 668),
+			Vector2(170, 706), Vector2(470, 742), Vector2(560, 748), Vector2(410, 818),
+			Vector2(285, 850), Vector2(520, 885), Vector2(110, 700), Vector2(620, 610),
+		],
+		"decor": [],
+		"walkers": ["char_tourist", "char_grandma", "char_woman", "char_boy", "char_kid"],
+		"vendor": [],
+	},
 }
 
 ## Faixas de nível visual: nível 1–9 → arte 1, 10–24 → arte 2, 25+ → arte 3.
@@ -29,22 +71,13 @@ const BUSINESS_ART := {
 	"pipoca": "popcorn_cart",
 	"sorveteria": "icecream_cart",
 	"quiosque_coco": "coconut_kiosk",
+	"mercadinho": "market",
+	"restaurante": "restaurant",
+	"supermercado": "supermarket",
+	"academia": "gym",
+	"hotel": "hotel",
+	"shopping": "mall",
 }
-
-## Pontos de passeio dos clientes na areia (longe dos lotes e da água).
-const WAYPOINTS := [
-	Vector2(330, 470), Vector2(420, 455), Vector2(370, 600), Vector2(290, 700),
-	Vector2(520, 690), Vector2(410, 790), Vector2(340, 880), Vector2(560, 640),
-	Vector2(200, 700), Vector2(450, 900), Vector2(600, 760), Vector2(380, 520),
-]
-
-## Decoração fixa: [textura, posição].
-const DECOR := [
-	["beach_umbrella", Vector2(175, 790)],
-	["beach_umbrella", Vector2(600, 905)],
-]
-
-const WALKERS := ["char_woman", "char_boy", "char_grandma", "char_tourist", "char_kid"]
 
 
 ## Índice 1..3 da arte para o nível do negócio.
@@ -66,5 +99,13 @@ static func texture(name: String) -> Texture2D:
 	return load("res://assets/optimized/%s.png" % name)
 
 
-static func is_island(slug: String) -> bool:
-	return ISLAND_LOTS.has(slug)
+## Distrito em que o negócio fica no mapa ("" se não tiver lote).
+static func district_of(slug: String) -> String:
+	for id in DISTRICTS:
+		if DISTRICTS[id].lots.has(slug):
+			return id
+	return ""
+
+
+static func title(district: String) -> String:
+	return DISTRICTS[district].title if DISTRICTS.has(district) else district

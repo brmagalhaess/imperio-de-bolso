@@ -32,6 +32,13 @@ export const Errors = {
       slug,
       secondsRemaining,
     }),
+  districtLocked: (district: string, requires: string) =>
+    new AppError(
+      409,
+      "DISTRICT_LOCKED",
+      "Distrito bloqueado: complete o distrito anterior primeiro",
+      { district, requires },
+    ),
   nothingToCollect: () => new AppError(409, "NOTHING_TO_COLLECT", "Nada pronto para coletar"),
   idempotencyKeyRequired: () =>
     new AppError(

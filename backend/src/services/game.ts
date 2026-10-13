@@ -1,6 +1,7 @@
 import type { Db, Tx } from "../db/prisma.js";
 import type { BusinessDefinition, PlayerBusiness } from "../generated/prisma/client.js";
 import { Errors } from "../errors.js";
+import { DISTRICTS, previousDistrict } from "../economy/districts.js";
 import { nextUpgradeCost, profitPerCycle } from "../economy/formulas.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { applyCoins } from "./wallet.js";
@@ -15,6 +16,7 @@ export interface BusinessView {
   slug: string;
   name: string;
   sortOrder: number;
+  district: string;
   cost: string;
   cycleSeconds: number;
   owned: boolean;
@@ -28,10 +30,18 @@ export interface BusinessView {
   secondsRemaining: number;
 }
 
+export interface DistrictView {
+  id: string;
+  unlocked: boolean;
+  /** Distrito que precisa estar completo (todos os negócios comprados), ou null. */
+  requires: string | null;
+}
+
 export interface PlayerStateView {
   player: { id: string; displayName: string };
   wallet: { coins: string; gems: string };
   businesses: BusinessView[];
+  districts: DistrictView[];
   serverTime: string;
 }
 
@@ -58,6 +68,7 @@ function toBusinessView(
     slug: def.slug,
     name: def.name,
     sortOrder: def.sortOrder,
+    district: def.district,
     cost: def.cost.toString(),
     cycleSeconds: def.cycleSeconds,
     owned: Boolean(pb),
@@ -85,6 +96,15 @@ export async function listBusinesses(
   return defs.map((def) => toBusinessView(def, byBusiness.get(def.id), now));
 }
 
+/** Distrito liberado quando todos os negócios do distrito anterior foram comprados. */
+export function districtViews(businesses: BusinessView[]): DistrictView[] {
+  const complete = (d: string) => businesses.filter((b) => b.district === d).every((b) => b.owned);
+  return DISTRICTS.map((id) => {
+    const requires = previousDistrict(id);
+    return { id, unlocked: requires === null || complete(requires), requires };
+  });
+}
+
 export async function getPlayerState(
   db: Reader,
   playerId: string,
@@ -92,10 +112,12 @@ export async function getPlayerState(
 ): Promise<PlayerStateView> {
   const player = await db.player.findUnique({ where: { id: playerId }, include: { wallet: true } });
   if (!player?.wallet) throw Errors.unauthorized();
+  const businesses = await listBusinesses(db, playerId, now);
   return {
     player: { id: player.id, displayName: player.displayName },
     wallet: { coins: player.wallet.coins.toString(), gems: player.wallet.gems.toString() },
-    businesses: await listBusinesses(db, playerId, now),
+    businesses,
+    districts: districtViews(businesses),
     serverTime: now.toISOString(),
   };
 }
@@ -113,6 +135,17 @@ export function purchaseBusiness(slug: string, now: Date) {
       where: { playerId_businessId: { playerId: wallet.playerId, businessId: def.id } },
     });
     if (existing) throw Errors.businessAlreadyOwned(slug);
+
+    const requires = previousDistrict(def.district);
+    if (requires) {
+      const [total, owned] = await Promise.all([
+        tx.businessDefinition.count({ where: { district: requires } }),
+        tx.playerBusiness.count({
+          where: { playerId: wallet.playerId, business: { district: requires } },
+        }),
+      ]);
+      if (owned < total) throw Errors.districtLocked(def.district, requires);
+    }
 
     await applyCoins(tx, wallet, -def.cost, `business_purchase:${slug}`, idempotencyKey);
     await tx.playerBusiness.create({

@@ -2,6 +2,21 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-13 — Fase 2: Cidade-maquete + ajustes pedidos
+
+- **Coleta pela moeda** não abre mais o painel do negócio (pedido do titular).
+- **Menus Construir e Mapa** refeitos no padrão do jogo: janela modal centralizada, faixa de
+  título, cartões com imagem do negócio/distrito e botões cartoon (`menu_modal.gd`).
+- **Cidade:** cenário (mockup D sem prédios) + 6 negócios × 3 níveis; Mapa alterna Ilha ↔ Cidade
+  com fade; lotes da cidade mostram "Complete a praia" até liberar.
+- **Servidor:** coluna `district`, regra `DISTRICT_LOCKED`, `districts[]` no estado (migração
+  `*_business_district`); contrato atualizado.
+- **Arte:** 2 testes + 17 prédios + 5 refeitos; gasto acumulado **US$5,01** (teto US$5,53).
+  Catálogo regerado por `tools/art/build_catalog.py` (84 linhas, 47 em uso).
+- **Testes:** backend 33/33 (3 novos de distrito); jogo unitários 24/24; integração 35/35;
+  roteiro `tests/demo_runner.tscn` com capturas de coleta, Construir, Mapa, Cidade e painel.
+- **Não validado:** APK com o visual novo; toque real em aparelho.
+
 ## 2026-10-12 — Direção visual v2: Ilha da Praia (Fase 1 jogável)
 
 - **Por quê:** o titular rejeitou o visual v1. Referências originais (conversa ChatGPT): Idle Town

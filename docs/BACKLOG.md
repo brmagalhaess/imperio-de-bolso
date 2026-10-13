@@ -24,8 +24,9 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] ~~Arte piloto v1~~ substituída pela direção visual v2 (ADR 0004)
 - [x] Mockups da tela (A/B/D escolhidos) e arte da Ilha da Praia (4 negócios × 3 níveis, UI, personagens)
 - [x] Cena da Ilha jogável: bolha de coleta, "+N", clientes andando, interface do mockup B
-- [ ] Aprovação visual da Ilha pelo titular
-- [ ] Fase 2: Cidade-maquete (mockup D) com os 6 negócios restantes + desbloqueio pelo Mapa
+- [x] Aprovação visual da Ilha pelo titular ("até melhor do que imaginei")
+- [x] Coleta pela moeda sem abrir painel; menus Construir/Mapa no padrão do jogo
+- [x] Fase 2: Cidade-maquete (mockup D) com os 6 negócios + desbloqueio no servidor + Mapa
 - [ ] Loja, Perfil e Configurações (hoje "em breve")
 - [ ] Rate limiting na API (`@fastify/rate-limit`)
 

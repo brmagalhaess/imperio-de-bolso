@@ -67,6 +67,8 @@ model BusinessDefinition {
   slug          String @unique
   name          String
   sortOrder     Int    @map("sort_order")
+  // Distrito do mapa (ordem em src/economy/districts.ts): praia → cidade.
+  district      String @default("praia")
   cost          BigInt
   revenue       BigInt
   operatingCost BigInt @default(0) @map("operating_cost")

@@ -36,6 +36,10 @@ Corpo vazio → cria conta convidada (100 moedas). Corpo `{ guestId, guestSecret
   "player": { "id": "uuid", "displayName": "Empreendedor 1234" },
   "wallet": { "coins": "100", "gems": "0" },
   "businesses": [Business, "... (10)"],
+  "districts": [
+    { "id": "praia", "unlocked": true, "requires": null },
+    { "id": "cidade", "unlocked": false, "requires": "praia" }
+  ],
   "serverTime": "ISO"
 }
 ```
@@ -43,7 +47,7 @@ Corpo vazio → cria conta convidada (100 moedas). Corpo `{ guestId, guestSecret
 `Business`:
 ```json
 {
-  "slug": "agua", "name": "Carrinho de Água", "sortOrder": 1,
+  "slug": "agua", "name": "Carrinho de Água", "sortOrder": 1, "district": "praia",
   "cost": "100", "cycleSeconds": 10,
   "owned": true, "level": 1, "maxLevel": 100,
   "profitPerCycle": "10", "nextUpgradeCost": "115",
@@ -63,7 +67,8 @@ Não comprado: `owned: false`, `level: 0`, `profitPerCycle` do nível 1, `nextUp
 Corpo `{ businessSlug }`. Debita `cost`, cria o negócio no nível 1 e inicia o primeiro ciclo.
 - `201 { purchased, state: PlayerState }`
 - `409 INSUFFICIENT_FUNDS { required, available }`, `409 BUSINESS_ALREADY_OWNED`,
-  `404 BUSINESS_NOT_FOUND`
+  `409 DISTRICT_LOCKED { district, requires }` (falta comprar todos os negócios do distrito
+  anterior), `404 BUSINESS_NOT_FOUND`
 
 ### `POST /businesses/upgrade` — `Idempotency-Key`
 Corpo `{ businessSlug }`. Custo para o nível n: `round(cost × 1,15^(n−1))`.

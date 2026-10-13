@@ -33,3 +33,14 @@ balões de lucro), SimCity BuildIt/Township (cidade densa e colorida) e cenas ca
   `lanchonete` → `quiosque_coco` (migração `*_quiosque_coco`).
 - Arte v1 fica nos originais e no catálogo como **descontinuada**.
 - Fonte Fredoka (OFL) embutida em `game/assets/fonts/`.
+
+## Atualização 2026-10-13 — Fase 2 (Cidade)
+
+- Desbloqueio **no servidor**: `business_definitions.district` (praia/cidade); comprar na cidade
+  exige possuir os 4 negócios da praia (`409 DISTRICT_LOCKED`); `GET /player/state` informa
+  `districts[].unlocked`.
+- Jogo: `district_view.gd` genérico (substitui `island.gd`) com planta por distrito em
+  `layout.gd`; Mapa troca de distrito com fade; menus Construir/Mapa viraram janela modal no
+  padrão do mockup B (`menu_modal.gd`, estilos em `ui_style.gd`).
+- Arte da cidade gerada a partir do mockup D; 5 prédios refeitos usando o próprio prédio em
+  outro nível como referência (a 1ª referência, o mercadinho, contaminou os outros).

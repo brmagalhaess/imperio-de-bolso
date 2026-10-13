@@ -103,7 +103,10 @@ func _draw_overlay() -> void:
 	var font: Font = UiFont.bold()
 	if not business.owned:
 		_pill(font, Vector2(0, 26), business.name, 20, Color(0.12, 0.3, 0.32, 0.92), Color.WHITE)
-		_pill(font, Vector2(0, 58), Fmt.coins(business.cost), 22, Color("fff3d6"), Color("8a4b00"), true)
+		if GameState.district_unlocked(str(business.get("district", "praia"))):
+			_pill(font, Vector2(0, 58), Fmt.coins(business.cost), 22, Color("fff3d6"), Color("8a4b00"), true)
+		else:
+			_pill(font, Vector2(0, 58), tr("Complete a praia"), 18, Color("e8e0d0"), Color("6b5d48"))
 		return
 
 	var top := bubble_position()
