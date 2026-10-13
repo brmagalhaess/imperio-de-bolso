@@ -71,6 +71,31 @@ func presence(district: String) -> Dictionary:
 	return await _command("/presence", {"district": district})
 
 
+func missions() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_GET, "/missions", null, "")
+
+
+func claim_mission(mission_id: String) -> Dictionary:
+	return await _command("/missions/claim", {"missionId": mission_id})
+
+
+func achievements() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_GET, "/achievements", null, "")
+
+
+func claim_achievement(achievement_id: String) -> Dictionary:
+	return await _command("/achievements/claim", {"achievementId": achievement_id})
+
+
+func leaderboard() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_GET, "/leaderboard", null, "")
+
+
+## Eventos de interface (o servidor só aceita os da lista permitida).
+func send_events(events: Array) -> Dictionary:
+	return await _authed(HTTPClient.METHOD_POST, "/analytics/events", {"events": events}, "")
+
+
 func complete_tutorial() -> Dictionary:
 	return await _authed(HTTPClient.METHOD_POST, "/tutorial/complete", {}, "")
 

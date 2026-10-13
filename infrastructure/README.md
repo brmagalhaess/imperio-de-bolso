@@ -11,6 +11,9 @@ docker compose -f infrastructure/docker-compose.yml down                     # p
 - PostgreSQL 17 em `localhost:55432` (usuário/senha `imperio`, apenas local), bancos `imperio`
   e `imperio_test` (criado por `postgres/01-test-db.sql` na primeira subida do volume).
 - A API em container aplica migrações (`prisma migrate deploy`) e o catálogo antes de subir.
+- Painel admin em container: `http://localhost:8080` (nginx; repassa `/api` para a API). Exige
+  `ADMIN_TOKEN` exportado antes do `up` (`export ADMIN_TOKEN=$(openssl rand -hex 32)`); vazio
+  deixa o painel desligado.
 
 ## Staging e produção (Dockploy) — ainda não configurado
 

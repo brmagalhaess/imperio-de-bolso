@@ -14,10 +14,11 @@ Arte: [docs/GUIA_ARTE_HIGGSFIELD.md](docs/GUIA_ARTE_HIGGSFIELD.md).
 | `shared/contracts/` | Contrato da API v1 (fonte para cliente e servidor). |
 | `infrastructure/` | Docker Compose local; notas de deploy Dockploy. |
 | `tools/art/` | Geração (API Higgsfield) e tratamento de arte para o Godot. |
+| `admin/` | Painel admin React + Vite, somente leitura (`/api/admin`, ADMIN_TOKEN). |
 | `docs/` | Documentação, backlog, status, ADRs, checklists. |
 | `.github/workflows/` | CI (testes do backend e do jogo). |
 
-`admin/` (React) e `landing/` (Next.js) ainda não existem — entram nas etapas 3 e de publicação.
+`landing/` (Next.js) ainda não existe — entra na etapa de publicação.
 
 ## Regras inegociáveis
 
@@ -49,6 +50,9 @@ npm run db:deploy && npm run db:seed
 npm run dev                     # http://127.0.0.1:3000
 npm test                        # usa TEST_DATABASE_URL (banco imperio_test)
 npm run typecheck && npm run format:check
+
+# Painel admin (precisa de ADMIN_TOKEN no backend/.env; em dev entra sozinho)
+cd admin && npm install && npm run dev   # http://localhost:5174
 
 # Jogo
 godot --headless --path game --import

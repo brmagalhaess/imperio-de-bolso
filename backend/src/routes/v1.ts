@@ -8,7 +8,11 @@ import {
   runIdempotentCommand,
   type CommandResult,
 } from "../lib/idempotency.js";
+import { CLIENT_EVENTS, track } from "../services/analytics.js";
+import { claimAchievement, listAchievements } from "../services/achievements.js";
 import { createGuest, resumeGuest } from "../services/auth.js";
+import { getLeaderboard } from "../services/leaderboard.js";
+import { claimMission, listMissions } from "../services/missions.js";
 import {
   collectProduction,
   completeTutorial,
@@ -36,6 +40,22 @@ const GuestAuthBody = z
 const BusinessBody = z.object({ businessSlug: Slug });
 const CollectBody = z.object({ businessSlug: Slug.optional() });
 const PresenceBody = z.object({ district: Slug });
+const MissionClaimBody = z.object({ missionId: z.uuid() });
+const AchievementClaimBody = z.object({ achievementId: Slug });
+const EventsBody = z.object({
+  events: z
+    .array(
+      z.object({
+        name: z.enum(CLIENT_EVENTS),
+        // Propriedades curtas e sem dados pessoais (validadas por tamanho).
+        props: z
+          .record(z.string().max(40), z.union([z.string().max(200), z.number(), z.boolean()]))
+          .optional(),
+      }),
+    )
+    .min(1)
+    .max(20),
+});
 
 function playerIdOf(request: FastifyRequest): string {
   return request.user.sub;
@@ -132,5 +152,35 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
     const at = now();
     await completeTutorial(db, playerIdOf(request), at);
     return getPlayerState(db, playerIdOf(request), at);
+  });
+
+  app.get("/missions", { preHandler: authenticate }, async (request) =>
+    listMissions(db, playerIdOf(request), now()),
+  );
+
+  app.post("/missions/claim", { preHandler: authenticate }, async (request, reply) => {
+    const { missionId } = MissionClaimBody.parse(request.body);
+    return command(request, reply, "missions.claim", (at) => claimMission(missionId, at));
+  });
+
+  app.get("/achievements", { preHandler: authenticate }, async (request) =>
+    listAchievements(db, playerIdOf(request), now()),
+  );
+
+  app.post("/achievements/claim", { preHandler: authenticate }, async (request, reply) => {
+    const { achievementId } = AchievementClaimBody.parse(request.body);
+    return command(request, reply, "achievements.claim", (at) =>
+      claimAchievement(achievementId, at),
+    );
+  });
+
+  app.get("/leaderboard", { preHandler: authenticate }, async (request) =>
+    getLeaderboard(db, playerIdOf(request), now()),
+  );
+
+  app.post("/analytics/events", { preHandler: authenticate }, async (request, reply) => {
+    const { events } = EventsBody.parse(request.body);
+    for (const e of events) await track(db, playerIdOf(request), e.name, e.props ?? {});
+    return reply.code(202).send({ accepted: events.length });
   });
 }

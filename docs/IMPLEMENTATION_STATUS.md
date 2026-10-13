@@ -2,6 +2,26 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-13 — Etapa 3: missões, conquistas, ranking, analytics e painel admin (ADR 0007)
+
+Revisados antes: docs/README.md (§3, §5, §8, §10, §11, §13), PROMPT_MESTRE (Etapa 3) e a
+conversa original (Desafio dos 7 dias, competir com amigos).
+- **Servidor:** missões diárias (3, Brasília) com progresso somado nos comandos e resgate
+  idempotente (moedas + 1 diamante); 11 conquistas com diamantes; ranking semanal por
+  faturamento de produção (top 50 + minha posição); analytics no servidor + eventos de interface
+  com lista fechada; ledger com relógio da aplicação; rotas admin somente leitura com token.
+  Migração `*_retention`. **73 testes** (missões estáveis, resgate único com 5 cliques
+  simultâneos, virada de dia/semana, conquistas, ranking, analytics, admin 401/200, config).
+- **Painel admin (`admin/`):** React + Vite; visão geral, jogadores, ledger do jogador, eventos.
+  Docker (nginx com proxy `/api`), serviço no compose (`--profile api`, porta 8080) e job no CI.
+  Verificado no navegador com dados reais e na pilha Docker (200 com token, 401 sem).
+- **Jogo:** botões laterais **Missões** (selo com prêmios a resgatar) e **Ranking**; contador de
+  diamantes; Perfil com conquistas; cartões atualizam no lugar ao resgatar; eventos de tutorial.
+  Unitários 49/49; integração 71/71 (missões, conquistas e ranking reais). Capturas conferidas.
+- **Placeholder:** ícones de Missões/Ranking/Diamante desenhados em código.
+- **Decisões a confirmar:** ranking por faturamento semanal (não patrimônio total); prêmio das
+  missões (~15 min de renda + 1 diamante).
+
 ## 2026-10-13 — AFK por mapa e tela de Ajudantes (pedido do titular, ADR 0006)
 
 - **Regra nova:** no mapa aberto a coleta é manual; ajudantes produzem AFK fora do mapa (outro

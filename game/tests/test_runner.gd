@@ -45,6 +45,7 @@ func _unit_tests() -> void:
 	check(Fmt.duration(10) == "10 s", "duração 10 s")
 	check(Fmt.duration(90) == "1 min 30 s", "duração 90 s")
 	check(Fmt.duration(3700) == "1 h 01 min", "duração 3700 s")
+	check(Fmt.duration(480_000) == "5 d 13 h", "duração em dias")
 	check(Fmt.rate(12.0) == "+12/s", "renda inteira")
 	check(Fmt.rate(2.5) == "+2,5/s", "renda com decimal")
 	check(Fmt.rate(1250.4) == "+1.250/s", "renda grande")
@@ -188,6 +189,34 @@ func _build_menu_tests() -> bool:
 	var sorv_btn: Button = hud._helper_cards["sorveteria"].button
 	check(agua_btn.text == "Contratado", "cartão contratado atualiza no lugar")
 	check(sorv_btn.text == "150" and not sorv_btn.disabled, "preço dos outros ajudantes não muda")
+
+	# Missões: cartões com progresso e resgate; atualização no lugar ao resgatar.
+	GameState.missions = {"day": "2026-01-01", "resetsAt": "2026-01-02T03:00:00.000Z",
+		"serverTime": "2026-01-01T12:00:00.000Z", "missions": [
+			{"id": "m1", "template": "collect_times", "title": "Colete moedas 10 vezes", "target": "10",
+				"progress": "10", "completed": true, "claimed": false, "rewardCoins": "450", "rewardGems": 1},
+			{"id": "m2", "template": "upgrade_times", "title": "Melhore negócios 5 vezes", "target": "5",
+				"progress": "2", "completed": false, "claimed": false, "rewardCoins": "450", "rewardGems": 1}]}
+	hud.open_missions_menu()
+	var m1: Button = hud._reward_cards["m1"].button
+	var m2: Button = hud._reward_cards["m2"].button
+	check(m1.text == "Resgatar" and not m1.disabled, "missão concluída mostra Resgatar")
+	check(m2.text == "2/5" and m2.disabled, "missão em andamento mostra o progresso")
+	check(GameState.claimable_missions() == 1, "selo conta 1 prêmio para resgatar")
+	var m1_card: Node = hud._modal._list.get_child(1)
+	GameState.missions.missions[0].claimed = true
+	GameState.missions_changed.emit()
+	check(m1.text == "Resgatado" and hud._modal._list.get_child(1) == m1_card, "resgate atualiza no lugar")
+	check(hud._missions_button.badge == 0, "selo some depois do resgate")
+	hud._modal.close()
+
+	GameState.achievements = [{"id": "first_business", "title": "Primeiro negócio",
+		"description": "Construa seu primeiro negócio", "rewardGems": 1, "progress": "1", "target": "1",
+		"unlocked": true, "claimed": false}]
+	hud.open_profile_menu()
+	check(hud._reward_cards["first_business"].button.text == "Resgatar", "conquista alcançada mostra Resgatar")
+	check(GameState.claimable_achievements() == 1, "conquistas para resgatar contadas")
+	hud._modal.close()
 	hud.queue_free()
 	GameState.state = {}
 	GameState.loaded = false
@@ -218,6 +247,12 @@ func _integration_test() -> void:
 	await GameState.refresh()
 	check(GameState.online, "servidor de volta: jogo reconecta")
 	check(not await GameState.hire_manager("agua"), "ajudante recusado sem saldo")
+	await GameState.refresh_missions()
+	check(GameState.missions.get("missions", []).size() == 3, "servidor entrega 3 missões do dia")
+	await GameState.refresh_achievements()
+	check(GameState.achievements.size() >= 10, "servidor entrega as conquistas")
+	var lb := await Api.leaderboard()
+	check(lb.ok and lb.data.has("entries"), "ranking semanal responde")
 
 	# Mesma conta é retomada com as credenciais salvas.
 	var player_id: String = GameState.state.player.id

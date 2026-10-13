@@ -5,6 +5,8 @@ import { DISTRICTS, previousDistrict } from "../economy/districts.js";
 import { nextUpgradeCost, profitPerCycle } from "../economy/formulas.js";
 import { OFFLINE_CAP_MS, settle } from "../economy/offline.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
+import { track } from "./analytics.js";
+import { trackMission } from "./missions.js";
 import { applyCoins, type LockedWallet } from "./wallet.js";
 
 // Ciclo manual: ao terminar, o negócio fica parado com 1 ciclo pronto até o jogador
@@ -204,7 +206,7 @@ export function purchaseBusiness(slug: string, now: Date) {
       if (owned < total) throw Errors.districtLocked(def.district, requires);
     }
 
-    await applyCoins(tx, wallet, -def.cost, `business_purchase:${slug}`, idempotencyKey);
+    await applyCoins(tx, wallet, -def.cost, `business_purchase:${slug}`, idempotencyKey, now);
     await tx.playerBusiness.create({
       data: {
         playerId: wallet.playerId,
@@ -214,6 +216,8 @@ export function purchaseBusiness(slug: string, now: Date) {
         lastSettlementAt: now,
       },
     });
+    await trackMission(tx, wallet.playerId, "purchase_count", 1n, now);
+    await track(tx, wallet.playerId, "business_purchased", { business: slug });
 
     return {
       statusCode: 201,
@@ -241,11 +245,20 @@ export function upgradeBusiness(slug: string, now: Date) {
         await settleAutomatic(tx, wallet, now, `${idempotencyKey}:settle`, { businessId: def.id })
       ).wallet;
     }
-    await applyCoins(tx, current, -cost, `business_upgrade:${slug}:${newLevel}`, idempotencyKey);
+    await applyCoins(
+      tx,
+      current,
+      -cost,
+      `business_upgrade:${slug}:${newLevel}`,
+      idempotencyKey,
+      now,
+    );
     await tx.playerBusiness.update({
       where: { playerId_businessId: { playerId: wallet.playerId, businessId: def.id } },
       data: { level: newLevel },
     });
+    await trackMission(tx, wallet.playerId, "upgrade_count", 1n, now);
+    await track(tx, wallet.playerId, "business_upgraded", { business: slug, level: newLevel });
 
     return {
       statusCode: 200,
@@ -289,7 +302,7 @@ export function collectProduction(slug: string | undefined, now: Date) {
     const total = collected.reduce((sum, c) => sum + c.amount, 0n);
 
     if (total > 0n) {
-      await applyCoins(tx, wallet, total, "production_collect", idempotencyKey);
+      await applyCoins(tx, wallet, total, "production_collect", idempotencyKey, now);
     }
     await tx.playerBusiness.updateMany({
       where: {
@@ -297,6 +310,12 @@ export function collectProduction(slug: string | undefined, now: Date) {
         businessId: { in: ready.map((pb) => pb.businessId) },
       },
       data: { cycleStartedAt: now, lastSettlementAt: now },
+    });
+    await trackMission(tx, wallet.playerId, "collect_count", 1n, now);
+    await trackMission(tx, wallet.playerId, "coins_earned", total, now);
+    await track(tx, wallet.playerId, "production_collected", {
+      businesses: collected.length,
+      total: total.toString(),
     });
 
     return {
@@ -367,7 +386,7 @@ async function settleAutomatic(
     });
   }
   const updated =
-    total > 0n ? await applyCoins(tx, wallet, total, "production_auto", ledgerKey) : wallet;
+    total > 0n ? await applyCoins(tx, wallet, total, "production_auto", ledgerKey, now) : wallet;
   return { wallet: updated, items, total, elapsedMs, capped };
 }
 
@@ -456,6 +475,14 @@ export function enterDistrict(district: string, now: Date) {
       where: { id: player.id },
       data: { currentDistrict: district, lastSeenAt: now },
     });
+    if (result.total > 0n) {
+      await trackMission(tx, player.id, "afk_collect", 1n, now);
+      await trackMission(tx, player.id, "coins_earned", result.total, now);
+    }
+    if (!stayed && district === "cidade")
+      await trackMission(tx, player.id, "visit_cidade", 1n, now);
+    // Sem sinal recente = o jogador abriu o jogo (ou voltou do segundo plano): nova sessão.
+    if (!fresh) await track(tx, player.id, "session_started", { district });
 
     return {
       statusCode: 200,
@@ -485,8 +512,10 @@ export function hireManager(slug: string, now: Date) {
     if (!pb) throw Errors.businessNotOwned(slug);
     if (pb.managerUnlocked) throw Errors.managerAlreadyHired(slug);
 
-    await applyCoins(tx, wallet, -def.managerCost, `manager_hire:${slug}`, idempotencyKey);
+    await applyCoins(tx, wallet, -def.managerCost, `manager_hire:${slug}`, idempotencyKey, now);
     await tx.playerBusiness.update({ where, data: { managerUnlocked: true } });
+    await trackMission(tx, wallet.playerId, "hire_count", 1n, now);
+    await track(tx, wallet.playerId, "manager_hired", { business: slug });
 
     const player = await tx.player.findUniqueOrThrow({ where: { id: wallet.playerId } });
     const present = freshPresence(player, now) && player.currentDistrict === def.district;
@@ -501,8 +530,9 @@ export function hireManager(slug: string, now: Date) {
 
 /** Marca o tutorial como concluído (idempotente; não mexe em saldo). */
 export async function completeTutorial(db: Db, playerId: string, now: Date): Promise<void> {
-  await db.player.updateMany({
+  const r = await db.player.updateMany({
     where: { id: playerId, tutorialCompletedAt: null },
     data: { tutorialCompletedAt: now },
   });
+  if (r.count === 1) await track(db, playerId, "tutorial_completed");
 }

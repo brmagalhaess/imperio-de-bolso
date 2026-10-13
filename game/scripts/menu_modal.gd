@@ -9,6 +9,8 @@ const Layout := preload("res://scripts/layout.gd")
 
 const COIN := preload("res://assets/optimized/icon_coin.png")
 const LOCK := preload("res://assets/optimized/lot_lock.png")
+const GlyphButton := preload("res://scripts/glyph_button.gd")
+var GEM: Texture2D = GlyphButton.gem_texture()
 
 const MAX_LIST_HEIGHT := 760.0
 
@@ -107,6 +109,13 @@ func close() -> void:
 	visible = false
 
 
+## Recalcula a altura da lista depois de adicionar itens com a janela já aberta
+## (ex.: ranking, que chega do servidor depois de a janela abrir).
+func refit() -> void:
+	await get_tree().process_frame
+	_scroll.custom_minimum_size.y = min(_list.get_combined_minimum_size().y, MAX_LIST_HEIGHT)
+
+
 ## Bloco de mensagem centralizado com imagem opcional (resumo offline, lista vazia).
 func add_message(texture: Texture2D, headline: String, body: String) -> void:
 	var box := VBoxContainer.new()
@@ -139,6 +148,11 @@ func add_action(text_value: String, on_press: Callable, color := Style.GREEN,
 	Style.style_button(button, color, edge)
 	button.pressed.connect(func(): close(); on_press.call())
 	_list.add_child(button)
+
+
+func clear_list() -> void:
+	for c in _list.get_children():
+		c.queue_free()
 
 
 func add_section(text: String) -> void:
@@ -274,6 +288,113 @@ func set_helper_state(handle: Dictionary, b: Dictionary, state: String) -> void:
 	handle.state = state
 
 
+## Cartão de missão/conquista com barra de progresso e prêmio. Atualiza no lugar
+## (set_reward_card) para não piscar ao resgatar. `item`: {title, subtitle, progress, target,
+## rewardCoins?, rewardGems, done, claimed}.
+func add_reward_card(item: Dictionary, on_claim: Callable) -> Dictionary:
+	var row := _card_row()
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.add_theme_constant_override("separation", 4)
+	row.add_child(col)
+	var title := _text("", 26, Style.INK)
+	col.add_child(title)
+	var sub := _text("", 20, Style.INK_SOFT, 500)
+	col.add_child(sub)
+	var bar := ProgressBar.new()
+	bar.custom_minimum_size = Vector2(0, 16)
+	bar.show_percentage = false
+	col.add_child(bar)
+	var reward := HBoxContainer.new()
+	reward.add_theme_constant_override("separation", 6)
+	col.add_child(reward)
+	var coin_icon := _icon(COIN, 26)
+	reward.add_child(coin_icon)
+	var coin_label := _text("", 22, Color("8a4b00"))
+	coin_label.autowrap_mode = TextServer.AUTOWRAP_OFF  # números não quebram linha
+	reward.add_child(coin_label)
+	reward.add_child(_icon(GEM, 26))
+	var gem_label := _text("", 22, Color("1f7fa8"))
+	gem_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	reward.add_child(gem_label)
+
+	var button := Button.new()
+	button.custom_minimum_size = Vector2(150, 76)
+	button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	button.pressed.connect(func():
+		button.disabled = true
+		on_claim.call())
+	row.add_child(button)
+	var handle := {"title": title, "sub": sub, "bar": bar, "coin_icon": coin_icon,
+		"coin_label": coin_label, "gem_label": gem_label, "button": button, "state": ""}
+	set_reward_card(handle, item)
+	return handle
+
+
+func set_reward_card(h: Dictionary, item: Dictionary) -> void:
+	h.title.text = item.title
+	h.sub.text = item.get("subtitle", "")
+	h.sub.visible = h.sub.text != ""
+	var target := maxf(1.0, str(item.target).to_float())
+	h.bar.value = clampf(str(item.progress).to_float() / target * 100.0, 0.0, 100.0)
+	var coins := str(item.get("rewardCoins", "0"))
+	h.coin_icon.visible = coins != "0"
+	h.coin_label.visible = coins != "0"
+	h.coin_label.text = Fmt.coins(coins)
+	h.gem_label.text = "+%d" % int(item.rewardGems)
+	var button: Button = h.button
+	var state := "claimed" if item.claimed else ("ready" if item.done else "progress")
+	button.disabled = state != "ready" or GameState.busy
+	if state == h.state:
+		return
+	h.state = state
+	button.add_theme_font_size_override("font_size", 24)
+	match state:
+		"ready":
+			button.text = tr("Resgatar")
+			Style.style_button(button, Style.ORANGE, Style.ORANGE_DARK)
+		"claimed":
+			button.text = tr("Resgatado")
+			Style.style_button(button, Style.TEAL_LIGHT, Style.TEAL_DARK)
+			button.add_theme_stylebox_override("disabled", Style.toy_button(Style.TEAL_LIGHT, Style.TEAL_DARK))
+		_:
+			button.text = "%s/%s" % [Fmt.coins(item.progress), Fmt.coins(item.target)]
+			Style.style_button(button, Style.GREY, Style.GREY_DARK)
+
+
+## Linha do ranking (posição, nome, faturamento); `me` destaca o jogador.
+func add_rank_row(rank: int, name_text: String, score: String, me: bool) -> void:
+	var panel := PanelContainer.new()
+	var b := Style.box(Color("ffe9b8") if me else Style.CREAM_CARD, 20,
+			Style.ORANGE if me else Style.CREAM_LINE, 3, false)
+	b.content_margin_top = 8
+	b.content_margin_bottom = 8
+	panel.add_theme_stylebox_override("panel", b)
+	_list.add_child(panel)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	panel.add_child(row)
+	var pos := _text("#%d" % rank, 28, [Color("c99a00"), Color("8f9aa6"), Color("b0703a")][rank - 1]
+			if rank <= 3 else Style.TEAL_DARK)
+	pos.custom_minimum_size.x = 76
+	pos.autowrap_mode = TextServer.AUTOWRAP_OFF
+	row.add_child(pos)
+	var who := _text(name_text + (tr(" (você)") if me else ""), 26, Style.INK)
+	who.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	who.autowrap_mode = TextServer.AUTOWRAP_OFF
+	who.clip_text = true
+	row.add_child(who)
+	var coin := TextureRect.new()
+	coin.texture = COIN
+	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	coin.custom_minimum_size = Vector2(28, 28)
+	coin.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(coin)
+	var score_label := _text(Fmt.coins(score), 26, Color("8a4b00"))
+	score_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	row.add_child(score_label)
+
+
 ## Cartão grande de distrito com miniatura do cenário.
 func add_district(id: String, status: String, is_current: bool, unlocked: bool,
 		on_press: Callable) -> void:
@@ -333,6 +454,16 @@ func _card_row() -> HBoxContainer:
 	row.add_theme_constant_override("separation", 14)
 	panel.add_child(row)
 	return row
+
+
+func _icon(texture: Texture2D, size: int) -> TextureRect:
+	var icon := TextureRect.new()
+	icon.texture = texture
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.custom_minimum_size = Vector2(size, size)
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	return icon
 
 
 func _text(value: String, size: int, color: Color, weight := 600) -> Label:

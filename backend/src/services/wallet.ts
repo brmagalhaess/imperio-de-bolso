@@ -34,6 +34,8 @@ export async function applyCoins(
   delta: bigint,
   reason: string,
   ledgerKey: string,
+  /** Relógio do servidor (o mesmo das regras); padrão: agora. */
+  at: Date = new Date(),
 ): Promise<LockedWallet> {
   const balanceAfter = wallet.coins + delta;
   if (balanceAfter < 0n) throw Errors.insufficientFunds(-delta, wallet.coins);
@@ -55,8 +57,42 @@ export async function applyCoins(
       balanceAfter,
       reason,
       idempotencyKey: `${wallet.playerId}:${ledgerKey}`,
+      createdAt: at,
     },
   });
 
   return { ...wallet, coins: balanceAfter, version: wallet.version + 1 };
+}
+
+/** Igual a applyCoins, para diamantes (moeda premium com fontes gratuitas — doc §6). */
+export async function applyGems(
+  tx: Tx,
+  wallet: LockedWallet,
+  delta: bigint,
+  reason: string,
+  ledgerKey: string,
+  /** Relógio do servidor (o mesmo das regras); padrão: agora. */
+  at: Date = new Date(),
+): Promise<LockedWallet> {
+  const balanceAfter = wallet.gems + delta;
+  if (balanceAfter < 0n) throw Errors.insufficientFunds(-delta, wallet.gems);
+  const updated = await tx.playerWallet.updateMany({
+    where: { playerId: wallet.playerId, version: wallet.version },
+    data: { gems: balanceAfter, version: { increment: 1 } },
+  });
+  if (updated.count !== 1) {
+    throw new AppError(409, "CONCURRENT_UPDATE", "Carteira alterada por outra operação");
+  }
+  await tx.walletLedger.create({
+    data: {
+      playerId: wallet.playerId,
+      currency: "GEMS",
+      delta,
+      balanceAfter,
+      reason,
+      idempotencyKey: `${wallet.playerId}:${ledgerKey}`,
+      createdAt: at,
+    },
+  });
+  return { ...wallet, gems: balanceAfter, version: wallet.version + 1 };
 }

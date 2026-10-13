@@ -6,6 +6,8 @@ import { loadConfig } from "../src/config.js";
 import { createPrisma, type Db } from "../src/db/prisma.js";
 import { seedCatalog } from "../src/db/seed.js";
 
+export const ADMIN_TOKEN = "token-de-admin-de-teste-com-mais-de-32-caracteres";
+
 export interface TestContext {
   app: FastifyInstance;
   db: Db;
@@ -21,11 +23,13 @@ export async function createTestContext(): Promise<TestContext> {
     NODE_ENV: "test",
     DATABASE_URL: url,
     JWT_SECRET: "segredo-de-teste-com-mais-de-32-caracteres!!",
+    ADMIN_TOKEN: ADMIN_TOKEN,
   });
   const db = createPrisma(url);
   await db.$executeRawUnsafe(
-    `TRUNCATE players, player_wallets, wallet_ledger, player_businesses,
-              idempotency_records, business_definitions RESTART IDENTITY CASCADE`,
+    `TRUNCATE players, player_wallets, wallet_ledger, player_businesses, idempotency_records,
+              business_definitions, player_missions, player_achievements, analytics_events
+     RESTART IDENTITY CASCADE`,
   );
   await seedCatalog(db);
 

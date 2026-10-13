@@ -14,6 +14,9 @@ signal offline_summary(district: String, total: String, elapsed_seconds: int, ca
 		cap_seconds: int)
 ## Conexão caiu (tentando de novo) / voltou.
 signal connection_changed(online: bool)
+## Missões do dia / conquistas atualizadas (para selos e telas abertas).
+signal missions_changed
+signal achievements_changed
 
 ## Sinal de presença (o servidor considera "fora do mapa" após 45 s sem sinal).
 const PRESENCE_INTERVAL := 15.0
@@ -34,9 +37,17 @@ const MESSAGES := {
 	"DISTRICT_LOCKED": "Compre os 4 negócios da praia para abrir a cidade.",
 	"MANAGER_ACTIVE": "Este negócio está produzindo sozinho.",
 	"MANAGER_ALREADY_HIRED": "Este negócio já tem ajudante.",
+	"MISSION_NOT_COMPLETED": "Termine a missão para resgatar.",
+	"MISSION_ALREADY_CLAIMED": "Prêmio já resgatado.",
+	"MISSION_NOT_FOUND": "Essa missão expirou. Veja as de hoje!",
+	"ACHIEVEMENT_LOCKED": "Conquista ainda não alcançada.",
+	"ACHIEVEMENT_ALREADY_CLAIMED": "Prêmio já resgatado.",
 }
 
 var state: Dictionary = {}
+## {day, resetsAt, missions:[...]} do servidor.
+var missions: Dictionary = {}
+var achievements: Array = []
 var loaded := false
 var busy := false
 var online := true
@@ -75,6 +86,8 @@ func boot() -> bool:
 	_apply_state(res.data)
 	_presence_timer.start()
 	await enter_district(current_district, true)
+	refresh_missions()
+	refresh_achievements()
 	return true
 
 
@@ -105,6 +118,7 @@ func enter_district(district: String, show_summary: bool) -> void:
 	_apply_state(res.data.state)
 	if not res.data.settled.is_empty():
 		collected.emit(res.data.settled)
+		refresh_missions()
 	if show_summary and int(res.data.elapsedSeconds) >= OFFLINE_SUMMARY_MIN_SECONDS \
 			and str(res.data.total) != "0":
 		offline_summary.emit(district, str(res.data.total), int(res.data.elapsedSeconds),
@@ -133,6 +147,71 @@ func has_managers() -> bool:
 
 func hire_manager(slug: String) -> bool:
 	return await _run(Api.hire_manager.bind(slug))
+
+
+func refresh_missions() -> void:
+	var res := await Api.missions()
+	if res.ok:
+		missions = res.data
+		missions_changed.emit()
+
+
+func refresh_achievements() -> void:
+	var res := await Api.achievements()
+	if res.ok:
+		achievements = res.data.achievements
+		achievements_changed.emit()
+
+
+func claim_mission(mission_id: String) -> bool:
+	if busy:
+		return false
+	_set_busy(true)
+	var res := await Api.claim_mission(mission_id)
+	_set_busy(false)
+	if not res.ok:
+		notice.emit(message_for(res.error_code))
+		refresh_missions()
+		return false
+	missions.missions = res.data.missions
+	_apply_state(res.data.state)
+	missions_changed.emit()
+	return true
+
+
+func claim_achievement(achievement_id: String) -> bool:
+	if busy:
+		return false
+	_set_busy(true)
+	var res := await Api.claim_achievement(achievement_id)
+	_set_busy(false)
+	if not res.ok:
+		notice.emit(message_for(res.error_code))
+		refresh_achievements()
+		return false
+	achievements = res.data.achievements
+	_apply_state(res.data.state)
+	achievements_changed.emit()
+	return true
+
+
+## Quantos prêmios esperam resgate (selo nos botões).
+func claimable_missions() -> int:
+	return missions.get("missions", []).filter(func(m): return m.completed and not m.claimed).size()
+
+
+func claimable_achievements() -> int:
+	return achievements.filter(func(a): return a.unlocked and not a.claimed).size()
+
+
+func gems() -> String:
+	return str(state.get("wallet", {}).get("gems", "0"))
+
+
+## Evento de interface para analytics (sem dados pessoais; envio em segundo plano).
+func track(event_name: String, props := {}) -> void:
+	if loaded:
+		Api.send_events([{"name": event_name, "props": props}])
 
 
 func complete_tutorial() -> void:
@@ -233,6 +312,8 @@ func _run(call: Callable) -> bool:
 			collected.emit(res.data.collected)
 		if res.data.has("settled") and not res.data.settled.is_empty():
 			collected.emit(res.data.settled)
+		refresh_missions()  # progresso das missões vem do servidor
+		refresh_achievements()
 		return true
 	if res.network_error:
 		_set_online(false)

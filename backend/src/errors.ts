@@ -45,6 +45,18 @@ export const Errors = {
     new AppError(404, "DISTRICT_NOT_FOUND", "Mapa não encontrado", { district }),
   managerAlreadyHired: (slug: string) =>
     new AppError(409, "MANAGER_ALREADY_HIRED", "Este negócio já tem ajudante", { slug }),
+  missionNotFound: (id: string) =>
+    new AppError(404, "MISSION_NOT_FOUND", "Missão não encontrada ou expirada", { id }),
+  missionAlreadyClaimed: (id: string) =>
+    new AppError(409, "MISSION_ALREADY_CLAIMED", "Prêmio já resgatado", { id }),
+  missionNotCompleted: (id: string) =>
+    new AppError(409, "MISSION_NOT_COMPLETED", "Missão ainda não concluída", { id }),
+  achievementNotFound: (id: string) =>
+    new AppError(404, "ACHIEVEMENT_NOT_FOUND", "Conquista não encontrada", { id }),
+  achievementLocked: (id: string) =>
+    new AppError(409, "ACHIEVEMENT_LOCKED", "Conquista ainda não alcançada", { id }),
+  achievementAlreadyClaimed: (id: string) =>
+    new AppError(409, "ACHIEVEMENT_ALREADY_CLAIMED", "Prêmio já resgatado", { id }),
   nothingToCollect: () => new AppError(409, "NOTHING_TO_COLLECT", "Nada pronto para coletar"),
   idempotencyKeyRequired: () =>
     new AppError(

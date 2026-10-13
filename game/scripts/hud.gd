@@ -15,6 +15,7 @@ const UiFont := preload("res://scripts/ui_font.gd")
 const Style := preload("res://scripts/ui_style.gd")
 const MenuModal := preload("res://scripts/menu_modal.gd")
 const Tutorial := preload("res://scripts/tutorial.gd")
+const GlyphButton := preload("res://scripts/glyph_button.gd")
 
 var slug := ""
 var current_district := "praia"
@@ -33,6 +34,12 @@ var _modal: Control
 var tutorial: Control
 ## Cartões da tela de Ajudantes aberta (slug → identificador), atualizados no lugar.
 var _helper_cards := {}
+## Cartões de Missões/Conquistas abertos (id → identificador), atualizados no lugar.
+var _reward_cards := {}
+var _reward_kind := ""  # "missions" | "achievements" | ""
+var _missions_button: Control
+var _ranking_button: Control
+var _gems_label: Label
 var _toast: Label
 var _toast_timer: Timer
 var _offline_pill: PanelContainer
@@ -47,6 +54,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	theme = _build_theme()
 	_build_top()
+	_build_side_buttons()
 	_build_bottom_bar()
 	_build_sheet()
 	tutorial = Tutorial.new()
@@ -64,6 +72,9 @@ func _ready() -> void:
 	GameState.notice.connect(show_toast)
 	GameState.offline_summary.connect(show_offline_summary)
 	GameState.state_changed.connect(_sync_helper_cards)
+	GameState.missions_changed.connect(_sync_rewards)
+	GameState.achievements_changed.connect(_sync_rewards)
+	GameState.busy_changed.connect(func(_b): _sync_rewards())
 	GameState.busy_changed.connect(func(_b): _sync_helper_cards())
 	GameState.connection_changed.connect(func(online): _offline_pill.visible = not online)
 
@@ -88,6 +99,8 @@ func show_offline_summary(district: String, total: String, elapsed_seconds: int,
 		cap_seconds: int) -> void:
 	close_sheet()
 	_helper_cards.clear()
+	_reward_cards.clear()
+	_reward_kind = ""
 	_modal.open(tr("Bem-vindo de volta!"))
 	var body := tr("Em %s fora da %s, seus ajudantes faturaram:") % [
 		Fmt.duration(elapsed_seconds), Layout.title(district)]
@@ -102,6 +115,9 @@ func show_offline_summary(district: String, total: String, elapsed_seconds: int,
 func open_helpers_menu() -> void:
 	close_sheet()
 	_helper_cards.clear()
+	_reward_cards.clear()
+	_reward_kind = ""
+	GameState.track("screen_view", {"screen": "ajudantes"})
 	_modal.open(tr("Ajudantes · %s") % Layout.title(current_district))
 	var auto_text := tr("Auto-coleta neste mapa: ativa") if GameState.auto_collect() \
 			else tr("Auto-coleta enquanto você joga neste mapa: em breve na Loja")
@@ -182,6 +198,7 @@ func _refresh() -> void:
 	if not GameState.loaded:
 		return
 	_coins_label.text = Fmt.coins(GameState.coins())
+	_gems_label.text = Fmt.coins(GameState.gems())
 	_rate_label.text = Fmt.rate(GameState.income_per_second())
 	_district_label.text = Layout.title(current_district)
 
@@ -266,6 +283,8 @@ func _on_hire_pressed() -> void:
 func open_build_menu() -> void:
 	close_sheet()
 	_helper_cards.clear()
+	_reward_cards.clear()
+	_reward_kind = ""
 	_modal.open(tr("Construir · %s") % Layout.title(current_district))
 	var unlocked := GameState.district_unlocked(current_district)
 	var shown := 0
@@ -296,6 +315,8 @@ func _next_district(id: String) -> String:
 func open_map_menu() -> void:
 	close_sheet()
 	_helper_cards.clear()
+	_reward_cards.clear()
+	_reward_kind = ""
 	_modal.open(tr("Mapa"))
 	for id in Layout.DISTRICT_ORDER:
 		var unlocked := GameState.district_unlocked(id)
@@ -316,6 +337,142 @@ func open_map_menu() -> void:
 		var target: String = id
 		_modal.add_district(id, status, id == current_district, unlocked,
 				func(): district_requested.emit(target))
+
+
+# --- Missões, Ranking e Perfil/Conquistas (Etapa 3) ---------------------------
+
+func open_missions_menu() -> void:
+	_open_rewards("missions")
+	_modal.open(tr("Missões do dia"))
+	_modal.add_message(null, "", tr("Complete as missões e resgate moedas e diamantes.") + "\n" + _reset_text())
+	for m in GameState.missions.get("missions", []):
+		var mission: Dictionary = m
+		var id: String = mission.id
+		_reward_cards[id] = _modal.add_reward_card(_mission_item(mission), func(): GameState.claim_mission(id))
+	GameState.refresh_missions()
+
+
+func open_profile_menu() -> void:
+	_open_rewards("achievements")
+	_modal.open(tr("Perfil"))
+	var player: Dictionary = GameState.state.get("player", {})
+	var owned := GameState.businesses().filter(func(b): return b.owned).size()
+	var helpers := GameState.businesses().filter(func(b): return b.get("managed", false)).size()
+	_modal.add_message(Layout.texture("icon_profile"), str(player.get("displayName", "")),
+			tr("%d negócios · %d ajudantes · %s diamantes") % [owned, helpers, Fmt.coins(GameState.gems())])
+	_modal.add_section(tr("Conquistas"))
+	for a in GameState.achievements:
+		var ach: Dictionary = a
+		var id: String = ach.id
+		_reward_cards[id] = _modal.add_reward_card(_achievement_item(ach), func(): GameState.claim_achievement(id))
+	GameState.refresh_achievements()
+
+
+func open_ranking_menu() -> void:
+	close_sheet()
+	_helper_cards.clear()
+	_reward_cards.clear()
+	_reward_kind = "ranking"
+	GameState.track("screen_view", {"screen": "ranking"})
+	_modal.open(tr("Ranking da semana"))
+	_modal.add_message(null, "", tr("Carregando…"))
+	var res := await Api.leaderboard()
+	if _reward_kind != "ranking" or not _modal.visible:
+		return
+	_modal.clear_list()
+	if not res.ok:
+		_modal.add_message(null, "", GameState.message_for(res.error_code))
+		return
+	var data: Dictionary = res.data
+	var ends := _iso_seconds(data.week.end) - _iso_seconds(data.serverTime)
+	_modal.add_message(null, tr("Desafio dos 7 dias"),
+			tr("Quem faturar mais com seus negócios até domingo vence.\nTermina em %s.") % Fmt.duration(ends))
+	if data.entries.is_empty():
+		_modal.add_message(null, "", tr("Ninguém faturou nesta semana ainda. Colete moedas e saia na frente!"))
+	for e in data.entries:
+		_modal.add_rank_row(int(e.rank), e.displayName, e.score, e.isMe)
+	if data.me != null and not data.entries.any(func(e): return e.isMe):
+		_modal.add_section(tr("Sua posição"))
+		_modal.add_rank_row(int(data.me.rank), data.me.displayName, data.me.score, true)
+	_modal.refit()
+
+
+func _open_rewards(kind: String) -> void:
+	close_sheet()
+	_helper_cards.clear()
+	_reward_cards.clear()
+	_reward_kind = kind
+	GameState.track("screen_view", {"screen": kind})
+
+
+func _mission_item(m: Dictionary) -> Dictionary:
+	return {"title": m.title, "progress": m.progress, "target": m.target, "rewardCoins": m.rewardCoins,
+		"rewardGems": m.rewardGems, "done": m.completed, "claimed": m.claimed}
+
+
+func _achievement_item(a: Dictionary) -> Dictionary:
+	return {"title": a.title, "subtitle": a.description, "progress": a.progress, "target": a.target,
+		"rewardGems": a.rewardGems, "done": a.unlocked, "claimed": a.claimed}
+
+
+## Missões/conquistas mudaram: atualiza selos e, se a tela estiver aberta, os cartões no lugar.
+func _sync_rewards() -> void:
+	if _missions_button:
+		_missions_button.badge = GameState.claimable_missions()
+	if _ranking_button:
+		_ranking_button.badge = 0
+	if _reward_cards.is_empty() or not _modal.visible:
+		return
+	if _reward_kind == "missions":
+		for m in GameState.missions.get("missions", []):
+			if _reward_cards.has(m.id):
+				_modal.set_reward_card(_reward_cards[m.id], _mission_item(m))
+	elif _reward_kind == "achievements":
+		for a in GameState.achievements:
+			if _reward_cards.has(a.id):
+				_modal.set_reward_card(_reward_cards[a.id], _achievement_item(a))
+
+
+func _reset_text() -> String:
+	var data: Dictionary = GameState.missions
+	if not data.has("resetsAt"):
+		return ""
+	var left := _iso_seconds(data.resetsAt) - _iso_seconds(data.serverTime)
+	return tr("Novas missões em %s.") % Fmt.duration(left)
+
+
+## Segundos Unix de um ISO 8601 do servidor ("2026-01-02T03:00:00.000Z").
+static func _iso_seconds(iso: String) -> float:
+	return Time.get_unix_time_from_datetime_string(iso.substr(0, 19))
+
+
+func _build_side_buttons() -> void:
+	var col := VBoxContainer.new()
+	col.position = Vector2(18, 232)
+	col.add_theme_constant_override("separation", 6)
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(col)
+	_missions_button = _side_button(col, GlyphButton.Glyph.MISSIONS, Style.ORANGE, Style.ORANGE_DARK,
+			tr("Missões"), open_missions_menu)
+	_ranking_button = _side_button(col, GlyphButton.Glyph.TROPHY, Color("9b7bff"), Color("6a4fd1"),
+			tr("Ranking"), open_ranking_menu)
+
+
+func _side_button(parent: Control, glyph: int, color: Color, edge: Color, text_value: String,
+		handler: Callable) -> Control:
+	var b: Control = GlyphButton.new(glyph, color, edge, 76.0)
+	b.pressed.connect(handler)
+	parent.add_child(b)
+	var label := Label.new()
+	label.text = text_value
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.custom_minimum_size.x = 76
+	label.add_theme_font_size_override("font_size", 20)
+	label.add_theme_color_override("font_color", Color.WHITE)
+	label.add_theme_color_override("font_outline_color", Style.TEAL_DARK)
+	label.add_theme_constant_override("outline_size", 8)
+	parent.add_child(label)
+	return b
 
 
 # --- Construção da interface -------------------------------------------------
@@ -401,11 +558,33 @@ func _build_top() -> void:
 	money.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(money)
 	money.add_child(_money_pill(true))
+	money.add_child(_gems_pill())
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	money.add_child(spacer)
 	money.add_child(_money_pill(false))
+
+
+func _gems_pill() -> PanelContainer:
+	var pill := PanelContainer.new()
+	pill.add_theme_stylebox_override("panel", Style.box(Color("e3f6ff"), 32, Color("2bb6e0"), 4))
+	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	pill.add_child(row)
+	var gem := TextureRect.new()
+	gem.texture = GlyphButton.gem_texture()
+	gem.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	gem.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	gem.custom_minimum_size = Vector2(34, 34)
+	row.add_child(gem)
+	_gems_label = Label.new()
+	_gems_label.add_theme_font_size_override("font_size", 30)
+	_gems_label.add_theme_color_override("font_color", Color("1f7fa8"))
+	_gems_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(_gems_label)
+	return pill
 
 
 func _money_pill(is_coins: bool) -> PanelContainer:
@@ -450,7 +629,7 @@ func _build_bottom_bar() -> void:
 		["icon_helpers", tr("Ajudantes"), open_helpers_menu],
 		["icon_shop", tr("Loja"), func(): show_toast(tr("Loja em breve"))],
 		["icon_map", tr("Mapa"), open_map_menu],
-		["icon_profile", tr("Perfil"), func(): show_toast(tr("Perfil em breve"))],
+		["icon_profile", tr("Perfil"), open_profile_menu],
 	]:
 		var col := VBoxContainer.new()
 		col.add_theme_constant_override("separation", 2)

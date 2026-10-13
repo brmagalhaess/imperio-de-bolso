@@ -20,6 +20,24 @@ func _ready() -> void:
 	while not GameState.loaded:
 		await get_tree().process_frame
 	var hud: Control = main.get_node("UI/HUD")
+	if mode == "etapa3":
+		await _wait(2.5)
+		hud._modal.close()
+		await _wait(0.8)
+		print("PASSO tela com botões laterais")
+		hud.open_missions_menu()
+		await _wait(1.5)
+		print("PASSO missões")
+		hud._modal.close()
+		hud.open_ranking_menu()
+		await _wait(1.8)
+		print("PASSO ranking")
+		hud._modal.close()
+		hud.open_profile_menu()
+		await _wait(1.5)
+		print("PASSO perfil e conquistas")
+		get_tree().quit()
+		return
 	if mode == "ajudantes":
 		await _wait(2.5)
 		hud._modal.close()

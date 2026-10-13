@@ -8,6 +8,12 @@ const ConfigSchema = z.object({
   JWT_SECRET: z.string().min(32, "JWT_SECRET precisa de pelo menos 32 caracteres"),
   JWT_EXPIRES_IN: z.string().default("1h"),
   STARTING_COINS: z.coerce.bigint().nonnegative().default(100n),
+  // Painel admin (somente leitura). Sem token configurado, as rotas /api/admin ficam desligadas.
+  // Vazio (ex.: `ADMIN_TOKEN=` no compose) = desligado.
+  ADMIN_TOKEN: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.string().min(32, "ADMIN_TOKEN precisa de pelo menos 32 caracteres").optional(),
+  ),
 });
 
 export type AppConfig = z.infer<typeof ConfigSchema>;

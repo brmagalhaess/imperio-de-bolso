@@ -24,6 +24,7 @@ var target_provider: Callable
 var blockers: Array = []
 var _collected_once := false
 var _finishing := false
+var _started_tracked := false
 var _card: PanelContainer
 var _label: Label
 var _arrow: Control
@@ -63,7 +64,9 @@ func _ready() -> void:
 	skip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	skip.add_theme_font_size_override("font_size", 22)
 	Style.style_button(skip, Style.GREY, Style.GREY_DARK, 22)
-	skip.pressed.connect(_finish)
+	skip.pressed.connect(func():
+		GameState.track("tutorial_skipped", {"step": int(current_step())})
+		_finish())
 	row.add_child(skip)
 
 	_arrow = Control.new()
@@ -103,6 +106,9 @@ func _update() -> void:
 		return
 	visible = true
 	_label.text = tr(TEXTS[step])
+	if not _started_tracked:
+		_started_tracked = true
+		GameState.track("tutorial_started")
 
 
 func _process(_delta: float) -> void:

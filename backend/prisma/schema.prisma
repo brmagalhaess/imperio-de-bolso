@@ -31,10 +31,13 @@ model Player {
   autoCollect         Boolean   @default(false) @map("auto_collect")
   createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
 
-  wallet      PlayerWallet?
-  businesses  PlayerBusiness[]
-  ledger      WalletLedger[]
-  idempotency IdempotencyRecord[]
+  wallet       PlayerWallet?
+  businesses   PlayerBusiness[]
+  ledger       WalletLedger[]
+  idempotency  IdempotencyRecord[]
+  missions     PlayerMission[]
+  achievements PlayerAchievement[]
+  events       AnalyticsEvent[]
 
   @@map("players")
 }
@@ -65,6 +68,7 @@ model WalletLedger {
   player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
   @@index([playerId, createdAt])
+  @@index([reason, createdAt])
   @@map("wallet_ledger")
 }
 
@@ -123,4 +127,51 @@ model IdempotencyRecord {
 
   @@id([playerId, key])
   @@map("idempotency_records")
+}
+
+// Missões diárias (docs/README.md §3/§10): 3 por jogador por dia (horário de Brasília).
+model PlayerMission {
+  id          String    @id @default(uuid()) @db.Uuid
+  playerId    String    @map("player_id") @db.Uuid
+  day         String // AAAA-MM-DD em America/Sao_Paulo
+  template    String
+  target      BigInt
+  progress    BigInt    @default(0)
+  rewardCoins BigInt    @map("reward_coins")
+  rewardGems  Int       @map("reward_gems")
+  claimedAt   DateTime? @map("claimed_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, day, template])
+  @@index([playerId, day])
+  @@map("player_missions")
+}
+
+model PlayerAchievement {
+  playerId      String    @map("player_id") @db.Uuid
+  achievementId String    @map("achievement_id")
+  unlockedAt    DateTime  @default(now()) @map("unlocked_at") @db.Timestamptz(3)
+  claimedAt     DateTime? @map("claimed_at") @db.Timestamptz(3)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, achievementId])
+  @@map("player_achievements")
+}
+
+// Eventos de analytics (docs/README.md §13). Sem dados pessoais nas propriedades.
+model AnalyticsEvent {
+  id        BigInt   @id @default(autoincrement())
+  playerId  String?  @map("player_id") @db.Uuid
+  name      String
+  props     Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  player Player? @relation(fields: [playerId], references: [id], onDelete: SetNull)
+
+  @@index([name, createdAt])
+  @@index([playerId, createdAt])
+  @@map("analytics_events")
 }

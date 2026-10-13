@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 import type { AppConfig } from "./config.js";
 import type { Db } from "./db/prisma.js";
 import { AppError } from "./errors.js";
+import { adminRoutes } from "./routes/admin.js";
 import { v1Routes } from "./routes/v1.js";
 
 declare module "@fastify/jwt" {
@@ -79,6 +80,16 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   await app.register((instance) => v1Routes(instance, { config: deps.config, db: deps.db, now }), {
     prefix: "/api/v1",
   });
+
+  const adminToken = deps.config.ADMIN_TOKEN;
+  if (adminToken) {
+    await app.register(
+      (instance) => adminRoutes(instance, { db: deps.db, token: adminToken, now }),
+      {
+        prefix: "/api/admin",
+      },
+    );
+  }
 
   return app;
 }

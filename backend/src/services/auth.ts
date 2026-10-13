@@ -1,6 +1,7 @@
 import { createHash, randomBytes, randomInt, randomUUID, timingSafeEqual } from "node:crypto";
 import type { Db } from "../db/prisma.js";
 import { Errors } from "../errors.js";
+import { track } from "./analytics.js";
 
 // Conta convidada: o servidor gera guestId + segredo de alta entropia, devolvidos
 // uma única vez; o cliente guarda os dois e troca por JWT curto a cada sessão.
@@ -41,6 +42,7 @@ export async function createGuest(db: Db, startingCoins: bigint): Promise<GuestS
         idempotencyKey: `${created.id}:initial_grant`,
       },
     });
+    await track(tx, created.id, "player_created");
     return created;
   });
 

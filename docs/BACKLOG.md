@@ -44,10 +44,13 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Arte própria dos ajudantes (1 por negócio) e ícone do botão Ajudantes
 
 ## Etapa 3 — Retenção
-- [ ] Missões diárias (3), conquistas simples, ranking semanal
-- [ ] Eventos de analytics (§13) e tabela `analytics_events`
-- [ ] Painel admin React mínimo (`admin/`)
-- [ ] Reivindicação de prêmios idempotente + testes de integração
+- [x] Missões diárias (3), conquistas simples, ranking semanal (ADR 0007)
+- [x] Eventos de analytics (§13) e tabela `analytics_events`
+- [x] Painel admin React mínimo (`admin/`), somente leitura, Docker + CI
+- [x] Reivindicação de prêmios idempotente + testes de integração
+- [ ] Ícones definitivos de Missões, Ranking e Diamante (hoje placeholder em código)
+- [ ] Prêmios de fim de semana do ranking; amigos e "batalha de impérios"
+- [ ] Editar nome do jogador (hoje "Empreendedor 1234") com moderação
 
 ## Etapa 4 — Monetização sandbox
 - [ ] Loja: **auto-coleta no mapa aberto** (liga `players.auto_collect`; forma/preço a definir — ADR 0006)

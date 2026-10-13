@@ -32,6 +32,8 @@ services:
       DATABASE_URL: postgresql://imperio:imperio@postgres:5432/imperio
       JWT_SECRET: ${JWT_SECRET:-dev-only-segredo-local-nao-usar-em-producao-123}
       STARTING_COINS: "100"
+      # Painel admin: defina ADMIN_TOKEN (openssl rand -hex 32) para ligar /api/admin.
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
     ports:
       - "3000:3000"
     healthcheck:
@@ -39,6 +41,15 @@ services:
       interval: 10s
       timeout: 3s
       retries: 10
+
+  admin:
+    profiles: ["api"]
+    build:
+      context: ../admin
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
 
 volumes:
   pgdata:

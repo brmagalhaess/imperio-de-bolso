@@ -26,7 +26,9 @@ static func duration(seconds: float) -> String:
 		return "%d s" % s
 	if s < 3600:
 		return "%d min %02d s" % [s / 60, s % 60]
-	return "%d h %02d min" % [s / 3600, (s % 3600) / 60]
+	if s < 86400:
+		return "%d h %02d min" % [s / 3600, (s % 3600) / 60]
+	return "%d d %02d h" % [s / 86400, (s % 86400) / 3600]
 
 
 ## Renda por segundo: "+12/s", "+12,5/s", "+1.250/s".

@@ -105,6 +105,33 @@ antes de subir de nível. `player.currentDistrict` e `player.autoCollect` vêm n
 Sem Idempotency-Key (não mexe em saldo); idempotente. `200 PlayerState` com
 `player.tutorialCompleted: true`.
 
+### `GET /missions`
+`200 { day, resetsAt, missions: [{ id, template, title, target, progress, completed, claimed,
+rewardCoins, rewardGems }], serverTime }` — 3 missões do dia (Brasília), criadas na 1ª consulta.
+
+### `POST /missions/claim` — `Idempotency-Key`
+Corpo `{ missionId }`. `200 { claimed, missions, state }`. `409 MISSION_NOT_COMPLETED`,
+`409 MISSION_ALREADY_CLAIMED`, `404 MISSION_NOT_FOUND` (de outro jogador ou de outro dia).
+
+### `GET /achievements`
+`200 { achievements: [{ id, title, description, rewardGems, progress, target, unlocked, claimed }] }`.
+
+### `POST /achievements/claim` — `Idempotency-Key`
+Corpo `{ achievementId }`. `200 { claimed, achievements, state }`. `409 ACHIEVEMENT_LOCKED`,
+`409 ACHIEVEMENT_ALREADY_CLAIMED`, `404 ACHIEVEMENT_NOT_FOUND`.
+
+### `GET /leaderboard`
+`200 { week: { start, end }, entries: [{ rank, displayName, score, isMe }], me, serverTime }` —
+faturamento de produção na semana (segunda 00:00 Brasília), top 50; `me` é null se o jogador
+não faturou na semana.
+
+### `POST /analytics/events`
+Corpo `{ events: [{ name, props? }] }` (1–20). Nomes permitidos: `tutorial_started`,
+`tutorial_step`, `tutorial_skipped`, `screen_view`, `crash`. `202 { accepted }`.
+
+### Admin — `/api/admin/*` (fora do `/api/v1`)
+`Authorization: Bearer <ADMIN_TOKEN>`; desligado sem token. Somente leitura:
+`GET /overview`, `GET /players?search&limit`, `GET /players/:id`, `GET /events?name&limit`.
+
 ### Ainda não implementados (docs/README.md §11)
-`POST /auth/link`, `GET /missions`, `POST /missions/claim`, `GET /leaderboard`,
-`GET /store/catalog`, `POST /purchases/verify`, `GET /config`.
+`POST /auth/link`, `GET /store/catalog`, `POST /purchases/verify`, `GET /config`.
