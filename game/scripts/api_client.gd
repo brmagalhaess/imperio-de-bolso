@@ -65,9 +65,10 @@ func hire_manager(slug: String) -> Dictionary:
 	return await _command("/managers/hire", {"businessSlug": slug})
 
 
-## Liquida a produção automática (ajudantes) no servidor.
-func settle() -> Dictionary:
-	return await _command("/production/settle", {})
+## Presença no mapa (ADR 0006): ao abrir, ao trocar de mapa e a cada ~15 s. Ao entrar num
+## mapa o servidor paga o AFK dos ajudantes dele.
+func presence(district: String) -> Dictionary:
+	return await _command("/presence", {"district": district})
 
 
 func complete_tutorial() -> Dictionary:

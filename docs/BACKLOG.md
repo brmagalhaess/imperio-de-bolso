@@ -40,6 +40,8 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Prédios reagem visualmente ao nível (3 artes por negócio)
 - [ ] Sons e efeitos sonoros (sem assets ainda)
 - [ ] Confirmar com o titular o preço dos ajudantes
+- [x] Tela Ajudantes (ver e contratar por mapa) e AFK por mapa (ADR 0006)
+- [ ] Arte própria dos ajudantes (1 por negócio) e ícone do botão Ajudantes
 
 ## Etapa 3 — Retenção
 - [ ] Missões diárias (3), conquistas simples, ranking semanal
@@ -48,6 +50,9 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [ ] Reivindicação de prêmios idempotente + testes de integração
 
 ## Etapa 4 — Monetização sandbox
+- [ ] Loja: **auto-coleta no mapa aberto** (liga `players.auto_collect`; forma/preço a definir — ADR 0006)
+- [ ] Loja: **pacotes de horas de coleta** (ex.: +2h de produção na hora, por mapa)
+- [ ] Anúncio recompensado para dobrar o AFK ao voltar (conversa original)
 - [ ] ADR do plugin AdMob para Godot (Android/iOS), IDs de teste, SSV com assinatura
 - [ ] Contratos IAP (Apple/Google), mocks, verificação de recibo, revogação/reembolso
 - [ ] `POST /purchases/verify`, `GET /store/catalog`

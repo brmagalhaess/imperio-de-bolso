@@ -24,6 +24,11 @@ model Player {
   guestSecretHash     String    @map("guest_secret_hash")
   displayName         String    @map("display_name")
   tutorialCompletedAt DateTime? @map("tutorial_completed_at") @db.Timestamptz(3)
+  // Presença por mapa (ADR 0006): mapa aberto agora e último sinal do jogo.
+  currentDistrict     String?   @map("current_district")
+  lastSeenAt          DateTime? @map("last_seen_at") @db.Timestamptz(3)
+  // Auto-coleta no mapa aberto: item da Loja (Etapa 4); desligada por padrão.
+  autoCollect         Boolean   @default(false) @map("auto_collect")
   createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
 
   wallet      PlayerWallet?

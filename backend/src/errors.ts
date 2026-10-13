@@ -40,7 +40,9 @@ export const Errors = {
       { district, requires },
     ),
   managerActive: (slug: string) =>
-    new AppError(409, "MANAGER_ACTIVE", "O ajudante já coleta este negócio sozinho", { slug }),
+    new AppError(409, "MANAGER_ACTIVE", "Este negócio está produzindo sozinho", { slug }),
+  districtNotFound: (district: string) =>
+    new AppError(404, "DISTRICT_NOT_FOUND", "Mapa não encontrado", { district }),
   managerAlreadyHired: (slug: string) =>
     new AppError(409, "MANAGER_ALREADY_HIRED", "Este negócio já tem ajudante", { slug }),
   nothingToCollect: () => new AppError(409, "NOTHING_TO_COLLECT", "Nada pronto para coletar"),

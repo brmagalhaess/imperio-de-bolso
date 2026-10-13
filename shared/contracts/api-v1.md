@@ -53,7 +53,7 @@ Corpo vazio → cria conta convidada (100 moedas). Corpo `{ guestId, guestSecret
   "profitPerCycle": "10", "nextUpgradeCost": "115",
   "cycleStartedAt": "ISO|null", "cycleEndsAt": "ISO|null",
   "ready": false, "secondsRemaining": 7,
-  "managed": false, "managerCost": "150", "pendingAmount": "0"
+  "managed": false, "automatic": false, "managerCost": "150", "pendingAmount": "0"
 }
 ```
 Slugs atuais: `agua`, `pipoca`, `sorveteria`, `quiosque_coco` (Ilha da Praia), `mercadinho`,
@@ -84,18 +84,22 @@ acumula **no máximo 1 ciclo**; a coleta credita `profitPerCycle` e reinicia o c
   `409 BUSINESS_NOT_OWNED`, `404`
 
 ### `POST /managers/hire` — `Idempotency-Key`
-Corpo `{ businessSlug }`. Cobra `managerCost`; o negócio passa a produzir sozinho. O andamento
-do ciclo manual vira sobra e, se já estava pronto, é pago na hora.
-- `200 { hired, settled: [{ slug, cycles, amount }], state }`
+Corpo `{ businessSlug }`. Cobra `managerCost`. No mapa aberto o negócio segue manual e o ajudante
+produz quando o jogador sair; fora do mapa já começa a produzir AFK.
+- `200 { hired, state }`
 - `409 BUSINESS_NOT_OWNED`, `409 MANAGER_ALREADY_HIRED`, `409 INSUFFICIENT_FUNDS`, `404`
 
-### `POST /production/settle` — `Idempotency-Key`
-Corpo `{}`. Liquida todos os negócios com ajudante: `clamp(agora − última, 0, 4h)` + sobra.
-- `200 { settled: [{ slug, cycles, amount }], total, elapsedSeconds, capped, capSeconds, state }`
-Com ajudante, `secondsRemaining` é o tempo até o próximo ciclo automático e `pendingAmount`
-é o lucro já produzido e ainda não liquidado (só leitura). Melhorar um negócio com ajudante
-liquida antes de subir de nível. `POST /production/collect` em negócio com ajudante →
-`409 MANAGER_ACTIVE`.
+### `POST /presence` — `Idempotency-Key`
+Corpo `{ district }` (`praia` | `cidade`). Chamar ao abrir o jogo, ao trocar de mapa e a cada
+~15 s. Sem sinal por 45 s o jogador conta como fora do mapa desde o último sinal (ADR 0006).
+Ao entrar num mapa, paga o AFK dos negócios com ajudante dele (`clamp(agora − saída, 0, 4h)` +
+sobra) e eles voltam ao ciclo manual; o mapa deixado passa a produzir AFK.
+- `200 { district, returned, settled: [{ slug, cycles, amount }], total, elapsedSeconds, capped,
+  capSeconds, state }` — `returned: false` quando o jogador já estava no mapa.
+- `404 DISTRICT_NOT_FOUND`
+Negócio com `automatic: true` (AFK ou auto-coleta) não tem bolha; `pendingAmount` é o AFK ainda
+não pago (só leitura). `POST /production/collect` nele → `409 MANAGER_ACTIVE`. Melhorar liquida
+antes de subir de nível. `player.currentDistrict` e `player.autoCollect` vêm no estado.
 
 ### `POST /tutorial/complete`
 Sem Idempotency-Key (não mexe em saldo); idempotente. `200 PlayerState` com

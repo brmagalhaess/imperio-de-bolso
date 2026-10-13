@@ -2,6 +2,20 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-13 — AFK por mapa e tela de Ajudantes (pedido do titular, ADR 0006)
+
+- **Regra nova:** no mapa aberto a coleta é manual; ajudantes produzem AFK fora do mapa (outro
+  mapa ou jogo fechado), 4h por mapa, pagos ao voltar. Auto-coleta no mapa e pacotes de horas
+  ficam para a Loja (Etapa 4). Desvio consciente da doc §3, registrado no ADR.
+- **Servidor:** `POST /presence` (substitui `/production/settle`), presença expira em 45 s,
+  colunas `current_district`, `last_seen_at`, `auto_collect`; migração devolve ajudantes ao
+  manual. 56/56 testes (Praia produz enquanto joga na Cidade, jogo fechado, teto por mapa,
+  auto-coleta, relógio, concorrência, replay).
+- **Jogo:** botão **Ajudantes** (contratar/contratado/travado por mapa), Mapa mostra o AFK
+  esperando, resumo por mapa, sinal de presença a cada 15 s. Executor de testes agora reprova
+  erro de script dentro de subseções. Unitários 37/37; integração 57/57.
+- **Pendente:** arte própria dos ajudantes e ícone do botão (hoje: personagens existentes).
+
 ## 2026-10-13 — Etapa 2: ajudantes, offline 4h, tutorial, reconexão
 
 Revisados antes: docs/README.md (§2, §3, §7, §8, §18), PROMPT_MESTRE (Etapa 2) e a conversa original.

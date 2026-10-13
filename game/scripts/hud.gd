@@ -80,15 +80,39 @@ func close_sheet() -> void:
 
 
 ## "Enquanto você estava fora…" — o servidor já creditou; a janela só mostra (docs §8).
-func show_offline_summary(total: String, elapsed_seconds: int, capped: bool, cap_seconds: int) -> void:
+func show_offline_summary(district: String, total: String, elapsed_seconds: int, capped: bool,
+		cap_seconds: int) -> void:
 	close_sheet()
 	_modal.open(tr("Bem-vindo de volta!"))
-	var body := tr("Em %s fora, seus ajudantes faturaram:") % Fmt.duration(elapsed_seconds)
+	var body := tr("Em %s fora da %s, seus ajudantes faturaram:") % [
+		Fmt.duration(elapsed_seconds), Layout.title(district)]
 	_modal.add_message(Layout.texture("char_vendor"), "+" + Fmt.coins(total), body)
 	if capped:
-		_modal.add_message(null, "", tr("Os ajudantes trabalham até %s sem você. Volte antes para não perder nada!")
+		_modal.add_message(null, "", tr("Os ajudantes trabalham até %s fora de cada mapa. Volte antes para não perder nada!")
 				% Fmt.duration(cap_seconds))
 	_modal.add_action(tr("Coletar"), func(): pass, Style.ORANGE, Style.ORANGE_DARK)
+
+
+## Tela de Ajudantes do mapa atual: ver quem já trabalha e contratar (pedido do titular).
+func open_helpers_menu() -> void:
+	close_sheet()
+	_modal.open(tr("Ajudantes · %s") % Layout.title(current_district))
+	var auto_text := tr("Auto-coleta neste mapa: ativa") if GameState.auto_collect() \
+			else tr("Auto-coleta enquanto você joga neste mapa: em breve na Loja")
+	_modal.add_message(null, "", tr("Ajudantes produzem sozinhos enquanto você está em outro mapa ou com o jogo fechado — até 4 horas por mapa.") + "\n" + auto_text)
+	for b in GameState.businesses():
+		if Layout.district_of(b.slug) != current_district:
+			continue
+		var state := "hired" if b.get("managed", false) else ("buy" if b.owned else "locked")
+		var target: String = b.slug
+		_modal.add_helper(b, state, func(): _hire_from_menu(target))
+
+
+func _hire_from_menu(target: String) -> void:
+	var b := GameState.business(target)
+	if await GameState.hire_manager(target):
+		show_toast(tr("Ajudante contratado para %s!") % b.name)
+		open_helpers_menu()
 
 
 func show_loading() -> void:
@@ -142,8 +166,10 @@ func _refresh() -> void:
 	if b.owned:
 		_info.text = tr("Nível %d · Lucro %s a cada %s") % [
 			int(b.level), Fmt.coins(b.profitPerCycle), Fmt.duration(b.cycleSeconds)]
-		if b.get("managed", false):
-			_info.text += tr(" · Ajudante trabalhando")
+		if b.get("automatic", false):
+			_info.text += tr(" · Produzindo sozinho")
+		elif b.get("managed", false):
+			_info.text += tr(" · Ajudante produz quando você sai do mapa")
 		if b.nextUpgradeCost == null:
 			_action_button.text = tr("Nível máximo")
 			_action_button.disabled = true
@@ -174,7 +200,7 @@ func _update_cycle(b: Dictionary) -> void:
 	if not b.owned:
 		return
 	_progress.value = GameState.cycle_progress(b) * 100.0
-	if b.get("managed", false):
+	if b.get("automatic", false):
 		_collect_button.disabled = true
 		_collect_button.text = tr("Automático · %s") % Fmt.duration(GameState.seconds_remaining(b))
 		return
@@ -251,10 +277,13 @@ func open_map_menu() -> void:
 				total += 1
 				owned += 1 if b.owned else 0
 		var status := tr("%d de %d negócios") % [owned, total]
+		var pending := GameState.pending_in(id)
 		if id == current_district:
 			status = tr("Você está aqui · ") + status
 		elif not unlocked:
 			status = tr("Compre os 4 negócios da praia")
+		elif pending > 0:
+			status += "\n" + tr("Ajudantes juntaram +%s") % Fmt.coins(str(pending))
 		var target: String = id
 		_modal.add_district(id, status, id == current_district, unlocked,
 				func(): district_requested.emit(target))
@@ -377,6 +406,24 @@ func _money_pill(is_coins: bool) -> PanelContainer:
 	return pill
 
 
+## Botão dos Ajudantes no mesmo formato dos ícones (quadrado arredondado com degrau).
+## Ícone provisório: retrato do vendedor (arte própria: a gerar).
+func _helpers_button(size: int, handler: Callable) -> Button:
+	var b := Button.new()
+	b.custom_minimum_size = Vector2(size, size)
+	b.icon = Layout.texture("char_vendor")
+	b.expand_icon = true
+	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	b.add_theme_constant_override("icon_max_width", int(size * 0.5))
+	Style.style_button(b, Color("9b7bff"), Color("6a4fd1"), 24)
+	for state in ["normal", "hover", "pressed"]:
+		var box: StyleBoxFlat = b.get_theme_stylebox(state)
+		box.content_margin_top = 8
+		box.content_margin_bottom = 12
+	b.pressed.connect(handler)
+	return b
+
+
 func _build_bottom_bar() -> void:
 	var bar := PanelContainer.new()
 	bar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE, Control.PRESET_MODE_MINSIZE, 20)
@@ -385,10 +432,11 @@ func _build_bottom_bar() -> void:
 	add_child(bar)
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", 18)
+	row.add_theme_constant_override("separation", 4)
 	bar.add_child(row)
 	for item in [
 		["icon_build", tr("Construir"), open_build_menu],
+		["helpers", tr("Ajudantes"), open_helpers_menu],
 		["icon_shop", tr("Loja"), func(): show_toast(tr("Loja em breve"))],
 		["icon_map", tr("Mapa"), open_map_menu],
 		["icon_profile", tr("Perfil"), func(): show_toast(tr("Perfil em breve"))],
@@ -397,12 +445,13 @@ func _build_bottom_bar() -> void:
 		col.add_theme_constant_override("separation", 2)
 		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(col)
-		var btn := _icon_button(item[0], 92, item[2])
+		var btn: Control = _helpers_button(84, item[2]) if item[0] == "helpers" \
+				else _icon_button(item[0], 84, item[2])
 		btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		col.add_child(btn)
 		var label := Label.new()
 		label.text = item[1]
-		label.add_theme_font_size_override("font_size", 24)
+		label.add_theme_font_size_override("font_size", 22)
 		label.add_theme_color_override("font_color", Style.TEAL_DARK)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		col.add_child(label)

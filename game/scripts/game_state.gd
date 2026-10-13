@@ -9,12 +9,14 @@ signal notice(text: String)
 signal connection_failed(text: String)
 ## Itens coletados [{slug, amount}] após uma coleta bem-sucedida (para animações).
 signal collected(items: Array)
-## Volta depois de um tempo fora: ajudantes produziram `total` em `elapsed_seconds`.
-signal offline_summary(total: String, elapsed_seconds: int, capped: bool, cap_seconds: int)
+## Volta a um mapa depois de um tempo fora: os ajudantes dele produziram `total`.
+signal offline_summary(district: String, total: String, elapsed_seconds: int, capped: bool,
+		cap_seconds: int)
 ## Conexão caiu (tentando de novo) / voltou.
 signal connection_changed(online: bool)
 
-const SETTLE_INTERVAL := 15.0
+## Sinal de presença (o servidor considera "fora do mapa" após 45 s sem sinal).
+const PRESENCE_INTERVAL := 15.0
 const RECONNECT_INTERVAL := 5.0
 ## Abaixo disso não mostra o resumo offline (foi só uma pausa curta).
 const OFFLINE_SUMMARY_MIN_SECONDS := 60
@@ -30,7 +32,7 @@ const MESSAGES := {
 	"UNAUTHORIZED": "Sessão expirada. Tentando reconectar…",
 	"COMING_SOON": "Em breve!",
 	"DISTRICT_LOCKED": "Compre os 4 negócios da praia para abrir a cidade.",
-	"MANAGER_ACTIVE": "O ajudante já coleta este negócio sozinho.",
+	"MANAGER_ACTIVE": "Este negócio está produzindo sozinho.",
 	"MANAGER_ALREADY_HIRED": "Este negócio já tem ajudante.",
 }
 
@@ -38,18 +40,20 @@ var state: Dictionary = {}
 var loaded := false
 var busy := false
 var online := true
+## Mapa aberto agora (praia/cidade) — define onde a produção é manual.
+var current_district := "praia"
 var _received_at_ms := 0
-var _settle_timer: Timer
+var _presence_timer: Timer
 var _reconnect_timer: Timer
 
 
 func _ready() -> void:
-	_settle_timer = Timer.new()
-	_settle_timer.wait_time = SETTLE_INTERVAL
-	_settle_timer.timeout.connect(func():
-		if has_managers() and not busy:
-			settle(false))
-	add_child(_settle_timer)
+	_presence_timer = Timer.new()
+	_presence_timer.wait_time = PRESENCE_INTERVAL
+	_presence_timer.timeout.connect(func():
+		if not busy:
+			enter_district(current_district, false))
+	add_child(_presence_timer)
 	_reconnect_timer = Timer.new()
 	_reconnect_timer.wait_time = RECONNECT_INTERVAL
 	_reconnect_timer.timeout.connect(_try_reconnect)
@@ -69,8 +73,8 @@ func boot() -> bool:
 		connection_failed.emit(message_for(res.error_code))
 		return false
 	_apply_state(res.data)
-	_settle_timer.start()
-	await settle(true)
+	_presence_timer.start()
+	await enter_district(current_district, true)
 	return true
 
 
@@ -83,17 +87,16 @@ func refresh() -> void:
 		_set_online(false)
 
 
-## Ao voltar do segundo plano: estado novo + produção dos ajudantes com resumo.
+## Ao voltar do segundo plano: o servidor paga o AFK do mapa aberto (com resumo).
 func resume() -> void:
-	await refresh()
-	await settle(true)
+	await enter_district(current_district, true)
 
 
-## Liquida os ajudantes no servidor; `show_summary` mostra o resumo se ficou fora ≥ 1 min.
-func settle(show_summary: bool) -> void:
-	if not has_managers():
-		return
-	var res := await Api.settle()
+## Avisa o servidor do mapa aberto; ao entrar num mapa recebe o AFK dos ajudantes dele.
+## `show_summary` mostra "Bem-vindo de volta" se ficou fora ≥ 1 min e houve ganho.
+func enter_district(district: String, show_summary: bool) -> void:
+	current_district = district
+	var res := await Api.presence(district)
 	if not res.ok:
 		if res.network_error:
 			_set_online(false)
@@ -104,8 +107,21 @@ func settle(show_summary: bool) -> void:
 		collected.emit(res.data.settled)
 	if show_summary and int(res.data.elapsedSeconds) >= OFFLINE_SUMMARY_MIN_SECONDS \
 			and str(res.data.total) != "0":
-		offline_summary.emit(str(res.data.total), int(res.data.elapsedSeconds),
+		offline_summary.emit(district, str(res.data.total), int(res.data.elapsedSeconds),
 				bool(res.data.capped), int(res.data.capSeconds))
+
+
+## AFK acumulado (ainda não pago) dos ajudantes de um mapa.
+func pending_in(district: String) -> int:
+	var total := 0
+	for b in businesses():
+		if b.get("district", "") == district and b.get("automatic", false):
+			total += str(b.get("pendingAmount", "0")).to_int()
+	return total
+
+
+func auto_collect() -> bool:
+	return bool(state.get("player", {}).get("autoCollect", false))
 
 
 func has_managers() -> bool:
@@ -247,7 +263,7 @@ func _set_online(value: bool) -> void:
 func _try_reconnect() -> void:
 	await refresh()
 	if online:
-		await settle(true)
+		await enter_district(current_district, true)
 
 
 func _set_busy(value: bool) -> void:

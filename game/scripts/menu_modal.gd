@@ -187,6 +187,63 @@ func add_business(b: Dictionary, state: String, on_press: Callable) -> void:
 	row.add_child(button)
 
 
+## Cartão de ajudante. `state`: "locked" (negócio não construído), "buy" (preço), "hired".
+func add_helper(b: Dictionary, state: String, on_press: Callable) -> void:
+	var row := _card_row()
+	var portrait := TextureRect.new()
+	portrait.texture = Layout.texture(Layout.HELPERS.get(b.slug, "char_vendor"))
+	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	portrait.custom_minimum_size = Vector2(70, 108)
+	if state == "locked":
+		portrait.modulate = Color(0.4, 0.4, 0.4, 0.8)
+	row.add_child(portrait)
+	var thumb := TextureRect.new()
+	thumb.texture = load(Layout.art_path(b.slug, max(1, int(b.level))))
+	thumb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	thumb.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	thumb.custom_minimum_size = Vector2(64, 64)
+	thumb.size_flags_vertical = Control.SIZE_SHRINK_END
+	thumb.modulate = Color(1, 1, 1, 0.5 if state == "locked" else 1.0)
+	row.add_child(thumb)
+
+	var texts := VBoxContainer.new()
+	texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	texts.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_child(texts)
+	texts.add_child(_text(b.name, 28, Style.INK))
+	var sub: String = {
+		"locked": tr("Construa o negócio primeiro"),
+		"buy": tr("Produz sozinho quando você sai do mapa"),
+		"hired": tr("Trabalhando · até 4h fora do mapa"),
+	}[state]
+	texts.add_child(_text(sub, 21, Style.INK_SOFT, 500))
+
+	var button := Button.new()
+	button.custom_minimum_size = Vector2(160, 76)
+	button.add_theme_font_size_override("font_size", 26)
+	match state:
+		"buy":
+			button.text = Fmt.coins(b.managerCost)
+			button.icon = COIN
+			button.add_theme_constant_override("icon_max_width", 32)
+			Style.style_button(button, Style.ORANGE, Style.ORANGE_DARK)
+			button.disabled = not GameState.can_afford(b.managerCost)
+			button.pressed.connect(on_press)
+		"hired":
+			button.text = tr("Contratado")
+			button.disabled = true
+			Style.style_button(button, Style.TEAL_LIGHT, Style.TEAL_DARK)
+			button.add_theme_stylebox_override("disabled", Style.toy_button(Style.TEAL_LIGHT, Style.TEAL_DARK))
+			button.add_theme_font_size_override("font_size", 22)
+		_:
+			button.icon = LOCK
+			button.add_theme_constant_override("icon_max_width", 40)
+			button.disabled = true
+			Style.style_button(button, Style.GREY, Style.GREY_DARK)
+	row.add_child(button)
+
+
 ## Cartão grande de distrito com miniatura do cenário.
 func add_district(id: String, status: String, is_current: bool, unlocked: bool,
 		on_press: Callable) -> void:

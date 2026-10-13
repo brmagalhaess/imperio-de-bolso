@@ -7,10 +7,15 @@ import { OFFLINE_CAP_MS, settle } from "../economy/offline.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { applyCoins, type LockedWallet } from "./wallet.js";
 
-// Ciclo manual (sem ajudante): ao terminar, o negócio fica parado com 1 ciclo
-// pronto até o jogador coletar; a coleta credita e já inicia o próximo ciclo.
-// Com ajudante (gerente da doc): produção automática liquidada pelo servidor com
-// teto de 4h (economy/offline.ts) — em /production/settle, ao contratar e antes de melhorar.
+// Ciclo manual: ao terminar, o negócio fica parado com 1 ciclo pronto até o jogador
+// coletar; a coleta credita e já inicia o próximo ciclo.
+// Ajudante (gerente da doc) — ADR 0006: no mapa aberto o negócio continua manual; quando o
+// jogador sai do mapa (ou fecha o jogo) ele passa a produzir AFK, até 4h (economy/offline.ts),
+// e o servidor paga ao voltar ao mapa (POST /presence). Auto-coleta no mapa aberto é item da
+// Loja (players.auto_collect).
+
+/** Presença vale enquanto o jogo manda sinal (a cada ~15 s); depois disso conta como fora. */
+export const PRESENCE_TIMEOUT_MS = 45_000;
 
 type Reader = Db | Tx;
 
@@ -30,10 +35,12 @@ export interface BusinessView {
   cycleEndsAt: string | null;
   ready: boolean;
   secondsRemaining: number;
-  /** Ajudante contratado: produção automática (sem bolha de coleta). */
+  /** Ajudante contratado. */
   managed: boolean;
+  /** Produzindo sozinho agora (AFK fora do mapa, ou auto-coleta da Loja): sem bolha. */
+  automatic: boolean;
   managerCost: string;
-  /** Com ajudante: lucro já produzido e ainda não liquidado (estimativa de leitura). */
+  /** Automático: lucro já produzido e ainda não liquidado (estimativa de leitura). */
   pendingAmount: string;
 }
 
@@ -45,15 +52,26 @@ export interface DistrictView {
 }
 
 export interface PlayerStateView {
-  player: { id: string; displayName: string; tutorialCompleted: boolean };
+  player: {
+    id: string;
+    displayName: string;
+    tutorialCompleted: boolean;
+    currentDistrict: string | null;
+    autoCollect: boolean;
+  };
   wallet: { coins: string; gems: string };
   businesses: BusinessView[];
   districts: DistrictView[];
   serverTime: string;
 }
 
+/** Com ajudante e fora do ciclo manual: produção liquidada pelo servidor. */
+export function isAutomatic(pb: PlayerBusiness | undefined): boolean {
+  return Boolean(pb?.managerUnlocked && pb.cycleStartedAt === null);
+}
+
 function cycleStatus(pb: PlayerBusiness | undefined, cycleSeconds: number, now: Date) {
-  if (pb?.managerUnlocked) {
+  if (pb && isAutomatic(pb)) {
     // Ciclo "virtual" do ajudante: posição atual dentro do ciclo, a partir da última liquidação.
     const s = settle({
       now,
@@ -110,6 +128,7 @@ function toBusinessView(
     ready: status.ready,
     secondsRemaining: status.secondsRemaining,
     managed: pb?.managerUnlocked ?? false,
+    automatic: isAutomatic(pb),
     managerCost: def.managerCost.toString(),
     pendingAmount: (profitPerCycle(def, level) * BigInt(status.pendingCycles)).toString(),
   };
@@ -150,6 +169,8 @@ export async function getPlayerState(
       id: player.id,
       displayName: player.displayName,
       tutorialCompleted: player.tutorialCompletedAt !== null,
+      currentDistrict: player.currentDistrict,
+      autoCollect: player.autoCollect,
     },
     wallet: { coins: player.wallet.coins.toString(), gems: player.wallet.gems.toString() },
     businesses,
@@ -213,10 +234,12 @@ export function upgradeBusiness(slug: string, now: Date) {
     if (cost === null) throw Errors.maxLevel(slug);
     const newLevel = pb.level + 1;
 
-    // Com ajudante, o que já foi produzido é pago no nível antigo antes de subir.
+    // Produzindo sozinho: o que já foi produzido é pago no nível antigo antes de subir.
     let current = wallet;
-    if (pb.managerUnlocked) {
-      current = (await settleManaged(tx, wallet, now, `${idempotencyKey}:settle`, def.id)).wallet;
+    if (isAutomatic(pb)) {
+      current = (
+        await settleAutomatic(tx, wallet, now, `${idempotencyKey}:settle`, { businessId: def.id })
+      ).wallet;
     }
     await applyCoins(tx, current, -cost, `business_upgrade:${slug}:${newLevel}`, idempotencyKey);
     await tx.playerBusiness.update({
@@ -246,8 +269,8 @@ export function collectProduction(slug: string | undefined, now: Date) {
       await findDefinition(tx, slug); // 404 se o slug não existe
       throw Errors.businessNotOwned(slug);
     }
-    if (slug && all[0]?.managerUnlocked) throw Errors.managerActive(slug);
-    const owned = all.filter((pb) => !pb.managerUnlocked);
+    if (slug && isAutomatic(all[0])) throw Errors.managerActive(slug);
+    const owned = all.filter((pb) => !isAutomatic(pb));
 
     const ready = owned.filter((pb) => cycleStatus(pb, pb.business.cycleSeconds, now).ready);
     if (ready.length === 0) {
@@ -294,15 +317,15 @@ export interface SettledItem {
 }
 
 /**
- * Liquida a produção automática dos negócios com ajudante (todos, ou só `businessId`):
- * credita os ciclos completos (teto de 4h) e guarda a sobra. Usa a carteira já travada.
+ * Liquida negócios em produção automática (filtrados por mapa e/ou negócio): credita os
+ * ciclos completos (teto de 4h) e guarda a sobra. Usa a carteira já travada.
  */
-async function settleManaged(
+async function settleAutomatic(
   tx: Tx,
   wallet: LockedWallet,
   now: Date,
   ledgerKey: string,
-  businessId?: number,
+  filter: { district?: string; businessId?: number } = {},
 ): Promise<{
   wallet: LockedWallet;
   items: SettledItem[];
@@ -310,11 +333,13 @@ async function settleManaged(
   elapsedMs: number;
   capped: boolean;
 }> {
-  const managed = await tx.playerBusiness.findMany({
+  const automatic = await tx.playerBusiness.findMany({
     where: {
       playerId: wallet.playerId,
       managerUnlocked: true,
-      ...(businessId ? { businessId } : {}),
+      cycleStartedAt: null,
+      ...(filter.businessId ? { businessId: filter.businessId } : {}),
+      ...(filter.district ? { business: { district: filter.district } } : {}),
     },
     include: { business: true },
   });
@@ -322,7 +347,7 @@ async function settleManaged(
   let total = 0n;
   let elapsedMs = 0;
   let capped = false;
-  for (const pb of managed) {
+  for (const pb of automatic) {
     const s = settle({
       now,
       lastSettlementAt: pb.lastSettlementAt,
@@ -333,8 +358,9 @@ async function settleManaged(
     total += amount;
     elapsedMs = Math.max(elapsedMs, s.elapsedMs);
     capped ||= s.capped;
-    if (s.cycles > 0)
+    if (s.cycles > 0) {
       items.push({ slug: pb.business.slug, cycles: s.cycles, amount: amount.toString() });
+    }
     await tx.playerBusiness.update({
       where: { playerId_businessId: { playerId: pb.playerId, businessId: pb.businessId } },
       data: { lastSettlementAt: now, carryMs: s.carryMs },
@@ -345,17 +371,101 @@ async function settleManaged(
   return { wallet: updated, items, total, elapsedMs, capped };
 }
 
-/** Liquida toda a produção automática (abrir o jogo, voltar do segundo plano, a cada ~15 s). */
-export function settleProduction(now: Date) {
+/** Negócios com ajudante de um mapa saem do modo manual e passam a produzir AFK desde `at`. */
+async function startAfk(tx: Tx, playerId: string, district: string, at: Date): Promise<void> {
+  const manual = await tx.playerBusiness.findMany({
+    where: {
+      playerId,
+      managerUnlocked: true,
+      cycleStartedAt: { not: null },
+      business: { district },
+    },
+    include: { business: true },
+  });
+  for (const pb of manual) {
+    const cycleMs = pb.business.cycleSeconds * 1000;
+    const progress = at.getTime() - (pb.cycleStartedAt as Date).getTime();
+    await tx.playerBusiness.update({
+      where: { playerId_businessId: { playerId, businessId: pb.businessId } },
+      data: {
+        cycleStartedAt: null,
+        lastSettlementAt: at,
+        carryMs: Math.min(Math.max(progress, 0), cycleMs),
+      },
+    });
+  }
+}
+
+/** Ao voltar ao mapa (já liquidado), os negócios automáticos retomam o ciclo manual. */
+async function resumeManual(tx: Tx, playerId: string, district: string, now: Date) {
+  const automatic = await tx.playerBusiness.findMany({
+    where: { playerId, managerUnlocked: true, cycleStartedAt: null, business: { district } },
+  });
+  for (const pb of automatic) {
+    await tx.playerBusiness.update({
+      where: { playerId_businessId: { playerId, businessId: pb.businessId } },
+      // Continua de onde o ciclo AFK parou (a sobra vira andamento do ciclo manual).
+      data: { cycleStartedAt: new Date(now.getTime() - pb.carryMs), carryMs: 0 },
+    });
+  }
+}
+
+function freshPresence(
+  player: { currentDistrict: string | null; lastSeenAt: Date | null },
+  now: Date,
+) {
+  return (
+    player.currentDistrict !== null &&
+    player.lastSeenAt !== null &&
+    now.getTime() - player.lastSeenAt.getTime() <= PRESENCE_TIMEOUT_MS
+  );
+}
+
+/**
+ * Presença por mapa (ADR 0006). O jogo chama ao abrir, ao trocar de mapa e a cada ~15 s.
+ * - Saindo de um mapa (ou sem sinal há mais de 45 s): os negócios com ajudante dele passam a
+ *   produzir AFK desde o momento em que o jogador saiu (último sinal).
+ * - Entrando num mapa: paga o AFK acumulado dele (teto 4h) e, sem auto-coleta, volta ao manual.
+ * - Ficando no mesmo mapa com auto-coleta (Loja): liquida a produção desse mapa.
+ */
+export function enterDistrict(district: string, now: Date) {
   return async ({ tx, wallet, idempotencyKey }: CommandContext): Promise<CommandResult> => {
-    const r = await settleManaged(tx, wallet, now, idempotencyKey);
+    if (!(DISTRICTS as readonly string[]).includes(district))
+      throw Errors.districtNotFound(district);
+    const player = await tx.player.findUniqueOrThrow({ where: { id: wallet.playerId } });
+    const fresh = freshPresence(player, now);
+    const stayed = fresh && player.currentDistrict === district;
+    const leftAt = fresh ? now : (player.lastSeenAt ?? now);
+
+    if (player.currentDistrict && !stayed) {
+      await startAfk(tx, player.id, player.currentDistrict, leftAt);
+    }
+    let result = {
+      wallet,
+      items: [] as SettledItem[],
+      total: 0n,
+      elapsedMs: 0,
+      capped: false,
+    };
+    if (!stayed || player.autoCollect) {
+      if (player.autoCollect) await startAfk(tx, player.id, district, now);
+      result = await settleAutomatic(tx, wallet, now, idempotencyKey, { district });
+      if (!player.autoCollect) await resumeManual(tx, player.id, district, now);
+    }
+    await tx.player.update({
+      where: { id: player.id },
+      data: { currentDistrict: district, lastSeenAt: now },
+    });
+
     return {
       statusCode: 200,
       body: {
-        settled: r.items,
-        total: r.total.toString(),
-        elapsedSeconds: Math.floor(r.elapsedMs / 1000),
-        capped: r.capped,
+        district,
+        returned: !stayed,
+        settled: result.items,
+        total: result.total.toString(),
+        elapsedSeconds: Math.floor(result.elapsedMs / 1000),
+        capped: result.capped,
         capSeconds: OFFLINE_CAP_MS / 1000,
         state: await getPlayerState(tx, wallet.playerId, now),
       },
@@ -363,7 +473,10 @@ export function settleProduction(now: Date) {
   };
 }
 
-/** Contrata o ajudante: cobra, passa para produção automática e paga o ciclo manual já pronto. */
+/**
+ * Contrata o ajudante. No mapa aberto (sem auto-coleta) o negócio segue manual e o ajudante
+ * passa a produzir quando o jogador sair; fora do mapa ele já começa a produzir AFK agora.
+ */
 export function hireManager(slug: string, now: Date) {
   return async ({ tx, wallet, idempotencyKey }: CommandContext): Promise<CommandResult> => {
     const def = await findDefinition(tx, slug);
@@ -372,34 +485,16 @@ export function hireManager(slug: string, now: Date) {
     if (!pb) throw Errors.businessNotOwned(slug);
     if (pb.managerUnlocked) throw Errors.managerAlreadyHired(slug);
 
-    const afterHire = await applyCoins(
-      tx,
-      wallet,
-      -def.managerCost,
-      `manager_hire:${slug}`,
-      idempotencyKey,
-    );
-    // O andamento do ciclo manual vira sobra (no máximo 1 ciclo, que é pago em seguida).
-    const cycleMs = def.cycleSeconds * 1000;
-    const progress = pb.cycleStartedAt ? now.getTime() - pb.cycleStartedAt.getTime() : 0;
-    await tx.playerBusiness.update({
-      where,
-      data: {
-        managerUnlocked: true,
-        cycleStartedAt: null,
-        lastSettlementAt: now,
-        carryMs: Math.min(Math.max(progress, 0), cycleMs),
-      },
-    });
-    const r = await settleManaged(tx, afterHire, now, `${idempotencyKey}:settle`, def.id);
+    await applyCoins(tx, wallet, -def.managerCost, `manager_hire:${slug}`, idempotencyKey);
+    await tx.playerBusiness.update({ where, data: { managerUnlocked: true } });
+
+    const player = await tx.player.findUniqueOrThrow({ where: { id: wallet.playerId } });
+    const present = freshPresence(player, now) && player.currentDistrict === def.district;
+    if (!present || player.autoCollect) await startAfk(tx, player.id, def.district, now);
 
     return {
       statusCode: 200,
-      body: {
-        hired: slug,
-        settled: r.items,
-        state: await getPlayerState(tx, wallet.playerId, now),
-      },
+      body: { hired: slug, state: await getPlayerState(tx, wallet.playerId, now) },
     };
   };
 }

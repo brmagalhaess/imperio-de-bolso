@@ -48,10 +48,13 @@ func go_to_district(id: String) -> void:
 	await hud.fade(true)
 	_show_district(id)
 	await hud.fade(false)
+	# Servidor paga o AFK dos ajudantes deste mapa e passa o anterior para AFK.
+	await GameState.enter_district(id, true)
 
 
 func _show_district(id: String) -> void:
 	current = id
+	GameState.current_district = id
 	hud.current_district = id
 	hud.close_sheet()
 	for d in districts:

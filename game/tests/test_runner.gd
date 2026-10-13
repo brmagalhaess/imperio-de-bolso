@@ -87,8 +87,9 @@ func _unit_tests() -> void:
 	]})
 	check(GameState.can_afford("250") and not GameState.can_afford("251"), "can_afford")
 	check(is_equal_approx(GameState.income_per_second(), 3.0), "renda por segundo só dos comprados")
-	await _tutorial_tests()
-	await _build_menu_tests()
+	# Erro de script aborta a função e ela devolve null: a seção conta como falha.
+	check(await _tutorial_tests() == true, "seção tutorial executou até o fim")
+	check(await _build_menu_tests() == true, "seção menus executou até o fim")
 	_sections_done += 1
 
 
@@ -99,7 +100,7 @@ func _biz(slug: String, owned: bool, level := 1, managed := false, district := "
 		"cycleStartedAt": null, "secondsRemaining": 0, "ready": false}
 
 
-func _tutorial_tests() -> void:
+func _tutorial_tests() -> bool:
 	var t: Control = Tutorial.new()
 	add_child(t)
 	var states := [
@@ -115,9 +116,10 @@ func _tutorial_tests() -> void:
 			"businesses": [_biz("agua", a[0], a[1] if a.size() > 1 else 1, a[2] if a.size() > 2 else false)]}
 		check(t.current_step() == case[1], case[2])
 	t.queue_free()
+	return true
 
 
-func _build_menu_tests() -> void:
+func _build_menu_tests() -> bool:
 	var hud: Control = Hud.new()
 	add_child(hud)
 	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "50000", "gems": "0"},
@@ -141,9 +143,28 @@ func _build_menu_tests() -> void:
 		if not c.is_queued_for_deletion() and c is Button:
 			buttons += 1
 	check(buttons == 1, "Construir vazio sugere ir para a Cidade")
+
+	var helper_state := _biz("pipoca", true)
+	helper_state.managed = true
+	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "500", "gems": "0"},
+		"districts": [{"id": "praia", "unlocked": true}, {"id": "cidade", "unlocked": false}],
+		"businesses": [_biz("agua", true), helper_state, _biz("sorveteria", false),
+			_biz("quiosque_coco", false), _biz("mercadinho", true, 1, false, "cidade")]})
+	hud.open_helpers_menu()
+	var helper_buttons := []
+	for c in hud._modal._list.get_children():
+		if not c.is_queued_for_deletion() and c is PanelContainer:
+			var row: HBoxContainer = c.get_child(0)
+			var btn: Button = row.get_child(row.get_child_count() - 1)
+			helper_buttons.append([row.get_child(2).get_child(0).text, btn.text, btn.disabled])
+	check(helper_buttons.size() == 4, "Ajudantes: só os 4 negócios do mapa atual")
+	check(helper_buttons[0] == ["agua", "150", false], "Ajudantes: contratar com preço")
+	check(helper_buttons[1][1] == "Contratado", "Ajudantes: contratado")
+	check(helper_buttons[2][2] == true, "Ajudantes: negócio não construído fica travado")
 	hud.queue_free()
 	GameState.state = {}
 	GameState.loaded = false
+	return true
 
 
 func _integration_test() -> void:

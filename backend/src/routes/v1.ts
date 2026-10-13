@@ -12,11 +12,11 @@ import { createGuest, resumeGuest } from "../services/auth.js";
 import {
   collectProduction,
   completeTutorial,
+  enterDistrict,
   getPlayerState,
   hireManager,
   listBusinesses,
   purchaseBusiness,
-  settleProduction,
   upgradeBusiness,
 } from "../services/game.js";
 
@@ -35,6 +35,7 @@ const GuestAuthBody = z
   });
 const BusinessBody = z.object({ businessSlug: Slug });
 const CollectBody = z.object({ businessSlug: Slug.optional() });
+const PresenceBody = z.object({ district: Slug });
 
 function playerIdOf(request: FastifyRequest): string {
   return request.user.sub;
@@ -122,9 +123,10 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
     return command(request, reply, "managers.hire", (at) => hireManager(businessSlug, at));
   });
 
-  app.post("/production/settle", { preHandler: authenticate }, async (request, reply) =>
-    command(request, reply, "production.settle", (at) => settleProduction(at)),
-  );
+  app.post("/presence", { preHandler: authenticate }, async (request, reply) => {
+    const { district } = PresenceBody.parse(request.body);
+    return command(request, reply, "presence", (at) => enterDistrict(district, at));
+  });
 
   app.post("/tutorial/complete", { preHandler: authenticate }, async (request) => {
     const at = now();

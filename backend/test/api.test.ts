@@ -7,6 +7,7 @@ import {
   newGuest,
   post,
   setCoins,
+  type Guest,
   type TestContext,
 } from "./helpers.js";
 
@@ -345,21 +346,35 @@ describe("distritos", () => {
   });
 });
 
-describe("ajudantes e produção offline", () => {
-  async function waterWithManager() {
+describe("ajudantes e produção AFK por mapa (ADR 0006)", () => {
+  const presence = (guest: Guest, district: string, k?: string) =>
+    post(ctx.app, guest, "/presence", { district }, k ?? key());
+
+  /** Jogador na praia com o carrinho de água e ajudante. */
+  async function waterWithHelper() {
     const guest = await newGuest(ctx.app);
     await setCoins(ctx.db, guest.playerId, 10_000n);
+    await presence(guest, "praia");
     await post(ctx.app, guest, "/businesses/purchase", { businessSlug: "agua" });
     const hire = await post(ctx.app, guest, "/managers/hire", { businessSlug: "agua" });
     expect(hire.statusCode).toBe(200);
     return guest;
   }
 
-  it("contratar ajudante cobra o preço do catálogo e marca o negócio como automático", async () => {
-    const guest = await waterWithManager();
+  const agua = async (guest: Guest) =>
+    (await get(ctx.app, guest, "/player/state")).json().businesses[0];
+
+  it("contratar cobra o preço do catálogo; no mapa aberto o negócio continua manual", async () => {
+    const guest = await waterWithHelper();
     expect(await coinsOf(ctx.db, guest.playerId)).toBe(10_000n - 100n - 150n);
-    const state = (await get(ctx.app, guest, "/player/state")).json();
-    expect(state.businesses[0]).toMatchObject({ managed: true, managerCost: "150", ready: false });
+    expect(await agua(guest)).toMatchObject({
+      managed: true,
+      automatic: false,
+      managerCost: "150",
+    });
+    ctx.clock.advance(10);
+    const collect = await post(ctx.app, guest, "/production/collect", { businessSlug: "agua" });
+    expect(collect.json().total).toBe("10");
   });
 
   it("não contrata sem possuir o negócio, sem saldo ou duas vezes", async () => {
@@ -375,102 +390,163 @@ describe("ajudantes e produção offline", () => {
     expect(twice.json().error.code).toBe("MANAGER_ALREADY_HIRED");
   });
 
-  it("ao contratar com o ciclo manual pronto, esse ciclo é pago", async () => {
-    const guest = await newGuest(ctx.app);
-    await setCoins(ctx.db, guest.playerId, 1_000n);
-    await post(ctx.app, guest, "/businesses/purchase", { businessSlug: "agua" });
-    ctx.clock.advance(30);
-    const res = await post(ctx.app, guest, "/managers/hire", { businessSlug: "agua" });
-    expect(res.json().settled).toEqual([{ slug: "agua", cycles: 1, amount: "10" }]);
-    expect(await coinsOf(ctx.db, guest.playerId)).toBe(1_000n - 100n - 150n + 10n);
+  it("ficar no mesmo mapa não gera AFK (sinal a cada 15 s)", async () => {
+    const guest = await waterWithHelper();
+    const before = await coinsOf(ctx.db, guest.playerId);
+    for (let i = 0; i < 8; i++) {
+      ctx.clock.advance(15);
+      const r = await presence(guest, "praia");
+      expect(r.json()).toMatchObject({ returned: false, total: "0" });
+    }
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before);
+    expect((await agua(guest)).ready).toBe(true); // ciclo manual pronto esperando o toque
   });
 
-  it("liquida ciclos completos e guarda a sobra entre chamadas", async () => {
-    const guest = await waterWithManager();
+  it("na Cidade, a Praia produz AFK; ao voltar, paga e retoma o manual", async () => {
+    const guest = await waterWithHelper();
     const before = await coinsOf(ctx.db, guest.playerId);
-    ctx.clock.advance(25);
-    const first = await post(ctx.app, guest, "/production/settle", {});
-    expect(first.json()).toMatchObject({ total: "20", settled: [{ slug: "agua", cycles: 2 }] });
-    ctx.clock.advance(5);
-    const second = await post(ctx.app, guest, "/production/settle", {});
-    expect(second.json().total).toBe("10"); // 5 s de sobra + 5 s novos = 1 ciclo
-    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 30n);
+    ctx.clock.advance(4);
+    await presence(guest, "cidade"); // sai da praia com 4 s de ciclo andado
+    expect(await agua(guest)).toMatchObject({ automatic: true });
+    for (let i = 0; i < 6; i++) {
+      ctx.clock.advance(15);
+      await presence(guest, "cidade"); // jogando na cidade
+    }
+    const back = await presence(guest, "praia"); // 90 s fora + 4 s = 9 ciclos
+    expect(back.json()).toMatchObject({
+      returned: true,
+      total: "90",
+      elapsedSeconds: 90,
+      settled: [{ slug: "agua", cycles: 9 }],
+    });
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 90n);
+    expect(await agua(guest)).toMatchObject({ automatic: false, secondsRemaining: 6 });
   });
 
-  it("offline: 10 horas fora rendem no máximo 4 horas", async () => {
-    const guest = await waterWithManager();
+  it("jogo fechado: AFK conta a partir do último sinal, com limite de 4 horas", async () => {
+    const guest = await waterWithHelper();
     const before = await coinsOf(ctx.db, guest.playerId);
-    ctx.clock.advance(10 * 3_600);
-    const res = await post(ctx.app, guest, "/production/settle", {});
-    expect(res.json()).toMatchObject({ total: "14400", capped: true, elapsedSeconds: 14_400 });
+    ctx.clock.advance(10 * 3_600); // sem sinal por 10 h
+    const back = await presence(guest, "praia");
+    expect(back.json()).toMatchObject({ total: "14400", capped: true, elapsedSeconds: 14_400 });
     expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 14_400n);
   });
 
-  it("relógio do servidor voltando no tempo não credita nem gera saldo negativo", async () => {
-    const guest = await waterWithManager();
+  it("o limite de 4 horas é por mapa: só o mapa visitado é pago", async () => {
+    const guest = await waterWithHelper();
+    await setCoins(ctx.db, guest.playerId, 1_000_000n);
+    for (const slug of ["pipoca", "sorveteria", "quiosque_coco", "mercadinho"]) {
+      await post(ctx.app, guest, "/businesses/purchase", { businessSlug: slug });
+    }
+    await post(ctx.app, guest, "/managers/hire", { businessSlug: "mercadinho" });
+    ctx.clock.advance(5 * 3_600);
+    const praia = await presence(guest, "praia");
+    expect(praia.json().settled.map((i: { slug: string }) => i.slug)).toEqual(["agua"]);
+    const cidade = await presence(guest, "cidade");
+    expect(cidade.json()).toMatchObject({ capped: true, elapsedSeconds: 14_400 });
+    expect(cidade.json().settled.map((i: { slug: string }) => i.slug)).toEqual(["mercadinho"]);
+  });
+
+  it("sem ajudante não há AFK", async () => {
+    const guest = await newGuest(ctx.app);
+    await presence(guest, "praia");
+    await post(ctx.app, guest, "/businesses/purchase", { businessSlug: "agua" });
+    await presence(guest, "cidade");
+    ctx.clock.advance(3_600);
+    expect((await presence(guest, "praia")).json().total).toBe("0");
+  });
+
+  it("contratar estando fora do mapa já começa a produzir AFK", async () => {
+    const guest = await newGuest(ctx.app);
+    await setCoins(ctx.db, guest.playerId, 1_000n);
+    await presence(guest, "praia");
+    await post(ctx.app, guest, "/businesses/purchase", { businessSlug: "agua" });
+    await presence(guest, "cidade");
+    await post(ctx.app, guest, "/managers/hire", { businessSlug: "agua" });
+    ctx.clock.advance(30);
+    expect((await presence(guest, "praia")).json().total).toBe("30");
+  });
+
+  it("auto-coleta (item da Loja) produz no mapa aberto a cada sinal", async () => {
+    const guest = await waterWithHelper();
+    await ctx.db.player.update({ where: { id: guest.playerId }, data: { autoCollect: true } });
+    const before = await coinsOf(ctx.db, guest.playerId);
+    ctx.clock.advance(15);
+    await presence(guest, "praia");
+    ctx.clock.advance(15);
+    const r = await presence(guest, "praia");
+    expect(r.json().total).toBe("10");
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 20n);
+    expect(await agua(guest)).toMatchObject({ automatic: true });
+  });
+
+  it("relógio do servidor voltando no tempo não credita", async () => {
+    const guest = await waterWithHelper();
+    await presence(guest, "cidade");
     const before = await coinsOf(ctx.db, guest.playerId);
     ctx.clock.advance(-3_600);
-    const res = await post(ctx.app, guest, "/production/settle", {});
-    expect(res.json()).toMatchObject({ total: "0", settled: [] });
+    expect((await presence(guest, "praia")).json().total).toBe("0");
     expect(await coinsOf(ctx.db, guest.playerId)).toBe(before);
   });
 
   it("o cliente não informa tempo: campos extras são ignorados", async () => {
-    const guest = await waterWithManager();
-    const res = await post(ctx.app, guest, "/production/settle", { elapsedSeconds: 999_999 });
-    expect(res.json().total).toBe("0");
+    const guest = await waterWithHelper();
+    await presence(guest, "cidade");
+    const r = await post(ctx.app, guest, "/presence", {
+      district: "praia",
+      elapsedSeconds: 99_999,
+    });
+    expect(r.json().total).toBe("0");
   });
 
-  it("liquidações simultâneas creditam uma única vez", async () => {
-    const guest = await waterWithManager();
+  it("voltas simultâneas ao mapa pagam uma única vez", async () => {
+    const guest = await waterWithHelper();
+    await presence(guest, "cidade");
     const before = await coinsOf(ctx.db, guest.playerId);
     ctx.clock.advance(100);
-    const results = await Promise.all(
-      Array.from({ length: 6 }, () => post(ctx.app, guest, "/production/settle", {})),
-    );
+    const results = await Promise.all(Array.from({ length: 6 }, () => presence(guest, "praia")));
     expect(results.every((r) => r.statusCode === 200)).toBe(true);
     expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 100n);
   });
 
-  it("reenvio da mesma liquidação (mesma chave) não paga de novo", async () => {
-    const guest = await waterWithManager();
+  it("reenvio da mesma presença (mesma chave) não paga de novo", async () => {
+    const guest = await waterWithHelper();
+    await presence(guest, "cidade");
     const before = await coinsOf(ctx.db, guest.playerId);
     ctx.clock.advance(50);
     const k = key();
-    await post(ctx.app, guest, "/production/settle", {}, k);
-    ctx.clock.advance(50);
-    const replay = await post(ctx.app, guest, "/production/settle", {}, k);
+    await presence(guest, "praia", k);
+    const replay = await presence(guest, "praia", k);
     expect(replay.json().total).toBe("50");
     expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 50n);
   });
 
-  it("melhorar com ajudante paga o produzido no nível antigo antes de subir", async () => {
-    const guest = await waterWithManager();
+  it("melhorar um negócio em AFK paga o produzido no nível antigo antes de subir", async () => {
+    const guest = await waterWithHelper();
+    await presence(guest, "cidade");
     const before = await coinsOf(ctx.db, guest.playerId);
     ctx.clock.advance(100);
     const res = await post(ctx.app, guest, "/businesses/upgrade", { businessSlug: "agua" });
     expect(res.statusCode).toBe(200);
     expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 100n - 115n);
-    ctx.clock.advance(10);
-    expect((await post(ctx.app, guest, "/production/settle", {})).json().total).toBe("11");
   });
 
-  it("coleta manual não vale para negócio com ajudante", async () => {
-    const guest = await waterWithManager();
+  it("coleta manual não vale para negócio produzindo AFK", async () => {
+    const guest = await waterWithHelper();
+    await presence(guest, "cidade");
     ctx.clock.advance(30);
     const res = await post(ctx.app, guest, "/production/collect", { businessSlug: "agua" });
     expect(res.json().error.code).toBe("MANAGER_ACTIVE");
-    const all = await post(ctx.app, guest, "/production/collect", {});
-    expect(all.json().error.code).toBe("NOTHING_TO_COLLECT");
   });
 
-  it("estado mostra o lucro pendente do ajudante sem creditar", async () => {
-    const guest = await waterWithManager();
+  it("estado mostra o AFK pendente sem creditar; mapa inválido → 404", async () => {
+    const guest = await waterWithHelper();
+    await presence(guest, "cidade");
     const before = await coinsOf(ctx.db, guest.playerId);
     ctx.clock.advance(35);
-    const state = (await get(ctx.app, guest, "/player/state")).json();
-    expect(state.businesses[0]).toMatchObject({ pendingAmount: "30", secondsRemaining: 5 });
+    expect(await agua(guest)).toMatchObject({ pendingAmount: "30", automatic: true });
     expect(await coinsOf(ctx.db, guest.playerId)).toBe(before);
+    expect((await presence(guest, "lua")).statusCode).toBe(404);
   });
 });
 

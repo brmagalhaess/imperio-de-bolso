@@ -63,6 +63,20 @@ const DISTRICTS := {
 	},
 }
 
+## Retrato do ajudante de cada negócio (personagens da arte v2; arte própria por negócio: a fazer).
+const HELPERS := {
+	"agua": "char_vendor",
+	"pipoca": "char_boy",
+	"sorveteria": "char_kid",
+	"quiosque_coco": "char_grandma",
+	"mercadinho": "char_woman",
+	"restaurante": "char_tourist",
+	"supermercado": "char_vendor",
+	"academia": "char_boy",
+	"hotel": "char_woman",
+	"shopping": "char_tourist",
+}
+
 ## Faixas de nível visual: nível 1–9 → arte 1, 10–24 → arte 2, 25+ → arte 3.
 const VISUAL_TIERS := [1, 10, 25]
 

@@ -14,7 +14,7 @@ const TEXTS := {
 	Step.BUY: "Bem-vindo à praia! Toque no Carrinho de Água e compre por 100 moedas.",
 	Step.COLLECT: "Seu carrinho já está vendendo! Quando a moeda aparecer, toque nela para coletar.",
 	Step.UPGRADE: "Junte 115 moedas e melhore o carrinho: toque nele e depois em Melhorar.",
-	Step.HIRE: "Contrate um ajudante: ele vende sozinho, até quando você estiver fora!",
+	Step.HIRE: "Contrate um ajudante no botão Ajudantes: ele vende sozinho quando você sai da praia (até 4h)!",
 }
 const TUTORIAL_SLUG := "agua"
 
