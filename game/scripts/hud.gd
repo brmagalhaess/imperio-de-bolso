@@ -247,7 +247,7 @@ func _refresh() -> void:
 		if b.get("automatic", false):
 			_info.text += tr(" · Produzindo sozinho")
 		elif b.get("managed", false):
-			_info.text += tr(" · Ajudante produz quando você sai do mapa")
+			_info.text += tr(" · Ajudante vende quando você sai do mapa. Coleta automática aqui: Loja")
 		if b.nextUpgradeCost == null:
 			_action_button.text = tr("Nível máximo")
 			_action_button.disabled = true
@@ -310,7 +310,13 @@ func _on_collect_pressed() -> void:
 func _on_hire_pressed() -> void:
 	var b := GameState.business(slug)
 	if await GameState.hire_manager(slug):
-		show_toast(tr("Ajudante contratado! %s agora produz sozinho.") % b.name)
+		# Regra (ADR 0006): o ajudante trabalha quando você sai do mapa; aqui dentro, coleta
+		# automática só com a Auto-coleta da Loja ou o Passe VIP.
+		if GameState.state.get("player", {}).get("autoCollect", false):
+			show_toast(tr("Ajudante contratado! %s agora produz sozinho.") % b.name)
+		else:
+			show_toast(tr("Ajudante contratado! Ele vende sozinho quando você sai da %s (até 4h).")
+					% Layout.title(current_district).to_lower())
 
 
 ## Construir: só o mapa atual e só o que ainda não foi construído (pedido do titular).
