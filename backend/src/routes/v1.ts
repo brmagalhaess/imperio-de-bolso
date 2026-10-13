@@ -17,6 +17,7 @@ import {
   verifierFor,
   verifyPurchase,
 } from "../services/purchases.js";
+import { deleteAccount } from "../services/account.js";
 import { changeName } from "../services/profile.js";
 import { buyWithGems, claimVipDaily, getCatalog } from "../services/store.js";
 import { claimAchievement, listAchievements } from "../services/achievements.js";
@@ -94,6 +95,12 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
     } catch {
       throw Errors.unauthorized();
     }
+    // Token ainda válido de uma conta excluída não serve mais (ADR 0009).
+    const exists = await db.player.findUnique({
+      where: { id: request.user.sub },
+      select: { id: true },
+    });
+    if (!exists) throw Errors.unauthorized();
   };
 
   // Criar/retomar conta convidada: limite mais rígido por IP (evita criação em massa).
@@ -231,6 +238,13 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
     const at = now();
     await changeName(db, playerIdOf(request), displayName, at);
     return getPlayerState(db, playerIdOf(request), at);
+  });
+
+  // Exclusão de conta (LGPD, ADR 0009): irreversível; exige a confirmação digitada.
+  app.post("/player/delete", { preHandler: authenticate }, async (request) => {
+    z.object({ confirm: z.literal("EXCLUIR") }).parse(request.body);
+    await deleteAccount(db, playerIdOf(request));
+    return { deleted: true };
   });
 
   app.post("/store/buy", { preHandler: authenticate }, async (request, reply) => {

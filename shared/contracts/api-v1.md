@@ -156,6 +156,18 @@ Corpo `{ events: [{ name, props? }] }` (1–20). Nomes permitidos: `tutorial_sta
 `{ displayName }` → `200 PlayerState` (`player.canChangeName: false`). Uma vez por conta.
 `422 NAME_INVALID`, `422 NAME_NOT_ALLOWED`, `409 NAME_TAKEN`, `409 NAME_ALREADY_CHANGED`.
 
+### `POST /player/delete`
+`{ confirm: "EXCLUIR" }` → `200 { deleted: true }`. Irreversível (ADR 0009): apaga jogador,
+carteira, ledger, negócios, missões, conquistas, anúncios e eventos. Recibos/assinaturas ficam
+sem dono. Depois disso o token e as credenciais de convidado respondem `401`.
+`400 VALIDATION_ERROR` sem a confirmação exata.
+
+`POST /purchases/verify` de uma **assinatura** cujo recibo ficou sem dono (conta excluída) →
+`200 { relinked: true, receipt, state }`; recibo de diamantes nessa situação →
+`409 PURCHASE_OWNED_BY_OTHER`.
+
+Qualquer rota: `429 RATE_LIMITED` `{ retryAfterSeconds }` acima do limite por IP.
+
 ### Admin — `/api/admin/*` (fora do `/api/v1`)
 `Authorization: Bearer <ADMIN_TOKEN>`; desligado sem token. Somente leitura:
 `GET /overview`, `GET /players?search&limit`, `GET /players/:id`, `GET /events?name&limit`.

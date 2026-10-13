@@ -190,7 +190,9 @@ model AnalyticsEvent {
 // Compras (doc §10): um recibo por transação da loja; sandbox/mock até as lojas estarem prontas.
 model PurchaseReceipt {
   id              String    @id @default(uuid()) @db.Uuid
-  playerId        String    @map("player_id") @db.Uuid
+  // Nulo depois da exclusão da conta (ADR 0009): o recibo fica, sem dado pessoal, para
+  // impedir reuso do mesmo recibo e para tratar reembolsos.
+  playerId        String?   @map("player_id") @db.Uuid
   store           String // mock | google | apple
   transactionId   String    @map("transaction_id")
   productId       String    @map("product_id")
@@ -201,7 +203,7 @@ model PurchaseReceipt {
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
   revokedAt       DateTime? @map("revoked_at") @db.Timestamptz(3)
 
-  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  player Player? @relation(fields: [playerId], references: [id], onDelete: SetNull)
 
   @@unique([store, transactionId])
   @@map("purchase_receipts")
@@ -209,7 +211,8 @@ model PurchaseReceipt {
 
 model Subscription {
   id            String    @id @default(uuid()) @db.Uuid
-  playerId      String    @map("player_id") @db.Uuid
+  // Nulo depois da exclusão da conta (ADR 0009); "restaurar" religa a uma conta nova.
+  playerId      String?   @map("player_id") @db.Uuid
   productId     String    @map("product_id")
   store         String
   transactionId String    @map("transaction_id")
@@ -218,7 +221,7 @@ model Subscription {
   expiresAt     DateTime  @map("expires_at") @db.Timestamptz(3)
   revokedAt     DateTime? @map("revoked_at") @db.Timestamptz(3)
 
-  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  player Player? @relation(fields: [playerId], references: [id], onDelete: SetNull)
 
   @@unique([store, transactionId])
   @@index([playerId, expiresAt])

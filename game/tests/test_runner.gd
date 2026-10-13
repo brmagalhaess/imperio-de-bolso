@@ -288,6 +288,14 @@ func _store_tests() -> bool:
 	await get_tree().process_frame
 	has_rename = hud._modal._list.get_children().any(func(c): return not c.is_queued_for_deletion() and c is Button and c.text.begins_with("Alterar nome"))
 	check(not has_rename, "depois de trocar, a opção some")
+	var live := func() -> Array: return hud._modal._list.get_children().filter(func(c): return not c.is_queued_for_deletion())
+	var del_btn: Array = live.call().filter(func(c): return c is Button and c.text == "Excluir conta")
+	check(del_btn.size() == 1, "perfil oferece excluir a conta (LGPD)")
+	hud.open_delete_account_form()
+	await get_tree().process_frame
+	var form: Array = live.call()
+	check(form.any(func(c): return c is LineEdit) and form.any(func(c): return c is Button and c.text == "Excluir para sempre"),
+			"exclusão pede confirmação digitada")
 	hud.queue_free()
 	GameState.state = {}
 	GameState.catalog = {}
@@ -378,5 +386,13 @@ func _integration_test() -> void:
 	check(not hud._sheet.visible, "abrir Construir fecha o painel de vez")
 	hud._modal.close()
 	main.queue_free()
+
+	# Exclusão de conta (LGPD): servidor apaga, sessão do aparelho é esquecida, entra conta nova.
+	var deleted := await Api.delete_account()
+	check(deleted.ok and not FileAccess.file_exists(Api.session_path),
+			"conta excluída e sessão do aparelho apagada")
+	check(await GameState.boot(), "depois de excluir, o jogo entra com conta nova")
+	check(GameState.state.player.id != player_id and GameState.coins() == "100", "conta nova começa do zero")
+	await Api.delete_account()  # não deixa conta de teste no banco local
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Api.session_path))
 	_sections_done += 1

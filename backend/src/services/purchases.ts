@@ -76,6 +76,27 @@ export function verifyPurchase(
     const existing = await tx.purchaseReceipt.findUnique({
       where: { store_transactionId: { store, transactionId: tr.transactionId } },
     });
+    if (existing && existing.playerId === null && item.kind === "subscription") {
+      // Assinatura de uma conta excluída (ADR 0009): a pessoa ainda paga na loja, então
+      // "restaurar" religa o direito à conta atual. Diamantes já entregues não voltam.
+      await tx.purchaseReceipt.update({
+        where: { id: existing.id },
+        data: { playerId: wallet.playerId },
+      });
+      await tx.subscription.updateMany({
+        where: { store, transactionId: tr.transactionId, playerId: null },
+        data: { playerId: wallet.playerId },
+      });
+      await track(tx, wallet.playerId, "subscription_relinked", { product: item.id, store });
+      return {
+        statusCode: 200,
+        body: {
+          relinked: true,
+          receipt: existing.id,
+          state: await getPlayerState(tx, wallet.playerId, now),
+        },
+      };
+    }
     if (existing) {
       if (existing.playerId !== wallet.playerId) {
         throw new AppError(409, "PURCHASE_OWNED_BY_OTHER", "Recibo pertence a outra conta");
@@ -149,7 +170,10 @@ export async function revokePurchase(db: Db, store: StoreName, transactionId: st
       return { alreadyRevoked: true, shortfall: r.revokeShortfall.toString() };
 
     let shortfall = 0n;
-    if (r.gemsGranted > 0n) {
+    if (r.gemsGranted > 0n && r.playerId === null) {
+      // Conta já excluída: não há saldo para retirar; registra o total como falta.
+      shortfall = r.gemsGranted;
+    } else if (r.gemsGranted > 0n && r.playerId !== null) {
       const [w] = await tx.$queryRaw<{ gems: bigint; version: number }[]>`
         SELECT gems, version FROM player_wallets WHERE player_id = ${r.playerId}::uuid FOR UPDATE`;
       const take = w!.gems < r.gemsGranted ? w!.gems : r.gemsGranted;

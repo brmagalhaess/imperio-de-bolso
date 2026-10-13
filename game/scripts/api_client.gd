@@ -111,6 +111,21 @@ func change_name(display_name: String) -> Dictionary:
 	return await _authed(HTTPClient.METHOD_POST, "/player/name", {"displayName": display_name}, "")
 
 
+## Exclusão de conta (LGPD, ADR 0009): irreversível. Esquece a sessão salva no aparelho.
+func delete_account() -> Dictionary:
+	var res := await _authed(HTTPClient.METHOD_POST, "/player/delete", {"confirm": "EXCLUIR"}, "")
+	if res.ok:
+		forget_session()
+	return res
+
+
+## Apaga o token e a conta convidada salva (a próxima autenticação cria uma conta nova).
+func forget_session() -> void:
+	_token = ""
+	if FileAccess.file_exists(session_path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(session_path))
+
+
 func store_buy(item_id: String, district := "") -> Dictionary:
 	var body := {"itemId": item_id}
 	if district != "":

@@ -16,8 +16,13 @@ Revisados antes: docs/README.md (Etapa 5), PROMPT_MESTRE (Etapa 5), plano §24/�
   (preset "Android Release"). Keystore de upload em `~/.imperio/keys/` (fora do Git, chmod 600)
   — o titular precisa guardar cópia segura. `tools/android/run_device.sh` instala e abre no
   aparelho com `adb reverse` para a API local.
+- **Defeito corrigido:** o APK saía com `allowBackup=false` — reinstalar o app ou trocar de
+  celular perdia o progresso. Agora o Backup automático do Android guarda a conta convidada.
+- **Exclusão de conta (LGPD/Play):** Perfil → "Excluir conta" → digitar EXCLUIR. Servidor apaga
+  tudo; recibos ficam sem dono (anti-reuso/reembolso); VIP pode ser religado. Migração
+  `*_account_deletion`. Backend **102 testes**; jogo 62 unitários, 100 com integração.
 - **Pendente:** teste no aparelho real do titular; Play Console (teste interno → fechado);
-  stack staging na VPS.
+  stack staging na VPS; link web de exclusão (landing).
 
 ## 2026-10-13 — Ajustes da Loja e Perfil (pedidos do titular)
 

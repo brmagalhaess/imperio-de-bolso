@@ -30,7 +30,8 @@ Itens marcados por quem executou e confirmou. Nunca marcar aprovação de loja s
 - [ ] Stacks Dockploy staging e produção separadas (compose pronto: `infrastructure/docker-compose.prod.yml`)
 - [x] Backups automáticos criptografados com restauração testada (local), healthcheck, rate limit
 - [ ] HTTPS no Traefik do Dockploy e monitoramento (na VPS)
-- [ ] Landing com política de privacidade, termos, exclusão de conta, suporte, app-ads.txt
+- [x] Exclusão de conta dentro do jogo (Perfil) e na API (ADR 0009)
+- [ ] Landing com política de privacidade, termos, **link web de exclusão de conta** (exigido pelo Play), suporte, app-ads.txt
 
 ## Monetização (ADR 0008)
 - [ ] Produtos criados nas lojas com os IDs `br.com.imperiodebolso.gems_50/120/300` e `vip_monthly`

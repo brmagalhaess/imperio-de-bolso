@@ -15,11 +15,28 @@ func _ready() -> void:
 	if mode == "novo":
 		Api.session_path = "user://demo_novo.cfg"
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(Api.session_path))
+	if mode == "excluir":
+		Api.session_path = "user://demo_excluir.cfg"
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(Api.session_path))
 	main = load("res://scenes/main.tscn").instantiate()
 	add_child(main)
 	while not GameState.loaded:
 		await get_tree().process_frame
 	var hud: Control = main.get_node("UI/HUD")
+	if mode == "excluir":
+		# Mostra Perfil → Excluir conta (não confirma: aqui a cena atual é o roteiro).
+		await _wait(2.0)
+		hud.open_profile_menu()
+		await _wait(1.2)
+		hud._modal._scroll.scroll_vertical = 100000
+		await _wait(1.0)
+		print("PASSO perfil fim")
+		hud.open_delete_account_form()
+		await _wait(1.2)
+		print("PASSO excluir conta")
+		await Api.delete_account()
+		get_tree().quit()
+		return
 	if mode == "loja2":
 		await _wait(2.5)
 		hud._modal.close()

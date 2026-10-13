@@ -60,6 +60,9 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Contratos de anúncios (sessão + SSV assinado) e compras (verificação, recibo, revogação, restauração) com mocks
 - [ ] Integrar plugins reais: AdMob, Google Play Billing, StoreKit 2 (bloqueado: contas + aparelho)
 - [ ] Verificadores Google/Apple + notificações de reembolso (RTDN / App Store Server Notifications)
+- [x] Exclusão de conta no jogo e na API (LGPD, ADR 0009)
+- [ ] Link web de exclusão de conta (landing) — exigido pela ficha do Play
+- [ ] Vincular conta convidada a Google/Apple (`/auth/link`) para recuperar sem o Backup do Android
 - [ ] Consentimento (UMP/LGPD), ATT no iOS, app-ads.txt
 - [x] ADR do plugin AdMob/IAP para Godot com bloqueio explícito (ADR 0008)
 - [x] `POST /purchases/verify`, `GET /store/catalog`

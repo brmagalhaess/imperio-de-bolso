@@ -572,7 +572,29 @@ func open_profile_menu() -> void:
 		var ach: Dictionary = a
 		var id: String = ach.id
 		_reward_cards[id] = _modal.add_reward_card(_achievement_item(ach), func(): GameState.claim_achievement(id))
+	_modal.add_section(tr("Conta"))
+	_modal.add_action(tr("Excluir conta"), open_delete_account_form, Style.RED, Style.RED_DARK)
 	GameState.refresh_achievements()
+
+
+## Exclusão de conta (LGPD, ADR 0009): irreversível, com confirmação digitada.
+func open_delete_account_form() -> void:
+	_reward_kind = "delete"
+	_reward_cards.clear()
+	_modal.open(tr("Excluir conta"))
+	_modal.add_message(null, tr("Isso não pode ser desfeito"),
+			tr("Seus negócios, moedas, diamantes, ajudantes, missões, conquistas e posição no ranking serão apagados para sempre, e o jogo recomeça do zero.\nCompras feitas na loja não são reembolsadas por aqui; o Passe VIP pode ser recuperado em \"Restaurar compras\" numa conta nova."))
+	var edit: LineEdit = _modal.add_line_edit(tr("Digite EXCLUIR para confirmar"), 10)
+	_modal.add_action(tr("Excluir para sempre"), func():
+		if edit.text.strip_edges().to_upper() != "EXCLUIR":
+			show_toast(tr("Digite EXCLUIR para confirmar."))
+			open_delete_account_form()
+			return
+		if not await GameState.delete_account():
+			open_profile_menu(), Style.RED, Style.RED_DARK)
+	_modal.add_action(tr("Voltar"), open_profile_menu, Style.GREY, Style.GREY_DARK)
+	_modal.refit()
+	edit.grab_focus.call_deferred()
 
 
 ## Troca de nome: permitida uma única vez (pedido do titular); o servidor valida.

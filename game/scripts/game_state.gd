@@ -56,6 +56,7 @@ const MESSAGES := {
 	"NAME_NOT_ALLOWED": "Esse nome não é permitido.",
 	"NAME_TAKEN": "Esse nome já está em uso.",
 	"NAME_ALREADY_CHANGED": "Você já trocou de nome uma vez.",
+	"VALIDATION_ERROR": "Dados inválidos. Confira e tente de novo.",
 }
 
 var state: Dictionary = {}
@@ -297,6 +298,28 @@ func change_name(display_name: String) -> bool:
 		notice.emit(message_for(res.error_code))
 		return false
 	_apply_state(res.data)
+	return true
+
+
+## Exclusão de conta: o servidor apaga tudo e o jogo recomeça do zero com uma conta nova.
+func delete_account() -> bool:
+	if busy:
+		return false
+	_set_busy(true)
+	var res := await Api.delete_account()
+	_set_busy(false)
+	if not res.ok:
+		notice.emit(message_for(res.error_code))
+		return false
+	_presence_timer.stop()
+	_reconnect_timer.stop()
+	state = {}
+	missions = {}
+	achievements = []
+	catalog = {}
+	loaded = false
+	current_district = "praia"
+	get_tree().reload_current_scene()
 	return true
 
 
