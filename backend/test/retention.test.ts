@@ -281,5 +281,14 @@ describe("analytics e painel admin", () => {
       headers: auth,
     });
     expect(detail.json().ledger[0]).toMatchObject({ reason: "initial_grant", delta: "100" });
+    // "Código do jogador" (8 primeiros hex do id) encontra a conta, em maiúsculas ou minúsculas.
+    await newGuest(ctx.app);
+    const code = g.playerId.slice(0, 8).toUpperCase();
+    const byCode = await ctx.app.inject({
+      method: "GET",
+      url: `/api/admin/players?search=${code}`,
+      headers: auth,
+    });
+    expect(byCode.json().players.map((p: { id: string }) => p.id)).toEqual([g.playerId]);
   });
 });

@@ -17,6 +17,10 @@ const TEXTS := {
 	Step.HIRE: "Contrate um ajudante no botão Ajudantes: ele vende sozinho quando você sai da praia (até 4h)!",
 }
 const TUTORIAL_SLUG := "agua"
+## Base do cartão do tutorial (acima da barra de botões) e posição mais alta quando a seta
+## aponta para a própria barra.
+const CARD_BOTTOM := -206.0
+const CARD_BOTTOM_ABOVE_ARROW := -340.0
 
 ## Devolve a posição de tela do lote (ou da bolha, se `bubble`) — fornecido pela cena principal.
 var target_provider: Callable
@@ -42,7 +46,7 @@ func _ready() -> void:
 	# Embaixo, acima da barra de botões: não cobre os negócios nem as moedas da ilha.
 	_card.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE, Control.PRESET_MODE_MINSIZE, 24)
 	_card.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_card.offset_bottom = -206
+	_card.offset_bottom = CARD_BOTTOM
 	add_child(_card)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
@@ -136,6 +140,8 @@ func _process(_delta: float) -> void:
 		return
 	var blocked := blockers.any(func(c): return c.visible)
 	_card.visible = not blocked
+	# Seta no botão Ajudantes (barra de baixo): o cartão sobe para a seta não cobrir o texto.
+	_card.offset_bottom = CARD_BOTTOM_ABOVE_ARROW if arrow_kind() == "helpers" else CARD_BOTTOM
 	_arrow.visible = not blocked
 	_arrow.queue_redraw()
 

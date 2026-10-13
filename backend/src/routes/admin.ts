@@ -1,3 +1,4 @@
+import type { Prisma } from "../generated/prisma/client.js";
 import { createHash, timingSafeEqual } from "node:crypto";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import { z } from "zod";
@@ -74,8 +75,18 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
 
   app.get("/players", async (request) => {
     const { search, limit } = PlayersQuery.parse(request.query);
+    let where: Prisma.PlayerWhereInput = search
+      ? { displayName: { contains: search, mode: "insensitive" } }
+      : {};
+    // "Código do jogador" (Perfil do jogo / pedidos de suporte e exclusão) = 8 primeiros hex do id.
+    const code = search?.trim().toLowerCase() ?? "";
+    if (/^[0-9a-f]{8}$/.test(code)) {
+      const rows = await db.$queryRaw<{ id: string }[]>`
+        SELECT id FROM players WHERE id::text LIKE ${code + "%"}`;
+      where = { OR: [where, { id: { in: rows.map((r) => r.id) } }] };
+    }
     const players = await db.player.findMany({
-      where: search ? { displayName: { contains: search, mode: "insensitive" } } : {},
+      where,
       orderBy: { createdAt: "desc" },
       take: limit,
       include: { wallet: true, _count: { select: { businesses: true } } },

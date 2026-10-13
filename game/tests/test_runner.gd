@@ -343,8 +343,10 @@ func _store_tests() -> bool:
 
 	# Perfil: "Alterar nome" só aparece se ainda pode trocar.
 	GameState._apply_state({"player": {"tutorialCompleted": true, "displayName": "Empreendedor 1",
-		"canChangeName": true}, "wallet": {"coins": "0", "gems": "0"}, "businesses": []})
+		"canChangeName": true, "id": "0418f66f-4380-4ef4-a53c-74d1007c18a6"}, "wallet": {"coins": "0", "gems": "0"}, "businesses": []})
 	hud.open_profile_menu()
+	var profile_text: String = " ".join(hud._modal._list.find_children("*", "Label", true, false).map(func(l): return l.text))
+	check(profile_text.contains("Código do jogador: 0418F66F"), "perfil mostra o código do jogador (suporte/exclusão)")
 	var has_rename: bool = hud._modal._list.get_children().any(func(c): return c is Button and c.text.begins_with("Alterar nome"))
 	check(has_rename, "perfil oferece trocar o nome uma vez")
 	GameState.state.player.canChangeName = false

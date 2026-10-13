@@ -572,7 +572,8 @@ func open_profile_menu() -> void:
 	var helpers := GameState.businesses().filter(func(b): return b.get("managed", false)).size()
 	var vip_tag := tr(" · VIP") if GameState.vip_until() != null else ""
 	_modal.add_message(Layout.texture("icon_profile"), str(player.get("displayName", "")),
-			tr("%d negócios · %d ajudantes · %s diamantes%s") % [owned, helpers, Fmt.coins(GameState.gems()), vip_tag])
+			tr("%d negócios · %d ajudantes · %s diamantes%s") % [owned, helpers, Fmt.coins(GameState.gems()), vip_tag]
+			+ "\n" + tr("Código do jogador: %s") % player_code())
 	if player.get("canChangeName", false):
 		_modal.add_action(tr("Alterar nome (só 1 vez)"), open_name_form, Style.TEAL_LIGHT, Style.TEAL_DARK)
 	_modal.add_section(tr("Conquistas"))
@@ -583,6 +584,12 @@ func open_profile_menu() -> void:
 	_modal.add_section(tr("Conta"))
 	_modal.add_action(tr("Excluir conta"), open_delete_account_form, Style.RED, Style.RED_DARK)
 	GameState.refresh_achievements()
+
+
+## Código curto da conta (8 primeiros caracteres do id) para suporte e pedidos de exclusão
+## pelo site; o painel admin encontra o jogador por ele.
+static func player_code() -> String:
+	return str(GameState.state.get("player", {}).get("id", "")).substr(0, 8).to_upper()
 
 
 ## Exclusão de conta (LGPD, ADR 0009): irreversível, com confirmação digitada.
