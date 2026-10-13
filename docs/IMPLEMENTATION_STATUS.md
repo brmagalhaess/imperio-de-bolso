@@ -2,6 +2,26 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-13 — Etapa 2: ajudantes, offline 4h, tutorial, reconexão
+
+Revisados antes: docs/README.md (§2, §3, §7, §8, §18), PROMPT_MESTRE (Etapa 2) e a conversa original.
+- **Servidor:** ajudante por negócio (`/managers/hire`), liquidação com teto de 4h e sobra em ms
+  (`/production/settle`, função pura `economy/offline.ts`), liquidação antes de melhorar,
+  `MANAGER_ACTIVE` na coleta manual, `/tutorial/complete`. Migração renomeia `carry_seconds` →
+  `carry_ms` (sem perda), adiciona `manager_cost` e `tutorial_completed_at`. ADR 0005.
+- **Jogo:** botão "Contratar ajudante" no painel; lote com ajudante mostra rostinho + anel verde e
+  "+N" a cada liquidação (15 s); "Bem-vindo de volta!" com o total offline e aviso do teto;
+  tutorial com seta (comprar → coletar → melhorar → contratar), embaixo para não cobrir moedas;
+  aviso "Sem conexão · reconectando…" com nova tentativa a cada 5 s.
+- **Pedido do titular:** Construir mostra só o mapa atual e só o que ainda não foi construído;
+  com tudo construído, sugere ir para o próximo distrito.
+- **Testes:** backend 52/52 (19 novos: offline por propriedade, 4h, relógio voltando,
+  concorrência, replay, upgrade com ajudante, tutorial); jogo unitários 31/31; integração 51/51
+  (inclui queda e volta do servidor). Capturas reais: tutorial, resumo offline, ajudantes,
+  Construir filtrado.
+- **Decisão a confirmar:** preço do ajudante (~4× o negócio; água 150).
+- **Fora da etapa:** anúncio para dobrar ganhos offline (Etapa 4); missões/ranking (Etapa 3).
+
 ## 2026-10-13 — Fase 2: Cidade-maquete + ajustes pedidos
 
 - **Coleta pela moeda** não abre mais o painel do negócio (pedido do titular).

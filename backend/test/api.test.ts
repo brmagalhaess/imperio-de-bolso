@@ -344,3 +344,146 @@ describe("distritos", () => {
     expect(res.json().state.districts[1]).toMatchObject({ id: "cidade", unlocked: true });
   });
 });
+
+describe("ajudantes e produção offline", () => {
+  async function waterWithManager() {
+    const guest = await newGuest(ctx.app);
+    await setCoins(ctx.db, guest.playerId, 10_000n);
+    await post(ctx.app, guest, "/businesses/purchase", { businessSlug: "agua" });
+    const hire = await post(ctx.app, guest, "/managers/hire", { businessSlug: "agua" });
+    expect(hire.statusCode).toBe(200);
+    return guest;
+  }
+
+  it("contratar ajudante cobra o preço do catálogo e marca o negócio como automático", async () => {
+    const guest = await waterWithManager();
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(10_000n - 100n - 150n);
+    const state = (await get(ctx.app, guest, "/player/state")).json();
+    expect(state.businesses[0]).toMatchObject({ managed: true, managerCost: "150", ready: false });
+  });
+
+  it("não contrata sem possuir o negócio, sem saldo ou duas vezes", async () => {
+    const guest = await newGuest(ctx.app);
+    const notOwned = await post(ctx.app, guest, "/managers/hire", { businessSlug: "agua" });
+    expect(notOwned.json().error.code).toBe("BUSINESS_NOT_OWNED");
+    await post(ctx.app, guest, "/businesses/purchase", { businessSlug: "agua" });
+    const broke = await post(ctx.app, guest, "/managers/hire", { businessSlug: "agua" });
+    expect(broke.json().error.code).toBe("INSUFFICIENT_FUNDS");
+    await setCoins(ctx.db, guest.playerId, 1_000n);
+    await post(ctx.app, guest, "/managers/hire", { businessSlug: "agua" });
+    const twice = await post(ctx.app, guest, "/managers/hire", { businessSlug: "agua" });
+    expect(twice.json().error.code).toBe("MANAGER_ALREADY_HIRED");
+  });
+
+  it("ao contratar com o ciclo manual pronto, esse ciclo é pago", async () => {
+    const guest = await newGuest(ctx.app);
+    await setCoins(ctx.db, guest.playerId, 1_000n);
+    await post(ctx.app, guest, "/businesses/purchase", { businessSlug: "agua" });
+    ctx.clock.advance(30);
+    const res = await post(ctx.app, guest, "/managers/hire", { businessSlug: "agua" });
+    expect(res.json().settled).toEqual([{ slug: "agua", cycles: 1, amount: "10" }]);
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(1_000n - 100n - 150n + 10n);
+  });
+
+  it("liquida ciclos completos e guarda a sobra entre chamadas", async () => {
+    const guest = await waterWithManager();
+    const before = await coinsOf(ctx.db, guest.playerId);
+    ctx.clock.advance(25);
+    const first = await post(ctx.app, guest, "/production/settle", {});
+    expect(first.json()).toMatchObject({ total: "20", settled: [{ slug: "agua", cycles: 2 }] });
+    ctx.clock.advance(5);
+    const second = await post(ctx.app, guest, "/production/settle", {});
+    expect(second.json().total).toBe("10"); // 5 s de sobra + 5 s novos = 1 ciclo
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 30n);
+  });
+
+  it("offline: 10 horas fora rendem no máximo 4 horas", async () => {
+    const guest = await waterWithManager();
+    const before = await coinsOf(ctx.db, guest.playerId);
+    ctx.clock.advance(10 * 3_600);
+    const res = await post(ctx.app, guest, "/production/settle", {});
+    expect(res.json()).toMatchObject({ total: "14400", capped: true, elapsedSeconds: 14_400 });
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 14_400n);
+  });
+
+  it("relógio do servidor voltando no tempo não credita nem gera saldo negativo", async () => {
+    const guest = await waterWithManager();
+    const before = await coinsOf(ctx.db, guest.playerId);
+    ctx.clock.advance(-3_600);
+    const res = await post(ctx.app, guest, "/production/settle", {});
+    expect(res.json()).toMatchObject({ total: "0", settled: [] });
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before);
+  });
+
+  it("o cliente não informa tempo: campos extras são ignorados", async () => {
+    const guest = await waterWithManager();
+    const res = await post(ctx.app, guest, "/production/settle", { elapsedSeconds: 999_999 });
+    expect(res.json().total).toBe("0");
+  });
+
+  it("liquidações simultâneas creditam uma única vez", async () => {
+    const guest = await waterWithManager();
+    const before = await coinsOf(ctx.db, guest.playerId);
+    ctx.clock.advance(100);
+    const results = await Promise.all(
+      Array.from({ length: 6 }, () => post(ctx.app, guest, "/production/settle", {})),
+    );
+    expect(results.every((r) => r.statusCode === 200)).toBe(true);
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 100n);
+  });
+
+  it("reenvio da mesma liquidação (mesma chave) não paga de novo", async () => {
+    const guest = await waterWithManager();
+    const before = await coinsOf(ctx.db, guest.playerId);
+    ctx.clock.advance(50);
+    const k = key();
+    await post(ctx.app, guest, "/production/settle", {}, k);
+    ctx.clock.advance(50);
+    const replay = await post(ctx.app, guest, "/production/settle", {}, k);
+    expect(replay.json().total).toBe("50");
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 50n);
+  });
+
+  it("melhorar com ajudante paga o produzido no nível antigo antes de subir", async () => {
+    const guest = await waterWithManager();
+    const before = await coinsOf(ctx.db, guest.playerId);
+    ctx.clock.advance(100);
+    const res = await post(ctx.app, guest, "/businesses/upgrade", { businessSlug: "agua" });
+    expect(res.statusCode).toBe(200);
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 100n - 115n);
+    ctx.clock.advance(10);
+    expect((await post(ctx.app, guest, "/production/settle", {})).json().total).toBe("11");
+  });
+
+  it("coleta manual não vale para negócio com ajudante", async () => {
+    const guest = await waterWithManager();
+    ctx.clock.advance(30);
+    const res = await post(ctx.app, guest, "/production/collect", { businessSlug: "agua" });
+    expect(res.json().error.code).toBe("MANAGER_ACTIVE");
+    const all = await post(ctx.app, guest, "/production/collect", {});
+    expect(all.json().error.code).toBe("NOTHING_TO_COLLECT");
+  });
+
+  it("estado mostra o lucro pendente do ajudante sem creditar", async () => {
+    const guest = await waterWithManager();
+    const before = await coinsOf(ctx.db, guest.playerId);
+    ctx.clock.advance(35);
+    const state = (await get(ctx.app, guest, "/player/state")).json();
+    expect(state.businesses[0]).toMatchObject({ pendingAmount: "30", secondsRemaining: 5 });
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before);
+  });
+});
+
+describe("tutorial", () => {
+  it("começa pendente e conclui de forma idempotente", async () => {
+    const guest = await newGuest(ctx.app);
+    expect((await get(ctx.app, guest, "/player/state")).json().player.tutorialCompleted).toBe(
+      false,
+    );
+    const first = await post(ctx.app, guest, "/tutorial/complete", {}, null);
+    expect(first.statusCode).toBe(200);
+    expect(first.json().player.tutorialCompleted).toBe(true);
+    const again = await post(ctx.app, guest, "/tutorial/complete", {}, null);
+    expect(again.json().player.tutorialCompleted).toBe(true);
+  });
+});

@@ -101,6 +101,40 @@ func close() -> void:
 	visible = false
 
 
+## Bloco de mensagem centralizado com imagem opcional (resumo offline, lista vazia).
+func add_message(texture: Texture2D, headline: String, body: String) -> void:
+	var box := VBoxContainer.new()
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 10)
+	_list.add_child(box)
+	if texture:
+		var img := TextureRect.new()
+		img.texture = texture
+		img.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		img.custom_minimum_size = Vector2(0, 170)
+		box.add_child(img)
+	if headline != "":
+		var h := _text(headline, 44, Style.TEAL_DARK)
+		h.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		box.add_child(h)
+	var b := _text(body, 26, Style.INK_SOFT, 500)
+	b.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(b)
+
+
+## Botão grande de ação no fim da lista (fecha a janela e chama `on_press`).
+func add_action(text_value: String, on_press: Callable, color := Style.GREEN,
+		edge := Style.GREEN_DARK) -> void:
+	var button := Button.new()
+	button.text = text_value
+	button.custom_minimum_size = Vector2(0, Style.MIN_TOUCH)
+	button.add_theme_font_size_override("font_size", 34)
+	Style.style_button(button, color, edge)
+	button.pressed.connect(func(): close(); on_press.call())
+	_list.add_child(button)
+
+
 func add_section(text: String) -> void:
 	var label := Label.new()
 	label.text = text

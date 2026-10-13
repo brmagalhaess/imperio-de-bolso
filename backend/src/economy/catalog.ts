@@ -13,24 +13,26 @@ export interface BusinessSeed {
   revenue: bigint;
   operatingCost: bigint;
   cycleSeconds: number;
+  /** Preço do ajudante (gerente) — proposta: ~4× o negócio; água mais barata p/ o tutorial. */
+  managerCost: bigint;
   maxLevel: number;
 }
 
 const MAX_LEVEL = 100;
 
 export const BUSINESS_CATALOG: readonly BusinessSeed[] = [
-  ["agua", "Carrinho de Água", 100n, 10n, 10],
-  ["pipoca", "Carrinho de Pipoca", 500n, 40n, 20],
-  ["sorveteria", "Sorveteria", 2_000n, 150n, 30],
+  ["agua", "Carrinho de Água", 100n, 10n, 10, 150n],
+  ["pipoca", "Carrinho de Pipoca", 500n, 40n, 20, 2_000n],
+  ["sorveteria", "Sorveteria", 2_000n, 150n, 30, 8_000n],
   // Na ilha da praia a "Lanchonete" da doc virou o Quiosque de Coco (direção visual v2).
-  ["quiosque_coco", "Quiosque de Coco", 8_000n, 600n, 45],
-  ["mercadinho", "Mercadinho", 25_000n, 1_800n, 60],
-  ["restaurante", "Restaurante", 80_000n, 5_000n, 90],
-  ["supermercado", "Supermercado", 250_000n, 14_000n, 120],
-  ["academia", "Academia", 700_000n, 35_000n, 180],
-  ["hotel", "Hotel", 2_000_000n, 100_000n, 240],
-  ["shopping", "Shopping", 8_000_000n, 350_000n, 300],
-].map(([slug, name, cost, revenue, cycleSeconds], i) => ({
+  ["quiosque_coco", "Quiosque de Coco", 8_000n, 600n, 45, 32_000n],
+  ["mercadinho", "Mercadinho", 25_000n, 1_800n, 60, 100_000n],
+  ["restaurante", "Restaurante", 80_000n, 5_000n, 90, 320_000n],
+  ["supermercado", "Supermercado", 250_000n, 14_000n, 120, 1_000_000n],
+  ["academia", "Academia", 700_000n, 35_000n, 180, 2_800_000n],
+  ["hotel", "Hotel", 2_000_000n, 100_000n, 240, 8_000_000n],
+  ["shopping", "Shopping", 8_000_000n, 350_000n, 300, 32_000_000n],
+].map(([slug, name, cost, revenue, cycleSeconds, managerCost], i) => ({
   slug: slug as string,
   name: name as string,
   sortOrder: i + 1,
@@ -39,5 +41,6 @@ export const BUSINESS_CATALOG: readonly BusinessSeed[] = [
   revenue: revenue as bigint,
   operatingCost: 0n,
   cycleSeconds: cycleSeconds as number,
+  managerCost: managerCost as bigint,
   maxLevel: MAX_LEVEL,
 }));

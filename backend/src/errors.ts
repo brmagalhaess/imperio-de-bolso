@@ -39,6 +39,10 @@ export const Errors = {
       "Distrito bloqueado: complete o distrito anterior primeiro",
       { district, requires },
     ),
+  managerActive: (slug: string) =>
+    new AppError(409, "MANAGER_ACTIVE", "O ajudante já coleta este negócio sozinho", { slug }),
+  managerAlreadyHired: (slug: string) =>
+    new AppError(409, "MANAGER_ALREADY_HIRED", "Este negócio já tem ajudante", { slug }),
   nothingToCollect: () => new AppError(409, "NOTHING_TO_COLLECT", "Nada pronto para coletar"),
   idempotencyKeyRequired: () =>
     new AppError(

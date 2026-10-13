@@ -28,15 +28,18 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Coleta pela moeda sem abrir painel; menus Construir/Mapa no padrão do jogo
 - [x] Fase 2: Cidade-maquete (mockup D) com os 6 negócios + desbloqueio no servidor + Mapa
 - [ ] Loja, Perfil e Configurações (hoje "em breve")
+- [x] Construir: só o mapa atual e só o que falta construir (pedido do titular)
 - [ ] Rate limiting na API (`@fastify/rate-limit`)
 
 ## Etapa 2 — MVP gameplay
-- [ ] Gerentes (desbloqueio, custo) e liquidação automática
-- [ ] Ganhos offline até 4h (clamp, carry_seconds) + tela de resumo offline
-- [ ] Testes de relógio adulterado, falha de rede e retomada
-- [ ] Tutorial (< 5 min) e feedback visual (moedas voando, sons)
-- [ ] Persistência/reconexão robusta; tela de erro de rede
-- [ ] Prédios reagem visualmente ao nível
+- [x] Ajudantes (gerentes): contratação, custo no catálogo e liquidação automática
+- [x] Ganhos offline até 4h (clamp, carry_ms) + tela "Bem-vindo de volta!"
+- [x] Testes de relógio adulterado, falha de rede e retomada
+- [x] Tutorial (< 5 min) com seta, deduzido do estado do servidor
+- [x] Reconexão automática com aviso; comandos repetem com a mesma chave
+- [x] Prédios reagem visualmente ao nível (3 artes por negócio)
+- [ ] Sons e efeitos sonoros (sem assets ainda)
+- [ ] Confirmar com o titular o preço dos ajudantes
 
 ## Etapa 3 — Retenção
 - [ ] Missões diárias (3), conquistas simples, ranking semanal

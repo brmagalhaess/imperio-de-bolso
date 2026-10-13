@@ -11,9 +11,12 @@ import {
 import { createGuest, resumeGuest } from "../services/auth.js";
 import {
   collectProduction,
+  completeTutorial,
   getPlayerState,
+  hireManager,
   listBusinesses,
   purchaseBusiness,
+  settleProduction,
   upgradeBusiness,
 } from "../services/game.js";
 
@@ -112,5 +115,20 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
     return command(request, reply, "production.collect", (at) =>
       collectProduction(businessSlug, at),
     );
+  });
+
+  app.post("/managers/hire", { preHandler: authenticate }, async (request, reply) => {
+    const { businessSlug } = BusinessBody.parse(request.body);
+    return command(request, reply, "managers.hire", (at) => hireManager(businessSlug, at));
+  });
+
+  app.post("/production/settle", { preHandler: authenticate }, async (request, reply) =>
+    command(request, reply, "production.settle", (at) => settleProduction(at)),
+  );
+
+  app.post("/tutorial/complete", { preHandler: authenticate }, async (request) => {
+    const at = now();
+    await completeTutorial(db, playerIdOf(request), at);
+    return getPlayerState(db, playerIdOf(request), at);
   });
 }

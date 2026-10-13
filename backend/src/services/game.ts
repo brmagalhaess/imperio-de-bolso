@@ -3,12 +3,14 @@ import type { BusinessDefinition, PlayerBusiness } from "../generated/prisma/cli
 import { Errors } from "../errors.js";
 import { DISTRICTS, previousDistrict } from "../economy/districts.js";
 import { nextUpgradeCost, profitPerCycle } from "../economy/formulas.js";
+import { OFFLINE_CAP_MS, settle } from "../economy/offline.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
-import { applyCoins } from "./wallet.js";
+import { applyCoins, type LockedWallet } from "./wallet.js";
 
-// Ciclo manual (sem gerente): ao terminar, o negócio fica parado com 1 ciclo
+// Ciclo manual (sem ajudante): ao terminar, o negócio fica parado com 1 ciclo
 // pronto até o jogador coletar; a coleta credita e já inicia o próximo ciclo.
-// Gerentes (Etapa 2) vão liquidar ciclos automaticamente com teto offline de 4h.
+// Com ajudante (gerente da doc): produção automática liquidada pelo servidor com
+// teto de 4h (economy/offline.ts) — em /production/settle, ao contratar e antes de melhorar.
 
 type Reader = Db | Tx;
 
@@ -28,6 +30,11 @@ export interface BusinessView {
   cycleEndsAt: string | null;
   ready: boolean;
   secondsRemaining: number;
+  /** Ajudante contratado: produção automática (sem bolha de coleta). */
+  managed: boolean;
+  managerCost: string;
+  /** Com ajudante: lucro já produzido e ainda não liquidado (estimativa de leitura). */
+  pendingAmount: string;
 }
 
 export interface DistrictView {
@@ -38,7 +45,7 @@ export interface DistrictView {
 }
 
 export interface PlayerStateView {
-  player: { id: string; displayName: string };
+  player: { id: string; displayName: string; tutorialCompleted: boolean };
   wallet: { coins: string; gems: string };
   businesses: BusinessView[];
   districts: DistrictView[];
@@ -46,13 +53,35 @@ export interface PlayerStateView {
 }
 
 function cycleStatus(pb: PlayerBusiness | undefined, cycleSeconds: number, now: Date) {
-  if (!pb?.cycleStartedAt) return { endsAt: null, ready: false, secondsRemaining: 0 };
+  if (pb?.managerUnlocked) {
+    // Ciclo "virtual" do ajudante: posição atual dentro do ciclo, a partir da última liquidação.
+    const s = settle({
+      now,
+      lastSettlementAt: pb.lastSettlementAt,
+      carryMs: pb.carryMs,
+      cycleSeconds,
+    });
+    const startedAt = new Date(now.getTime() - s.carryMs);
+    const endsAt = new Date(startedAt.getTime() + cycleSeconds * 1000);
+    return {
+      startedAt,
+      endsAt,
+      ready: false,
+      secondsRemaining: Math.max(1, Math.ceil((endsAt.getTime() - now.getTime()) / 1000)),
+      pendingCycles: s.cycles,
+    };
+  }
+  if (!pb?.cycleStartedAt) {
+    return { startedAt: null, endsAt: null, ready: false, secondsRemaining: 0, pendingCycles: 0 };
+  }
   const endsAt = new Date(pb.cycleStartedAt.getTime() + cycleSeconds * 1000);
   const remainingMs = endsAt.getTime() - now.getTime();
   return {
+    startedAt: pb.cycleStartedAt,
     endsAt,
     ready: remainingMs <= 0,
     secondsRemaining: Math.max(0, Math.ceil(remainingMs / 1000)),
+    pendingCycles: 0,
   };
 }
 
@@ -76,10 +105,13 @@ function toBusinessView(
     maxLevel: def.maxLevel,
     profitPerCycle: profitPerCycle(def, level).toString(),
     nextUpgradeCost: upgrade === null ? null : upgrade.toString(),
-    cycleStartedAt: pb?.cycleStartedAt?.toISOString() ?? null,
+    cycleStartedAt: status.startedAt?.toISOString() ?? null,
     cycleEndsAt: status.endsAt?.toISOString() ?? null,
     ready: status.ready,
     secondsRemaining: status.secondsRemaining,
+    managed: pb?.managerUnlocked ?? false,
+    managerCost: def.managerCost.toString(),
+    pendingAmount: (profitPerCycle(def, level) * BigInt(status.pendingCycles)).toString(),
   };
 }
 
@@ -114,7 +146,11 @@ export async function getPlayerState(
   if (!player?.wallet) throw Errors.unauthorized();
   const businesses = await listBusinesses(db, playerId, now);
   return {
-    player: { id: player.id, displayName: player.displayName },
+    player: {
+      id: player.id,
+      displayName: player.displayName,
+      tutorialCompleted: player.tutorialCompletedAt !== null,
+    },
     wallet: { coins: player.wallet.coins.toString(), gems: player.wallet.gems.toString() },
     businesses,
     districts: districtViews(businesses),
@@ -177,7 +213,12 @@ export function upgradeBusiness(slug: string, now: Date) {
     if (cost === null) throw Errors.maxLevel(slug);
     const newLevel = pb.level + 1;
 
-    await applyCoins(tx, wallet, -cost, `business_upgrade:${slug}:${newLevel}`, idempotencyKey);
+    // Com ajudante, o que já foi produzido é pago no nível antigo antes de subir.
+    let current = wallet;
+    if (pb.managerUnlocked) {
+      current = (await settleManaged(tx, wallet, now, `${idempotencyKey}:settle`, def.id)).wallet;
+    }
+    await applyCoins(tx, current, -cost, `business_upgrade:${slug}:${newLevel}`, idempotencyKey);
     await tx.playerBusiness.update({
       where: { playerId_businessId: { playerId: wallet.playerId, businessId: def.id } },
       data: { level: newLevel },
@@ -197,14 +238,16 @@ export function upgradeBusiness(slug: string, now: Date) {
 /** Coleta um negócio (slug) ou todos os prontos (slug ausente). */
 export function collectProduction(slug: string | undefined, now: Date) {
   return async ({ tx, wallet, idempotencyKey }: CommandContext): Promise<CommandResult> => {
-    const owned = await tx.playerBusiness.findMany({
+    const all = await tx.playerBusiness.findMany({
       where: { playerId: wallet.playerId, ...(slug ? { business: { slug } } : {}) },
       include: { business: true },
     });
-    if (slug && owned.length === 0) {
+    if (slug && all.length === 0) {
       await findDefinition(tx, slug); // 404 se o slug não existe
       throw Errors.businessNotOwned(slug);
     }
+    if (slug && all[0]?.managerUnlocked) throw Errors.managerActive(slug);
+    const owned = all.filter((pb) => !pb.managerUnlocked);
 
     const ready = owned.filter((pb) => cycleStatus(pb, pb.business.cycleSeconds, now).ready);
     if (ready.length === 0) {
@@ -242,4 +285,129 @@ export function collectProduction(slug: string | undefined, now: Date) {
       },
     };
   };
+}
+
+export interface SettledItem {
+  slug: string;
+  cycles: number;
+  amount: string;
+}
+
+/**
+ * Liquida a produção automática dos negócios com ajudante (todos, ou só `businessId`):
+ * credita os ciclos completos (teto de 4h) e guarda a sobra. Usa a carteira já travada.
+ */
+async function settleManaged(
+  tx: Tx,
+  wallet: LockedWallet,
+  now: Date,
+  ledgerKey: string,
+  businessId?: number,
+): Promise<{
+  wallet: LockedWallet;
+  items: SettledItem[];
+  total: bigint;
+  elapsedMs: number;
+  capped: boolean;
+}> {
+  const managed = await tx.playerBusiness.findMany({
+    where: {
+      playerId: wallet.playerId,
+      managerUnlocked: true,
+      ...(businessId ? { businessId } : {}),
+    },
+    include: { business: true },
+  });
+  const items: SettledItem[] = [];
+  let total = 0n;
+  let elapsedMs = 0;
+  let capped = false;
+  for (const pb of managed) {
+    const s = settle({
+      now,
+      lastSettlementAt: pb.lastSettlementAt,
+      carryMs: pb.carryMs,
+      cycleSeconds: pb.business.cycleSeconds,
+    });
+    const amount = profitPerCycle(pb.business, pb.level) * BigInt(s.cycles);
+    total += amount;
+    elapsedMs = Math.max(elapsedMs, s.elapsedMs);
+    capped ||= s.capped;
+    if (s.cycles > 0)
+      items.push({ slug: pb.business.slug, cycles: s.cycles, amount: amount.toString() });
+    await tx.playerBusiness.update({
+      where: { playerId_businessId: { playerId: pb.playerId, businessId: pb.businessId } },
+      data: { lastSettlementAt: now, carryMs: s.carryMs },
+    });
+  }
+  const updated =
+    total > 0n ? await applyCoins(tx, wallet, total, "production_auto", ledgerKey) : wallet;
+  return { wallet: updated, items, total, elapsedMs, capped };
+}
+
+/** Liquida toda a produção automática (abrir o jogo, voltar do segundo plano, a cada ~15 s). */
+export function settleProduction(now: Date) {
+  return async ({ tx, wallet, idempotencyKey }: CommandContext): Promise<CommandResult> => {
+    const r = await settleManaged(tx, wallet, now, idempotencyKey);
+    return {
+      statusCode: 200,
+      body: {
+        settled: r.items,
+        total: r.total.toString(),
+        elapsedSeconds: Math.floor(r.elapsedMs / 1000),
+        capped: r.capped,
+        capSeconds: OFFLINE_CAP_MS / 1000,
+        state: await getPlayerState(tx, wallet.playerId, now),
+      },
+    };
+  };
+}
+
+/** Contrata o ajudante: cobra, passa para produção automática e paga o ciclo manual já pronto. */
+export function hireManager(slug: string, now: Date) {
+  return async ({ tx, wallet, idempotencyKey }: CommandContext): Promise<CommandResult> => {
+    const def = await findDefinition(tx, slug);
+    const where = { playerId_businessId: { playerId: wallet.playerId, businessId: def.id } };
+    const pb = await tx.playerBusiness.findUnique({ where });
+    if (!pb) throw Errors.businessNotOwned(slug);
+    if (pb.managerUnlocked) throw Errors.managerAlreadyHired(slug);
+
+    const afterHire = await applyCoins(
+      tx,
+      wallet,
+      -def.managerCost,
+      `manager_hire:${slug}`,
+      idempotencyKey,
+    );
+    // O andamento do ciclo manual vira sobra (no máximo 1 ciclo, que é pago em seguida).
+    const cycleMs = def.cycleSeconds * 1000;
+    const progress = pb.cycleStartedAt ? now.getTime() - pb.cycleStartedAt.getTime() : 0;
+    await tx.playerBusiness.update({
+      where,
+      data: {
+        managerUnlocked: true,
+        cycleStartedAt: null,
+        lastSettlementAt: now,
+        carryMs: Math.min(Math.max(progress, 0), cycleMs),
+      },
+    });
+    const r = await settleManaged(tx, afterHire, now, `${idempotencyKey}:settle`, def.id);
+
+    return {
+      statusCode: 200,
+      body: {
+        hired: slug,
+        settled: r.items,
+        state: await getPlayerState(tx, wallet.playerId, now),
+      },
+    };
+  };
+}
+
+/** Marca o tutorial como concluído (idempotente; não mexe em saldo). */
+export async function completeTutorial(db: Db, playerId: string, now: Date): Promise<void> {
+  await db.player.updateMany({
+    where: { id: playerId, tutorialCompletedAt: null },
+    data: { tutorialCompletedAt: now },
+  });
 }

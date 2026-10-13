@@ -61,6 +61,19 @@ func collect(slug := "") -> Dictionary:
 	return await _command("/production/collect", {"businessSlug": slug} if slug != "" else {})
 
 
+func hire_manager(slug: String) -> Dictionary:
+	return await _command("/managers/hire", {"businessSlug": slug})
+
+
+## Liquida a produção automática (ajudantes) no servidor.
+func settle() -> Dictionary:
+	return await _command("/production/settle", {})
+
+
+func complete_tutorial() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_POST, "/tutorial/complete", {}, "")
+
+
 static func new_idempotency_key() -> String:
 	return Crypto.new().generate_random_bytes(16).hex_encode()
 

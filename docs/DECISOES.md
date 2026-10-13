@@ -8,3 +8,4 @@
 | [0002](ADRs/0002-economia-autoritativa.md) | Economia no servidor: BIGINT, lock por carteira, ledger, Idempotency-Key, relógio do servidor | aceita |
 | [0003](ADRs/0003-ciclo-manual-e-gerentes.md) | Sem gerente: 1 ciclo pronto aguardando coleta; gerente liquida offline até 4h | aceita |
 | [0004](ADRs/0004-direcao-visual-v2.md) | Direção visual v2: Ilha da Praia cartoon (mockups A+B), depois Cidade-maquete (D) | aceita |
+| [0005](ADRs/0005-ajudantes-offline-tutorial.md) | Ajudantes (gerentes), liquidação offline 4h no servidor, resumo offline, tutorial deduzido do estado | aceita |

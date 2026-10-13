@@ -9,6 +9,7 @@ const UiFont := preload("res://scripts/ui_font.gd")
 const BUBBLE_RADIUS := 34.0
 const COIN := preload("res://assets/optimized/icon_coin.png")
 const LOCK := preload("res://assets/optimized/lot_lock.png")
+const HELPER := preload("res://assets/optimized/icon_profile.png")
 
 var slug := ""
 var business: Dictionary = {}
@@ -119,8 +120,13 @@ func _draw_overlay() -> void:
 		_overlay.draw_texture_rect(COIN, Rect2(c - cs / 2, cs), false)
 	else:
 		var p := GameState.cycle_progress(business)
+		var managed: bool = business.get("managed", false)
+		var fill := Color("7ee08a") if managed else Color("ffd34d")
 		_overlay.draw_arc(top, 18, 0, TAU, 32, Color(0, 0, 0, 0.35), 9.0, true)
-		_overlay.draw_arc(top, 18, -PI / 2, -PI / 2 + TAU * p, 32, Color("ffd34d"), 9.0, true)
+		_overlay.draw_arc(top, 18, -PI / 2, -PI / 2 + TAU * p, 32, fill, 9.0, true)
+		if managed:
+			# Rostinho do ajudante ao lado do anel: produção automática.
+			_overlay.draw_texture_rect(HELPER, Rect2(top + Vector2(-62, -20), Vector2(40, 40)), false)
 	_pill(font, Vector2(0, 22), "Nv %d" % int(business.level), 18, Color(0.12, 0.3, 0.32, 0.92), Color.WHITE)
 	if selected:
 		_overlay.draw_arc(Vector2(0, 4), 60, 0, TAU, 48, Color("ffd34d"), 4.0, true)

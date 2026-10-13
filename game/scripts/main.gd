@@ -27,6 +27,7 @@ func _ready() -> void:
 			districts[d].highlight(""))
 	hud.district_requested.connect(go_to_district)
 	hud.retry_requested.connect(_boot)
+	hud.tutorial.target_provider = _tutorial_target
 	GameState.connection_failed.connect(hud.show_error)
 	_boot()
 
@@ -66,7 +67,18 @@ func _on_business_requested(slug: String) -> void:
 	districts[id].select(slug)
 
 
+## Posição de tela do lote (ou da sua bolha) para a seta do tutorial; null se fora da tela atual.
+func _tutorial_target(slug: String, bubble: bool) -> Variant:
+	var id := Layout.district_of(slug)
+	if id != current:
+		return null
+	var view: Node2D = districts[id]
+	var lot: Node2D = view.lots[slug]
+	var world: Vector2 = lot.position + (lot.bubble_position() if bubble else Vector2(0, -lot.building_height()))
+	return view.get_canvas_transform() * world
+
+
 func _notification(what: int) -> void:
 	# Ao voltar do segundo plano, o servidor reapura o estado.
 	if what == NOTIFICATION_APPLICATION_RESUMED and GameState.loaded:
-		GameState.refresh()
+		GameState.resume()

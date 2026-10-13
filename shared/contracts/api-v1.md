@@ -33,7 +33,7 @@ Corpo vazio → cria conta convidada (100 moedas). Corpo `{ guestId, guestSecret
 `200 PlayerState`:
 ```json
 {
-  "player": { "id": "uuid", "displayName": "Empreendedor 1234" },
+  "player": { "id": "uuid", "displayName": "Empreendedor 1234", "tutorialCompleted": false },
   "wallet": { "coins": "100", "gems": "0" },
   "businesses": [Business, "... (10)"],
   "districts": [
@@ -52,7 +52,8 @@ Corpo vazio → cria conta convidada (100 moedas). Corpo `{ guestId, guestSecret
   "owned": true, "level": 1, "maxLevel": 100,
   "profitPerCycle": "10", "nextUpgradeCost": "115",
   "cycleStartedAt": "ISO|null", "cycleEndsAt": "ISO|null",
-  "ready": false, "secondsRemaining": 7
+  "ready": false, "secondsRemaining": 7,
+  "managed": false, "managerCost": "150", "pendingAmount": "0"
 }
 ```
 Slugs atuais: `agua`, `pipoca`, `sorveteria`, `quiosque_coco` (Ilha da Praia), `mercadinho`,
@@ -81,6 +82,24 @@ acumula **no máximo 1 ciclo**; a coleta credita `profitPerCycle` e reinicia o c
 - `200 { collected: [{ slug, amount }], total, state }`
 - `409 PRODUCTION_NOT_READY { slug, secondsRemaining }`, `409 NOTHING_TO_COLLECT`,
   `409 BUSINESS_NOT_OWNED`, `404`
+
+### `POST /managers/hire` — `Idempotency-Key`
+Corpo `{ businessSlug }`. Cobra `managerCost`; o negócio passa a produzir sozinho. O andamento
+do ciclo manual vira sobra e, se já estava pronto, é pago na hora.
+- `200 { hired, settled: [{ slug, cycles, amount }], state }`
+- `409 BUSINESS_NOT_OWNED`, `409 MANAGER_ALREADY_HIRED`, `409 INSUFFICIENT_FUNDS`, `404`
+
+### `POST /production/settle` — `Idempotency-Key`
+Corpo `{}`. Liquida todos os negócios com ajudante: `clamp(agora − última, 0, 4h)` + sobra.
+- `200 { settled: [{ slug, cycles, amount }], total, elapsedSeconds, capped, capSeconds, state }`
+Com ajudante, `secondsRemaining` é o tempo até o próximo ciclo automático e `pendingAmount`
+é o lucro já produzido e ainda não liquidado (só leitura). Melhorar um negócio com ajudante
+liquida antes de subir de nível. `POST /production/collect` em negócio com ajudante →
+`409 MANAGER_ACTIVE`.
+
+### `POST /tutorial/complete`
+Sem Idempotency-Key (não mexe em saldo); idempotente. `200 PlayerState` com
+`player.tutorialCompleted: true`.
 
 ### Ainda não implementados (docs/README.md §11)
 `POST /auth/link`, `GET /missions`, `POST /missions/claim`, `GET /leaderboard`,

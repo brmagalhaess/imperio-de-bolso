@@ -14,6 +14,7 @@ const Layout := preload("res://scripts/layout.gd")
 const UiFont := preload("res://scripts/ui_font.gd")
 const Style := preload("res://scripts/ui_style.gd")
 const MenuModal := preload("res://scripts/menu_modal.gd")
+const Tutorial := preload("res://scripts/tutorial.gd")
 
 var slug := ""
 var current_district := "praia"
@@ -27,9 +28,12 @@ var _info: Label
 var _progress: ProgressBar
 var _action_button: Button
 var _collect_button: Button
+var _hire_button: Button
 var _modal: Control
+var tutorial: Control
 var _toast: Label
 var _toast_timer: Timer
+var _offline_pill: PanelContainer
 var _fader: ColorRect
 var _overlay: ColorRect
 var _overlay_label: Label
@@ -43,15 +47,21 @@ func _ready() -> void:
 	_build_top()
 	_build_bottom_bar()
 	_build_sheet()
+	tutorial = Tutorial.new()
+	add_child(tutorial)
 	_modal = MenuModal.new()
 	add_child(_modal)
+	tutorial.blockers = [_sheet, _modal]
 	_build_toast()
+	_build_offline_pill()
 	_build_fader()
 	_build_overlay()
 
 	GameState.state_changed.connect(_refresh)
 	GameState.busy_changed.connect(func(_b): _refresh())
 	GameState.notice.connect(show_toast)
+	GameState.offline_summary.connect(show_offline_summary)
+	GameState.connection_changed.connect(func(online): _offline_pill.visible = not online)
 
 
 func show_business(new_slug: String) -> void:
@@ -67,6 +77,18 @@ func close_sheet() -> void:
 	slug = ""
 	_sheet.visible = false
 	selection_cleared.emit()
+
+
+## "Enquanto você estava fora…" — o servidor já creditou; a janela só mostra (docs §8).
+func show_offline_summary(total: String, elapsed_seconds: int, capped: bool, cap_seconds: int) -> void:
+	close_sheet()
+	_modal.open(tr("Bem-vindo de volta!"))
+	var body := tr("Em %s fora, seus ajudantes faturaram:") % Fmt.duration(elapsed_seconds)
+	_modal.add_message(Layout.texture("char_vendor"), "+" + Fmt.coins(total), body)
+	if capped:
+		_modal.add_message(null, "", tr("Os ajudantes trabalham até %s sem você. Volte antes para não perder nada!")
+				% Fmt.duration(cap_seconds))
+	_modal.add_action(tr("Coletar"), func(): pass, Style.ORANGE, Style.ORANGE_DARK)
 
 
 func show_loading() -> void:
@@ -120,6 +142,8 @@ func _refresh() -> void:
 	if b.owned:
 		_info.text = tr("Nível %d · Lucro %s a cada %s") % [
 			int(b.level), Fmt.coins(b.profitPerCycle), Fmt.duration(b.cycleSeconds)]
+		if b.get("managed", false):
+			_info.text += tr(" · Ajudante trabalhando")
 		if b.nextUpgradeCost == null:
 			_action_button.text = tr("Nível máximo")
 			_action_button.disabled = true
@@ -134,6 +158,11 @@ func _refresh() -> void:
 		else:
 			_action_button.text = tr("Complete a praia")
 			_action_button.disabled = true
+	var can_hire: bool = b.owned and not b.get("managed", false)
+	_hire_button.visible = can_hire
+	if can_hire:
+		_hire_button.text = tr("Contratar ajudante  %s") % Fmt.coins(b.managerCost)
+		_hire_button.disabled = GameState.busy or not GameState.can_afford(b.managerCost)
 	_update_cycle(b)
 
 
@@ -145,6 +174,10 @@ func _update_cycle(b: Dictionary) -> void:
 	if not b.owned:
 		return
 	_progress.value = GameState.cycle_progress(b) * 100.0
+	if b.get("managed", false):
+		_collect_button.disabled = true
+		_collect_button.text = tr("Automático · %s") % Fmt.duration(GameState.seconds_remaining(b))
+		return
 	var ready := GameState.is_ready(b)
 	_collect_button.disabled = GameState.busy or not ready
 	_collect_button.text = (tr("Coletar  %s") % Fmt.coins(b.profitPerCycle)) if ready \
@@ -170,18 +203,40 @@ func _on_collect_pressed() -> void:
 	await GameState.collect(slug)
 
 
+func _on_hire_pressed() -> void:
+	var b := GameState.business(slug)
+	if await GameState.hire_manager(slug):
+		show_toast(tr("Ajudante contratado! %s agora produz sozinho.") % b.name)
+
+
+## Construir: só o mapa atual e só o que ainda não foi construído (pedido do titular).
 func open_build_menu() -> void:
 	close_sheet()
-	_modal.open(tr("Construir"))
-	for id in Layout.DISTRICT_ORDER:
-		_modal.add_section(Layout.title(id))
-		var unlocked := GameState.district_unlocked(id)
-		for b in GameState.businesses():
-			if Layout.district_of(b.slug) != id:
-				continue
-			var state := "owned" if b.owned else ("buy" if unlocked else "locked")
-			var target: String = b.slug
-			_modal.add_business(b, state, func(): business_requested.emit(target))
+	_modal.open(tr("Construir · %s") % Layout.title(current_district))
+	var unlocked := GameState.district_unlocked(current_district)
+	var shown := 0
+	for b in GameState.businesses():
+		if Layout.district_of(b.slug) != current_district or b.owned:
+			continue
+		var target: String = b.slug
+		_modal.add_business(b, "buy" if unlocked else "locked", func(): business_requested.emit(target))
+		shown += 1
+	if shown > 0:
+		return
+	# Tudo construído aqui: sugere o próximo passo.
+	var next := _next_district(current_district)
+	if next != "" and GameState.district_unlocked(next):
+		_modal.add_message(Layout.texture("icon_map"), tr("Tudo construído!"),
+				tr("A %s está esperando por você.") % Layout.title(next))
+		_modal.add_action(tr("Ir para %s") % Layout.title(next), func(): district_requested.emit(next))
+	else:
+		_modal.add_message(Layout.texture("icon_build"), tr("Tudo construído!"),
+				tr("Melhore seus negócios e contrate ajudantes para lucrar mais."))
+
+
+func _next_district(id: String) -> String:
+	var i := Layout.DISTRICT_ORDER.find(id)
+	return Layout.DISTRICT_ORDER[i + 1] if i >= 0 and i + 1 < Layout.DISTRICT_ORDER.size() else ""
 
 
 func open_map_menu() -> void:
@@ -389,6 +444,8 @@ func _build_sheet() -> void:
 	_collect_button = _make_button(buttons, _on_collect_pressed)
 	Style.style_button(_collect_button, Style.ORANGE, Style.ORANGE_DARK)
 	_action_button = _make_button(buttons, _on_action_pressed)
+	_hire_button = _make_button(col, _on_hire_pressed)
+	Style.style_button(_hire_button, Style.TEAL_LIGHT, Style.TEAL_DARK)
 
 
 func _make_button(parent: Control, handler: Callable) -> Button:
@@ -418,6 +475,22 @@ func _build_toast() -> void:
 	_toast_timer.one_shot = true
 	_toast_timer.timeout.connect(func(): _toast.visible = false)
 	add_child(_toast_timer)
+
+
+func _build_offline_pill() -> void:
+	_offline_pill = PanelContainer.new()
+	_offline_pill.add_theme_stylebox_override("panel", Style.box(Style.RED, 30, Style.RED_DARK, 4))
+	_offline_pill.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	_offline_pill.offset_top = 230
+	_offline_pill.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_offline_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_offline_pill.visible = false
+	var label := Label.new()
+	label.text = tr("Sem conexão · reconectando…")
+	label.add_theme_color_override("font_color", Color.WHITE)
+	label.add_theme_font_size_override("font_size", 26)
+	_offline_pill.add_child(label)
+	add_child(_offline_pill)
 
 
 func _build_fader() -> void:

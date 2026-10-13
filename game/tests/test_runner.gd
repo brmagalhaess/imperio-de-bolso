@@ -5,6 +5,8 @@ extends Node
 
 const Fmt := preload("res://scripts/fmt.gd")
 const Layout := preload("res://scripts/layout.gd")
+const Tutorial := preload("res://scripts/tutorial.gd")
+const Hud := preload("res://scripts/hud.gd")
 
 var _failures := 0
 var _checks := 0
@@ -13,7 +15,7 @@ var _sections_done := 0
 
 func _ready() -> void:
 	var expected_sections := 1
-	_unit_tests()
+	await _unit_tests()
 	if OS.get_environment("IMPERIO_TEST_API") == "1":
 		expected_sections += 1
 		await _integration_test()
@@ -85,7 +87,63 @@ func _unit_tests() -> void:
 	]})
 	check(GameState.can_afford("250") and not GameState.can_afford("251"), "can_afford")
 	check(is_equal_approx(GameState.income_per_second(), 3.0), "renda por segundo só dos comprados")
+	await _tutorial_tests()
+	await _build_menu_tests()
 	_sections_done += 1
+
+
+func _biz(slug: String, owned: bool, level := 1, managed := false, district := "praia") -> Dictionary:
+	return {"slug": slug, "name": slug, "owned": owned, "level": level if owned else 0,
+		"managed": managed, "district": district, "cost": "100", "profitPerCycle": "10",
+		"cycleSeconds": 10, "managerCost": "150", "nextUpgradeCost": "115",
+		"cycleStartedAt": null, "secondsRemaining": 0, "ready": false}
+
+
+func _tutorial_tests() -> void:
+	var t: Control = Tutorial.new()
+	add_child(t)
+	var states := [
+		[{"coins": "100", "agua": [false]}, Tutorial.Step.BUY, "tutorial: comprar"],
+		[{"coins": "0", "agua": [true, 1]}, Tutorial.Step.COLLECT, "tutorial: coletar"],
+		[{"coins": "30", "agua": [true, 1]}, Tutorial.Step.UPGRADE, "tutorial: melhorar"],
+		[{"coins": "0", "agua": [true, 2]}, Tutorial.Step.HIRE, "tutorial: contratar ajudante"],
+		[{"coins": "0", "agua": [true, 2, true]}, Tutorial.Step.DONE, "tutorial: concluído"],
+	]
+	for case in states:
+		var a: Array = case[0].agua
+		GameState.state = {"player": {"tutorialCompleted": true}, "wallet": {"coins": case[0].coins},
+			"businesses": [_biz("agua", a[0], a[1] if a.size() > 1 else 1, a[2] if a.size() > 2 else false)]}
+		check(t.current_step() == case[1], case[2])
+	t.queue_free()
+
+
+func _build_menu_tests() -> void:
+	var hud: Control = Hud.new()
+	add_child(hud)
+	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "50000", "gems": "0"},
+		"districts": [{"id": "praia", "unlocked": true}, {"id": "cidade", "unlocked": true}],
+		"businesses": [_biz("agua", true), _biz("pipoca", false), _biz("sorveteria", false),
+			_biz("quiosque_coco", true), _biz("mercadinho", false, 1, false, "cidade")]})
+	hud.current_district = "praia"
+	hud.open_build_menu()
+	var names := []
+	for c in hud._modal._list.get_children():
+		if not c.is_queued_for_deletion():
+			names.append(c.get_child(0).get_child(1).get_child(0).text)
+	check(names == ["pipoca", "sorveteria"], "Construir: só o mapa atual e só o que falta construir")
+	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "0", "gems": "0"},
+		"districts": [{"id": "praia", "unlocked": true}, {"id": "cidade", "unlocked": true}],
+		"businesses": [_biz("agua", true), _biz("pipoca", true), _biz("sorveteria", true),
+			_biz("quiosque_coco", true)]})
+	hud.open_build_menu()
+	var buttons := 0
+	for c in hud._modal._list.get_children():
+		if not c.is_queued_for_deletion() and c is Button:
+			buttons += 1
+	check(buttons == 1, "Construir vazio sugere ir para a Cidade")
+	hud.queue_free()
+	GameState.state = {}
+	GameState.loaded = false
 
 
 func _integration_test() -> void:
@@ -95,12 +153,23 @@ func _integration_test() -> void:
 
 	check(await GameState.boot(), "boot cria convidado e carrega estado")
 	check(GameState.coins() == "100", "saldo inicial 100")
+	check(not GameState.tutorial_completed(), "conta nova começa com tutorial pendente")
 	check(GameState.businesses().size() == 10, "10 negócios no catálogo")
 	check(not await GameState.purchase("pipoca"), "pipoca recusada sem saldo")
 	check(await GameState.purchase("agua"), "compra do carrinho de água")
 	check(GameState.coins() == "0", "saldo após compra")
 	check(GameState.business("agua").owned, "água marcada como comprada")
 	check(not await GameState.collect("agua"), "coleta antes do ciclo recusada")
+
+	# Falha de rede e retomada (prompt mestre, Etapa 2).
+	var real_url := Api.base_url
+	Api.base_url = "http://127.0.0.1:9/api/v1"
+	await GameState.refresh()
+	check(not GameState.online, "sem servidor: jogo percebe que está offline")
+	Api.base_url = real_url
+	await GameState.refresh()
+	check(GameState.online, "servidor de volta: jogo reconecta")
+	check(not await GameState.hire_manager("agua"), "ajudante recusado sem saldo")
 
 	# Mesma conta é retomada com as credenciais salvas.
 	var player_id: String = GameState.state.player.id
