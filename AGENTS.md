@@ -18,7 +18,8 @@ Arte: [docs/GUIA_ARTE_HIGGSFIELD.md](docs/GUIA_ARTE_HIGGSFIELD.md).
 | `docs/` | Documentação, backlog, status, ADRs, checklists. |
 | `.github/workflows/` | CI (testes do backend e do jogo). |
 
-`landing/` (Next.js) ainda não existe — entra na etapa de publicação.
+`landing/` (Next.js, export estático): site + políticas exigidas pelas lojas (privacidade, termos,
+exclusão de conta, suporte). Dados da empresa via build args; o build recusa campos pendentes.
 
 ## Regras inegociáveis
 

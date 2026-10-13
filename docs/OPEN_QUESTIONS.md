@@ -22,3 +22,12 @@ Dúvidas que não bloqueiam o trabalho atual. Bloqueios reais ficam em `IMPLEMEN
    (auto-coleta em todos os mapas + 5 diamantes/dia + selo) — aguardando o titular.
 10. **Ranking por faturamento semanal** (ADR 0007) e **prêmio das missões** (~15 min de renda +
     1 diamante) — propostos, aguardando confirmação.
+9. **Público-alvo nas lojas:** proposta 13+ (fora do programa Famílias do Google, que exige
+   redes de anúncios certificadas e regras extras). Política de privacidade já diz "não
+   direcionado a menores de 13". Confirmar com o titular.
+10. **Registros de acesso (Marco Civil, art. 15):** a política promete guardar IP/data/hora por
+    6 meses. Hoje os acessos ficam nos logs do nginx-proxy/Docker do servidor, sem rotação
+    garantida. Antes do lançamento: log de acesso dedicado (volume, retenção de 6 meses).
+11. **Pré-cadastro por e-mail na landing (plano §21):** fica para depois (exige opt-in,
+    descadastro e guarda de e-mails). Por ora a landing tem "Em breve" nas lojas.
+

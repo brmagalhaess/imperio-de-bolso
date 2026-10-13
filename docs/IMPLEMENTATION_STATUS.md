@@ -2,6 +2,18 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-13 — Landing e políticas das lojas; código do jogador
+
+- `landing/` (Next.js 16.3.8, export estático + nginx): home com tela real do jogo, Política de
+  Privacidade (LGPD + Marco Civil), Termos de Uso, Excluir conta (no app e por e-mail com o
+  Código do jogador) e Suporte; robots/sitemap. Dados da empresa por build args — o build de
+  produção falha se faltar razão social, CNPJ, cidade ou e-mail. Ainda não publicado (aguarda
+  dados da empresa). Respostas dos formulários das lojas: `docs/LOJAS_FORMULARIOS.md`.
+- Jogo: "Código do jogador" no Perfil; admin encontra a conta pelo código. Cartão do tutorial
+  sobe quando a seta aponta para a barra (não cobre o texto).
+- Decisão do titular: conta de convidado + vincular Google/Apple no Perfil (próximo passo).
+- Xcode está só com o Personal Team: falta adicionar a equipe da empresa.
+
 ## 2026-10-13 — Sons, efeitos e música (pedido do titular)
 
 - Higgsfield não gera música/efeitos (o conector recusa; a API só tem modelos de imagem/vídeo).
