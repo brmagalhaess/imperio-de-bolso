@@ -2,6 +2,17 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-13 — Sons, efeitos e música (pedido do titular)
+
+- Higgsfield não gera música/efeitos (o conector recusa; a API só tem modelos de imagem/vídeo).
+  Com autorização do titular: pacotes **CC0** (Kenney: interface, cassino, jingles; OpenGameArt:
+  "Tropical Fantasy" na Praia e "Sandy Seaside 2" na Cidade). Créditos em
+  `game/assets/audio/CREDITOS.md`. Jingles escolhidos por análise da melodia (sobe = positivo).
+- Autoload `Audio`: clique em todo botão, moedas ao coletar, jingles de compra/melhoria/ajudante/
+  prêmio, som de erro (não para falta de rede), música por mapa com transição e volume menor com
+  janela aberta. **Configurações** (engrenagem): Música e Efeitos liga/desliga, salvo no aparelho.
+- Testes: jogo 78 unitários, 116 com integração.
+
 ## 2026-10-13 — Etapa 5 (em andamento): beta Android, segurança e backups
 
 Revisados antes: docs/README.md (Etapa 5), PROMPT_MESTRE (Etapa 5), plano §24/§28, conversa.

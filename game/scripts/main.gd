@@ -60,6 +60,7 @@ func _show_district(id: String) -> void:
 	for d in districts:
 		districts[d].visible = d == id
 	districts[id].frame(camera)
+	Audio.play_music(id)
 
 
 func _on_business_requested(slug: String) -> void:

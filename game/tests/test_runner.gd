@@ -96,6 +96,7 @@ func _unit_tests() -> void:
 	check(await _tutorial_tests() == true, "seção tutorial executou até o fim")
 	check(await _build_menu_tests() == true, "seção menus executou até o fim")
 	check(await _store_tests() == true, "seção loja executou até o fim")
+	check(await _audio_tests() == true, "seção áudio executou até o fim")
 	_sections_done += 1
 
 
@@ -104,6 +105,52 @@ func _biz(slug: String, owned: bool, level := 1, managed := false, district := "
 		"managed": managed, "district": district, "cost": "100", "profitPerCycle": "10",
 		"cycleSeconds": 10, "managerCost": "150", "nextUpgradeCost": "115",
 		"cycleStartedAt": null, "secondsRemaining": 0, "ready": false}
+
+
+## Sons e música (pedido do titular): efeitos e música desligáveis, escolha salva no aparelho.
+func _audio_tests() -> bool:
+	var real_path: String = Audio.settings_path
+	Audio.settings_path = "user://test_settings.cfg"
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(Audio.settings_path))
+	Audio.music_on = true
+	Audio.sfx_on = true
+	Audio.last_sfx = ""
+	Audio.play("buy")
+	check(Audio.last_sfx == "buy", "áudio: efeito toca com efeitos ligados")
+	Audio.play_music("praia")
+	await get_tree().process_frame
+	check(Audio.current_track() == "praia" and Audio.is_music_playing(), "áudio: música do mapa toca")
+
+	var hud: Control = Hud.new()
+	add_child(hud)
+	hud.open_settings_menu()
+	await get_tree().process_frame
+	var toggles: Array = hud._modal._list.find_children("*", "Button", true, false).filter(
+			func(b): return b.text == "Ligado" or b.text == "Desligado")
+	check(toggles.size() == 2 and toggles[0].text == "Ligado", "configurações: música e efeitos ligados")
+	toggles[0].pressed.emit()
+	toggles[1].pressed.emit()
+	check(not Audio.music_on and not Audio.is_music_playing() and toggles[0].text == "Desligado",
+			"configurações: desligar a música para na hora")
+	check(hud._modal.visible, "configurações: liga/desliga não fecha a janela")
+	Audio.last_sfx = ""
+	Audio.play("coin")
+	check(Audio.last_sfx == "", "áudio: efeitos desligados não tocam")
+	Audio.music_on = true
+	Audio.sfx_on = true
+	Audio.load_settings()
+	check(not Audio.music_on and not Audio.sfx_on, "áudio: escolha fica salva no aparelho")
+	Audio.play_music("cidade")
+	check(not Audio.is_music_playing(), "áudio: trocar de mapa com música desligada não toca")
+	Audio.set_music_on(true)
+	await get_tree().process_frame
+	check(Audio.is_music_playing() and Audio.current_track() == "cidade", "áudio: religar volta a faixa do mapa atual")
+	Audio.set_sfx_on(true)
+	hud.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(Audio.settings_path))
+	Audio.settings_path = real_path
+	Audio.load_settings()
+	return true
 
 
 func _tutorial_tests() -> bool:

@@ -81,6 +81,7 @@ func _ready() -> void:
 	add_child(_mock_ad)
 	# Janela abriu com um aviso na tela: o aviso desce para não cobrir o título.
 	_modal.visibility_changed.connect(func():
+		Audio.set_ducked(_modal.visible)
 		if _toast and _toast.visible:
 			show_toast(_toast.text))
 	_build_toast()
@@ -604,6 +605,23 @@ func open_delete_account_form() -> void:
 	edit.grab_focus.call_deferred()
 
 
+## Configurações: música e efeitos sonoros (pedido do titular). Salvo só no aparelho.
+func open_settings_menu() -> void:
+	close_sheet()
+	_reward_kind = "settings"
+	_reward_cards.clear()
+	_helper_cards.clear()
+	_modal.open(tr("Configurações"))
+	_modal.add_toggle(null, tr("Música"), Audio.music_on, func(on: bool):
+		Audio.set_music_on(on)
+		Audio.play("toggle"))
+	_modal.add_toggle(null, tr("Efeitos sonoros"), Audio.sfx_on, func(on: bool):
+		Audio.set_sfx_on(on)
+		Audio.play("toggle"))
+	_modal.add_message(null, "", tr("Versão %s") % str(ProjectSettings.get_setting("application/config/version", "0.1.0")))
+	_modal.refit()
+
+
 ## Troca de nome: permitida uma única vez (pedido do titular); o servidor valida.
 func open_name_form() -> void:
 	_reward_kind = "name"
@@ -805,7 +823,7 @@ func _build_top() -> void:
 	titles.add_child(_district_label)
 	row.add_child(_icon_button("icon_help", 68, func(): show_toast(
 			tr("Compre negócios, toque na moeda para coletar e melhore para lucrar mais!"))))
-	row.add_child(_icon_button("icon_settings", 68, func(): show_toast(tr("Configurações em breve"))))
+	row.add_child(_icon_button("icon_settings", 68, open_settings_menu))
 
 	var money := HBoxContainer.new()
 	money.add_theme_constant_override("separation", 12)

@@ -164,7 +164,7 @@ func has_managers() -> bool:
 
 
 func hire_manager(slug: String) -> bool:
-	return await _run(Api.hire_manager.bind(slug))
+	return await _run(Api.hire_manager.bind(slug), "hire")
 
 
 func refresh_missions() -> void:
@@ -188,11 +188,12 @@ func claim_mission(mission_id: String) -> bool:
 	var res := await Api.claim_mission(mission_id)
 	_set_busy(false)
 	if not res.ok:
-		notice.emit(message_for(res.error_code))
+		_fail(res.error_code)
 		refresh_missions()
 		return false
 	missions.missions = res.data.missions
 	_apply_state(res.data.state)
+	Audio.play("reward")
 	missions_changed.emit()
 	return true
 
@@ -204,11 +205,12 @@ func claim_achievement(achievement_id: String) -> bool:
 	var res := await Api.claim_achievement(achievement_id)
 	_set_busy(false)
 	if not res.ok:
-		notice.emit(message_for(res.error_code))
+		_fail(res.error_code)
 		refresh_achievements()
 		return false
 	achievements = res.data.achievements
 	_apply_state(res.data.state)
+	Audio.play("reward")
 	achievements_changed.emit()
 	return true
 
@@ -251,9 +253,10 @@ func buy_with_gems(item_id: String) -> Dictionary:
 	var res := await Api.store_buy(item_id, current_district)
 	_set_busy(false)
 	if not res.ok:
-		notice.emit(message_for(res.error_code))
+		_fail(res.error_code)
 		return {}
 	_apply_state(res.data.state)
+	Audio.play("bonus")
 	return res.data
 
 
@@ -266,9 +269,10 @@ func buy_sandbox(product_id: String) -> bool:
 	var res := await Api.verify_purchase("mock", product_id, token)
 	_set_busy(false)
 	if not res.ok:
-		notice.emit(message_for(res.error_code))
+		_fail(res.error_code)
 		return false
 	_apply_state(res.data.state)
+	Audio.play("bonus")
 	return true
 
 
@@ -280,9 +284,10 @@ func claim_vip_daily() -> bool:
 	var res := await Api.vip_daily()
 	_set_busy(false)
 	if not res.ok:
-		notice.emit(message_for(res.error_code))
+		_fail(res.error_code)
 		return false
 	_apply_state(res.data.state)
+	Audio.play("reward")
 	await refresh_catalog()
 	return true
 
@@ -295,7 +300,7 @@ func change_name(display_name: String) -> bool:
 	var res := await Api.change_name(display_name)
 	_set_busy(false)
 	if not res.ok:
-		notice.emit(message_for(res.error_code))
+		_fail(res.error_code)
 		return false
 	_apply_state(res.data)
 	return true
@@ -309,7 +314,7 @@ func delete_account() -> bool:
 	var res := await Api.delete_account()
 	_set_busy(false)
 	if not res.ok:
-		notice.emit(message_for(res.error_code))
+		_fail(res.error_code)
 		return false
 	_presence_timer.stop()
 	_reconnect_timer.stop()
@@ -321,6 +326,13 @@ func delete_account() -> bool:
 	current_district = "praia"
 	get_tree().reload_current_scene()
 	return true
+
+
+## Erro do servidor: aviso na tela + som de erro (falta de rede não "apita").
+func _fail(error_code: String) -> void:
+	notice.emit(message_for(error_code))
+	if error_code != "NETWORK_ERROR":
+		Audio.play("error")
 
 
 func gems() -> String:
@@ -344,11 +356,11 @@ func tutorial_completed() -> bool:
 
 
 func purchase(slug: String) -> bool:
-	return await _run(Api.purchase.bind(slug))
+	return await _run(Api.purchase.bind(slug), "buy")
 
 
 func upgrade(slug: String) -> bool:
-	return await _run(Api.upgrade.bind(slug))
+	return await _run(Api.upgrade.bind(slug), "upgrade")
 
 
 func collect(slug: String) -> bool:
@@ -418,7 +430,8 @@ static func message_for(code: String) -> String:
 	return MESSAGES.get(code, "Algo deu errado. Tente novamente.")
 
 
-func _run(call: Callable) -> bool:
+## `sfx`: efeito tocado quando o servidor confirma (a moeda da coleta vem do sinal `collected`).
+func _run(call: Callable, sfx := "") -> bool:
 	if busy:
 		return false
 	_set_busy(true)
@@ -427,6 +440,7 @@ func _run(call: Callable) -> bool:
 	if res.ok:
 		_set_online(true)
 		_apply_state(res.data.state)
+		Audio.play(sfx)
 		if res.data.has("collected"):
 			collected.emit(res.data.collected)
 		if res.data.has("settled") and not res.data.settled.is_empty():
@@ -436,7 +450,7 @@ func _run(call: Callable) -> bool:
 		return true
 	if res.network_error:
 		_set_online(false)
-	notice.emit(message_for(res.error_code))
+	_fail(res.error_code)
 	if res.error_code == "PRODUCTION_NOT_READY":
 		await refresh()  # ressincroniza a contagem com o servidor
 	return false

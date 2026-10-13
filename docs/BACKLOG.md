@@ -38,7 +38,7 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Tutorial (< 5 min) com seta, deduzido do estado do servidor
 - [x] Reconexão automática com aviso; comandos repetem com a mesma chave
 - [x] Prédios reagem visualmente ao nível (3 artes por negócio)
-- [ ] Sons e efeitos sonoros (sem assets ainda)
+- [x] Sons, efeitos e música de fundo (CC0: Kenney + OpenGameArt) com liga/desliga nas Configurações
 - [ ] Confirmar com o titular o preço dos ajudantes
 - [x] Tela Ajudantes (ver e contratar por mapa) e AFK por mapa (ADR 0006)
 - [x] Arte própria dos ajudantes (1 por negócio) e ícone do botão Ajudantes

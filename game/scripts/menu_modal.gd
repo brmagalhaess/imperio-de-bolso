@@ -153,6 +153,41 @@ func add_action(text_value: String, on_press: Callable, color := Style.GREEN,
 	_list.add_child(button)
 
 
+## Linha liga/desliga (Configurações): não fecha a janela; o botão muda no lugar, sem piscar.
+## `on_toggled(novo_valor)`. Devolve o botão (para testes).
+func add_toggle(icon: Texture2D, text_value: String, value: bool, on_toggled: Callable) -> Button:
+	var row := _card_row()
+	if icon:
+		var thumb := TextureRect.new()
+		thumb.texture = icon
+		thumb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		thumb.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		thumb.custom_minimum_size = Vector2(72, 72)
+		row.add_child(thumb)
+	var label := _text(text_value, 30, Style.INK)
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(label)
+	var button := Button.new()
+	button.custom_minimum_size = Vector2(190, 76)
+	button.add_theme_font_size_override("font_size", 28)
+	button.set_meta("no_click_sfx", true)  # tem som próprio (toggle)
+	var paint := func(on: bool) -> void:
+		button.text = tr("Ligado") if on else tr("Desligado")
+		if on:
+			Style.style_button(button, Style.GREEN, Style.GREEN_DARK)
+		else:
+			Style.style_button(button, Style.GREY, Style.GREY_DARK)
+	paint.call(value)
+	button.set_meta("on", value)
+	button.pressed.connect(func():
+		var on := not bool(button.get_meta("on"))
+		button.set_meta("on", on)
+		paint.call(on)
+		on_toggled.call(on))
+	row.add_child(button)
+	return button
+
+
 func clear_list() -> void:
 	_store_cards.clear()
 	for c in _list.get_children():
