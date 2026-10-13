@@ -33,7 +33,7 @@ export async function createTestContext(
   await db.$executeRawUnsafe(
     `TRUNCATE players, player_wallets, wallet_ledger, player_businesses, idempotency_records,
               business_definitions, player_missions, player_achievements, analytics_events,
-              purchase_receipts, subscriptions, ad_rewards
+              purchase_receipts, subscriptions, ad_rewards, vip_daily_claims
      RESTART IDENTITY CASCADE`,
   );
   await seedCatalog(db);

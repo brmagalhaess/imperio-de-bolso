@@ -20,6 +20,24 @@ func _ready() -> void:
 	while not GameState.loaded:
 		await get_tree().process_frame
 	var hud: Control = main.get_node("UI/HUD")
+	if mode == "loja2":
+		await _wait(2.5)
+		hud._modal.close()
+		await hud.open_store_menu()
+		await _wait(1.5)
+		print("PASSO loja topo")
+		hud._modal._scroll.scroll_vertical = 520
+		await _wait(1.0)
+		print("PASSO loja vip")
+		hud._modal.close()
+		hud.open_profile_menu()
+		await _wait(1.2)
+		print("PASSO perfil")
+		hud.open_name_form()
+		await _wait(1.2)
+		print("PASSO alterar nome")
+		get_tree().quit()
+		return
 	if mode == "loja":
 		await _wait(2.5)
 		hud._modal.close()

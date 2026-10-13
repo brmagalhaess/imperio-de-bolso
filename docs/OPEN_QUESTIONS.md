@@ -7,7 +7,8 @@ Dúvidas que não bloqueiam o trabalho atual. Bloqueios reais ficam em `IMPLEMEN
    para Git LFS (não instalado nesta máquina).
 2. **Bundle ID / package name:** provisório `br.com.imperiodebolso.game`. Confirmar titularidade
    do domínio `imperiodebolso.com.br` (usado também em api./admin./www.).
-3. **Nome do jogador:** hoje gerado ("Empreendedor 1234"). Permitir edição? Moderação de nomes?
+3. **Nome do jogador:** troca única implementada. Falta moderação manual no painel admin
+   (renomear/denunciar nomes) e ampliar a lista de termos bloqueados.
 4. **Credencial convidada no aparelho:** guardada em `user://session.cfg` (sandbox do app).
    Avaliar Keychain/Keystore antes do lançamento e o fluxo `POST /auth/link`.
 5. **Custo operacional:** catálogo usa custo operacional 0 (lucro = receita). Definir no
@@ -17,7 +18,7 @@ Dúvidas que não bloqueiam o trabalho atual. Bloqueios reais ficam em `IMPLEMEN
 7. **Node 24 LTS:** máquina usa Node 22.14 (compatível). Atualizar quando conveniente.
 8. **Repositório:** o README original diz que o remote não estava confirmado — confirmado:
    `github.com/brmagalhaess/imperio-de-bolso` (privado).
-9. **Preços da Loja em diamantes** (auto-coleta 20/100, turbo 10/30) e **benefícios do VIP**
-   (hoje: auto-coleta em todos os mapas + selo) — proposta do ADR 0008, aguardando o titular.
+9. **Preços da Loja em diamantes** (auto-coleta 20/100, coleta antecipada 10/30) e **VIP**
+   (auto-coleta em todos os mapas + 5 diamantes/dia + selo) — aguardando o titular.
 10. **Ranking por faturamento semanal** (ADR 0007) e **prêmio das missões** (~15 min de renda +
     1 diamante) — propostos, aguardando confirmação.

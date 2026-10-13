@@ -1,7 +1,8 @@
 import type { Db, Tx } from "../db/prisma.js";
 import { AppError, Errors } from "../errors.js";
 import { profitPerCycle } from "../economy/formulas.js";
-import { STORE_ITEMS, storeItem } from "../economy/store.js";
+import { STORE_ITEMS, VIP_DAILY_GEMS, storeItem } from "../economy/store.js";
+import { dayBounds, gameDay } from "../lib/time.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { track } from "./analytics.js";
 import { vipUntil } from "./entitlements.js";
@@ -32,23 +33,81 @@ export async function productionFor(
   );
 }
 
-export async function getCatalog(db: Db, playerId: string, now: Date, storeMode: string) {
+/**
+ * Catálogo + situação do jogador: estimativa de moedas da coleta antecipada no mapa informado,
+ * uso de hoje do anúncio grátis (ex.: 1/5) e a recompensa diária do VIP.
+ */
+export async function getCatalog(
+  db: Db,
+  playerId: string,
+  now: Date,
+  storeMode: string,
+  district = "praia",
+) {
   const player = await db.player.findUniqueOrThrow({ where: { id: playerId } });
+  const [vip, adsToday, vipClaim] = await Promise.all([
+    vipUntil(db, playerId, now),
+    db.adReward.count({
+      where: {
+        playerId,
+        placement: "ad_boost",
+        status: "CLAIMED",
+        claimedAt: { gte: dayBounds(now).start },
+      },
+    }),
+    db.vipDailyClaim.findUnique({ where: { playerId_day: { playerId, day: gameDay(now) } } }),
+  ]);
+  const items = await Promise.all(
+    STORE_ITEMS.map(async (i) => {
+      const seconds = i.kind === "boost" ? i.hours * 3600 : i.kind === "ad" ? i.minutes * 60 : 0;
+      return {
+        ...i,
+        ...("gems" in i ? { gems: i.gems.toString() } : {}),
+        ...("costGems" in i ? { costGems: i.costGems.toString() } : {}),
+        ...(seconds > 0
+          ? { estimateCoins: (await productionFor(db, playerId, district, seconds)).toString() }
+          : {}),
+        ...(i.kind === "ad" ? { usedToday: adsToday } : {}),
+      };
+    }),
+  );
   return {
     sandbox: storeMode === "mock",
-    items: STORE_ITEMS.map((i) => ({
-      ...i,
-      ...("gems" in i ? { gems: i.gems.toString() } : {}),
-      ...("costGems" in i ? { costGems: i.costGems.toString() } : {}),
-    })),
+    district,
+    items,
     entitlements: {
       autoCollectUntil:
         player.autoCollectUntil && player.autoCollectUntil > now
           ? player.autoCollectUntil.toISOString()
           : null,
-      vipUntil: (await vipUntil(db, playerId, now))?.toISOString() ?? null,
+      vipUntil: vip?.toISOString() ?? null,
+      vipDailyGems: VIP_DAILY_GEMS,
+      vipDailyClaimed: vipClaim !== null,
     },
     serverTime: now.toISOString(),
+  };
+}
+
+/** Recompensa diária do Passe VIP: diamantes, uma vez por dia (Brasília). */
+export function claimVipDaily(now: Date) {
+  return async ({ tx, wallet, idempotencyKey }: CommandContext): Promise<CommandResult> => {
+    if (!(await vipUntil(tx, wallet.playerId, now))) {
+      throw new AppError(409, "VIP_REQUIRED", "Benefício exclusivo do Passe VIP");
+    }
+    const day = gameDay(now);
+    const already = await tx.vipDailyClaim.findUnique({
+      where: { playerId_day: { playerId: wallet.playerId, day } },
+    });
+    if (already) throw new AppError(409, "VIP_DAILY_CLAIMED", "Recompensa de hoje já resgatada");
+    await tx.vipDailyClaim.create({
+      data: { playerId: wallet.playerId, day, gems: VIP_DAILY_GEMS, claimedAt: now },
+    });
+    await applyGems(tx, wallet, BigInt(VIP_DAILY_GEMS), "vip_daily", idempotencyKey, now);
+    await track(tx, wallet.playerId, "vip_daily_claimed");
+    return {
+      statusCode: 200,
+      body: { gems: VIP_DAILY_GEMS, state: await getPlayerState(tx, wallet.playerId, now) },
+    };
   };
 }
 

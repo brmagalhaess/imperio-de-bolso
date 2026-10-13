@@ -23,6 +23,8 @@ model Player {
   guestId             String    @unique @map("guest_id") @db.Uuid
   guestSecretHash     String    @map("guest_secret_hash")
   displayName         String    @map("display_name")
+  // Troca de nome permitida uma única vez (Perfil).
+  nameChangedAt       DateTime? @map("name_changed_at") @db.Timestamptz(3)
   tutorialCompletedAt DateTime? @map("tutorial_completed_at") @db.Timestamptz(3)
   // Presença por mapa (ADR 0006): mapa aberto agora e último sinal do jogo.
   currentDistrict     String?   @map("current_district")
@@ -36,16 +38,17 @@ model Player {
   lastAfkDoubled      Boolean   @default(false) @map("last_afk_doubled")
   createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
 
-  wallet        PlayerWallet?
-  businesses    PlayerBusiness[]
-  ledger        WalletLedger[]
-  idempotency   IdempotencyRecord[]
-  missions      PlayerMission[]
-  achievements  PlayerAchievement[]
-  events        AnalyticsEvent[]
-  receipts      PurchaseReceipt[]
-  subscriptions Subscription[]
-  adRewards     AdReward[]
+  wallet         PlayerWallet?
+  businesses     PlayerBusiness[]
+  ledger         WalletLedger[]
+  idempotency    IdempotencyRecord[]
+  missions       PlayerMission[]
+  achievements   PlayerAchievement[]
+  events         AnalyticsEvent[]
+  receipts       PurchaseReceipt[]
+  subscriptions  Subscription[]
+  adRewards      AdReward[]
+  vipDailyClaims VipDailyClaim[]
 
   @@map("players")
 }
@@ -241,4 +244,17 @@ model AdReward {
 
   @@index([playerId, placement, createdAt])
   @@map("ad_rewards")
+}
+
+// Recompensa diária do Passe VIP (diamantes): um resgate por dia do jogo (Brasília).
+model VipDailyClaim {
+  playerId  String   @map("player_id") @db.Uuid
+  day       String
+  gems      Int
+  claimedAt DateTime @default(now()) @map("claimed_at") @db.Timestamptz(3)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, day])
+  @@map("vip_daily_claims")
 }

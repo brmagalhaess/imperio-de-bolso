@@ -57,7 +57,7 @@ export const STORE_ITEMS: readonly StoreItem[] = [
     title: "Passe VIP",
     priceBRL: "14,90",
     periodDays: 30,
-    benefits: ["Auto-coleta em todos os mapas", "Selo VIP no perfil"],
+    benefits: ["Auto-coleta em todos os mapas", "5 diamantes por dia", "Selo VIP no perfil"],
   },
   {
     id: "auto_collect_24h",
@@ -73,17 +73,21 @@ export const STORE_ITEMS: readonly StoreItem[] = [
     costGems: 100n,
     hours: 24 * 7,
   },
-  { id: "boost_1h", kind: "boost", title: "Turbo: 1 hora de produção", costGems: 10n, hours: 1 },
-  { id: "boost_4h", kind: "boost", title: "Turbo: 4 horas de produção", costGems: 30n, hours: 4 },
+  // "Coleta antecipada" (pedido do titular): recebe agora X horas de produção do mapa atual.
+  { id: "boost_1h", kind: "boost", title: "Coleta antecipada de 1 hora", costGems: 10n, hours: 1 },
+  { id: "boost_4h", kind: "boost", title: "Coleta antecipada de 4 horas", costGems: 30n, hours: 4 },
   {
     id: "ad_boost",
     kind: "ad",
-    title: "Assista e ganhe 15 min de produção",
+    title: "Coleta antecipada de 15 min",
     placement: "ad_boost",
     minutes: 15,
     dailyLimit: 5,
   },
 ];
+
+/** Recompensa diária do Passe VIP (diamantes por dia do jogo). */
+export const VIP_DAILY_GEMS = 5;
 
 /** Anúncio "dobrar ganhos" do resumo offline: limite diário e janela após o resumo. */
 export const OFFLINE_DOUBLE_DAILY_LIMIT = 3;

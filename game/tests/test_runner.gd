@@ -242,7 +242,9 @@ func _store_tests() -> bool:
 	# Loja: cartões de diamantes ficam habilitados/esmaecidos sem recriar a lista.
 	var hud: Control = Hud.new()
 	add_child(hud)
-	GameState.catalog = {"sandbox": true, "items": [
+	GameState.catalog = {"sandbox": true, "district": "praia", "entitlements": {"vipDailyGems": 5}, "items": [
+		{"id": "ad_boost", "kind": "ad", "title": "Coleta antecipada de 15 min", "estimateCoins": "900",
+			"usedToday": 5, "dailyLimit": 5},
 		{"id": "auto_collect_24h", "kind": "auto_collect", "title": "Auto-coleta por 24 horas", "costGems": "20"},
 		{"id": "auto_collect_7d", "kind": "auto_collect", "title": "Auto-coleta por 7 dias", "costGems": "100"},
 		{"id": "boost_1h", "kind": "boost", "title": "Turbo 1h", "costGems": "10"},
@@ -257,13 +259,35 @@ func _store_tests() -> bool:
 	var buttons := []
 	for h in hud._modal._store_cards:
 		buttons.append(h.button)
-	var gem_button: Button = buttons[1]  # auto-coleta 24h
+	var ad_button: Button = buttons[0]
+	var ad_sub: String = hud._modal._store_cards[0].sub.text
+	check(ad_button.text == "5/5" and ad_button.disabled and ad_sub.contains("Hoje: 5/5"),
+			"coleta antecipada grátis mostra o uso de hoje e trava no limite")
+	check(ad_sub.contains("900"), "coleta antecipada mostra a estimativa de moedas")
+	var gem_button: Button = buttons[3]  # auto-coleta 24h
 	check(gem_button.text == "20" and gem_button.disabled, "sem diamantes: botão esmaecido com o preço")
 	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "0", "gems": "25"},
 		"businesses": []})
-	check(not gem_button.disabled and hud._modal._store_cards[1].button == gem_button,
+	check(not gem_button.disabled and hud._modal._store_cards[3].button == gem_button,
 			"com diamantes: o mesmo botão habilita (sem recriar)")
-	check(buttons[2].disabled, "item mais caro continua esmaecido")
+	check(buttons[4].disabled, "item mais caro continua esmaecido")
+
+	# Cada janela abre no topo, mesmo que a anterior estivesse rolada.
+	hud._modal._scroll.scroll_vertical = 400
+	hud.open_profile_menu()
+	check(hud._modal._scroll.scroll_vertical == 0, "janela nova abre no topo")
+
+	# Perfil: "Alterar nome" só aparece se ainda pode trocar.
+	GameState._apply_state({"player": {"tutorialCompleted": true, "displayName": "Empreendedor 1",
+		"canChangeName": true}, "wallet": {"coins": "0", "gems": "0"}, "businesses": []})
+	hud.open_profile_menu()
+	var has_rename: bool = hud._modal._list.get_children().any(func(c): return c is Button and c.text.begins_with("Alterar nome"))
+	check(has_rename, "perfil oferece trocar o nome uma vez")
+	GameState.state.player.canChangeName = false
+	hud.open_profile_menu()
+	await get_tree().process_frame
+	has_rename = hud._modal._list.get_children().any(func(c): return not c.is_queued_for_deletion() and c is Button and c.text.begins_with("Alterar nome"))
+	check(not has_rename, "depois de trocar, a opção some")
 	hud.queue_free()
 	GameState.state = {}
 	GameState.catalog = {}
@@ -309,6 +333,13 @@ func _integration_test() -> void:
 	check(GameState.gems() == "50", "diamantes creditados pelo servidor")
 	var bought := await GameState.buy_with_gems("auto_collect_24h")
 	check(not bought.is_empty() and GameState.state.player.autoCollect, "auto-coleta comprada com diamantes")
+	check(GameState.state.player.canChangeName, "conta nova pode trocar de nome")
+	check(not await GameState.change_name("P0rr4"), "nome ofensivo recusado pelo servidor")
+	var new_name := "Teste %d" % (randi() % 100000)
+	check(await GameState.change_name(new_name), "troca de nome aceita")
+	check(GameState.state.player.displayName == new_name and not GameState.state.player.canChangeName,
+			"nome novo e troca bloqueada")
+	check(not await GameState.change_name("Outro Nome"), "segunda troca recusada")
 	var ad := await Api.ad_start("ad_boost", "praia")
 	check(ad.ok, "anúncio de bônus: sessão criada")
 	var early := await Api.ad_claim(ad.data.sessionId)

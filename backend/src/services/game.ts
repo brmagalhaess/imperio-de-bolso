@@ -63,6 +63,8 @@ export interface PlayerStateView {
     autoCollect: boolean;
     autoCollectUntil: string | null;
     vipUntil: string | null;
+    /** Pode trocar o nome (só uma vez). */
+    canChangeName: boolean;
   };
   wallet: { coins: string; gems: string };
   businesses: BusinessView[];
@@ -181,6 +183,7 @@ export async function getPlayerState(
           ? player.autoCollectUntil.toISOString()
           : null,
       vipUntil: (await vipUntil(db, player.id, now))?.toISOString() ?? null,
+      canChangeName: player.nameChangedAt === null,
     },
     wallet: { coins: player.wallet.coins.toString(), gems: player.wallet.gems.toString() },
     businesses,

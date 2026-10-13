@@ -41,3 +41,16 @@ Até lá, `google`/`apple` respondem `501 STORE_NOT_CONFIGURED` — nada de API 
 Próximo passo técnico: build com Gradle no Android, instalar os plugins, IDs de teste do AdMob,
 e implementar os verificadores Google/Apple + notificações de reembolso (RTDN / App Store Server
 Notifications) chamando `revokePurchase`.
+
+## Ajustes pedidos pelo titular (2026-10-13)
+
+- **"Coleta antecipada"** substitui "turbo"/"anúncio de bônus": 15 min grátis com anúncio
+  (até 5/dia, com contador "Hoje: x/5" vindo do servidor), 1 h (10 diamantes) e 4 h (30).
+  O catálogo recebe `?district=` e devolve `estimateCoins` para mostrar quantas moedas virão.
+- **Passe VIP com recompensa diária:** +5 diamantes por dia do jogo (Brasília), resgatados em
+  `POST /vip/daily` (um por dia; só com VIP ativo). Tabela `vip_daily_claims`.
+- **Trocar o nome uma única vez** (`POST /player/name`): 3–20 caracteres (letras, números,
+  espaço, `. _ -`), lista básica de termos bloqueados com normalização (acentos e "leet"),
+  único entre nomes escolhidos (índice parcial em `lower(display_name)`), e a condição
+  `name_changed_at IS NULL` garante uma troca só, mesmo com pedidos simultâneos.
+

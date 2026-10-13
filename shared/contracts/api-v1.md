@@ -130,7 +130,11 @@ Corpo `{ events: [{ name, props? }] }` (1–20). Nomes permitidos: `tutorial_sta
 `tutorial_step`, `tutorial_skipped`, `screen_view`, `crash`. `202 { accepted }`.
 
 ### Loja, compras e anúncios (ADR 0008)
-- `GET /store/catalog` → `{ sandbox, items, entitlements: { autoCollectUntil, vipUntil }, serverTime }`.
+- `GET /store/catalog?district=praia` → `{ sandbox, district, items (coleta antecipada com
+  `estimateCoins`; anúncio com `usedToday`/`dailyLimit`), entitlements: { autoCollectUntil, vipUntil,
+  vipDailyGems, vipDailyClaimed }, serverTime }`.
+- `POST /vip/daily` — `Idempotency-Key`. `{}` → `200 { gems, state }`. `409 VIP_REQUIRED`,
+  `409 VIP_DAILY_CLAIMED`.
 - `POST /store/buy` — `Idempotency-Key`. `{ itemId, district? }` (auto-coleta/turbo com
   diamantes) → `200 { bought, autoCollectUntil? | coins?, state }`. `409 INSUFFICIENT_FUNDS`,
   `409 NOTHING_TO_BOOST`, `404 STORE_ITEM_NOT_FOUND`.
@@ -147,6 +151,10 @@ Corpo `{ events: [{ name, props? }] }` (1–20). Nomes permitidos: `tutorial_sta
 - Somente modo mock: `POST /ads/mock-complete { sessionId }`, `POST /purchases/mock/refund
   { transactionId }` (simula reembolso da loja).
 `player` no estado ganha `autoCollectUntil` e `vipUntil`.
+
+### `POST /player/name`
+`{ displayName }` → `200 PlayerState` (`player.canChangeName: false`). Uma vez por conta.
+`422 NAME_INVALID`, `422 NAME_NOT_ALLOWED`, `409 NAME_TAKEN`, `409 NAME_ALREADY_CHANGED`.
 
 ### Admin — `/api/admin/*` (fora do `/api/v1`)
 `Authorization: Bearer <ADMIN_TOKEN>`; desligado sem token. Somente leitura:

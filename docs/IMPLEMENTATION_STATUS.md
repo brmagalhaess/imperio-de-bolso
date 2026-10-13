@@ -2,6 +2,19 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-13 — Ajustes da Loja e Perfil (pedidos do titular)
+
+- **Coleta antecipada** (15 min grátis com anúncio, 1 h e 4 h com diamantes) com estimativa de
+  moedas do mapa atual e contador **"Hoje: x/5"**; trava no limite.
+- **Passe VIP:** +5 diamantes por dia (resgate na Loja, um por dia).
+- **Perfil:** trocar o nome **uma única vez**, com validação, palavras bloqueadas e nome único.
+- Correções: janela nova abre no topo (Perfil herdava a rolagem da Loja); executor de testes com
+  limite de tempo local e `timeout-minutes` no CI (erro de script travava o Godot).
+- Incidente local: uma migração falhou no meio (a coluna não entrou no schema por causa do
+  alinhamento do `prisma format`); revertida com `migrate resolve` e reaplicada só no banco de
+  desenvolvimento. Lição: conferir o SQL gerado antes do `deploy`.
+- Testes: backend 93; jogo 60 unitários + 95 integração.
+
 ## 2026-10-13 — Etapa 4: Loja, anúncios recompensados e compras em sandbox (ADR 0008)
 
 Revisados antes: docs/README.md §12, PROMPT_MESTRE (Etapa 4, adendo 4–5), plano §23, conversa.

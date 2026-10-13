@@ -17,7 +17,8 @@ import {
   verifierFor,
   verifyPurchase,
 } from "../services/purchases.js";
-import { buyWithGems, getCatalog } from "../services/store.js";
+import { changeName } from "../services/profile.js";
+import { buyWithGems, claimVipDaily, getCatalog } from "../services/store.js";
 import { claimAchievement, listAchievements } from "../services/achievements.js";
 import { createGuest, resumeGuest } from "../services/auth.js";
 import { getLeaderboard } from "../services/leaderboard.js";
@@ -209,9 +210,21 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
 
   // --- Loja, compras e anúncios (ADR 0008) ---------------------------------
 
-  app.get("/store/catalog", { preHandler: authenticate }, async (request) =>
-    getCatalog(db, playerIdOf(request), now(), config.STORE_MODE),
+  app.get("/store/catalog", { preHandler: authenticate }, async (request) => {
+    const { district } = z.object({ district: Slug.optional() }).parse(request.query);
+    return getCatalog(db, playerIdOf(request), now(), config.STORE_MODE, district);
+  });
+
+  app.post("/vip/daily", { preHandler: authenticate }, async (request, reply) =>
+    command(request, reply, "vip.daily", (at) => claimVipDaily(at)),
   );
+
+  app.post("/player/name", { preHandler: authenticate }, async (request) => {
+    const { displayName } = z.object({ displayName: z.string().max(60) }).parse(request.body);
+    const at = now();
+    await changeName(db, playerIdOf(request), displayName, at);
+    return getPlayerState(db, playerIdOf(request), at);
+  });
 
   app.post("/store/buy", { preHandler: authenticate }, async (request, reply) => {
     const { itemId, district } = BuyBody.parse(request.body);

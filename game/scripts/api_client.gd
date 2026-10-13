@@ -98,8 +98,17 @@ func send_events(events: Array) -> Dictionary:
 
 # --- Loja, compras e anúncios (ADR 0008) ---
 
-func store_catalog() -> Dictionary:
-	return await _authed(HTTPClient.METHOD_GET, "/store/catalog", null, "")
+func store_catalog(district := "praia") -> Dictionary:
+	return await _authed(HTTPClient.METHOD_GET, "/store/catalog?district=" + district, null, "")
+
+
+func vip_daily() -> Dictionary:
+	return await _command("/vip/daily", {})
+
+
+## Troca de nome (permitida uma vez; o servidor valida).
+func change_name(display_name: String) -> Dictionary:
+	return await _authed(HTTPClient.METHOD_POST, "/player/name", {"displayName": display_name}, "")
 
 
 func store_buy(item_id: String, district := "") -> Dictionary:

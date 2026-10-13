@@ -50,11 +50,12 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Reivindicação de prêmios idempotente + testes de integração
 - [ ] Ícones definitivos de Missões, Ranking e Diamante (hoje placeholder em código)
 - [ ] Prêmios de fim de semana do ranking; amigos e "batalha de impérios"
-- [ ] Editar nome do jogador (hoje "Empreendedor 1234") com moderação
+- [x] Editar nome do jogador uma vez, com validação e palavras bloqueadas (moderação no admin: futuro)
 
 ## Etapa 4 — Monetização sandbox
 - [x] Loja: **auto-coleta no mapa aberto** (diamantes 24h/7d e Passe VIP — ADR 0008)
-- [x] Loja: **pacotes de horas de coleta** (turbo 1h/4h do mapa atual)
+- [x] Loja: **coleta antecipada** (15 min grátis com anúncio "Hoje: x/5", 1 h e 4 h com diamantes)
+- [x] Passe VIP: recompensa diária de diamantes
 - [x] Anúncio recompensado para dobrar o AFK ao voltar (conversa original) — sandbox
 - [x] Contratos de anúncios (sessão + SSV assinado) e compras (verificação, recibo, revogação, restauração) com mocks
 - [ ] Integrar plugins reais: AdMob, Google Play Billing, StoreKit 2 (bloqueado: contas + aparelho)

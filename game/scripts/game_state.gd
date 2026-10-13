@@ -50,6 +50,12 @@ const MESSAGES := {
 	"STORE_NOT_CONFIGURED": "Compras ainda não disponíveis nesta versão.",
 	"MOCK_DISABLED": "Compras de teste desligadas.",
 	"PURCHASE_INVALID": "Não foi possível confirmar a compra.",
+	"VIP_REQUIRED": "Benefício exclusivo do Passe VIP.",
+	"VIP_DAILY_CLAIMED": "Você já resgatou os diamantes de hoje.",
+	"NAME_INVALID": "Use de 3 a 20 letras, números, espaço, ponto, hífen ou _.",
+	"NAME_NOT_ALLOWED": "Esse nome não é permitido.",
+	"NAME_TAKEN": "Esse nome já está em uso.",
+	"NAME_ALREADY_CHANGED": "Você já trocou de nome uma vez.",
 }
 
 var state: Dictionary = {}
@@ -216,7 +222,7 @@ func claimable_achievements() -> int:
 
 
 func refresh_catalog() -> void:
-	var res := await Api.store_catalog()
+	var res := await Api.store_catalog(current_district)
 	if res.ok:
 		catalog = res.data
 
@@ -262,6 +268,35 @@ func buy_sandbox(product_id: String) -> bool:
 		notice.emit(message_for(res.error_code))
 		return false
 	_apply_state(res.data.state)
+	return true
+
+
+## Recompensa diária do VIP (diamantes).
+func claim_vip_daily() -> bool:
+	if busy:
+		return false
+	_set_busy(true)
+	var res := await Api.vip_daily()
+	_set_busy(false)
+	if not res.ok:
+		notice.emit(message_for(res.error_code))
+		return false
+	_apply_state(res.data.state)
+	await refresh_catalog()
+	return true
+
+
+## Troca de nome (uma vez). Devolve true se o servidor aceitou.
+func change_name(display_name: String) -> bool:
+	if busy:
+		return false
+	_set_busy(true)
+	var res := await Api.change_name(display_name)
+	_set_busy(false)
+	if not res.ok:
+		notice.emit(message_for(res.error_code))
+		return false
+	_apply_state(res.data)
 	return true
 
 

@@ -12,6 +12,7 @@ concurrency:
 jobs:
   backend:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: backend
@@ -46,6 +47,7 @@ jobs:
 
   admin:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: admin
@@ -61,6 +63,8 @@ jobs:
 
   game:
     runs-on: ubuntu-latest
+    # Erro de script no executor de testes deixa o Godot aberto: o limite derruba o job.
+    timeout-minutes: 10
     env:
       GODOT_VERSION: 4.7.2
     steps:

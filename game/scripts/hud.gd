@@ -370,61 +370,96 @@ func open_map_menu() -> void:
 func open_store_menu() -> void:
 	_open_rewards("store")
 	_modal.open(tr("Loja"))
-	if GameState.catalog.is_empty():
-		await GameState.refresh_catalog()
+	if GameState.catalog.get("district", "") != current_district:
+		await GameState.refresh_catalog()  # estimativas são do mapa atual
 	if not _modal.visible or _reward_kind != "store":
 		return
 	if GameState.catalog.get("sandbox", false):
 		_modal.add_message(null, "", tr("MODO DE TESTE: nenhuma compra é cobrada e os anúncios são simulados."))
 
-	_modal.add_section(tr("Grátis"))
-	_modal.add_store_card(func(): return {
-		"title": tr("Anúncio de bônus"), "icon": COIN_TEX,
-		"subtitle": tr("Assista e ganhe 15 min de produção de %s (até 5 por dia)") % Layout.title(current_district),
-		"button": tr("Assistir"), "color": PURPLE, "edge": PURPLE_DARK, "enabled": true,
-	}, func(): watch_ad("ad_boost"))
+	# Coleta antecipada: recebe agora X tempo de produção do mapa atual (pedido do titular).
+	_modal.add_section(tr("Coleta antecipada · %s") % Layout.title(current_district))
+	_modal.add_store_card(func():
+		var ad := GameState.store_item("ad_boost")
+		var used := int(ad.get("usedToday", 0))
+		var limit := int(ad.get("dailyLimit", 5))
+		return {
+			"title": ad.get("title", tr("Coleta antecipada")), "icon": COIN_TEX,
+			"subtitle": tr("Grátis com anúncio · ≈ %s moedas\nHoje: %d/%d") % [
+				Fmt.coins(ad.get("estimateCoins", "0")), used, limit],
+			"button": tr("Assistir") if used < limit else "%d/%d" % [used, limit],
+			"color": PURPLE, "edge": PURPLE_DARK, "enabled": used < limit,
+		}, func(): watch_ad("ad_boost"))
+	for id in ["boost_1h", "boost_4h"]:
+		var item_id: String = id
+		_modal.add_store_card(func():
+			var item := GameState.store_item(item_id)
+			var cost: String = item.get("costGems", "0")
+			return {
+				"title": item.get("title", item_id), "icon": COIN_TEX,
+				"subtitle": tr("≈ %s moedas na hora") % Fmt.coins(item.get("estimateCoins", "0")),
+				"button": cost, "button_icon": _gem_tex, "color": BLUE, "edge": BLUE_DARK,
+				"enabled": GameState.gems().to_int() >= cost.to_int(),
+			}, func(): _buy_with_gems(item_id))
 
 	_modal.add_section(tr("Auto-coleta"))
 	for id in ["auto_collect_24h", "auto_collect_7d"]:
-		_gem_card(id, tr("Os ajudantes coletam sozinhos enquanto você joga") + "\n" + _auto_collect_status())
+		var item_id: String = id
+		_modal.add_store_card(func():
+			var item := GameState.store_item(item_id)
+			var cost: String = item.get("costGems", "0")
+			return {
+				"title": item.get("title", item_id),
+				"subtitle": tr("Os ajudantes coletam sozinhos enquanto você joga") + "\n" + _auto_collect_status(),
+				"button": cost, "button_icon": _gem_tex, "color": BLUE, "edge": BLUE_DARK,
+				"enabled": GameState.gems().to_int() >= cost.to_int(),
+			}, func(): _buy_with_gems(item_id))
 
-	_modal.add_section(tr("Turbo de produção"))
-	for id in ["boost_1h", "boost_4h"]:
-		_gem_card(id, tr("Receba agora a produção de %s") % Layout.title(current_district))
+	_modal.add_section(tr("Passe VIP"))
+	_modal.add_store_card(func():
+		var vip := GameState.store_item("vip_monthly")
+		return {
+			"title": vip.get("title", "Passe VIP"), "icon": Layout.texture("icon_helpers"),
+			"subtitle": " · ".join(vip.get("benefits", [])) + "\n" + _vip_status(),
+			"button": tr("R$ %s/mês") % vip.get("priceBRL", ""), "color": Style.ORANGE,
+			"edge": Style.ORANGE_DARK, "enabled": true,
+		}, func():
+			var vip := GameState.store_item("vip_monthly")
+			_confirm_sandbox(vip, vip.get("productId", "")))
+	# Recompensa diária de diamantes do VIP (pedido do titular).
+	_modal.add_store_card(func():
+		var ent: Dictionary = GameState.catalog.get("entitlements", {})
+		var is_vip := GameState.vip_until() != null
+		var claimed: bool = ent.get("vipDailyClaimed", false)
+		return {
+			"title": tr("Diamantes diários do VIP"), "icon": _gem_tex,
+			"subtitle": tr("+%d diamantes por dia para assinantes") % int(ent.get("vipDailyGems", 5)) \
+					if not is_vip else (tr("Volte amanhã para mais") if claimed else tr("Disponível hoje")),
+			"button": tr("Resgatado") if claimed else tr("Resgatar"),
+			"color": Style.TEAL_LIGHT if claimed else Style.ORANGE,
+			"edge": Style.TEAL_DARK if claimed else Style.ORANGE_DARK,
+			"enabled": is_vip and not claimed,
+		}, func():
+			if await GameState.claim_vip_daily():
+				show_toast(tr("+%d diamantes!") % int(GameState.catalog.get("entitlements", {}).get("vipDailyGems", 5)))
+			_modal.refresh_store_cards())
 
 	_modal.add_section(tr("Diamantes"))
 	for id in ["gems_50", "gems_120", "gems_300"]:
-		var item := GameState.store_item(id)
-		var product: String = item.get("productId", "")
-		_modal.add_store_card(func(): return {
-			"title": item.get("title", id), "icon": _gem_tex,
-			"subtitle": tr("+%s diamantes") % Fmt.coins(item.get("gems", "0")),
-			"button": "R$ " + str(item.get("priceBRL", "")), "color": Style.GREEN, "edge": Style.GREEN_DARK,
-			"enabled": true,
-		}, func(): _confirm_sandbox(item, product))
-
-	_modal.add_section(tr("Passe VIP"))
-	var vip := GameState.store_item("vip_monthly")
-	_modal.add_store_card(func(): return {
-		"title": vip.get("title", "Passe VIP"), "icon": Layout.texture("icon_helpers"),
-		"subtitle": " · ".join(vip.get("benefits", [])) + "\n" + _vip_status(),
-		"button": tr("R$ %s/mês") % vip.get("priceBRL", ""), "color": Style.ORANGE, "edge": Style.ORANGE_DARK,
-		"enabled": true,
-	}, func(): _confirm_sandbox(vip, vip.get("productId", "")))
+		var item_id: String = id
+		_modal.add_store_card(func():
+			var item := GameState.store_item(item_id)
+			return {
+				"title": item.get("title", item_id), "icon": _gem_tex,
+				"subtitle": tr("+%s diamantes") % Fmt.coins(item.get("gems", "0")),
+				"button": "R$ " + str(item.get("priceBRL", "")), "color": Style.GREEN,
+				"edge": Style.GREEN_DARK, "enabled": true,
+			}, func():
+				var item := GameState.store_item(item_id)
+				_confirm_sandbox(item, item.get("productId", "")))
 
 	_modal.add_action(tr("Restaurar compras"), _restore_purchases, Style.TEAL_LIGHT, Style.TEAL_DARK)
 	_modal.refit()
-
-
-func _gem_card(item_id: String, subtitle: String) -> void:
-	var item := GameState.store_item(item_id)
-	var cost: String = item.get("costGems", "0")
-	_modal.add_store_card(func(): return {
-		"title": item.get("title", item_id), "subtitle": subtitle if item_id.begins_with("boost") \
-				else tr("Os ajudantes coletam sozinhos enquanto você joga") + "\n" + _auto_collect_status(),
-		"button": cost, "button_icon": _gem_tex, "color": BLUE, "edge": BLUE_DARK,
-		"enabled": GameState.gems().to_int() >= cost.to_int(),
-	}, func(): _buy_with_gems(item_id))
 
 
 func _buy_with_gems(item_id: String) -> void:
@@ -433,9 +468,10 @@ func _buy_with_gems(item_id: String) -> void:
 		_modal.refresh_store_cards()
 		return
 	if data.has("coins"):
-		show_toast(tr("Turbo! +%s moedas") % Fmt.coins(data.coins))
+		show_toast(tr("Coleta antecipada: +%s moedas") % Fmt.coins(data.coins))
 	else:
 		show_toast(tr("Auto-coleta ativa!"))
+	await GameState.refresh_catalog()
 	_modal.refresh_store_cards()
 
 
@@ -484,6 +520,8 @@ func watch_ad(placement: String) -> void:
 		return
 	GameState._apply_state(claim.data.state)
 	show_toast(tr("+%s moedas!") % Fmt.coins(claim.data.coins))
+	await GameState.refresh_catalog()  # atualiza o "Hoje: 1/5"
+	_modal.refresh_store_cards()
 
 
 func _auto_collect_status() -> String:
@@ -524,14 +562,35 @@ func open_profile_menu() -> void:
 	var player: Dictionary = GameState.state.get("player", {})
 	var owned := GameState.businesses().filter(func(b): return b.owned).size()
 	var helpers := GameState.businesses().filter(func(b): return b.get("managed", false)).size()
+	var vip_tag := tr(" · VIP") if GameState.vip_until() != null else ""
 	_modal.add_message(Layout.texture("icon_profile"), str(player.get("displayName", "")),
-			tr("%d negócios · %d ajudantes · %s diamantes") % [owned, helpers, Fmt.coins(GameState.gems())])
+			tr("%d negócios · %d ajudantes · %s diamantes%s") % [owned, helpers, Fmt.coins(GameState.gems()), vip_tag])
+	if player.get("canChangeName", false):
+		_modal.add_action(tr("Alterar nome (só 1 vez)"), open_name_form, Style.TEAL_LIGHT, Style.TEAL_DARK)
 	_modal.add_section(tr("Conquistas"))
 	for a in GameState.achievements:
 		var ach: Dictionary = a
 		var id: String = ach.id
 		_reward_cards[id] = _modal.add_reward_card(_achievement_item(ach), func(): GameState.claim_achievement(id))
 	GameState.refresh_achievements()
+
+
+## Troca de nome: permitida uma única vez (pedido do titular); o servidor valida.
+func open_name_form() -> void:
+	_reward_kind = "name"
+	_reward_cards.clear()
+	_modal.open(tr("Alterar nome"))
+	_modal.add_message(null, "", tr("Escolha com cuidado: você só pode trocar de nome uma vez.\nDe 3 a 20 caracteres. O nome aparece no ranking."))
+	var edit: LineEdit = _modal.add_line_edit(tr("Seu novo nome"), 20)
+	_modal.add_action(tr("Confirmar"), func():
+		if await GameState.change_name(edit.text):
+			show_toast(tr("Agora você é %s!") % GameState.state.player.displayName)
+			open_profile_menu()
+		else:
+			open_name_form(), Style.GREEN, Style.GREEN_DARK)
+	_modal.add_action(tr("Voltar"), open_profile_menu, Style.GREY, Style.GREY_DARK)
+	_modal.refit()
+	edit.grab_focus.call_deferred()
 
 
 func open_ranking_menu() -> void:

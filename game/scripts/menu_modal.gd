@@ -87,6 +87,7 @@ func open(title_text: String) -> void:
 	var was_open := visible
 	_title.text = title_text
 	_store_cards.clear()
+	_scroll.scroll_vertical = 0  # cada janela abre no topo (não herda a rolagem da anterior)
 	for c in _list.get_children():
 		c.queue_free()
 	visible = true
@@ -156,6 +157,23 @@ func clear_list() -> void:
 	_store_cards.clear()
 	for c in _list.get_children():
 		c.queue_free()
+
+
+## Campo de texto no padrão do jogo (ex.: novo nome). Devolve o LineEdit.
+func add_line_edit(placeholder: String, max_length: int) -> LineEdit:
+	var edit := LineEdit.new()
+	edit.placeholder_text = placeholder
+	edit.max_length = max_length
+	edit.custom_minimum_size = Vector2(0, 84)
+	edit.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	edit.add_theme_font_override("font", UiFont.bold())
+	edit.add_theme_font_size_override("font_size", 32)
+	edit.add_theme_color_override("font_color", Style.INK)
+	edit.add_theme_color_override("font_placeholder_color", Style.INK_SOFT)
+	edit.add_theme_stylebox_override("normal", Style.box(Color.WHITE, 22, Style.TEAL, 4, false))
+	edit.add_theme_stylebox_override("focus", Style.box(Color.WHITE, 22, Style.ORANGE, 4, false))
+	_list.add_child(edit)
+	return edit
 
 
 func add_section(text: String) -> void:
