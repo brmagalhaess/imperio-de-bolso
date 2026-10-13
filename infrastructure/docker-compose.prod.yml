@@ -1,0 +1,78 @@
+# Stack de STAGING/PRODUÇÃO para o Dockploy (uma stack por ambiente, plano §24).
+# Todos os segredos vêm das variáveis de ambiente da stack no Dockploy — nada aqui é segredo.
+# Exemplo de variáveis em infrastructure/prod.env.example. HTTPS e domínios ficam no Traefik
+# do Dockploy (api.<domínio> → api:3000, admin.<domínio> → admin:80).
+name: imperio-${STACK_ENV:-staging}
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: imperio
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD}
+      POSTGRES_DB: imperio
+    # Sem porta publicada: o banco só é acessível pela rede interna da stack.
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U imperio -d imperio"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: ../backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://imperio:${POSTGRES_PASSWORD}@postgres:5432/imperio
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      STARTING_COINS: ${STARTING_COINS:-100}
+      STORE_MODE: ${STORE_MODE:-live}
+      ADS_MODE: ${ADS_MODE:-admob}
+      BETA_SANDBOX: ${BETA_SANDBOX:-false}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+      TRUST_PROXY: "true"
+      RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-600}
+      RATE_LIMIT_AUTH_PER_MINUTE: ${RATE_LIMIT_AUTH_PER_MINUTE:-20}
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      interval: 15s
+      timeout: 3s
+      retries: 10
+
+  admin:
+    build:
+      context: ../admin
+    restart: unless-stopped
+    depends_on:
+      - api
+    expose:
+      - "80"
+
+  backup:
+    build:
+      context: ./backup
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://imperio:${POSTGRES_PASSWORD}@postgres:5432/imperio
+      BACKUP_PASSPHRASE: ${BACKUP_PASSPHRASE:?defina BACKUP_PASSPHRASE}
+      BACKUP_KEEP: ${BACKUP_KEEP:-14}
+      BACKUP_CRON: ${BACKUP_CRON:-30 3 * * *}
+    volumes:
+      - backups:/backups
+
+volumes:
+  pgdata:
+  backups:

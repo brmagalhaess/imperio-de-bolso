@@ -1,4 +1,6 @@
+import fastifyHelmet from "@fastify/helmet";
 import fastifyJwt from "@fastify/jwt";
+import fastifyRateLimit from "@fastify/rate-limit";
 import Fastify, { type FastifyInstance } from "fastify";
 import { ZodError } from "zod";
 import type { AppConfig } from "./config.js";
@@ -26,7 +28,15 @@ export interface AppDeps {
 
 export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   const app = Fastify({
-    logger: deps.logger ?? false,
+    trustProxy: deps.config.TRUST_PROXY,
+    // Logs sem dados sensíveis (plano §28): nada de corpo, cabeçalho Authorization ou query.
+    logger: deps.logger
+      ? {
+          serializers: {
+            req: (req) => ({ method: req.method, url: (req.url ?? "").split("?")[0] }),
+          },
+        }
+      : false,
     bodyLimit: 16 * 1024,
   });
   const now = deps.now ?? (() => new Date());
@@ -44,6 +54,18 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   });
 
   await app.register(fastifyJwt, { secret: deps.config.JWT_SECRET });
+  // Cabeçalhos de segurança (API JSON: sem CSP de página).
+  await app.register(fastifyHelmet, { contentSecurityPolicy: false });
+  await app.register(fastifyRateLimit, {
+    max: deps.config.RATE_LIMIT_PER_MINUTE,
+    timeWindow: "1 minute",
+    allowList: (req) => req.url === "/health",
+    // Vira AppError para sair no formato padrão { error: { code, message, details } }.
+    errorResponseBuilder: (_req, ctx) =>
+      new AppError(429, "RATE_LIMITED", "Muitas requisições. Tente de novo em instantes.", {
+        retryAfterSeconds: Math.ceil(ctx.ttl / 1000),
+      }),
+  });
 
   app.setErrorHandler((error, request, reply) => {
     if (error instanceof AppError) {

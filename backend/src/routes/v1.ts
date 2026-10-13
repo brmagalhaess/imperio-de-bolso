@@ -96,25 +96,32 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
     }
   };
 
-  app.post("/auth/guest", async (request, reply) => {
-    const body = GuestAuthBody.parse(request.body ?? {});
-    const session =
-      body.guestId && body.guestSecret
-        ? await resumeGuest(db, body.guestId, body.guestSecret)
-        : await createGuest(db, config.STARTING_COINS);
-    const accessToken = await reply.jwtSign(
-      { sub: session.playerId },
-      { expiresIn: config.JWT_EXPIRES_IN },
-    );
-    return reply.code(session.created ? 201 : 200).send({
-      playerId: session.playerId,
-      guestId: session.guestId,
-      ...(session.guestSecret ? { guestSecret: session.guestSecret } : {}),
-      accessToken,
-      tokenType: "Bearer",
-      expiresIn: config.JWT_EXPIRES_IN,
-    });
-  });
+  // Criar/retomar conta convidada: limite mais rígido por IP (evita criação em massa).
+  app.post(
+    "/auth/guest",
+    {
+      config: { rateLimit: { max: config.RATE_LIMIT_AUTH_PER_MINUTE, timeWindow: "1 minute" } },
+    },
+    async (request, reply) => {
+      const body = GuestAuthBody.parse(request.body ?? {});
+      const session =
+        body.guestId && body.guestSecret
+          ? await resumeGuest(db, body.guestId, body.guestSecret)
+          : await createGuest(db, config.STARTING_COINS);
+      const accessToken = await reply.jwtSign(
+        { sub: session.playerId },
+        { expiresIn: config.JWT_EXPIRES_IN },
+      );
+      return reply.code(session.created ? 201 : 200).send({
+        playerId: session.playerId,
+        guestId: session.guestId,
+        ...(session.guestSecret ? { guestSecret: session.guestSecret } : {}),
+        accessToken,
+        tokenType: "Bearer",
+        expiresIn: config.JWT_EXPIRES_IN,
+      });
+    },
+  );
 
   app.get("/player/state", { preHandler: authenticate }, async (request) =>
     getPlayerState(db, playerIdOf(request), now()),

@@ -19,6 +19,13 @@ describe("configuração", () => {
     expect(loadConfig({ ...prod, STORE_MODE: "live", ADS_MODE: "admob" }).STORE_MODE).toBe("live");
   });
 
+  it("teste fechado libera mock em produção só com BETA_SANDBOX=true explícito", () => {
+    const prod = { ...base, NODE_ENV: "production", JWT_SECRET: "y".repeat(40) };
+    expect(loadConfig({ ...prod, BETA_SANDBOX: "true" }).STORE_MODE).toBe("mock");
+    expect(() => loadConfig({ ...prod, BETA_SANDBOX: "false" })).toThrow(/mock/);
+    expect(() => loadConfig({ ...prod, BETA_SANDBOX: "yes" })).toThrow();
+  });
+
   it("produção recusa JWT_SECRET de exemplo", () => {
     expect(() =>
       loadConfig({
