@@ -113,6 +113,22 @@ func _integration_test() -> void:
 	await get_tree().create_timer(1.0).timeout
 	var coins_label: Label = main.get_node("UI/HUD")._coins_label
 	check(coins_label.text == "0", "cena principal mostra saldo do servidor")
+
+	# Regressão: fechar o painel e depois coletar pela moeda não pode reabrir o painel.
+	var hud: Control = main.get_node("UI/HUD")
+	var praia: Node2D = main.districts["praia"]
+	praia.select("agua")
+	check(hud._sheet.visible, "tocar no negócio abre o painel")
+	hud.close_sheet()
+	check(not hud._sheet.visible and hud.slug == "", "fechar o painel limpa a seleção")
+	check(not praia.lots["agua"].selected, "fechar o painel tira o destaque do lote")
+	GameState._apply_state(GameState.state)  # o que acontece após uma coleta
+	check(not hud._sheet.visible, "atualização após coleta não reabre o painel")
+	praia.select("agua")
+	hud.open_build_menu()
+	GameState._apply_state(GameState.state)
+	check(not hud._sheet.visible, "abrir Construir fecha o painel de vez")
+	hud._modal.close()
 	main.queue_free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Api.session_path))
 	_sections_done += 1

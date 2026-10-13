@@ -6,6 +6,8 @@ extends Control
 signal retry_requested
 signal business_requested(slug: String)
 signal district_requested(id: String)
+## Painel do negócio fechado: o mundo tira o destaque do lote.
+signal selection_cleared
 
 const Fmt := preload("res://scripts/fmt.gd")
 const Layout := preload("res://scripts/layout.gd")
@@ -55,6 +57,16 @@ func _ready() -> void:
 func show_business(new_slug: String) -> void:
 	slug = new_slug
 	_refresh()
+
+
+## Fecha o painel e esquece o negócio selecionado — senão a próxima atualização de estado
+## (ex.: coletar pela moeda) reabriria o painel.
+func close_sheet() -> void:
+	if slug == "" and not _sheet.visible:
+		return
+	slug = ""
+	_sheet.visible = false
+	selection_cleared.emit()
 
 
 func show_loading() -> void:
@@ -159,7 +171,7 @@ func _on_collect_pressed() -> void:
 
 
 func open_build_menu() -> void:
-	_sheet.visible = false
+	close_sheet()
 	_modal.open(tr("Construir"))
 	for id in Layout.DISTRICT_ORDER:
 		_modal.add_section(Layout.title(id))
@@ -173,7 +185,7 @@ func open_build_menu() -> void:
 
 
 func open_map_menu() -> void:
-	_sheet.visible = false
+	close_sheet()
 	_modal.open(tr("Mapa"))
 	for id in Layout.DISTRICT_ORDER:
 		var unlocked := GameState.district_unlocked(id)
@@ -359,7 +371,7 @@ func _build_sheet() -> void:
 	_title.add_theme_color_override("font_color", Style.TEAL_DARK)
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(_title)
-	head.add_child(Style.close_button(func(): _sheet.visible = false))
+	head.add_child(Style.close_button(close_sheet))
 
 	_info = Label.new()
 	_info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

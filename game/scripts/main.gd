@@ -22,6 +22,9 @@ func _ready() -> void:
 	_show_district("praia")
 
 	hud.business_requested.connect(_on_business_requested)
+	hud.selection_cleared.connect(func():
+		for d in districts:
+			districts[d].highlight(""))
 	hud.district_requested.connect(go_to_district)
 	hud.retry_requested.connect(_boot)
 	GameState.connection_failed.connect(hud.show_error)
@@ -49,7 +52,7 @@ func go_to_district(id: String) -> void:
 func _show_district(id: String) -> void:
 	current = id
 	hud.current_district = id
-	hud.show_business("")
+	hud.close_sheet()
 	for d in districts:
 		districts[d].visible = d == id
 	districts[id].frame(camera)

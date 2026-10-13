@@ -92,9 +92,14 @@ func _sync() -> void:
 
 
 func select(slug: String) -> void:
+	highlight(slug)
+	lot_selected.emit(slug)
+
+
+## Só o destaque visual (sem abrir painel); "" tira o destaque de todos.
+func highlight(slug: String) -> void:
 	for s in lots:
 		lots[s].selected = s == slug
-	lot_selected.emit(slug)
 
 
 func _on_collected(items: Array) -> void:
