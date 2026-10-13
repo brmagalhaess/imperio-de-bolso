@@ -28,7 +28,9 @@ func _init(p_glyph: Glyph, p_color: Color, p_edge: Color, p_size := 76.0) -> voi
 
 
 func _gui_input(event: InputEvent) -> void:
-	if event is InputEventScreenTouch or event is InputEventMouseButton:
+	# Só o clique (o toque no celular chega também como clique emulado): tratar os dois fazia
+	# cada toque contar duas vezes.
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
 			pivot_offset = size / 2
 			scale = Vector2.ONE * 0.9

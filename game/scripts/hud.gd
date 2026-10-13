@@ -578,8 +578,10 @@ func open_profile_menu() -> void:
 	var helpers := GameState.businesses().filter(func(b): return b.get("managed", false)).size()
 	var vip_tag := tr(" · VIP") if GameState.vip_until() != null else ""
 	_modal.add_message(Layout.texture("icon_profile"), str(player.get("displayName", "")),
-			tr("%d negócios · %d ajudantes · %s diamantes%s") % [owned, helpers, Fmt.coins(GameState.gems()), vip_tag]
-			+ "\n" + tr("Código do jogador: %s") % player_code())
+			tr("%d negócios · %d ajudantes · %s diamantes%s") % [owned, helpers, Fmt.coins(GameState.gems()), vip_tag])
+	# Código usado no suporte e para pedir exclusão pelo site (sem o jogo instalado).
+	_modal.add_copy_row(tr("Código do jogador (suporte)"), player_code(), func():
+		show_toast(tr("Código copiado!")))
 	if player.get("canChangeName", false):
 		_modal.add_action(tr("Alterar nome (só 1 vez)"), open_name_form, Style.TEAL_LIGHT, Style.TEAL_DARK)
 	_modal.add_section(tr("Conquistas"))
@@ -857,7 +859,7 @@ func _gems_pill() -> PanelContainer:
 	# Tocar nos diamantes abre a Loja.
 	pill.mouse_filter = Control.MOUSE_FILTER_STOP
 	pill.gui_input.connect(func(e):
-		if (e is InputEventScreenTouch and not e.pressed) or (e is InputEventMouseButton and not e.pressed):
+		if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed:
 			open_store_menu())
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)

@@ -28,8 +28,10 @@ func _ready() -> void:
 	var backdrop := ColorRect.new()
 	backdrop.color = Color(0.02, 0.12, 0.13, 0.55)
 	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	# Fecha ao soltar o dedo fora do cartão (não ao encostar: no celular, errar o botão por
+	# pouco fechava a janela). Só o clique: o toque chega também como clique emulado.
 	backdrop.gui_input.connect(func(e):
-		if (e is InputEventScreenTouch and not e.pressed) or (e is InputEventMouseButton and e.pressed):
+		if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed:
 			close())
 	add_child(backdrop)
 
@@ -76,6 +78,9 @@ func _ready() -> void:
 
 	_scroll = ScrollContainer.new()
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	# No celular, o dedo sempre escorrega um pouco: sem esta folga, qualquer toque num botão
+	# da lista virava rolagem e o botão não respondia.
+	_scroll.scroll_deadzone = 28
 	col.add_child(_scroll)
 	_list = VBoxContainer.new()
 	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -184,6 +189,27 @@ func add_toggle(icon: Texture2D, text_value: String, value: bool, on_toggled: Ca
 		button.set_meta("on", on)
 		paint.call(on)
 		on_toggled.call(on))
+	row.add_child(button)
+	return button
+
+
+## Linha "rótulo: valor" com botão Copiar (ex.: Código do jogador). Devolve o botão.
+func add_copy_row(label_text: String, value: String, on_copied: Callable) -> Button:
+	var row := _card_row()
+	var texts := VBoxContainer.new()
+	texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	texts.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_child(texts)
+	texts.add_child(_text(label_text, 24, Style.INK_SOFT))
+	texts.add_child(_text(value, 36, Style.TEAL_DARK, 700))
+	var button := Button.new()
+	button.text = tr("Copiar")
+	button.custom_minimum_size = Vector2(170, 76)
+	button.add_theme_font_size_override("font_size", 28)
+	Style.style_button(button, Style.TEAL_LIGHT, Style.TEAL_DARK)
+	button.pressed.connect(func():
+		DisplayServer.clipboard_set(value)
+		on_copied.call())
 	row.add_child(button)
 	return button
 

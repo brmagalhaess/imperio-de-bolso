@@ -10,7 +10,9 @@ const Walker := preload("res://scripts/walker.gd")
 const FloatingText := preload("res://scripts/floating_text.gd")
 const Fmt := preload("res://scripts/fmt.gd")
 
-const TAP_MAX_DRAG := 16.0
+## Quanto o dedo pode escorregar entre tocar e soltar e ainda contar como toque (pixels da
+## resolução base 720×1280; dedos reais se mexem bem mais que o mouse).
+const TAP_MAX_DRAG := 40.0
 
 var district := ""
 var config: Dictionary
@@ -125,7 +127,8 @@ func _on_collected(items: Array) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_visible_in_tree():
 		return
-	if event is InputEventScreenTouch:
+	# Só o primeiro dedo: um segundo dedo encostando não vira toque fantasma.
+	if event is InputEventScreenTouch and event.index == 0:
 		if event.pressed:
 			_press_pos = event.position
 		elif event.position.distance_to(_press_pos) <= TAP_MAX_DRAG:
