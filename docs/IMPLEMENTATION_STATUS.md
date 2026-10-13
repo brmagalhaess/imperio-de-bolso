@@ -15,6 +15,11 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
   esperando, resumo por mapa, sinal de presença a cada 15 s. Executor de testes agora reprova
   erro de script dentro de subseções. Unitários 37/37; integração 57/57.
 - **Pendente:** arte própria dos ajudantes e ícone do botão (hoje: personagens existentes).
+- **Correção (pedido do titular):** contratar na tela de Ajudantes reabria a janela inteira (ela
+  piscava e os preços dos outros trocavam de cor, parecendo mudar de valor). Agora os cartões são
+  atualizados no lugar, o botão fica travado durante o pedido, sem saldo o botão laranja só
+  esmaece (preço igual) e o aviso que cobria a janela virou um pulinho no próprio botão.
+  Teste de regressão + captura real quadro a quadro (brilho constante, sem piscar).
 
 ## 2026-10-13 — Etapa 2: ajudantes, offline 4h, tutorial, reconexão
 

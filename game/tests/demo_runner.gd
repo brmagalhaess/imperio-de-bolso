@@ -10,6 +10,8 @@ var main: Node
 
 func _ready() -> void:
 	var mode := OS.get_environment("DEMO")
+	if mode == "contratar":
+		Api.session_path = "user://demo_hire.cfg"
 	if mode == "novo":
 		Api.session_path = "user://demo_novo.cfg"
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(Api.session_path))
@@ -18,6 +20,17 @@ func _ready() -> void:
 	while not GameState.loaded:
 		await get_tree().process_frame
 	var hud: Control = main.get_node("UI/HUD")
+	if mode == "contratar":
+		await _wait(2.5)  # deixa o resumo inicial (se houver) aparecer antes
+		hud._modal.close()
+		hud.open_helpers_menu()
+		await _wait(1.0)
+		print("PASSO antes")
+		hud._hire_from_menu("pipoca")
+		await _wait(1.5)
+		print("PASSO depois")
+		get_tree().quit()
+		return
 	if mode == "novo":
 		await _wait(2.0)
 		print("PASSO tutorial comprar")

@@ -81,10 +81,16 @@ func _ready() -> void:
 
 
 func open(title_text: String) -> void:
+	var was_open := visible
 	_title.text = title_text
 	for c in _list.get_children():
 		c.queue_free()
 	visible = true
+	if was_open:
+		# Troca de conteúdo com a janela aberta: sem piscar (sem nova animação de entrada).
+		await get_tree().process_frame
+		_scroll.custom_minimum_size.y = min(_list.get_combined_minimum_size().y, MAX_LIST_HEIGHT)
+		return
 	modulate.a = 0.0
 	_card.scale = Vector2.ONE * 0.85
 	await get_tree().process_frame  # espera os cartões entrarem no layout
@@ -188,15 +194,15 @@ func add_business(b: Dictionary, state: String, on_press: Callable) -> void:
 
 
 ## Cartão de ajudante. `state`: "locked" (negócio não construído), "buy" (preço), "hired".
-func add_helper(b: Dictionary, state: String, on_press: Callable) -> void:
+## Devolve um identificador para atualizar o cartão no lugar (set_helper_state), sem recriar
+## a lista — recriar fazia a janela piscar a cada contratação.
+func add_helper(b: Dictionary, state: String, on_press: Callable) -> Dictionary:
 	var row := _card_row()
 	var portrait := TextureRect.new()
 	portrait.texture = Layout.texture(Layout.HELPERS.get(b.slug, "char_vendor"))
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	portrait.custom_minimum_size = Vector2(70, 108)
-	if state == "locked":
-		portrait.modulate = Color(0.4, 0.4, 0.4, 0.8)
 	row.add_child(portrait)
 	var thumb := TextureRect.new()
 	thumb.texture = load(Layout.art_path(b.slug, max(1, int(b.level))))
@@ -204,7 +210,6 @@ func add_helper(b: Dictionary, state: String, on_press: Callable) -> void:
 	thumb.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	thumb.custom_minimum_size = Vector2(64, 64)
 	thumb.size_flags_vertical = Control.SIZE_SHRINK_END
-	thumb.modulate = Color(1, 1, 1, 0.5 if state == "locked" else 1.0)
 	row.add_child(thumb)
 
 	var texts := VBoxContainer.new()
@@ -212,36 +217,61 @@ func add_helper(b: Dictionary, state: String, on_press: Callable) -> void:
 	texts.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_child(texts)
 	texts.add_child(_text(b.name, 28, Style.INK))
-	var sub: String = {
+	var sub := _text("", 21, Style.INK_SOFT, 500)
+	texts.add_child(sub)
+
+	var button := Button.new()
+	button.custom_minimum_size = Vector2(160, 76)
+	button.pressed.connect(func():
+		button.disabled = true  # evita clique duplo enquanto o servidor responde
+		on_press.call())
+	row.add_child(button)
+
+	var handle := {"button": button, "sub": sub, "portrait": portrait, "thumb": thumb, "state": ""}
+	set_helper_state(handle, b, state)
+	return handle
+
+
+## Atualiza um cartão de ajudante sem recriá-lo (preço fixo; só muda se dá para pagar).
+func set_helper_state(handle: Dictionary, b: Dictionary, state: String) -> void:
+	var button: Button = handle.button
+	handle.sub.text = {
 		"locked": tr("Construa o negócio primeiro"),
 		"buy": tr("Produz sozinho quando você sai do mapa"),
 		"hired": tr("Trabalhando · até 4h fora do mapa"),
 	}[state]
-	texts.add_child(_text(sub, 21, Style.INK_SOFT, 500))
+	var dim := Color(0.4, 0.4, 0.4, 0.8) if state == "locked" else Color.WHITE
+	handle.portrait.modulate = dim
+	handle.thumb.modulate = Color(1, 1, 1, 0.5) if state == "locked" else Color.WHITE
 
-	var button := Button.new()
-	button.custom_minimum_size = Vector2(160, 76)
-	button.add_theme_font_size_override("font_size", 26)
-	match state:
-		"buy":
+	if state == "buy":
+		var affordable := GameState.can_afford(b.managerCost) and not GameState.busy
+		button.disabled = not affordable
+		if handle.state != "buy":
 			button.text = Fmt.coins(b.managerCost)
 			button.icon = COIN
 			button.add_theme_constant_override("icon_max_width", 32)
+			button.add_theme_font_size_override("font_size", 26)
 			Style.style_button(button, Style.ORANGE, Style.ORANGE_DARK)
-			button.disabled = not GameState.can_afford(b.managerCost)
-			button.pressed.connect(on_press)
-		"hired":
-			button.text = tr("Contratado")
-			button.disabled = true
-			Style.style_button(button, Style.TEAL_LIGHT, Style.TEAL_DARK)
-			button.add_theme_stylebox_override("disabled", Style.toy_button(Style.TEAL_LIGHT, Style.TEAL_DARK))
-			button.add_theme_font_size_override("font_size", 22)
-		_:
-			button.icon = LOCK
-			button.add_theme_constant_override("icon_max_width", 40)
-			button.disabled = true
-			Style.style_button(button, Style.GREY, Style.GREY_DARK)
-	row.add_child(button)
+			# Sem saldo: o mesmo botão laranja, só esmaecido — o preço não "muda".
+			var faded := Style.toy_button(Style.ORANGE, Style.ORANGE_DARK)
+			faded.bg_color.a = 0.45
+			faded.border_color.a = 0.45
+			button.add_theme_stylebox_override("disabled", faded)
+	elif state == "hired" and handle.state != "hired":
+		button.text = tr("Contratado")
+		button.icon = null
+		button.disabled = true
+		button.add_theme_font_size_override("font_size", 22)
+		Style.style_button(button, Style.TEAL_LIGHT, Style.TEAL_DARK)
+		button.add_theme_stylebox_override("disabled", Style.toy_button(Style.TEAL_LIGHT, Style.TEAL_DARK))
+	elif state == "locked" and handle.state != "locked":
+		button.text = ""
+		button.icon = LOCK
+		button.add_theme_constant_override("icon_max_width", 40)
+		button.disabled = true
+		Style.style_button(button, Style.GREY, Style.GREY_DARK)
+	handle.state = state
 
 
 ## Cartão grande de distrito com miniatura do cenário.

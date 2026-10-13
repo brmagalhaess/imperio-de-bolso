@@ -161,6 +161,30 @@ func _build_menu_tests() -> bool:
 	check(helper_buttons[0] == ["agua", "150", false], "Ajudantes: contratar com preço")
 	check(helper_buttons[1][1] == "Contratado", "Ajudantes: contratado")
 	check(helper_buttons[2][2] == true, "Ajudantes: negócio não construído fica travado")
+
+	# Regressão: contratar com a tela aberta não pode recriar a lista (a janela piscava).
+	await get_tree().create_timer(0.5).timeout  # termina a animação de entrada
+	var cards_before := []
+	for c in hud._modal._list.get_children():
+		cards_before.append(c)
+	var hired_now := _biz("agua", true)
+	hired_now.managed = true
+	helper_state.managed = true
+	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "350", "gems": "0"},
+		"districts": [{"id": "praia", "unlocked": true}, {"id": "cidade", "unlocked": false}],
+		"businesses": [hired_now, helper_state, _biz("sorveteria", true),
+			_biz("quiosque_coco", false), _biz("mercadinho", true, 1, false, "cidade")]})
+	var cards_after := []
+	for c in hud._modal._list.get_children():
+		cards_after.append(c)
+	check(cards_after == cards_before and not cards_after.any(func(c): return c.is_queued_for_deletion()),
+			"contratar não recria os cartões")
+	check(is_equal_approx(hud._modal.modulate.a, 1.0) and hud._modal._card.scale == Vector2.ONE,
+			"contratar não faz a janela piscar")
+	var agua_btn: Button = hud._helper_cards["agua"].button
+	var sorv_btn: Button = hud._helper_cards["sorveteria"].button
+	check(agua_btn.text == "Contratado", "cartão contratado atualiza no lugar")
+	check(sorv_btn.text == "150" and not sorv_btn.disabled, "preço dos outros ajudantes não muda")
 	hud.queue_free()
 	GameState.state = {}
 	GameState.loaded = false

@@ -31,6 +31,8 @@ var _collect_button: Button
 var _hire_button: Button
 var _modal: Control
 var tutorial: Control
+## Cartões da tela de Ajudantes aberta (slug → identificador), atualizados no lugar.
+var _helper_cards := {}
 var _toast: Label
 var _toast_timer: Timer
 var _offline_pill: PanelContainer
@@ -61,6 +63,8 @@ func _ready() -> void:
 	GameState.busy_changed.connect(func(_b): _refresh())
 	GameState.notice.connect(show_toast)
 	GameState.offline_summary.connect(show_offline_summary)
+	GameState.state_changed.connect(_sync_helper_cards)
+	GameState.busy_changed.connect(func(_b): _sync_helper_cards())
 	GameState.connection_changed.connect(func(online): _offline_pill.visible = not online)
 
 
@@ -83,6 +87,7 @@ func close_sheet() -> void:
 func show_offline_summary(district: String, total: String, elapsed_seconds: int, capped: bool,
 		cap_seconds: int) -> void:
 	close_sheet()
+	_helper_cards.clear()
 	_modal.open(tr("Bem-vindo de volta!"))
 	var body := tr("Em %s fora da %s, seus ajudantes faturaram:") % [
 		Fmt.duration(elapsed_seconds), Layout.title(district)]
@@ -96,6 +101,7 @@ func show_offline_summary(district: String, total: String, elapsed_seconds: int,
 ## Tela de Ajudantes do mapa atual: ver quem já trabalha e contratar (pedido do titular).
 func open_helpers_menu() -> void:
 	close_sheet()
+	_helper_cards.clear()
 	_modal.open(tr("Ajudantes · %s") % Layout.title(current_district))
 	var auto_text := tr("Auto-coleta neste mapa: ativa") if GameState.auto_collect() \
 			else tr("Auto-coleta enquanto você joga neste mapa: em breve na Loja")
@@ -103,16 +109,37 @@ func open_helpers_menu() -> void:
 	for b in GameState.businesses():
 		if Layout.district_of(b.slug) != current_district:
 			continue
-		var state := "hired" if b.get("managed", false) else ("buy" if b.owned else "locked")
 		var target: String = b.slug
-		_modal.add_helper(b, state, func(): _hire_from_menu(target))
+		_helper_cards[target] = _modal.add_helper(b, _helper_state(b), func(): _hire_from_menu(target))
+
+
+func _helper_state(b: Dictionary) -> String:
+	return "hired" if b.get("managed", false) else ("buy" if b.owned else "locked")
+
+
+## Estado/saldo mudou com a tela de Ajudantes aberta: atualiza os cartões sem recriar.
+func _sync_helper_cards() -> void:
+	if _helper_cards.is_empty() or not _modal.visible:
+		return
+	for slug in _helper_cards:
+		var b := GameState.business(slug)
+		if not b.is_empty():
+			_modal.set_helper_state(_helper_cards[slug], b, _helper_state(b))
 
 
 func _hire_from_menu(target: String) -> void:
-	var b := GameState.business(target)
+	# Sem aviso flutuante aqui: ele cobria o texto da janela. O próprio cartão vira
+	# "Contratado" e dá um pulinho de confirmação.
 	if await GameState.hire_manager(target):
-		show_toast(tr("Ajudante contratado para %s!") % b.name)
-		open_helpers_menu()
+		_sync_helper_cards()
+		var button: Button = _helper_cards.get(target, {}).get("button")
+		if button:
+			button.pivot_offset = button.size / 2
+			button.scale = Vector2(1.15, 1.15)
+			create_tween().tween_property(button, "scale", Vector2.ONE, 0.35) \
+					.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	else:
+		_sync_helper_cards()
 
 
 func show_loading() -> void:
@@ -238,6 +265,7 @@ func _on_hire_pressed() -> void:
 ## Construir: só o mapa atual e só o que ainda não foi construído (pedido do titular).
 func open_build_menu() -> void:
 	close_sheet()
+	_helper_cards.clear()
 	_modal.open(tr("Construir · %s") % Layout.title(current_district))
 	var unlocked := GameState.district_unlocked(current_district)
 	var shown := 0
@@ -267,6 +295,7 @@ func _next_district(id: String) -> String:
 
 func open_map_menu() -> void:
 	close_sheet()
+	_helper_cards.clear()
 	_modal.open(tr("Mapa"))
 	for id in Layout.DISTRICT_ORDER:
 		var unlocked := GameState.district_unlocked(id)
