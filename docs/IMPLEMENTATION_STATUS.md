@@ -28,6 +28,11 @@ Revisados antes: docs/README.md (Etapa 5), PROMPT_MESTRE (Etapa 5), plano §24/�
   (carrinho de água, `tools/art/make_app_icon.py`, adaptativo + monocromático, sem custo de
   geração) e abertura com a arte do jogo no lugar do logo do Godot. Falhas de conexão no
   aparelho vêm do cabo/`adb reverse` — resolvidas com a API na VPS (HTTPS).
+- **Staging online (Dokploy do titular):** `https://api-imperio.crowntech.com.br` e
+  `https://admin-imperio.crowntech.com.br` via nginx-proxy + Let's Encrypt do servidor;
+  autodeploy da branch `deploy/servidor`. O APK usa `imperio/api/base_url_mobile` (o sufixo
+  `.android` não era aplicado no jogo exportado — corrigido). Testado no Redmi pela internet:
+  conta criada e compra gravada no servidor. Ícone do jogo na tela inicial do aparelho.
 - **Pendente:** Play Console (teste interno → fechado);
   stack staging na VPS; link web de exclusão (landing).
 
