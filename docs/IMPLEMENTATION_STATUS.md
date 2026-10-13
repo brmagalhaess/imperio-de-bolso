@@ -2,6 +2,23 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-13 — Etapa 5 (em andamento): beta Android, segurança e backups
+
+Revisados antes: docs/README.md (Etapa 5), PROMPT_MESTRE (Etapa 5), plano §24/§28, conversa.
+- **API:** limite de requisições por IP (geral 600/min; `/auth/guest` 20/min), helmet, corpo
+  máximo 16 KB, logs sem query/corpo, `TRUST_PROXY`. `BETA_SANDBOX=true` libera loja/anúncios
+  de teste em produção só para o teste fechado. Backend: **97 testes**.
+- **Backups:** `pg_dump` diário criptografado (AES-256) com rotação; restauração testada
+  (contagens e saldo idênticos; senha errada falha sem tocar no banco).
+- **Deploy:** `infrastructure/docker-compose.prod.yml` + guia Dockploy no
+  `infrastructure/README.md` (aguarda acesso do titular à VPS e domínio).
+- **Android:** APK de depuração (arm64 + x86_64) e **AAB de release assinado** via Gradle
+  (preset "Android Release"). Keystore de upload em `~/.imperio/keys/` (fora do Git, chmod 600)
+  — o titular precisa guardar cópia segura. `tools/android/run_device.sh` instala e abre no
+  aparelho com `adb reverse` para a API local.
+- **Pendente:** teste no aparelho real do titular; Play Console (teste interno → fechado);
+  stack staging na VPS.
+
 ## 2026-10-13 — Ajustes da Loja e Perfil (pedidos do titular)
 
 - **Coleta antecipada** (15 min grátis com anúncio, 1 h e 4 h com diamantes) com estimativa de

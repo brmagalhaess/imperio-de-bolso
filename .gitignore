@@ -20,3 +20,10 @@ backend/src/generated/
 # Godot
 game/.godot/
 game/build/
+
+# Builds exportados (APK/AAB) — nunca versionar
+/build/
+# Template Gradle do Android (instalado pelo Godot)
+game/android/
+*.keystore
+*.jks
