@@ -1,6 +1,8 @@
 #!/bin/sh
-# Instala o APK de depuração no Android conectado por cabo e abre o jogo apontando para a API
-# local (adb reverse: 127.0.0.1:3000 no celular → 3000 no Mac). Requer `npm run dev` no backend.
+# Instala o APK de depuração no Android conectado por cabo e abre o jogo. O APK usa a API do
+# servidor (api/base_url.android no project.godot). Para testar contra a API local do Mac,
+# exporte com IMPERIO_API_URL não funciona no Android: troque base_url.android para
+# http://127.0.0.1:3000/api/v1 — o adb reverse abaixo leva a porta 3000 do celular ao Mac.
 #   tools/android/run_device.sh            exporta, instala e abre
 #   tools/android/run_device.sh --no-export  só instala o APK já exportado
 set -eu

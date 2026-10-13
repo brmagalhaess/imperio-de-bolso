@@ -38,6 +38,17 @@ Segurança já aplicada na API: cabeçalhos (helmet), limite de requisições po
 estrito em `/auth/guest`), corpo máximo de 16 KB, logs sem corpo/query/Authorization,
 `TRUST_PROXY=true` atrás do Traefik, JWT de exemplo e mock recusados em produção.
 
+## Staging atual (2026-10-13)
+
+- Dokploy do titular (`dokploy.home.crowntech.com.br`), projeto **Imperio de Bolso** → serviço
+  Compose **servidor**, branch `deploy/servidor`, `infrastructure/docker-compose.prod.yml`,
+  autodeploy com watch paths `backend/**`, `admin/**`, `infrastructure/**`.
+- Segredos só no Dokploy (cópia em `~/.imperio/staging.env` no Mac do titular).
+- O Traefik do Dokploy não atende as portas 80/443 desse servidor: quem atende é um nginx do
+  próprio servidor. A stack publica a API em `127.0.0.1:3010` e o admin em `127.0.0.1:3011`;
+  o nginx usa `infrastructure/nginx/imperio.conf` + certbot.
+- Domínios: `api-imperio.crowntech.com.br` (jogo Android) e `admin-imperio.crowntech.com.br`.
+
 ## Backups (plano §24)
 
 O serviço `backup` faz `pg_dump` diário (`BACKUP_CRON`, padrão 03:30 UTC), criptografado com

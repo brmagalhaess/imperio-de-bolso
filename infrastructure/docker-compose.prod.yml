@@ -1,7 +1,9 @@
 # Stack de STAGING/PRODUÇÃO para o Dockploy (uma stack por ambiente, plano §24).
 # Todos os segredos vêm das variáveis de ambiente da stack no Dockploy — nada aqui é segredo.
 # Exemplo de variáveis em infrastructure/prod.env.example. HTTPS e domínios ficam no Traefik
-# do Dockploy (api.<domínio> → api:3000, admin.<domínio> → admin:80).
+# do Dockploy (api.<domínio> → api:3000, admin.<domínio> → admin:80) ou num nginx do próprio
+# servidor apontando para 127.0.0.1:3010 (API) e 127.0.0.1:3011 (admin) — ver
+# infrastructure/nginx/imperio.conf.
 name: imperio-${STACK_ENV:-staging}
 
 services:
@@ -43,6 +45,9 @@ services:
       RATE_LIMIT_AUTH_PER_MINUTE: ${RATE_LIMIT_AUTH_PER_MINUTE:-20}
     expose:
       - "3000"
+    # Para um proxy (nginx) instalado direto no servidor, fora do Docker: só no loopback.
+    ports:
+      - "${API_BIND:-127.0.0.1}:${API_HOST_PORT:-3010}:3000"
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
       interval: 15s
@@ -57,6 +62,8 @@ services:
       - api
     expose:
       - "80"
+    ports:
+      - "${ADMIN_BIND:-127.0.0.1}:${ADMIN_HOST_PORT:-3011}:80"
 
   backup:
     build:
