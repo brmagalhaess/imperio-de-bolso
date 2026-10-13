@@ -13,8 +13,11 @@ var _token := ""
 
 func _ready() -> void:
 	var env_url := OS.get_environment("IMPERIO_API_URL")
+	# Celular usa o servidor online; desktop (desenvolvimento) usa a API local. Escolha explícita:
+	# o sufixo de plataforma (`base_url.android`) não é aplicado no jogo exportado.
+	var key := "imperio/api/base_url_mobile" if OS.has_feature("mobile") else "imperio/api/base_url"
 	base_url = env_url if env_url != "" else str(
-		ProjectSettings.get_setting("imperio/api/base_url", "http://127.0.0.1:3000/api/v1")
+		ProjectSettings.get_setting(key, "http://127.0.0.1:3000/api/v1")
 	)
 
 
@@ -211,11 +214,14 @@ func _send(method: int, path: String, body: Variant, idempotency_key := "") -> D
 	var err := http.request(base_url + path, headers, method, payload)
 	if err != OK:
 		http.queue_free()
+		push_warning("Api: requisição não iniciou (erro %d) %s" % [err, base_url + path])
 		return _network_failure()
 	var result: Array = await http.request_completed
 	http.queue_free()
 
 	if result[0] != HTTPRequest.RESULT_SUCCESS:
+		# Sem dados pessoais: só o código do HTTPRequest (ex.: 5 = TLS, 3 = conexão) e a rota.
+		push_warning("Api: falha de rede (result %d) %s" % [result[0], base_url + path])
 		return _network_failure()
 	var status: int = result[1]
 	var text: String = (result[3] as PackedByteArray).get_string_from_utf8()

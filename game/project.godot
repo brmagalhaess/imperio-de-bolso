@@ -33,7 +33,7 @@ window/handheld/orientation=1
 [imperio]
 
 api/base_url="http://127.0.0.1:3000/api/v1"
-api/base_url.android="https://api-imperio.crowntech.com.br/api/v1"
+api/base_url_mobile="https://api-imperio.crowntech.com.br/api/v1"
 
 [input_devices]
 
