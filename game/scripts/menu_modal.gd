@@ -18,6 +18,7 @@ var _title: Label
 var _list: VBoxContainer
 var _card: PanelContainer
 var _scroll: ScrollContainer
+var _store_cards: Array = []
 
 
 func _ready() -> void:
@@ -85,6 +86,7 @@ func _ready() -> void:
 func open(title_text: String) -> void:
 	var was_open := visible
 	_title.text = title_text
+	_store_cards.clear()
 	for c in _list.get_children():
 		c.queue_free()
 	visible = true
@@ -151,6 +153,7 @@ func add_action(text_value: String, on_press: Callable, color := Style.GREEN,
 
 
 func clear_list() -> void:
+	_store_cards.clear()
 	for c in _list.get_children():
 		c.queue_free()
 
@@ -360,6 +363,63 @@ func set_reward_card(h: Dictionary, item: Dictionary) -> void:
 		_:
 			button.text = "%s/%s" % [Fmt.coins(item.progress), Fmt.coins(item.target)]
 			Style.style_button(button, Style.GREY, Style.GREY_DARK)
+
+
+## Cartão da Loja. `spec` é um Callable que devolve o estado atual do cartão:
+## {title, subtitle, icon?: Texture2D, button: String, button_icon?: Texture2D, color, edge,
+## enabled: bool}. Atualizado no lugar por refresh_store_cards() (sem recriar = sem piscar).
+func add_store_card(spec: Callable, on_press: Callable) -> Dictionary:
+	var row := _card_row()
+	var icon := _icon(null, 72)
+	row.add_child(icon)
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_child(col)
+	var title := _text("", 26, Style.INK)
+	col.add_child(title)
+	var sub := _text("", 20, Style.INK_SOFT, 500)
+	col.add_child(sub)
+	var button := Button.new()
+	button.custom_minimum_size = Vector2(170, 76)
+	button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	button.add_theme_font_size_override("font_size", 24)
+	button.add_theme_constant_override("icon_max_width", 30)
+	button.pressed.connect(func():
+		button.disabled = true
+		on_press.call())
+	row.add_child(button)
+	var handle := {"spec": spec, "icon": icon, "title": title, "sub": sub, "button": button, "color": null}
+	_store_cards.append(handle)
+	set_store_card(handle)
+	return handle
+
+
+func set_store_card(h: Dictionary) -> void:
+	var d: Dictionary = h.spec.call()
+	h.icon.texture = d.get("icon")
+	h.icon.visible = d.get("icon") != null
+	h.title.text = d.title
+	h.sub.text = d.get("subtitle", "")
+	h.sub.visible = h.sub.text != ""
+	var button: Button = h.button
+	button.text = d.button
+	button.icon = d.get("button_icon")
+	button.disabled = not d.get("enabled", true) or GameState.busy
+	if h.color != d.color:
+		h.color = d.color
+		Style.style_button(button, d.color, d.edge)
+		# Indisponível: mesma cor, esmaecida (o preço continua visível e igual).
+		var faded := Style.toy_button(d.color, d.edge)
+		faded.bg_color.a = 0.45
+		faded.border_color.a = 0.45
+		button.add_theme_stylebox_override("disabled", faded)
+
+
+func refresh_store_cards() -> void:
+	for h in _store_cards:
+		if is_instance_valid(h.button):
+			set_store_card(h)
 
 
 ## Linha do ranking (posição, nome, faturamento); `me` destaca o jogador.

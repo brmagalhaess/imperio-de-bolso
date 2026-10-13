@@ -96,6 +96,43 @@ func send_events(events: Array) -> Dictionary:
 	return await _authed(HTTPClient.METHOD_POST, "/analytics/events", {"events": events}, "")
 
 
+# --- Loja, compras e anúncios (ADR 0008) ---
+
+func store_catalog() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_GET, "/store/catalog", null, "")
+
+
+func store_buy(item_id: String, district := "") -> Dictionary:
+	var body := {"itemId": item_id}
+	if district != "":
+		body.district = district
+	return await _command("/store/buy", body)
+
+
+func verify_purchase(store: String, product_id: String, token: String) -> Dictionary:
+	return await _command("/purchases/verify", {"store": store, "productId": product_id, "purchaseToken": token})
+
+
+func restore_purchases() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_POST, "/purchases/restore", {}, "")
+
+
+func ad_start(placement: String, district := "") -> Dictionary:
+	var body := {"placement": placement}
+	if district != "":
+		body.district = district
+	return await _command("/ads/start", body)
+
+
+## Somente modo de teste: confirma no servidor que o "anúncio de teste" terminou.
+func ad_mock_complete(session_id: String) -> Dictionary:
+	return await _authed(HTTPClient.METHOD_POST, "/ads/mock-complete", {"sessionId": session_id}, "")
+
+
+func ad_claim(session_id: String) -> Dictionary:
+	return await _command("/ads/claim", {"sessionId": session_id})
+
+
 func complete_tutorial() -> Dictionary:
 	return await _authed(HTTPClient.METHOD_POST, "/tutorial/complete", {}, "")
 

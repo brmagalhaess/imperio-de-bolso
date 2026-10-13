@@ -15,7 +15,10 @@ export interface TestContext {
   close(): Promise<void>;
 }
 
-export async function createTestContext(): Promise<TestContext> {
+export async function createTestContext(
+  env: Record<string, string> = {},
+  admobKeys?: import("../src/lib/admob-ssv.js").KeyResolver,
+): Promise<TestContext> {
   const url = process.env.TEST_DATABASE_URL;
   if (!url) throw new Error("TEST_DATABASE_URL não definido");
   const config = loadConfig({
@@ -24,11 +27,13 @@ export async function createTestContext(): Promise<TestContext> {
     DATABASE_URL: url,
     JWT_SECRET: "segredo-de-teste-com-mais-de-32-caracteres!!",
     ADMIN_TOKEN: ADMIN_TOKEN,
+    ...env,
   });
   const db = createPrisma(url);
   await db.$executeRawUnsafe(
     `TRUNCATE players, player_wallets, wallet_ledger, player_businesses, idempotency_records,
-              business_definitions, player_missions, player_achievements, analytics_events
+              business_definitions, player_missions, player_achievements, analytics_events,
+              purchase_receipts, subscriptions, ad_rewards
      RESTART IDENTITY CASCADE`,
   );
   await seedCatalog(db);
@@ -39,7 +44,7 @@ export async function createTestContext(): Promise<TestContext> {
       this.now = new Date(this.now.getTime() + seconds * 1000);
     },
   };
-  const app = await buildApp({ config, db, now: () => clock.now });
+  const app = await buildApp({ config, db, now: () => clock.now, admobKeys });
   return {
     app,
     db,

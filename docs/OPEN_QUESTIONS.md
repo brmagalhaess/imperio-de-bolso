@@ -17,3 +17,7 @@ Dúvidas que não bloqueiam o trabalho atual. Bloqueios reais ficam em `IMPLEMEN
 7. **Node 24 LTS:** máquina usa Node 22.14 (compatível). Atualizar quando conveniente.
 8. **Repositório:** o README original diz que o remote não estava confirmado — confirmado:
    `github.com/brmagalhaess/imperio-de-bolso` (privado).
+9. **Preços da Loja em diamantes** (auto-coleta 20/100, turbo 10/30) e **benefícios do VIP**
+   (hoje: auto-coleta em todos os mapas + selo) — proposta do ADR 0008, aguardando o titular.
+10. **Ranking por faturamento semanal** (ADR 0007) e **prêmio das missões** (~15 min de renda +
+    1 diamante) — propostos, aguardando confirmação.

@@ -13,6 +13,12 @@ describe("configuração", () => {
     expect(() => loadConfig({ ...base, ADMIN_TOKEN: "curto" })).toThrow(/ADMIN_TOKEN/);
   });
 
+  it("produção recusa loja/anúncios em modo mock", () => {
+    const prod = { ...base, NODE_ENV: "production", JWT_SECRET: "y".repeat(40) };
+    expect(() => loadConfig(prod)).toThrow(/mock/);
+    expect(loadConfig({ ...prod, STORE_MODE: "live", ADS_MODE: "admob" }).STORE_MODE).toBe("live");
+  });
+
   it("produção recusa JWT_SECRET de exemplo", () => {
     expect(() =>
       loadConfig({

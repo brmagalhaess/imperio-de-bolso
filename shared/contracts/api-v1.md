@@ -129,9 +129,28 @@ não faturou na semana.
 Corpo `{ events: [{ name, props? }] }` (1–20). Nomes permitidos: `tutorial_started`,
 `tutorial_step`, `tutorial_skipped`, `screen_view`, `crash`. `202 { accepted }`.
 
+### Loja, compras e anúncios (ADR 0008)
+- `GET /store/catalog` → `{ sandbox, items, entitlements: { autoCollectUntil, vipUntil }, serverTime }`.
+- `POST /store/buy` — `Idempotency-Key`. `{ itemId, district? }` (auto-coleta/turbo com
+  diamantes) → `200 { bought, autoCollectUntil? | coins?, state }`. `409 INSUFFICIENT_FUNDS`,
+  `409 NOTHING_TO_BOOST`, `404 STORE_ITEM_NOT_FOUND`.
+- `POST /purchases/verify` — `Idempotency-Key`. `{ store: mock|google|apple, productId,
+  purchaseToken }` → `201 { receipt, product, gems, state }` (recibo repetido: `200 { duplicate }`).
+  `409 PURCHASE_OWNED_BY_OTHER`, `422 PURCHASE_INVALID`, `404 PRODUCT_NOT_FOUND`,
+  `403 MOCK_DISABLED`, `501 STORE_NOT_CONFIGURED` (google/apple até as contas existirem).
+- `POST /purchases/restore` → `{ purchases, activeSubscriptions }`.
+- `POST /ads/start` — `Idempotency-Key`. `{ placement: ad_boost|offline_double, district? }` →
+  `201 { sessionId, rewardCoins, expiresAt }`. `409 AD_DAILY_LIMIT`, `409 AD_NOT_AVAILABLE`.
+- `GET /ads/ssv` (Google, sem login, assinatura ECDSA) → `200 { verified }` · `400 SSV_INVALID`.
+- `POST /ads/claim` — `Idempotency-Key`. `{ sessionId }` → `200 { claimed, coins, state }`.
+  `409 AD_NOT_VERIFIED`, `409 AD_ALREADY_CLAIMED`.
+- Somente modo mock: `POST /ads/mock-complete { sessionId }`, `POST /purchases/mock/refund
+  { transactionId }` (simula reembolso da loja).
+`player` no estado ganha `autoCollectUntil` e `vipUntil`.
+
 ### Admin — `/api/admin/*` (fora do `/api/v1`)
 `Authorization: Bearer <ADMIN_TOKEN>`; desligado sem token. Somente leitura:
 `GET /overview`, `GET /players?search&limit`, `GET /players/:id`, `GET /events?name&limit`.
 
 ### Ainda não implementados (docs/README.md §11)
-`POST /auth/link`, `GET /store/catalog`, `POST /purchases/verify`, `GET /config`.
+`POST /auth/link`, `GET /config`.

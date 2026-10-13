@@ -20,6 +20,8 @@ export interface AppDeps {
   /** Relógio do servidor; injetável para testes de tempo. */
   now?: () => Date;
   logger?: boolean;
+  /** Chaves do SSV do AdMob (testes injetam as suas). */
+  admobKeys?: import("./lib/admob-ssv.js").KeyResolver;
 }
 
 export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
@@ -77,9 +79,13 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return { status: "ok", serverTime: now().toISOString() };
   });
 
-  await app.register((instance) => v1Routes(instance, { config: deps.config, db: deps.db, now }), {
-    prefix: "/api/v1",
-  });
+  await app.register(
+    (instance) =>
+      v1Routes(instance, { config: deps.config, db: deps.db, now, admobKeys: deps.admobKeys }),
+    {
+      prefix: "/api/v1",
+    },
+  );
 
   const adminToken = deps.config.ADMIN_TOKEN;
   if (adminToken) {

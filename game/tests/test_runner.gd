@@ -7,6 +7,7 @@ const Fmt := preload("res://scripts/fmt.gd")
 const Layout := preload("res://scripts/layout.gd")
 const Tutorial := preload("res://scripts/tutorial.gd")
 const Hud := preload("res://scripts/hud.gd")
+const MockAd := preload("res://scripts/mock_ad.gd")
 
 var _failures := 0
 var _checks := 0
@@ -94,6 +95,7 @@ func _unit_tests() -> void:
 	# Erro de script aborta a função e ela devolve null: a seção conta como falha.
 	check(await _tutorial_tests() == true, "seção tutorial executou até o fim")
 	check(await _build_menu_tests() == true, "seção menus executou até o fim")
+	check(await _store_tests() == true, "seção loja executou até o fim")
 	_sections_done += 1
 
 
@@ -223,6 +225,52 @@ func _build_menu_tests() -> bool:
 	return true
 
 
+func _store_tests() -> bool:
+	# Anúncio de teste: só conta como assistido se for até o fim.
+	var ad: ColorRect = MockAd.new()
+	add_child(ad)
+	var closed := [null]
+	(func(): closed[0] = await ad.play()).call()
+	ad._end(false)
+	check(closed[0] == false, "anúncio fechado antes do fim não paga")
+	var watched := [null]
+	(func(): watched[0] = await ad.play()).call()
+	ad._process(6.0)
+	check(watched[0] == true, "anúncio assistido até o fim conta")
+	ad.queue_free()
+
+	# Loja: cartões de diamantes ficam habilitados/esmaecidos sem recriar a lista.
+	var hud: Control = Hud.new()
+	add_child(hud)
+	GameState.catalog = {"sandbox": true, "items": [
+		{"id": "auto_collect_24h", "kind": "auto_collect", "title": "Auto-coleta por 24 horas", "costGems": "20"},
+		{"id": "auto_collect_7d", "kind": "auto_collect", "title": "Auto-coleta por 7 dias", "costGems": "100"},
+		{"id": "boost_1h", "kind": "boost", "title": "Turbo 1h", "costGems": "10"},
+		{"id": "boost_4h", "kind": "boost", "title": "Turbo 4h", "costGems": "30"},
+		{"id": "gems_50", "kind": "iap", "title": "Punhado", "priceBRL": "4,90", "gems": "50",
+			"productId": "br.com.imperiodebolso.gems_50"},
+		{"id": "vip_monthly", "kind": "subscription", "title": "Passe VIP", "priceBRL": "14,90",
+			"benefits": ["Auto-coleta em todos os mapas"], "productId": "br.com.imperiodebolso.vip_monthly"}]}
+	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "0", "gems": "0"},
+		"businesses": []})
+	await hud.open_store_menu()
+	var buttons := []
+	for h in hud._modal._store_cards:
+		buttons.append(h.button)
+	var gem_button: Button = buttons[1]  # auto-coleta 24h
+	check(gem_button.text == "20" and gem_button.disabled, "sem diamantes: botão esmaecido com o preço")
+	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "0", "gems": "25"},
+		"businesses": []})
+	check(not gem_button.disabled and hud._modal._store_cards[1].button == gem_button,
+			"com diamantes: o mesmo botão habilita (sem recriar)")
+	check(buttons[2].disabled, "item mais caro continua esmaecido")
+	hud.queue_free()
+	GameState.state = {}
+	GameState.catalog = {}
+	GameState.loaded = false
+	return true
+
+
 func _integration_test() -> void:
 	print("Integração com a API (%s)" % Api.base_url)
 	Api.session_path = "user://test_session.cfg"
@@ -254,6 +302,23 @@ func _integration_test() -> void:
 	var lb := await Api.leaderboard()
 	check(lb.ok and lb.data.has("entries"), "ranking semanal responde")
 
+	# Loja em modo de teste (nada é cobrado).
+	await GameState.refresh_catalog()
+	check(GameState.catalog.get("sandbox", false), "servidor local está em modo de teste")
+	check(await GameState.buy_sandbox("br.com.imperiodebolso.gems_50"), "compra de teste de diamantes")
+	check(GameState.gems() == "50", "diamantes creditados pelo servidor")
+	var bought := await GameState.buy_with_gems("auto_collect_24h")
+	check(not bought.is_empty() and GameState.state.player.autoCollect, "auto-coleta comprada com diamantes")
+	var ad := await Api.ad_start("ad_boost", "praia")
+	check(ad.ok, "anúncio de bônus: sessão criada")
+	var early := await Api.ad_claim(ad.data.sessionId)
+	check(early.error_code == "AD_NOT_VERIFIED", "anúncio não confirmado não paga")
+	await Api.ad_mock_complete(ad.data.sessionId)
+	var coins_before := GameState.coins().to_int()
+	var claim := await Api.ad_claim(ad.data.sessionId)
+	check(claim.ok and claim.data.state.wallet.coins.to_int() == coins_before + claim.data.coins.to_int(),
+			"anúncio confirmado paga uma vez")
+
 	# Mesma conta é retomada com as credenciais salvas.
 	var player_id: String = GameState.state.player.id
 	Api._token = ""
@@ -264,7 +329,7 @@ func _integration_test() -> void:
 	add_child(main)
 	await get_tree().create_timer(1.0).timeout
 	var coins_label: Label = main.get_node("UI/HUD")._coins_label
-	check(coins_label.text == "0", "cena principal mostra saldo do servidor")
+	check(coins_label.text == Fmt.coins(GameState.coins()), "cena principal mostra saldo do servidor")
 
 	# Regressão: fechar o painel e depois coletar pela moeda não pode reabrir o painel.
 	var hud: Control = main.get_node("UI/HUD")

@@ -57,6 +57,8 @@ export const Errors = {
     new AppError(409, "ACHIEVEMENT_LOCKED", "Conquista ainda não alcançada", { id }),
   achievementAlreadyClaimed: (id: string) =>
     new AppError(409, "ACHIEVEMENT_ALREADY_CLAIMED", "Prêmio já resgatado", { id }),
+  storeItemNotFound: (id: string) =>
+    new AppError(404, "STORE_ITEM_NOT_FOUND", "Item da loja não encontrado", { id }),
   nothingToCollect: () => new AppError(409, "NOTHING_TO_COLLECT", "Nada pronto para coletar"),
   idempotencyKeyRequired: () =>
     new AppError(

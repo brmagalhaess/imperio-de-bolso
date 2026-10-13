@@ -42,12 +42,22 @@ const MESSAGES := {
 	"MISSION_NOT_FOUND": "Essa missão expirou. Veja as de hoje!",
 	"ACHIEVEMENT_LOCKED": "Conquista ainda não alcançada.",
 	"ACHIEVEMENT_ALREADY_CLAIMED": "Prêmio já resgatado.",
+	"AD_DAILY_LIMIT": "Você já assistiu o máximo de anúncios hoje.",
+	"AD_NOT_AVAILABLE": "Esse bônus não está mais disponível.",
+	"AD_NOT_VERIFIED": "O anúncio não foi confirmado. Tente de novo.",
+	"AD_ALREADY_CLAIMED": "Prêmio já resgatado.",
+	"NOTHING_TO_BOOST": "Construa um negócio neste mapa primeiro.",
+	"STORE_NOT_CONFIGURED": "Compras ainda não disponíveis nesta versão.",
+	"MOCK_DISABLED": "Compras de teste desligadas.",
+	"PURCHASE_INVALID": "Não foi possível confirmar a compra.",
 }
 
 var state: Dictionary = {}
 ## {day, resetsAt, missions:[...]} do servidor.
 var missions: Dictionary = {}
 var achievements: Array = []
+## Catálogo da Loja ({sandbox, items, entitlements}).
+var catalog: Dictionary = {}
 var loaded := false
 var busy := false
 var online := true
@@ -88,6 +98,7 @@ func boot() -> bool:
 	await enter_district(current_district, true)
 	refresh_missions()
 	refresh_achievements()
+	refresh_catalog()  # Loja abre já preenchida
 	return true
 
 
@@ -202,6 +213,56 @@ func claimable_missions() -> int:
 
 func claimable_achievements() -> int:
 	return achievements.filter(func(a): return a.unlocked and not a.claimed).size()
+
+
+func refresh_catalog() -> void:
+	var res := await Api.store_catalog()
+	if res.ok:
+		catalog = res.data
+
+
+func store_item(item_id: String) -> Dictionary:
+	for i in catalog.get("items", []):
+		if i.id == item_id:
+			return i
+	return {}
+
+
+func vip_until() -> Variant:
+	return state.get("player", {}).get("vipUntil")
+
+
+func auto_collect_until() -> Variant:
+	return state.get("player", {}).get("autoCollectUntil")
+
+
+## Compra com diamantes (auto-coleta, turbo). Devolve a resposta (moedas do turbo etc.).
+func buy_with_gems(item_id: String) -> Dictionary:
+	if busy:
+		return {}
+	_set_busy(true)
+	var res := await Api.store_buy(item_id, current_district)
+	_set_busy(false)
+	if not res.ok:
+		notice.emit(message_for(res.error_code))
+		return {}
+	_apply_state(res.data.state)
+	return res.data
+
+
+## Compra de TESTE (modo sandbox): nada é cobrado; o servidor registra como loja "mock".
+func buy_sandbox(product_id: String) -> bool:
+	if busy:
+		return false
+	_set_busy(true)
+	var token := "mock-" + Api.new_idempotency_key()
+	var res := await Api.verify_purchase("mock", product_id, token)
+	_set_busy(false)
+	if not res.ok:
+		notice.emit(message_for(res.error_code))
+		return false
+	_apply_state(res.data.state)
+	return true
 
 
 func gems() -> String:

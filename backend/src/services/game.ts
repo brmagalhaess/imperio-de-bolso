@@ -6,6 +6,7 @@ import { nextUpgradeCost, profitPerCycle } from "../economy/formulas.js";
 import { OFFLINE_CAP_MS, settle } from "../economy/offline.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { track } from "./analytics.js";
+import { autoCollectActive, vipUntil } from "./entitlements.js";
 import { trackMission } from "./missions.js";
 import { applyCoins, type LockedWallet } from "./wallet.js";
 
@@ -60,6 +61,8 @@ export interface PlayerStateView {
     tutorialCompleted: boolean;
     currentDistrict: string | null;
     autoCollect: boolean;
+    autoCollectUntil: string | null;
+    vipUntil: string | null;
   };
   wallet: { coins: string; gems: string };
   businesses: BusinessView[];
@@ -172,7 +175,12 @@ export async function getPlayerState(
       displayName: player.displayName,
       tutorialCompleted: player.tutorialCompletedAt !== null,
       currentDistrict: player.currentDistrict,
-      autoCollect: player.autoCollect,
+      autoCollect: await autoCollectActive(db, player, now),
+      autoCollectUntil:
+        player.autoCollectUntil && player.autoCollectUntil > now
+          ? player.autoCollectUntil.toISOString()
+          : null,
+      vipUntil: (await vipUntil(db, player.id, now))?.toISOString() ?? null,
     },
     wallet: { coins: player.wallet.coins.toString(), gems: player.wallet.gems.toString() },
     businesses,
@@ -453,6 +461,7 @@ export function enterDistrict(district: string, now: Date) {
       throw Errors.districtNotFound(district);
     const player = await tx.player.findUniqueOrThrow({ where: { id: wallet.playerId } });
     const fresh = freshPresence(player, now);
+    const autoCollect = await autoCollectActive(tx, player, now);
     const stayed = fresh && player.currentDistrict === district;
     const leftAt = fresh ? now : (player.lastSeenAt ?? now);
 
@@ -466,14 +475,22 @@ export function enterDistrict(district: string, now: Date) {
       elapsedMs: 0,
       capped: false,
     };
-    if (!stayed || player.autoCollect) {
-      if (player.autoCollect) await startAfk(tx, player.id, district, now);
+    if (!stayed || autoCollect) {
+      if (autoCollect) await startAfk(tx, player.id, district, now);
       result = await settleAutomatic(tx, wallet, now, idempotencyKey, { district });
-      if (!player.autoCollect) await resumeManual(tx, player.id, district, now);
+      if (!autoCollect) await resumeManual(tx, player.id, district, now);
     }
+    // Guarda o AFK pago ao voltar ao mapa: o anúncio "dobrar ganhos" pode pagá-lo de novo, uma vez.
+    const returnedWithAfk = !stayed && result.total > 0n;
     await tx.player.update({
       where: { id: player.id },
-      data: { currentDistrict: district, lastSeenAt: now },
+      data: {
+        currentDistrict: district,
+        lastSeenAt: now,
+        ...(returnedWithAfk
+          ? { lastAfkTotal: result.total, lastAfkAt: now, lastAfkDoubled: false }
+          : {}),
+      },
     });
     if (result.total > 0n) {
       await trackMission(tx, player.id, "afk_collect", 1n, now);
@@ -519,7 +536,9 @@ export function hireManager(slug: string, now: Date) {
 
     const player = await tx.player.findUniqueOrThrow({ where: { id: wallet.playerId } });
     const present = freshPresence(player, now) && player.currentDistrict === def.district;
-    if (!present || player.autoCollect) await startAfk(tx, player.id, def.district, now);
+    if (!present || (await autoCollectActive(tx, player, now))) {
+      await startAfk(tx, player.id, def.district, now);
+    }
 
     return {
       statusCode: 200,

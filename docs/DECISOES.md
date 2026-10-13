@@ -11,3 +11,4 @@
 | [0005](ADRs/0005-ajudantes-offline-tutorial.md) | Ajudantes (gerentes), liquidação offline 4h no servidor, resumo offline, tutorial deduzido do estado | aceita |
 | [0006](ADRs/0006-afk-por-mapa.md) | AFK por mapa (4h cada), coleta manual no mapa aberto; auto-coleta e pacotes de horas na Loja | aceita |
 | [0007](ADRs/0007-retencao-missoes-ranking-admin.md) | Missões diárias, conquistas, ranking semanal por faturamento, analytics e painel admin só leitura | aceita |
+| [0008](ADRs/0008-loja-anuncios-compras-sandbox.md) | Loja, anúncios (SSV) e compras em sandbox; mock recusado em produção; plugins verificados e bloqueio explícito | aceita |

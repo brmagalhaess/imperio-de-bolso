@@ -27,17 +27,25 @@ model Player {
   // Presença por mapa (ADR 0006): mapa aberto agora e último sinal do jogo.
   currentDistrict     String?   @map("current_district")
   lastSeenAt          DateTime? @map("last_seen_at") @db.Timestamptz(3)
-  // Auto-coleta no mapa aberto: item da Loja (Etapa 4); desligada por padrão.
-  autoCollect         Boolean   @default(false) @map("auto_collect")
+  // Auto-coleta no mapa aberto (Loja, ADR 0008): comprada com diamantes até esta data;
+  // o Passe VIP ativo também liga.
+  autoCollectUntil    DateTime? @map("auto_collect_until") @db.Timestamptz(3)
+  // Último AFK pago ao voltar a um mapa (para o anúncio "dobrar" — uma vez por resumo).
+  lastAfkTotal        BigInt    @default(0) @map("last_afk_total")
+  lastAfkAt           DateTime? @map("last_afk_at") @db.Timestamptz(3)
+  lastAfkDoubled      Boolean   @default(false) @map("last_afk_doubled")
   createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
 
-  wallet       PlayerWallet?
-  businesses   PlayerBusiness[]
-  ledger       WalletLedger[]
-  idempotency  IdempotencyRecord[]
-  missions     PlayerMission[]
-  achievements PlayerAchievement[]
-  events       AnalyticsEvent[]
+  wallet        PlayerWallet?
+  businesses    PlayerBusiness[]
+  ledger        WalletLedger[]
+  idempotency   IdempotencyRecord[]
+  missions      PlayerMission[]
+  achievements  PlayerAchievement[]
+  events        AnalyticsEvent[]
+  receipts      PurchaseReceipt[]
+  subscriptions Subscription[]
+  adRewards     AdReward[]
 
   @@map("players")
 }
@@ -174,4 +182,63 @@ model AnalyticsEvent {
   @@index([name, createdAt])
   @@index([playerId, createdAt])
   @@map("analytics_events")
+}
+
+// Compras (doc §10): um recibo por transação da loja; sandbox/mock até as lojas estarem prontas.
+model PurchaseReceipt {
+  id              String    @id @default(uuid()) @db.Uuid
+  playerId        String    @map("player_id") @db.Uuid
+  store           String // mock | google | apple
+  transactionId   String    @map("transaction_id")
+  productId       String    @map("product_id")
+  status          String // VERIFIED | REVOKED
+  gemsGranted     BigInt    @default(0) @map("gems_granted")
+  // Diamantes que não puderam ser retirados no reembolso (já gastos).
+  revokeShortfall BigInt    @default(0) @map("revoke_shortfall")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  revokedAt       DateTime? @map("revoked_at") @db.Timestamptz(3)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([store, transactionId])
+  @@map("purchase_receipts")
+}
+
+model Subscription {
+  id            String    @id @default(uuid()) @db.Uuid
+  playerId      String    @map("player_id") @db.Uuid
+  productId     String    @map("product_id")
+  store         String
+  transactionId String    @map("transaction_id")
+  status        String // ACTIVE | REVOKED
+  startsAt      DateTime  @map("starts_at") @db.Timestamptz(3)
+  expiresAt     DateTime  @map("expires_at") @db.Timestamptz(3)
+  revokedAt     DateTime? @map("revoked_at") @db.Timestamptz(3)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([store, transactionId])
+  @@index([playerId, expiresAt])
+  @@map("subscriptions")
+}
+
+// Anúncio recompensado: sessão criada antes de exibir; o servidor só paga depois de verificada
+// (SSV do AdMob com assinatura em produção; confirmação mock só em desenvolvimento).
+model AdReward {
+  id            String    @id @default(uuid()) @db.Uuid
+  playerId      String    @map("player_id") @db.Uuid
+  placement     String // ad_boost | offline_double
+  district      String?
+  rewardCoins   BigInt    @default(0) @map("reward_coins")
+  status        String // PENDING | VERIFIED | CLAIMED | EXPIRED
+  transactionId String?   @unique @map("transaction_id")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  expiresAt     DateTime  @map("expires_at") @db.Timestamptz(3)
+  verifiedAt    DateTime? @map("verified_at") @db.Timestamptz(3)
+  claimedAt     DateTime? @map("claimed_at") @db.Timestamptz(3)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@index([playerId, placement, createdAt])
+  @@map("ad_rewards")
 }

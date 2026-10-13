@@ -29,6 +29,13 @@ Itens marcados por quem executou e confirmou. Nunca marcar aprovação de loja s
 - [ ] HTTPS, backups automáticos com restauração testada, healthcheck, monitoramento, rate limit
 - [ ] Landing com política de privacidade, termos, exclusão de conta, suporte, app-ads.txt
 
+## Monetização (ADR 0008)
+- [ ] Produtos criados nas lojas com os IDs `br.com.imperiodebolso.gems_50/120/300` e `vip_monthly`
+- [ ] Credencial da Google Play Developer API e chave da App Store Server API (fora do Git)
+- [ ] Blocos de anúncio AdMob por plataforma; URL de SSV apontando para `/api/v1/ads/ssv`
+- [ ] Trocar `STORE_MODE=live` e `ADS_MODE=admob` em produção (a API recusa mock lá)
+- [ ] Notificações de reembolso configuradas (RTDN / App Store Server Notifications)
+
 ## Antes da submissão
 - [ ] Revisar políticas vigentes da App Store e Google Play
 - [ ] Monetização real só após conformidade e aprovação do titular

@@ -53,12 +53,15 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [ ] Editar nome do jogador (hoje "Empreendedor 1234") com moderação
 
 ## Etapa 4 — Monetização sandbox
-- [ ] Loja: **auto-coleta no mapa aberto** (liga `players.auto_collect`; forma/preço a definir — ADR 0006)
-- [ ] Loja: **pacotes de horas de coleta** (ex.: +2h de produção na hora, por mapa)
-- [ ] Anúncio recompensado para dobrar o AFK ao voltar (conversa original)
-- [ ] ADR do plugin AdMob para Godot (Android/iOS), IDs de teste, SSV com assinatura
-- [ ] Contratos IAP (Apple/Google), mocks, verificação de recibo, revogação/reembolso
-- [ ] `POST /purchases/verify`, `GET /store/catalog`
+- [x] Loja: **auto-coleta no mapa aberto** (diamantes 24h/7d e Passe VIP — ADR 0008)
+- [x] Loja: **pacotes de horas de coleta** (turbo 1h/4h do mapa atual)
+- [x] Anúncio recompensado para dobrar o AFK ao voltar (conversa original) — sandbox
+- [x] Contratos de anúncios (sessão + SSV assinado) e compras (verificação, recibo, revogação, restauração) com mocks
+- [ ] Integrar plugins reais: AdMob, Google Play Billing, StoreKit 2 (bloqueado: contas + aparelho)
+- [ ] Verificadores Google/Apple + notificações de reembolso (RTDN / App Store Server Notifications)
+- [ ] Consentimento (UMP/LGPD), ATT no iOS, app-ads.txt
+- [x] ADR do plugin AdMob/IAP para Godot com bloqueio explícito (ADR 0008)
+- [x] `POST /purchases/verify`, `GET /store/catalog`
 
 ## Etapa 5 — Beta Android
 - [ ] Keystore de release (fora do Git), AAB assinado, teste em aparelho real

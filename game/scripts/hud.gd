@@ -16,6 +16,12 @@ const Style := preload("res://scripts/ui_style.gd")
 const MenuModal := preload("res://scripts/menu_modal.gd")
 const Tutorial := preload("res://scripts/tutorial.gd")
 const GlyphButton := preload("res://scripts/glyph_button.gd")
+const MockAd := preload("res://scripts/mock_ad.gd")
+const COIN_TEX := preload("res://assets/optimized/icon_coin.png")
+const PURPLE := Color("9b7bff")
+const PURPLE_DARK := Color("6a4fd1")
+const BLUE := Color("2bb6e0")
+const BLUE_DARK := Color("1f7fa8")
 
 var slug := ""
 var current_district := "praia"
@@ -40,6 +46,8 @@ var _reward_kind := ""  # "missions" | "achievements" | ""
 var _missions_button: Control
 var _ranking_button: Control
 var _gems_label: Label
+var _mock_ad: ColorRect
+var _gem_tex: Texture2D = GlyphButton.gem_texture()
 var _toast: Label
 var _toast_timer: Timer
 var _offline_pill: PanelContainer
@@ -62,6 +70,12 @@ func _ready() -> void:
 	_modal = MenuModal.new()
 	add_child(_modal)
 	tutorial.blockers = [_sheet, _modal]
+	_mock_ad = MockAd.new()
+	add_child(_mock_ad)
+	# Janela abriu com um aviso na tela: o aviso desce para não cobrir o título.
+	_modal.visibility_changed.connect(func():
+		if _toast and _toast.visible:
+			show_toast(_toast.text))
 	_build_toast()
 	_build_offline_pill()
 	_build_fader()
@@ -72,6 +86,8 @@ func _ready() -> void:
 	GameState.notice.connect(show_toast)
 	GameState.offline_summary.connect(show_offline_summary)
 	GameState.state_changed.connect(_sync_helper_cards)
+	GameState.state_changed.connect(func(): _modal.refresh_store_cards())
+	GameState.busy_changed.connect(func(_b): _modal.refresh_store_cards())
 	GameState.missions_changed.connect(_sync_rewards)
 	GameState.achievements_changed.connect(_sync_rewards)
 	GameState.busy_changed.connect(func(_b): _sync_rewards())
@@ -108,6 +124,7 @@ func show_offline_summary(district: String, total: String, elapsed_seconds: int,
 	if capped:
 		_modal.add_message(null, "", tr("Os ajudantes trabalham até %s fora de cada mapa. Volte antes para não perder nada!")
 				% Fmt.duration(cap_seconds))
+	_modal.add_action(tr("Assistir anúncio e dobrar"), func(): watch_ad("offline_double"), PURPLE, PURPLE_DARK)
 	_modal.add_action(tr("Coletar"), func(): pass, Style.ORANGE, Style.ORANGE_DARK)
 
 
@@ -175,6 +192,15 @@ func hide_overlay() -> void:
 
 
 func show_toast(text: String) -> void:
+	# Com janela aberta, o aviso vai para baixo (em cima ele cobria o título da janela).
+	if _modal.visible:
+		_toast.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+		_toast.offset_top = -260
+		_toast.offset_bottom = -200
+	else:
+		_toast.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+		_toast.offset_top = 300
+	_toast.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_toast.text = text
 	_toast.visible = true
 	_toast_timer.start(2.5)
@@ -337,6 +363,146 @@ func open_map_menu() -> void:
 		var target: String = id
 		_modal.add_district(id, status, id == current_district, unlocked,
 				func(): district_requested.emit(target))
+
+
+# --- Loja (Etapa 4, ADR 0008) ------------------------------------------------
+
+func open_store_menu() -> void:
+	_open_rewards("store")
+	_modal.open(tr("Loja"))
+	if GameState.catalog.is_empty():
+		await GameState.refresh_catalog()
+	if not _modal.visible or _reward_kind != "store":
+		return
+	if GameState.catalog.get("sandbox", false):
+		_modal.add_message(null, "", tr("MODO DE TESTE: nenhuma compra é cobrada e os anúncios são simulados."))
+
+	_modal.add_section(tr("Grátis"))
+	_modal.add_store_card(func(): return {
+		"title": tr("Anúncio de bônus"), "icon": COIN_TEX,
+		"subtitle": tr("Assista e ganhe 15 min de produção de %s (até 5 por dia)") % Layout.title(current_district),
+		"button": tr("Assistir"), "color": PURPLE, "edge": PURPLE_DARK, "enabled": true,
+	}, func(): watch_ad("ad_boost"))
+
+	_modal.add_section(tr("Auto-coleta"))
+	for id in ["auto_collect_24h", "auto_collect_7d"]:
+		_gem_card(id, tr("Os ajudantes coletam sozinhos enquanto você joga") + "\n" + _auto_collect_status())
+
+	_modal.add_section(tr("Turbo de produção"))
+	for id in ["boost_1h", "boost_4h"]:
+		_gem_card(id, tr("Receba agora a produção de %s") % Layout.title(current_district))
+
+	_modal.add_section(tr("Diamantes"))
+	for id in ["gems_50", "gems_120", "gems_300"]:
+		var item := GameState.store_item(id)
+		var product: String = item.get("productId", "")
+		_modal.add_store_card(func(): return {
+			"title": item.get("title", id), "icon": _gem_tex,
+			"subtitle": tr("+%s diamantes") % Fmt.coins(item.get("gems", "0")),
+			"button": "R$ " + str(item.get("priceBRL", "")), "color": Style.GREEN, "edge": Style.GREEN_DARK,
+			"enabled": true,
+		}, func(): _confirm_sandbox(item, product))
+
+	_modal.add_section(tr("Passe VIP"))
+	var vip := GameState.store_item("vip_monthly")
+	_modal.add_store_card(func(): return {
+		"title": vip.get("title", "Passe VIP"), "icon": Layout.texture("icon_helpers"),
+		"subtitle": " · ".join(vip.get("benefits", [])) + "\n" + _vip_status(),
+		"button": tr("R$ %s/mês") % vip.get("priceBRL", ""), "color": Style.ORANGE, "edge": Style.ORANGE_DARK,
+		"enabled": true,
+	}, func(): _confirm_sandbox(vip, vip.get("productId", "")))
+
+	_modal.add_action(tr("Restaurar compras"), _restore_purchases, Style.TEAL_LIGHT, Style.TEAL_DARK)
+	_modal.refit()
+
+
+func _gem_card(item_id: String, subtitle: String) -> void:
+	var item := GameState.store_item(item_id)
+	var cost: String = item.get("costGems", "0")
+	_modal.add_store_card(func(): return {
+		"title": item.get("title", item_id), "subtitle": subtitle if item_id.begins_with("boost") \
+				else tr("Os ajudantes coletam sozinhos enquanto você joga") + "\n" + _auto_collect_status(),
+		"button": cost, "button_icon": _gem_tex, "color": BLUE, "edge": BLUE_DARK,
+		"enabled": GameState.gems().to_int() >= cost.to_int(),
+	}, func(): _buy_with_gems(item_id))
+
+
+func _buy_with_gems(item_id: String) -> void:
+	var data := await GameState.buy_with_gems(item_id)
+	if data.is_empty():
+		_modal.refresh_store_cards()
+		return
+	if data.has("coins"):
+		show_toast(tr("Turbo! +%s moedas") % Fmt.coins(data.coins))
+	else:
+		show_toast(tr("Auto-coleta ativa!"))
+	_modal.refresh_store_cards()
+
+
+## Confirmação da compra em dinheiro. No modo de teste deixa claro que nada é cobrado.
+func _confirm_sandbox(item: Dictionary, product_id: String) -> void:
+	_reward_kind = "store_confirm"
+	_modal.open(tr("Confirmar compra"))
+	var price := "R$ " + str(item.get("priceBRL", ""))
+	if GameState.catalog.get("sandbox", false):
+		_modal.add_message(null, str(item.get("title", "")),
+				tr("%s\n\nCOMPRA DE TESTE: nenhum valor será cobrado.") % price)
+	else:
+		_modal.add_message(null, str(item.get("title", "")), price)
+	_modal.add_action(tr("Confirmar"), func():
+		if await GameState.buy_sandbox(product_id):
+			show_toast(tr("Compra confirmada: %s") % item.get("title", ""))
+		open_store_menu(), Style.GREEN, Style.GREEN_DARK)
+	_modal.add_action(tr("Voltar"), open_store_menu, Style.GREY, Style.GREY_DARK)
+	_modal.refit()
+
+
+func _restore_purchases() -> void:
+	var res := await Api.restore_purchases()
+	if res.ok:
+		show_toast(tr("%d compra(s) encontrada(s) nesta conta.") % res.data.purchases.size())
+		await GameState.refresh()
+
+
+## Anúncio recompensado: sessão no servidor → anúncio (de teste) → confirmação → resgate.
+func watch_ad(placement: String) -> void:
+	var start := await Api.ad_start(placement, current_district)
+	if not start.ok:
+		show_toast(GameState.message_for(start.error_code))
+		return
+	if not await _mock_ad.play():
+		show_toast(tr("Anúncio fechado antes do fim: sem prêmio."))
+		return
+	var session: String = start.data.sessionId
+	var done := await Api.ad_mock_complete(session)
+	if not done.ok:
+		show_toast(GameState.message_for(done.error_code))
+		return
+	var claim := await Api.ad_claim(session)
+	if not claim.ok:
+		show_toast(GameState.message_for(claim.error_code))
+		return
+	GameState._apply_state(claim.data.state)
+	show_toast(tr("+%s moedas!") % Fmt.coins(claim.data.coins))
+
+
+func _auto_collect_status() -> String:
+	if GameState.vip_until() != null:
+		return tr("Ativa pelo Passe VIP")
+	var until: Variant = GameState.auto_collect_until()
+	return tr("Ativa até %s") % _date_text(until) if until != null else tr("Desligada")
+
+
+func _vip_status() -> String:
+	var until: Variant = GameState.vip_until()
+	return tr("Ativo até %s") % _date_text(until) if until != null else tr("Assinatura mensal")
+
+
+## "dd/mm às hh:mm" no fuso do aparelho.
+static func _date_text(iso: Variant) -> String:
+	var unix: float = _iso_seconds(str(iso)) + Time.get_time_zone_from_system().bias * 60
+	var d := Time.get_datetime_dict_from_unix_time(int(unix))
+	return "%02d/%02d às %02d:%02d" % [d.day, d.month, d.hour, d.minute]
 
 
 # --- Missões, Ranking e Perfil/Conquistas (Etapa 3) ---------------------------
@@ -569,7 +735,11 @@ func _build_top() -> void:
 func _gems_pill() -> PanelContainer:
 	var pill := PanelContainer.new()
 	pill.add_theme_stylebox_override("panel", Style.box(Color("e3f6ff"), 32, Color("2bb6e0"), 4))
-	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Tocar nos diamantes abre a Loja.
+	pill.mouse_filter = Control.MOUSE_FILTER_STOP
+	pill.gui_input.connect(func(e):
+		if (e is InputEventScreenTouch and not e.pressed) or (e is InputEventMouseButton and not e.pressed):
+			open_store_menu())
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
 	pill.add_child(row)
@@ -627,7 +797,7 @@ func _build_bottom_bar() -> void:
 	for item in [
 		["icon_build", tr("Construir"), open_build_menu],
 		["icon_helpers", tr("Ajudantes"), open_helpers_menu],
-		["icon_shop", tr("Loja"), func(): show_toast(tr("Loja em breve"))],
+		["icon_shop", tr("Loja"), open_store_menu],
 		["icon_map", tr("Mapa"), open_map_menu],
 		["icon_profile", tr("Perfil"), open_profile_menu],
 	]:

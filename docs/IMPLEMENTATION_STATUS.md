@@ -2,6 +2,24 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-13 — Etapa 4: Loja, anúncios recompensados e compras em sandbox (ADR 0008)
+
+Revisados antes: docs/README.md §12, PROMPT_MESTRE (Etapa 4, adendo 4–5), plano §23, conversa.
+- **Servidor:** catálogo; compras com diamantes (auto-coleta 24h/7d, turbo 1h/4h do mapa);
+  compras em dinheiro verificadas por provedor (mock em dev; google/apple → 501 explícito),
+  recibos únicos, VIP como assinatura, **reembolso que revoga** (sem saldo negativo, falta
+  registrada), restauração; anúncios com sessão no servidor, **SSV do AdMob com assinatura
+  verificada**, limites diários, "dobrar ganhos" uma vez por resumo. Mock recusado em produção.
+  Migração `*_store_sandbox` (auto-coleta vira validade; preserva quem tinha). **87 testes**
+  (inclui SSV com chaves ECDSA reais geradas no teste e assinatura adulterada recusada).
+- **Jogo:** Loja (grátis/anúncio, auto-coleta, turbo, diamantes, VIP, restaurar) com cartões
+  atualizados no lugar; confirmação "COMPRA DE TESTE"; "ANÚNCIO DE TESTE" de 5 s; "Assistir e
+  dobrar" no resumo; tocar nos diamantes abre a Loja. Unitários 55/55; integração 85/85.
+- **Plugins verificados:** AdMob (poingstudios v5.1.0), Google Play Billing (godot-sdk-integrations
+  3.3.0), StoreKit 2 (godot-sdk-integrations). **Bloqueio:** contas Play Console/App Store
+  Connect/AdMob e aparelho físico (ação do titular).
+- **A confirmar:** preços em diamantes e benefícios do VIP.
+
 ## 2026-10-13 — Etapa 3: missões, conquistas, ranking, analytics e painel admin (ADR 0007)
 
 Revisados antes: docs/README.md (§3, §5, §8, §10, §11, §13), PROMPT_MESTRE (Etapa 3) e a

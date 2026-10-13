@@ -469,7 +469,10 @@ describe("ajudantes e produção AFK por mapa (ADR 0006)", () => {
 
   it("auto-coleta (item da Loja) produz no mapa aberto a cada sinal", async () => {
     const guest = await waterWithHelper();
-    await ctx.db.player.update({ where: { id: guest.playerId }, data: { autoCollect: true } });
+    await ctx.db.player.update({
+      where: { id: guest.playerId },
+      data: { autoCollectUntil: new Date("2026-02-01T00:00:00Z") },
+    });
     const before = await coinsOf(ctx.db, guest.playerId);
     ctx.clock.advance(15);
     await presence(guest, "praia");

@@ -9,6 +9,11 @@ const ConfigSchema = z.object({
   JWT_EXPIRES_IN: z.string().default("1h"),
   STARTING_COINS: z.coerce.bigint().nonnegative().default(100n),
   // Painel admin (somente leitura). Sem token configurado, as rotas /api/admin ficam desligadas.
+  // Loja e anúncios (ADR 0008). "mock" = simulação para desenvolvimento (nada é cobrado);
+  // produção exige os provedores reais (google/apple e admob) — mock é recusado lá.
+  STORE_MODE: z.enum(["mock", "live"]).default("mock"),
+  ADS_MODE: z.enum(["mock", "admob"]).default("mock"),
+  ADMOB_KEYS_URL: z.url().default("https://www.gstatic.com/admob/reward/verifier-keys.json"),
   // Vazio (ex.: `ADMIN_TOKEN=` no compose) = desligado.
   ADMIN_TOKEN: z.preprocess(
     (v) => (v === "" ? undefined : v),
@@ -27,6 +32,12 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   const config = parsed.data;
   if (config.NODE_ENV === "production" && /troque|dev-only|change-me/i.test(config.JWT_SECRET)) {
     throw new Error("JWT_SECRET de exemplo não pode ser usado em produção");
+  }
+  if (
+    config.NODE_ENV === "production" &&
+    (config.STORE_MODE === "mock" || config.ADS_MODE === "mock")
+  ) {
+    throw new Error("STORE_MODE/ADS_MODE mock não podem ser usados em produção");
   }
   return config;
 }

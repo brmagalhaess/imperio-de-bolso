@@ -20,6 +20,29 @@ func _ready() -> void:
 	while not GameState.loaded:
 		await get_tree().process_frame
 	var hud: Control = main.get_node("UI/HUD")
+	if mode == "loja":
+		await _wait(2.5)
+		hud._modal.close()
+		await hud.open_store_menu()
+		await _wait(1.5)
+		print("PASSO loja")
+		hud._modal._scroll.scroll_vertical = 900
+		await _wait(1.0)
+		print("PASSO loja rolada")
+		var item := GameState.store_item("gems_120")
+		hud._confirm_sandbox(item, item.productId)
+		await _wait(1.2)
+		print("PASSO confirmar compra de teste")
+		hud._modal.close()
+		hud.watch_ad("ad_boost")
+		await _wait(2.0)
+		print("PASSO anúncio de teste")
+		await _wait(5.0)
+		hud.show_offline_summary("praia", "1250000", 7200, false, 14400)
+		await _wait(1.2)
+		print("PASSO resumo com dobrar")
+		get_tree().quit()
+		return
 	if mode == "etapa3":
 		await _wait(2.5)
 		hud._modal.close()
