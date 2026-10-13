@@ -1,9 +1,8 @@
 # Stack de STAGING/PRODUÇÃO para o Dockploy (uma stack por ambiente, plano §24).
 # Todos os segredos vêm das variáveis de ambiente da stack no Dockploy — nada aqui é segredo.
 # Exemplo de variáveis em infrastructure/prod.env.example. HTTPS e domínios ficam no Traefik
-# do Dockploy (api.<domínio> → api:3000, admin.<domínio> → admin:80) ou num nginx do próprio
-# servidor apontando para 127.0.0.1:3010 (API) e 127.0.0.1:3011 (admin) — ver
-# infrastructure/nginx/imperio.conf.
+# do proxy do servidor: o nginx-proxy (jwilder) + acme-companion lê VIRTUAL_HOST/LETSENCRYPT_HOST
+# dos containers na rede `PROXY_NETWORK` (padrão nginx-proxy) e emite o certificado sozinho.
 name: imperio-${STACK_ENV:-staging}
 
 services:
@@ -15,6 +14,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD}
       POSTGRES_DB: imperio
     # Sem porta publicada: o banco só é acessível pela rede interna da stack.
+    networks:
+      default:
+        aliases: [imperio-postgres]
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -32,7 +34,7 @@ services:
         condition: service_healthy
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://imperio:${POSTGRES_PASSWORD}@postgres:5432/imperio
+      DATABASE_URL: postgresql://imperio:${POSTGRES_PASSWORD}@imperio-postgres:5432/imperio
       JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
       STARTING_COINS: ${STARTING_COINS:-100}
@@ -43,11 +45,16 @@ services:
       TRUST_PROXY: "true"
       RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-600}
       RATE_LIMIT_AUTH_PER_MINUTE: ${RATE_LIMIT_AUTH_PER_MINUTE:-20}
+      # nginx-proxy + acme-companion do servidor (jwilder): roteia pelo domínio e emite o HTTPS.
+      VIRTUAL_HOST: ${API_DOMAIN:-api-imperio.crowntech.com.br}
+      VIRTUAL_PORT: "3000"
+      LETSENCRYPT_HOST: ${API_DOMAIN:-api-imperio.crowntech.com.br}
     expose:
       - "3000"
-    # Para um proxy (nginx) instalado direto no servidor, fora do Docker: só no loopback.
-    ports:
-      - "${API_BIND:-127.0.0.1}:${API_HOST_PORT:-3010}:3000"
+    networks:
+      default:
+        aliases: [imperio-api]
+      proxy:
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
       interval: 15s
@@ -60,10 +67,15 @@ services:
     restart: unless-stopped
     depends_on:
       - api
+    environment:
+      VIRTUAL_HOST: ${ADMIN_DOMAIN:-admin-imperio.crowntech.com.br}
+      VIRTUAL_PORT: "80"
+      LETSENCRYPT_HOST: ${ADMIN_DOMAIN:-admin-imperio.crowntech.com.br}
     expose:
       - "80"
-    ports:
-      - "${ADMIN_BIND:-127.0.0.1}:${ADMIN_HOST_PORT:-3011}:80"
+    networks:
+      - default
+      - proxy
 
   backup:
     build:
@@ -73,12 +85,18 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://imperio:${POSTGRES_PASSWORD}@postgres:5432/imperio
+      DATABASE_URL: postgresql://imperio:${POSTGRES_PASSWORD}@imperio-postgres:5432/imperio
       BACKUP_PASSPHRASE: ${BACKUP_PASSPHRASE:?defina BACKUP_PASSPHRASE}
       BACKUP_KEEP: ${BACKUP_KEEP:-14}
       BACKUP_CRON: ${BACKUP_CRON:-30 3 * * *}
     volumes:
       - backups:/backups
+
+networks:
+  default:
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK:-nginx-proxy}
 
 volumes:
   pgdata:

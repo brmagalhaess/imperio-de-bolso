@@ -44,9 +44,10 @@ estrito em `/auth/guest`), corpo máximo de 16 KB, logs sem corpo/query/Authoriz
   Compose **servidor**, branch `deploy/servidor`, `infrastructure/docker-compose.prod.yml`,
   autodeploy com watch paths `backend/**`, `admin/**`, `infrastructure/**`.
 - Segredos só no Dokploy (cópia em `~/.imperio/staging.env` no Mac do titular).
-- O Traefik do Dokploy não atende as portas 80/443 desse servidor: quem atende é um nginx do
-  próprio servidor. A stack publica a API em `127.0.0.1:3010` e o admin em `127.0.0.1:3011`;
-  o nginx usa `infrastructure/nginx/imperio.conf` + certbot.
+- O Traefik do Dokploy não atende as portas 80/443 desse servidor: quem atende é o container
+  `nginx-proxy` (jwilder) com o `letsencrypt-nginx-proxy-companion`. A API e o admin entram na
+  rede `nginx-proxy` com `VIRTUAL_HOST`/`LETSENCRYPT_HOST` e ganham HTTPS automaticamente.
+  DNS: curinga `*.crowntech.com.br` → 169.58.235.246 (Cloudflare, sem proxy).
 - Domínios: `api-imperio.crowntech.com.br` (jogo Android) e `admin-imperio.crowntech.com.br`.
 
 ## Backups (plano §24)

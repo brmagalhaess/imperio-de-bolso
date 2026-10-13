@@ -34,6 +34,9 @@ services:
       STARTING_COINS: "100"
       # Painel admin: defina ADMIN_TOKEN (openssl rand -hex 32) para ligar /api/admin.
       ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+    networks:
+      default:
+        aliases: [imperio-api]
     ports:
       - "3000:3000"
     healthcheck:
