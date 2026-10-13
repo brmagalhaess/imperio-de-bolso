@@ -9,8 +9,11 @@ config/name="Império de Bolso"
 config/description="Idle tycoon isométrico 2D"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
-config/icon="res://icon.svg"
-boot_splash/bg_color=Color(0.13, 0.55, 0.45, 1)
+config/icon="res://assets/app_icon/icon_512.png"
+boot_splash/bg_color=Color(0.0471, 0.5412, 0.5216, 1)
+boot_splash/image="res://assets/app_icon/adaptive_fg_432.png"
+boot_splash/fullsize=false
+boot_splash/use_filter=true
 
 [autoload]
 

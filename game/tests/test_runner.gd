@@ -121,6 +121,23 @@ func _tutorial_tests() -> bool:
 		GameState.state = {"player": {"tutorialCompleted": true}, "wallet": {"coins": case[0].coins},
 			"businesses": [_biz("agua", a[0], a[1] if a.size() > 1 else 1, a[2] if a.size() > 2 else false)]}
 		check(t.current_step() == case[1], case[2])
+
+	# Seta: comprado o carrinho, ela sai do lote (pedido do titular) e só volta quando há o que fazer.
+	var arrow := func(coins: String, b: Dictionary) -> String:
+		GameState.state = {"player": {"tutorialCompleted": true}, "wallet": {"coins": coins}, "businesses": [b]}
+		GameState._received_at_ms = Time.get_ticks_msec()
+		return t.arrow_kind()
+	check(arrow.call("100", _biz("agua", false)) == "lot", "seta: no carrinho para comprar")
+	var producing := _biz("agua", true)
+	producing.cycleStartedAt = "2026-01-01T00:00:00.000Z"
+	producing.secondsRemaining = 8
+	check(arrow.call("0", producing) == "", "seta: some depois da compra enquanto produz")
+	var ready := producing.duplicate()
+	ready.secondsRemaining = 0
+	check(arrow.call("0", ready) == "bubble", "seta: aponta a moeda quando fica pronta")
+	check(arrow.call("30", _biz("agua", true)) == "", "seta: sem saldo para melhorar, sem seta")
+	check(arrow.call("115", _biz("agua", true)) == "lot", "seta: com saldo, aponta para melhorar")
+	check(arrow.call("0", _biz("agua", true, 2)) == "helpers", "seta: último passo aponta o botão Ajudantes")
 	t.queue_free()
 	return true
 

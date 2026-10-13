@@ -38,6 +38,8 @@ var _collect_button: Button
 var _hire_button: Button
 var _modal: Control
 var tutorial: Control
+## Botão Ajudantes da barra (alvo da seta no último passo do tutorial).
+var _helpers_button: Control
 ## Cartões da tela de Ajudantes aberta (slug → identificador), atualizados no lugar.
 var _helper_cards := {}
 ## Cartões de Missões/Conquistas abertos (id → identificador), atualizados no lugar.
@@ -70,6 +72,11 @@ func _ready() -> void:
 	_modal = MenuModal.new()
 	add_child(_modal)
 	tutorial.blockers = [_sheet, _modal]
+	tutorial.helpers_target = func() -> Variant:
+		if _helpers_button == null:
+			return null
+		var r := _helpers_button.get_global_rect()
+		return Vector2(r.get_center().x, r.position.y)
 	_mock_ad = MockAd.new()
 	add_child(_mock_ad)
 	# Janela abriu com um aviso na tela: o aviso desce para não cobrir o título.
@@ -889,6 +896,8 @@ func _build_bottom_bar() -> void:
 		var btn := _icon_button(item[0], 84, item[2])
 		btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		col.add_child(btn)
+		if item[0] == "icon_helpers":
+			_helpers_button = btn
 		var label := Label.new()
 		label.text = item[1]
 		label.add_theme_font_size_override("font_size", 22)

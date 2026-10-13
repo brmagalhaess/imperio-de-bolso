@@ -20,6 +20,8 @@ const TUTORIAL_SLUG := "agua"
 
 ## Devolve a posição de tela do lote (ou da bolha, se `bubble`) — fornecido pela cena principal.
 var target_provider: Callable
+## Ponto de tela do botão Ajudantes (topo, centro) — fornecido pelo HUD.
+var helpers_target: Callable
 ## Telas que, abertas, escondem o tutorial (painel do negócio, menus) — fornecido pelo HUD.
 var blockers: Array = []
 var _collected_once := false
@@ -96,6 +98,24 @@ func current_step() -> Step:
 	return Step.DONE
 
 
+## Para onde a seta aponta agora (público para testes): "lot", "bubble", "helpers" ou "".
+## A seta só aparece quando há algo a fazer — comprado o carrinho, ela sai do lote até a moeda
+## ficar pronta; no passo de melhorar, só quando há saldo; no do ajudante, vai para o botão.
+func arrow_kind() -> String:
+	var b := GameState.business(TUTORIAL_SLUG)
+	match current_step():
+		Step.BUY:
+			return "lot"
+		Step.COLLECT:
+			return "bubble" if GameState.is_ready(b) else ""
+		Step.UPGRADE:
+			var cost: Variant = b.get("nextUpgradeCost")
+			return "lot" if cost != null and GameState.can_afford(cost) else ""
+		Step.HIRE:
+			return "helpers"
+	return ""
+
+
 func _update() -> void:
 	if not GameState.loaded or GameState.tutorial_completed():
 		visible = false
@@ -121,9 +141,12 @@ func _process(_delta: float) -> void:
 
 
 func _draw_arrow() -> void:
-	if not target_provider.is_valid():
-		return
-	var target: Variant = target_provider.call(TUTORIAL_SLUG, current_step() == Step.COLLECT)
+	var kind := arrow_kind()
+	var target: Variant = null
+	if kind == "helpers" and helpers_target.is_valid():
+		target = helpers_target.call()
+	elif (kind == "lot" or kind == "bubble") and target_provider.is_valid():
+		target = target_provider.call(TUTORIAL_SLUG, kind == "bubble")
 	if target == null:
 		return
 	var bob := sin(Time.get_ticks_msec() / 160.0) * 10.0

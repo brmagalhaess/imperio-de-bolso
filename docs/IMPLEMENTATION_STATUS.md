@@ -21,7 +21,14 @@ Revisados antes: docs/README.md (Etapa 5), PROMPT_MESTRE (Etapa 5), plano §24/�
 - **Exclusão de conta (LGPD/Play):** Perfil → "Excluir conta" → digitar EXCLUIR. Servidor apaga
   tudo; recibos ficam sem dono (anti-reuso/reembolso); VIP pode ser religado. Migração
   `*_account_deletion`. Backend **102 testes**; jogo 62 unitários, 100 com integração.
-- **Pendente:** teste no aparelho real do titular; Play Console (teste interno → fechado);
+- **Teste no aparelho (Redmi Note 9 Pro, Android 12, Adreno 618):** jogo abre, conecta à API
+  local via `adb reverse`, ~240 MB de RAM, 35–50% de um núcleo parado, sem aquecimento.
+  Corrigido no aparelho: seta do tutorial agora segue o passo (some após a compra; aponta a
+  moeda pronta, "Melhorar" só com saldo, e o botão Ajudantes no fim); ícone do app próprio
+  (carrinho de água, `tools/art/make_app_icon.py`, adaptativo + monocromático, sem custo de
+  geração) e abertura com a arte do jogo no lugar do logo do Godot. Falhas de conexão no
+  aparelho vêm do cabo/`adb reverse` — resolvidas com a API na VPS (HTTPS).
+- **Pendente:** Play Console (teste interno → fechado);
   stack staging na VPS; link web de exclusão (landing).
 
 ## 2026-10-13 — Ajustes da Loja e Perfil (pedidos do titular)
