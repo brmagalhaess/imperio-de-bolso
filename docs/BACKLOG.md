@@ -41,7 +41,7 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [ ] Sons e efeitos sonoros (sem assets ainda)
 - [ ] Confirmar com o titular o preço dos ajudantes
 - [x] Tela Ajudantes (ver e contratar por mapa) e AFK por mapa (ADR 0006)
-- [ ] Arte própria dos ajudantes (1 por negócio) e ícone do botão Ajudantes
+- [x] Arte própria dos ajudantes (1 por negócio) e ícone do botão Ajudantes
 
 ## Etapa 3 — Retenção
 - [ ] Missões diárias (3), conquistas simples, ranking semanal

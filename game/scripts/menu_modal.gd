@@ -199,7 +199,7 @@ func add_business(b: Dictionary, state: String, on_press: Callable) -> void:
 func add_helper(b: Dictionary, state: String, on_press: Callable) -> Dictionary:
 	var row := _card_row()
 	var portrait := TextureRect.new()
-	portrait.texture = Layout.texture(Layout.HELPERS.get(b.slug, "char_vendor"))
+	portrait.texture = Layout.texture(Layout.helper_texture_name(b.slug))
 	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	portrait.custom_minimum_size = Vector2(70, 108)

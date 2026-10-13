@@ -14,7 +14,9 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 - **Jogo:** botão **Ajudantes** (contratar/contratado/travado por mapa), Mapa mostra o AFK
   esperando, resumo por mapa, sinal de presença a cada 15 s. Executor de testes agora reprova
   erro de script dentro de subseções. Unitários 37/37; integração 57/57.
-- **Pendente:** arte própria dos ajudantes e ícone do botão (hoje: personagens existentes).
+- **Arte dos ajudantes (autorizada, US$0,26):** 10 ajudantes próprios (2 folhas Grok com o
+  estilo dos personagens) + ícone do botão. Aparecem na tela de Ajudantes e **em pé ao lado do
+  negócio** quando contratados. Recorte de folhas agora separa figuras encostadas.
 - **Correção (pedido do titular):** contratar na tela de Ajudantes reabria a janela inteira (ela
   piscava e os preços dos outros trocavam de cor, parecendo mudar de valor). Agora os cartões são
   atualizados no lugar, o botão fica travado durante o pedido, sem saldo o botão laranja só

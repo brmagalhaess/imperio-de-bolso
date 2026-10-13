@@ -75,6 +75,9 @@ func _unit_tests() -> void:
 		ui_ok = ui_ok and ResourceLoader.exists("res://assets/optimized/%s.png" % name)
 	for id in Layout.DISTRICT_ORDER:
 		ui_ok = ui_ok and ResourceLoader.exists("res://assets/optimized/%s" % Layout.DISTRICTS[id].base)
+	for slug in Layout.BUSINESS_ART:
+		ui_ok = ui_ok and ResourceLoader.exists("res://assets/optimized/%s.png" % Layout.helper_texture_name(slug))
+	ui_ok = ui_ok and ResourceLoader.exists("res://assets/optimized/icon_helpers.png")
 	check(ui_ok, "ícones e personagens existem")
 
 	var key: String = Api.new_idempotency_key()

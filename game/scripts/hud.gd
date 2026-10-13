@@ -435,24 +435,6 @@ func _money_pill(is_coins: bool) -> PanelContainer:
 	return pill
 
 
-## Botão dos Ajudantes no mesmo formato dos ícones (quadrado arredondado com degrau).
-## Ícone provisório: retrato do vendedor (arte própria: a gerar).
-func _helpers_button(size: int, handler: Callable) -> Button:
-	var b := Button.new()
-	b.custom_minimum_size = Vector2(size, size)
-	b.icon = Layout.texture("char_vendor")
-	b.expand_icon = true
-	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	b.add_theme_constant_override("icon_max_width", int(size * 0.5))
-	Style.style_button(b, Color("9b7bff"), Color("6a4fd1"), 24)
-	for state in ["normal", "hover", "pressed"]:
-		var box: StyleBoxFlat = b.get_theme_stylebox(state)
-		box.content_margin_top = 8
-		box.content_margin_bottom = 12
-	b.pressed.connect(handler)
-	return b
-
-
 func _build_bottom_bar() -> void:
 	var bar := PanelContainer.new()
 	bar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE, Control.PRESET_MODE_MINSIZE, 20)
@@ -465,7 +447,7 @@ func _build_bottom_bar() -> void:
 	bar.add_child(row)
 	for item in [
 		["icon_build", tr("Construir"), open_build_menu],
-		["helpers", tr("Ajudantes"), open_helpers_menu],
+		["icon_helpers", tr("Ajudantes"), open_helpers_menu],
 		["icon_shop", tr("Loja"), func(): show_toast(tr("Loja em breve"))],
 		["icon_map", tr("Mapa"), open_map_menu],
 		["icon_profile", tr("Perfil"), func(): show_toast(tr("Perfil em breve"))],
@@ -474,8 +456,7 @@ func _build_bottom_bar() -> void:
 		col.add_theme_constant_override("separation", 2)
 		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(col)
-		var btn: Control = _helpers_button(84, item[2]) if item[0] == "helpers" \
-				else _icon_button(item[0], 84, item[2])
+		var btn := _icon_button(item[0], 84, item[2])
 		btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		col.add_child(btn)
 		var label := Label.new()

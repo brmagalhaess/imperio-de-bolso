@@ -15,8 +15,8 @@ const TAP_MAX_DRAG := 16.0
 var district := ""
 var config: Dictionary
 var lots := {}  # slug → BusinessLot
+var _helpers := {}  # slug → Sprite2D do ajudante (visível quando contratado)
 var _sorted: Node2D
-var _vendor: Sprite2D
 var _press_pos := Vector2.ZERO
 
 
@@ -63,14 +63,16 @@ func _ready() -> void:
 	for i in config.walkers.size():
 		_sorted.add_child(Walker.new(config.walkers[i], config.waypoints, i * 2, config.char_scale))
 
-	if not config.vendor.is_empty():
-		_vendor = Sprite2D.new()
-		_vendor.texture = Layout.texture("char_vendor")
-		_vendor.scale = Vector2.ONE * config.char_scale
-		_vendor.offset = Vector2(0, -_vendor.texture.get_height() / 2.0)
-		_vendor.position = config.lots[config.vendor[0]] + config.vendor[1]
-		_vendor.visible = false
-		_sorted.add_child(_vendor)
+	# Ajudante em pé ao lado do negócio quando contratado (pedido: "mostrar os ajudantes").
+	for slug in config.lots:
+		var helper := Sprite2D.new()
+		helper.texture = Layout.texture(Layout.helper_texture_name(slug))
+		helper.scale = Vector2.ONE * config.char_scale
+		helper.offset = Vector2(0, -helper.texture.get_height() / 2.0)
+		helper.position = config.lots[slug] + config.helper_offset
+		helper.visible = false
+		_sorted.add_child(helper)
+		_helpers[slug] = helper
 
 	GameState.state_changed.connect(_sync)
 	GameState.collected.connect(_on_collected)
@@ -87,8 +89,19 @@ func _sync() -> void:
 	for b in GameState.businesses():
 		if lots.has(b.slug):
 			lots[b.slug].update_from(b)
-	if _vendor:
-		_vendor.visible = GameState.business(config.vendor[0]).get("owned", false)
+	for slug in _helpers:
+		var b := GameState.business(slug)
+		var show: bool = b.get("managed", false)
+		if show and not _helpers[slug].visible:
+			_pop(_helpers[slug])
+		_helpers[slug].visible = show
+
+
+## Pulinho ao aparecer (contratação).
+func _pop(node: Node2D) -> void:
+	var base := node.scale
+	node.scale = base * Vector2(0.6, 1.3)
+	create_tween().tween_property(node, "scale", base, 0.4).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
 
 func select(slug: String) -> void:

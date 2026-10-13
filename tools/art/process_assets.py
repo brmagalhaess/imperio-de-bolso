@@ -57,6 +57,7 @@ SPRITES = {
     "mall_lv2": ("g_mall_lv2/g_mall_lv2_v01.jpeg", {"width": 300}),
     "mall_lv3": ("g_mall_lv3/g_mall_lv3_v01.jpeg", {"width": 320}),
     "beach_umbrella": ("g_beach_umbrella/g_beach_umbrella_v01.jpeg", {"width": 150}),
+    "icon_helpers": ("g_icon_helpers/g_icon_helpers_v01.jpeg", {"width": 176}),
 }
 
 # Folhas: arquivo → lista de ids na ordem de leitura (linhas de cima p/ baixo, esq. → dir.)
@@ -69,6 +70,16 @@ SHEETS = {
         ["icon_build", "icon_shop", "icon_map", "icon_profile",
          "icon_coin", None, "icon_settings", "icon_help"],  # None = bolha (desenhada no código)
         {"width": 176},
+    ),
+    "g_helpers_praia/g_helpers_praia_v01.png": (
+        ["helper_agua", "helper_pipoca", "helper_sorveteria", "helper_quiosque_coco",
+         "helper_mercadinho"],
+        {"height": 140},
+    ),
+    "g_helpers_cidade/g_helpers_cidade_v01.png": (
+        ["helper_restaurante", "helper_supermercado", "helper_academia", "helper_hotel",
+         "helper_shopping"],
+        {"height": 140},
     ),
 }
 SHEET_OVERRIDES = {"icon_coin": {"width": 96}}
@@ -148,6 +159,20 @@ def runs(filled: np.ndarray, min_gap: int) -> list[tuple[int, int]]:
     return out
 
 
+def split_touching(items: list[Image.Image], expected: int) -> list[Image.Image]:
+    """Figuras encostadas: divide a peça mais larga na coluna mais vazia do seu miolo."""
+    while len(items) < expected:
+        i = max(range(len(items)), key=lambda k: items[k].width)
+        item = items[i]
+        cover = (np.asarray(item.getchannel("A")) > 8).sum(axis=0)
+        lo, hi = int(item.width * 0.3), int(item.width * 0.7)
+        cut = lo + int(np.argmin(cover[lo:hi]))
+        left = item.crop((0, 0, cut, item.height))
+        right = item.crop((cut, 0, item.width, item.height))
+        items[i:i + 1] = [left, right]
+    return items
+
+
 def split_sheet(rgba: Image.Image) -> list[Image.Image]:
     """Separa itens de uma folha: primeiro em linhas, depois em colunas, pelos vãos."""
     a = np.asarray(rgba.getchannel("A")) > 8
@@ -174,7 +199,7 @@ def main() -> None:
     for rel, (names, target) in SHEETS.items():
         im = Image.open(SRC / rel)
         im.thumbnail((2048, 2048), Image.LANCZOS)
-        items = split_sheet(cutout(im))
+        items = split_touching(split_sheet(cutout(im)), len(names))
         if len(items) != len(names):
             raise SystemExit(f"{rel}: esperava {len(names)} itens, encontrei {len(items)}")
         for name, item in zip(names, items):

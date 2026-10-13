@@ -33,8 +33,8 @@ const DISTRICTS := {
 		],
 		"decor": [["beach_umbrella", Vector2(175, 790)], ["beach_umbrella", Vector2(600, 905)]],
 		"walkers": ["char_woman", "char_boy", "char_grandma", "char_tourist", "char_kid"],
-		## Vendedor fixo ao lado deste negócio, quando comprado.
-		"vendor": ["agua", Vector2(-78, 16)],
+		## Onde o ajudante contratado fica em pé, relativo ao lote.
+		"helper_offset": Vector2(-80, 16),
 	},
 	"cidade": {
 		"title": "Cidade",
@@ -59,23 +59,14 @@ const DISTRICTS := {
 		],
 		"decor": [],
 		"walkers": ["char_tourist", "char_grandma", "char_woman", "char_boy", "char_kid"],
-		"vendor": [],
+		"helper_offset": Vector2(-100, 6),
 	},
 }
 
-## Retrato do ajudante de cada negócio (personagens da arte v2; arte própria por negócio: a fazer).
-const HELPERS := {
-	"agua": "char_vendor",
-	"pipoca": "char_boy",
-	"sorveteria": "char_kid",
-	"quiosque_coco": "char_grandma",
-	"mercadinho": "char_woman",
-	"restaurante": "char_tourist",
-	"supermercado": "char_vendor",
-	"academia": "char_boy",
-	"hotel": "char_woman",
-	"shopping": "char_tourist",
-}
+## Retrato do ajudante de cada negócio (folhas g_helpers_praia/g_helpers_cidade).
+static func helper_texture_name(slug: String) -> String:
+	return "helper_%s" % slug
+
 
 ## Faixas de nível visual: nível 1–9 → arte 1, 10–24 → arte 2, 25+ → arte 3.
 const VISUAL_TIERS := [1, 10, 25]

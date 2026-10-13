@@ -20,6 +20,22 @@ func _ready() -> void:
 	while not GameState.loaded:
 		await get_tree().process_frame
 	var hud: Control = main.get_node("UI/HUD")
+	if mode == "ajudantes":
+		await _wait(2.5)
+		hud._modal.close()
+		await _wait(1.0)
+		print("PASSO praia com ajudantes")
+		hud.open_helpers_menu()
+		await _wait(1.2)
+		print("PASSO tela de ajudantes")
+		hud._modal.close()
+		await main.go_to_district("cidade")
+		await _wait(2.5)
+		hud._modal.close()
+		await _wait(1.0)
+		print("PASSO cidade com ajudantes")
+		get_tree().quit()
+		return
 	if mode == "contratar":
 		await _wait(2.5)  # deixa o resumo inicial (se houver) aparecer antes
 		hud._modal.close()
