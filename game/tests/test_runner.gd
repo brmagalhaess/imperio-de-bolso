@@ -16,6 +16,8 @@ var _sections_done := 0
 
 func _ready() -> void:
 	var expected_sections := 1
+	# Os testes conferem textos em pt-BR, qualquer que seja o idioma da máquina (CI em inglês).
+	TranslationServer.set_locale("pt_BR")
 	await _unit_tests()
 	if OS.get_environment("IMPERIO_TEST_API") == "1":
 		expected_sections += 1
@@ -105,6 +107,7 @@ func _unit_tests() -> void:
 	check(await _audio_tests() == true, "seção áudio executou até o fim")
 	check(await _trail_tests() == true, "seção trilha de mapas executou até o fim")
 	check(await _fast_collect_tests() == true, "seção coleta rápida executou até o fim")
+	check(await _i18n_tests() == true, "seção idiomas executou até o fim")
 	_sections_done += 1
 
 
@@ -187,6 +190,55 @@ func _trail_tests() -> bool:
 
 
 ## Sons e música (pedido do titular): efeitos e música desligáveis, escolha salva no aparelho.
+func _i18n_tests() -> bool:
+	var real_path: String = Lang.settings_path
+	Lang.settings_path = "user://test_settings.cfg"
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(Lang.settings_path))
+	check(Lang.detect("pt") == "pt_BR" and Lang.detect("es") == "es" and Lang.detect("en") == "en"
+			and Lang.detect("fr") == "en", "idiomas: automático segue o aparelho (outros → inglês)")
+
+	Lang.set_choice("en")
+	check(TranslationServer.get_locale().begins_with("en"), "idiomas: escolher inglês")
+	check(tr("Loja") == "Shop" and tr("Carrinho de Água") == "Water Cart", "idiomas: textos e negócios em inglês")
+	check(Layout.title("praia") == "Beach Island" and Layout.short_title("porto") == "the harbor",
+			"idiomas: nomes dos mapas traduzidos")
+	check(GameState.message_for("INSUFFICIENT_FUNDS") == "Not enough coins.", "idiomas: erros do servidor traduzidos")
+	check(tr("Escolha com cuidado: você só pode trocar de nome uma vez.\nDe 3 a 20 caracteres. O nome aparece no ranking.")
+			.begins_with("Choose carefully"), "idiomas: texto com quebra de linha traduzido")
+	check(Fmt.coins("1234567") == "1,234,567" and Fmt.rate(2.5) == "+2.5/s", "idiomas: números no padrão inglês")
+	var mission := {"title": "Fature 1.000 moedas", "titleTemplate": "Fature {n} moedas", "target": "1000"}
+	check(Hud.mission_title(mission) == "Earn 1,000 coins", "idiomas: missão traduzida com o alvo formatado")
+	check(Hud.mission_title({"title": "Fature 1.000 moedas", "target": "1000"}) == "Fature 1.000 moedas",
+			"idiomas: servidor antigo sem modelo mostra o título pronto")
+
+	Lang.set_choice("es")
+	check(tr("Vender o império") == "Vender el imperio" and Fmt.coins("1234567") == "1.234.567",
+			"idiomas: espanhol com milhar em ponto")
+	Lang.choice = "pt_BR"
+	Lang.load_settings()
+	check(Lang.choice == "es", "idiomas: escolha fica salva no aparelho")
+
+	var hud: Control = Hud.new()
+	add_child(hud)
+	hud.open_settings_menu()
+	await get_tree().process_frame
+	var labels: Array = hud._modal._list.find_children("*", "Label", true, false).map(func(l): return l.text)
+	check(labels.has("Idioma") and labels.has("Español"), "idiomas: Configurações mostra o idioma atual")
+	hud.open_language_menu()
+	await get_tree().process_frame
+	var names: Array = hud._modal._list.find_children("*", "Button", true, false).map(func(b): return b.text)
+	check(names.has("✓  Español") and names.has("English") and names.has("Português"),
+			"idiomas: lista de idiomas marca o escolhido")
+	hud.queue_free()
+
+	Lang.set_choice("auto")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(Lang.settings_path))
+	Lang.settings_path = real_path
+	TranslationServer.set_locale("pt_BR")
+	check(tr("Loja") == "Loja" and Fmt.coins("1000") == "1.000", "idiomas: português volta ao normal")
+	return true
+
+
 func _audio_tests() -> bool:
 	var real_path: String = Audio.settings_path
 	Audio.settings_path = "user://test_settings.cfg"

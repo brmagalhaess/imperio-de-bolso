@@ -165,6 +165,25 @@ func add_action(text_value: String, on_press: Callable, color := Style.GREEN,
 	_list.add_child(button)
 
 
+## Linha com valor e botão "Alterar" (Configurações → Idioma). Devolve o botão (para testes).
+func add_option(text_value: String, value_text: String, on_press: Callable) -> Button:
+	var row := _card_row()
+	var texts := VBoxContainer.new()
+	texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	texts.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	texts.add_child(_text(text_value, 30, Style.INK))
+	texts.add_child(_text(value_text, 24, Style.INK_SOFT))
+	row.add_child(texts)
+	var button := Button.new()
+	button.text = tr("Alterar")
+	button.custom_minimum_size = Vector2(190, 76)
+	button.add_theme_font_size_override("font_size", 28)
+	Style.style_button(button, Style.TEAL, Style.TEAL_DARK)
+	button.pressed.connect(on_press)
+	row.add_child(button)
+	return button
+
+
 ## Linha liga/desliga (Configurações): não fecha a janela; o botão muda no lugar, sem piscar.
 ## `on_toggled(novo_valor)`. Devolve o botão (para testes).
 func add_toggle(icon: Texture2D, text_value: String, value: bool, on_toggled: Callable) -> Button:
@@ -268,7 +287,7 @@ func add_business(b: Dictionary, state: String, on_press: Callable) -> void:
 	texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	texts.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_child(texts)
-	texts.add_child(_text(b.name, 30, Style.INK))
+	texts.add_child(_text(tr(b.name), 30, Style.INK))
 	var sub := tr("Lucro %s a cada %s") % [Fmt.coins(b.profitPerCycle), Fmt.duration(b.cycleSeconds)]
 	if state == "locked":
 		sub = tr("Complete %s para abrir") % Layout.short_title(Layout.previous_district(str(b.get("district", "praia"))))
@@ -319,7 +338,7 @@ func add_helper(b: Dictionary, state: String, on_press: Callable) -> Dictionary:
 	texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	texts.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_child(texts)
-	texts.add_child(_text(b.name, 28, Style.INK))
+	texts.add_child(_text(tr(b.name), 28, Style.INK))
 	var sub := _text("", 21, Style.INK_SOFT, 500)
 	texts.add_child(sub)
 
@@ -421,7 +440,7 @@ func add_reward_card(item: Dictionary, on_claim: Callable) -> Dictionary:
 
 
 func set_reward_card(h: Dictionary, item: Dictionary) -> void:
-	h.title.text = item.title
+	h.title.text = tr(item.title)
 	h.sub.text = item.get("subtitle", "")
 	h.sub.visible = h.sub.text != ""
 	var target := maxf(1.0, str(item.target).to_float())
@@ -485,7 +504,7 @@ func set_store_card(h: Dictionary) -> void:
 	var d: Dictionary = h.spec.call()
 	h.icon.texture = d.get("icon")
 	h.icon.visible = d.get("icon") != null
-	h.title.text = d.title
+	h.title.text = tr(d.title)
 	h.sub.text = d.get("subtitle", "")
 	h.sub.visible = h.sub.text != ""
 	var button: Button = h.button

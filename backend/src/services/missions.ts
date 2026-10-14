@@ -22,7 +22,10 @@ type Reader = Db | Tx;
 export interface MissionView {
   id: string;
   template: string;
+  /** Título pronto em pt-BR (compatibilidade). */
   title: string;
+  /** Modelo com {n} (chave de tradução no cliente, V1.2). */
+  titleTemplate: string;
   target: string;
   progress: string;
   completed: boolean;
@@ -113,6 +116,7 @@ function toView(m: {
     id: m.id,
     template: m.template,
     title: (t?.title ?? m.template).replace("{n}", m.target.toLocaleString("pt-BR")),
+    titleTemplate: t?.title ?? m.template,
     target: m.target.toString(),
     progress: progress.toString(),
     completed: m.progress >= m.target,

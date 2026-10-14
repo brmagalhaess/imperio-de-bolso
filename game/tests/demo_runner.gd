@@ -18,11 +18,33 @@ func _ready() -> void:
 	if mode == "excluir":
 		Api.session_path = "user://demo_excluir.cfg"
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(Api.session_path))
+	# DEMO_LANG=en|es: captura em outro idioma sem mudar a escolha salva.
+	if OS.get_environment("DEMO_LANG") != "":
+		TranslationServer.set_locale(OS.get_environment("DEMO_LANG"))
 	main = load("res://scenes/main.tscn").instantiate()
 	add_child(main)
 	while not GameState.loaded:
 		await get_tree().process_frame
 	var hud: Control = main.get_node("UI/HUD")
+	if mode == "idioma":
+		await _wait(2.0)
+		hud._modal.close()
+		await _wait(0.8)
+		print("PASSO mapa")
+		hud.open_missions_menu()
+		await _wait(1.2)
+		print("PASSO missoes")
+		hud.open_store_menu()
+		await _wait(1.2)
+		print("PASSO loja")
+		hud.open_settings_menu()
+		await _wait(1.0)
+		print("PASSO config")
+		hud.open_language_menu()
+		await _wait(1.0)
+		print("PASSO idiomas")
+		get_tree().quit()
+		return
 	if mode == "prestigio":
 		await _wait(2.0)
 		hud._modal.close()

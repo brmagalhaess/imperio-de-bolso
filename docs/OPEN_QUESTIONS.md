@@ -30,4 +30,6 @@ Dúvidas que não bloqueiam o trabalho atual. Bloqueios reais ficam em `IMPLEMEN
     garantida. Antes do lançamento: log de acesso dedicado (volume, retenção de 6 meses).
 11. **Pré-cadastro por e-mail na landing (plano §21):** fica para depois (exige opt-in,
     descadastro e guarda de e-mails). Por ora a landing tem "Em breve" nas lojas.
-
+12. **Nome do jogo em outros idiomas:** hoje "Império de Bolso" em todos. Opções: manter a marca
+    ou usar "Pocket Empire" (en) / "Imperio de Bolsillo" (es) no jogo e nas lojas. Decisão do
+    titular (verificar disponibilidade do nome nas lojas antes).

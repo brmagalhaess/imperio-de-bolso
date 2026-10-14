@@ -27,3 +27,4 @@ game/build/
 game/android/
 *.keystore
 *.jks
+game/i18n/*.translation

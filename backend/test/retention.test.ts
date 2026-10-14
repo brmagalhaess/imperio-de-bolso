@@ -52,6 +52,13 @@ describe("missões diárias", () => {
     expect(first.missions).toHaveLength(3);
     expect(first.missions.map((m: { template: string }) => m.template)).toContain("collect_times");
     expect(first.missions.every((m: { rewardGems: number }) => m.rewardGems === 1)).toBe(true);
+    // V1.2: modelo com {n} para o cliente traduzir; o título pronto continua em pt-BR.
+    for (const m of first.missions as { title: string; titleTemplate: string; target: string }[]) {
+      expect(m.titleTemplate).toContain("{n}");
+      expect(m.title).toBe(
+        m.titleTemplate.replace("{n}", Number(m.target).toLocaleString("pt-BR")),
+      );
+    }
     const again = await missions(g);
     expect(again.missions.map((m: { id: string }) => m.id)).toEqual(
       first.missions.map((m: { id: string }) => m.id),

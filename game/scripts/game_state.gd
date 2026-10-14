@@ -591,7 +591,7 @@ func can_afford(amount: Variant) -> bool:
 
 
 static func message_for(code: String) -> String:
-	return MESSAGES.get(code, "Algo deu errado. Tente novamente.")
+	return TranslationServer.translate(MESSAGES.get(code, "Algo deu errado. Tente novamente."))
 
 
 ## `sfx`: efeito tocado quando o servidor confirma (a moeda da coleta vem do sinal `collected`).

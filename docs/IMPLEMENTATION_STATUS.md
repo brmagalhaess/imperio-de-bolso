@@ -2,6 +2,16 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-14 — Etapa 6 · V1.2a: Idiomas inglês e espanhol (ADR 0012)
+
+- 258 textos traduzidos (interface, erros, tutorial, mapas, negócios, missões, conquistas, Loja)
+  em `game/i18n/translations.csv`; extrator `tools/i18n/extract.py`.
+- Configurações → Idioma (Automático/Português/English/Español), salvo no aparelho; números no
+  padrão de cada idioma. Servidor: missões com `titleTemplate` (contrato atualizado).
+- Testes: backend **107**; jogo **116** unitários e **156** com integração. Capturas em en/es
+  conferidas (Missões, Loja, Idioma).
+- Nome do jogo mantido em português (OPEN_QUESTIONS 12).
+
 ## 2026-10-14 — Etapa 6 · V1.1: Prestígio "Vender o império" (ADR 0011)
 
 Revisados antes: docs/README.md §4/§69, PROMPT_MESTRE (Etapa 6), BACKLOG, conversa original.

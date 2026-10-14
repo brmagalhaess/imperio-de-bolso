@@ -18,9 +18,15 @@ boot_splash/use_filter=true
 
 [autoload]
 
+Lang="*res://scripts/lang.gd"
 Audio="*res://scripts/audio_manager.gd"
 Api="*res://scripts/api_client.gd"
 GameState="*res://scripts/game_state.gd"
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://i18n/translations.pt_BR.translation", "res://i18n/translations.en.translation", "res://i18n/translations.es.translation")
+locale/fallback="pt_BR"
 
 [display]
 

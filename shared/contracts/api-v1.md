@@ -106,8 +106,13 @@ Sem Idempotency-Key (não mexe em saldo); idempotente. `200 PlayerState` com
 `player.tutorialCompleted: true`.
 
 ### `GET /missions`
-`200 { day, resetsAt, missions: [{ id, template, title, target, progress, completed, claimed,
-rewardCoins, rewardGems }], serverTime }` — 3 missões do dia (Brasília), criadas na 1ª consulta.
+`200 { day, resetsAt, missions: [{ id, template, title, titleTemplate, target, progress, completed,
+claimed, rewardCoins, rewardGems }], serverTime }` — 3 missões do dia (Brasília), criadas na 1ª
+consulta. `title` vem pronto em pt-BR; `titleTemplate` traz o modelo com `{n}` (ex.: "Fature {n}
+moedas"), que o cliente traduz e preenche com `target` no formato do idioma (V1.2).
+
+Textos de catálogo (nomes de negócios, títulos/descrições de conquistas, itens da Loja) seguem em
+pt-BR e servem de chave de tradução no cliente (`game/i18n/translations.csv`).
 
 ### `POST /missions/claim` — `Idempotency-Key`
 Corpo `{ missionId }`. `200 { claimed, missions, state }`. `409 MISSION_NOT_COMPLETED`,

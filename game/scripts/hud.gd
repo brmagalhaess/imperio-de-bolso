@@ -251,7 +251,7 @@ func _refresh() -> void:
 	_sheet.visible = not b.is_empty()
 	if b.is_empty():
 		return
-	_title.text = b.name
+	_title.text = tr(b.name)
 	if b.owned:
 		_info.text = tr("Nível %d · Lucro %s a cada %s") % [
 			int(b.level), Fmt.coins(b.profitPerCycle), Fmt.duration(b.cycleSeconds)]
@@ -314,7 +314,7 @@ func _on_action_pressed() -> void:
 		if not opened.is_empty():
 			show_toast(tr("%s foi liberado! Abra o Mapa.") % Layout.title(opened[0]))
 		else:
-			show_toast(tr("%s é seu!") % b.name)
+			show_toast(tr("%s é seu!") % tr(b.name))
 
 
 func _on_collect_pressed() -> void:
@@ -327,7 +327,7 @@ func _on_hire_pressed() -> void:
 		# Regra (ADR 0006): o ajudante trabalha quando você sai do mapa; aqui dentro, coleta
 		# automática só com a Auto-coleta da Loja ou o Passe VIP.
 		if GameState.state.get("player", {}).get("autoCollect", false):
-			show_toast(tr("Ajudante contratado! %s agora produz sozinho.") % b.name)
+			show_toast(tr("Ajudante contratado! %s agora produz sozinho.") % tr(b.name))
 		else:
 			show_toast(tr("Ajudante contratado! Ele vende sozinho quando você sai da %s (até 4h).")
 					% Layout.title(current_district).to_lower())
@@ -431,7 +431,7 @@ func open_store_menu() -> void:
 		var vip := GameState.store_item("vip_monthly")
 		return {
 			"title": vip.get("title", "Passe VIP"), "icon": Layout.texture("icon_helpers"),
-			"subtitle": " · ".join(vip.get("benefits", [])) + "\n" + _vip_status(),
+			"subtitle": " · ".join(Array(vip.get("benefits", [])).map(func(t): return tr(t))) + "\n" + _vip_status(),
 			"button": tr("R$ %s/mês") % vip.get("priceBRL", ""), "color": Style.ORANGE,
 			"edge": Style.ORANGE_DARK, "enabled": true,
 		}, func():
@@ -669,8 +669,34 @@ func open_settings_menu() -> void:
 	_modal.add_toggle(null, tr("Efeitos sonoros"), Audio.sfx_on, func(on: bool):
 		Audio.set_sfx_on(on)
 		Audio.play("toggle"))
+	_modal.add_option(tr("Idioma"), Lang.label(), open_language_menu)
 	_modal.add_message(null, "", tr("Versão %s") % str(ProjectSettings.get_setting("application/config/version", "0.1.0")))
 	_modal.refit()
+
+
+## Idioma (V1.2): troca na hora — a cena é recarregada para todos os textos mudarem.
+func open_language_menu() -> void:
+	_reward_kind = "language"
+	_modal.open(tr("Idioma"))
+	var auto_name: String = Lang.NAMES[Lang.detect(OS.get_locale_language())]
+	var options := [["auto", tr("Automático · %s") % auto_name]]
+	for code in Lang.SUPPORTED:
+		options.append([code, Lang.NAMES[code]])
+	for o in options:
+		var code: String = o[0]
+		var chosen: bool = Lang.choice == code
+		_modal.add_action(("✓  " if chosen else "") + o[1], func(): choose_language(code),
+				Style.GREEN if chosen else Style.TEAL, Style.GREEN_DARK if chosen else Style.TEAL_DARK)
+	_modal.add_action(tr("Voltar"), open_settings_menu, Style.GREY, Style.GREY_DARK)
+	_modal.refit()
+
+
+func choose_language(code: String) -> void:
+	var before := TranslationServer.get_locale()
+	Lang.set_choice(code)
+	_modal.close()
+	if TranslationServer.get_locale() != before:
+		get_tree().reload_current_scene()
 
 
 ## Troca de nome: permitida uma única vez (pedido do titular); o servidor valida.
@@ -728,13 +754,21 @@ func _open_rewards(kind: String) -> void:
 	GameState.track("screen_view", {"screen": kind})
 
 
+## Título da missão no idioma do jogador: o servidor manda o modelo ("Fature {n} moedas") e o
+## alvo; versões antigas do servidor só mandam o título pronto em pt-BR.
+static func mission_title(m: Dictionary) -> String:
+	if not m.has("titleTemplate"):
+		return str(m.get("title", ""))
+	return TranslationServer.translate(m.titleTemplate).replace("{n}", Fmt.coins(m.target))
+
+
 func _mission_item(m: Dictionary) -> Dictionary:
-	return {"title": m.title, "progress": m.progress, "target": m.target, "rewardCoins": m.rewardCoins,
+	return {"title": mission_title(m), "progress": m.progress, "target": m.target, "rewardCoins": m.rewardCoins,
 		"rewardGems": m.rewardGems, "done": m.completed, "claimed": m.claimed}
 
 
 func _achievement_item(a: Dictionary) -> Dictionary:
-	return {"title": a.title, "subtitle": a.description, "progress": a.progress, "target": a.target,
+	return {"title": tr(a.title), "subtitle": tr(a.description), "progress": a.progress, "target": a.target,
 		"rewardGems": a.rewardGems, "done": a.unlocked, "claimed": a.claimed}
 
 

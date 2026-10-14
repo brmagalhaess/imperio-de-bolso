@@ -188,8 +188,9 @@ static func previous_district(district: String) -> String:
 
 ## Nome curto para etiquetas pequenas ("a praia", "a cidade", "o porto", "o centro").
 static func short_title(district: String) -> String:
-	return {"praia": "a praia", "cidade": "a cidade", "porto": "o porto", "centro": "o centro"}.get(district, title(district))
+	var short: Dictionary = {"praia": "a praia", "cidade": "a cidade", "porto": "o porto", "centro": "o centro"}
+	return TranslationServer.translate(short[district]) if short.has(district) else title(district)
 
 
 static func title(district: String) -> String:
-	return DISTRICTS[district].title if DISTRICTS.has(district) else district
+	return TranslationServer.translate(DISTRICTS[district].title) if DISTRICTS.has(district) else district
