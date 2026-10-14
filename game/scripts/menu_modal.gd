@@ -6,6 +6,7 @@ const Style := preload("res://scripts/ui_style.gd")
 const UiFont := preload("res://scripts/ui_font.gd")
 const Fmt := preload("res://scripts/fmt.gd")
 const Layout := preload("res://scripts/layout.gd")
+const TouchScroll := preload("res://scripts/touch_scroll.gd")
 
 const COIN := preload("res://assets/optimized/icon_coin.png")
 const LOCK := preload("res://assets/optimized/lot_lock.png")
@@ -19,6 +20,10 @@ var _list: VBoxContainer
 var _card: PanelContainer
 var _scroll: ScrollContainer
 var _store_cards: Array = []
+
+
+## Rolagem por toque mesmo começando em cima de um item (ver touch_scroll.gd).
+var touch_scroll: Node
 
 
 func _ready() -> void:
@@ -81,6 +86,8 @@ func _ready() -> void:
 	# No celular, o dedo sempre escorrega um pouco: sem esta folga, qualquer toque num botão
 	# da lista virava rolagem e o botão não respondia.
 	_scroll.scroll_deadzone = 28
+	touch_scroll = TouchScroll.new(_scroll)
+	add_child(touch_scroll)
 	col.add_child(_scroll)
 	_list = VBoxContainer.new()
 	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL

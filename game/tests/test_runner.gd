@@ -371,6 +371,20 @@ func _store_tests() -> bool:
 			"com diamantes: o mesmo botão habilita (sem recriar)")
 	check(buttons[4].disabled, "item mais caro continua esmaecido")
 
+	# Rolagem por toque começando num item da Loja (pedido do titular).
+	var ts: Node = hud._modal.touch_scroll
+	ts.pass_through()
+	var stoppers: Array = hud._modal._scroll.find_children("*", "Control", true, false).filter(
+			func(c): return c.mouse_filter == Control.MOUSE_FILTER_STOP and not c is LineEdit)
+	check(stoppers.is_empty(), "lista: cartões e botões repassam o arrasto para a rolagem")
+	hud._modal._scroll.scroll_started.emit()
+	var store_buttons: Array = hud._modal._scroll.find_children("*", "BaseButton", true, false)
+	check(ts.muted and store_buttons.all(func(b): return b.button_mask == 0),
+			"lista: enquanto rola, nenhum botão aceita o toque (não compra sem querer)")
+	ts.unmute()
+	check(store_buttons.all(func(b): return b.button_mask == MOUSE_BUTTON_MASK_LEFT),
+			"lista: no próximo toque os botões voltam a funcionar")
+
 	# Cada janela abre no topo, mesmo que a anterior estivesse rolada.
 	hud._modal._scroll.scroll_vertical = 400
 	hud.open_profile_menu()

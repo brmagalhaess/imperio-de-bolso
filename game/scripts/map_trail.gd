@@ -9,6 +9,7 @@ const Style := preload("res://scripts/ui_style.gd")
 const Layout := preload("res://scripts/layout.gd")
 const Fmt := preload("res://scripts/fmt.gd")
 const UiFont := preload("res://scripts/ui_font.gd")
+const TouchScroll := preload("res://scripts/touch_scroll.gd")
 
 const CARD_SIZE := Vector2(540, 380)
 ## Distância vertical entre os mapas na trilha.
@@ -42,6 +43,7 @@ func _ready() -> void:
 	_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 	_scroll.scroll_deadzone = 28
 	add_child(_scroll)
+	add_child(TouchScroll.new(_scroll))
 	_canvas = Control.new()
 	_canvas.mouse_filter = Control.MOUSE_FILTER_PASS
 	_canvas.draw.connect(_draw_trail)
