@@ -10,7 +10,8 @@ export type MissionMetric =
   | "hire_count"
   | "purchase_count"
   | "afk_collect"
-  | "visit_cidade";
+  | "visit_cidade"
+  | "ad_watched";
 
 export interface MissionContext {
   /** Renda potencial por segundo (lucro do ciclo ÷ duração, negócios comprados). */
@@ -20,6 +21,12 @@ export interface MissionContext {
   canHire: boolean; // há negócio comprado sem ajudante
   hasHelper: boolean;
   cityUnlocked: boolean;
+  /** Negócios com moeda para tocar (sem auto-coleta, os com ajudante também contam). */
+  manualCount?: number;
+  /** Preço do negócio liberado mais barato ainda não construído / do ajudante mais barato. */
+  cheapestBuy?: number | null;
+  cheapestHire?: number | null;
+  coins?: number;
 }
 
 export interface MissionTemplate {
@@ -27,6 +34,8 @@ export interface MissionTemplate {
   metric: MissionMetric;
   /** Título com {n} para o alvo. */
   title: string;
+  /** Missões do mesmo grupo não saem no mesmo dia (ex.: duas de faturar). */
+  group?: string;
   target: (ctx: MissionContext) => bigint;
   eligible: (ctx: MissionContext) => boolean;
 }
@@ -38,26 +47,58 @@ export function niceRound(value: number): bigint {
   return BigInt(Math.round(value / mag) * mag);
 }
 
+/**
+ * Fase do jogador pelo número de negócios: 0 iniciante (praia), 1 cidade, 2 porto, 3 centro.
+ * Alvos crescem com a fase (pedido do titular: missão de iniciante não faz sentido para quem
+ * já evoluiu).
+ */
+export function missionTier(ctx: MissionContext): number {
+  if (ctx.ownedCount < 4) return 0;
+  if (ctx.ownedCount < 10) return 1;
+  if (ctx.ownedCount < 16) return 2;
+  return 3;
+}
+
+const byTier =
+  (values: readonly bigint[]) =>
+  (c: MissionContext): bigint =>
+    values[Math.min(missionTier(c), values.length - 1)] ?? 1n;
+
+/** Dá para alcançar hoje: já tem o dinheiro ou junta em até 30 min de renda. */
+const reachable = (price: number | null | undefined, c: MissionContext) =>
+  price !== null &&
+  price !== undefined &&
+  price <= Math.max(c.coins ?? 0, c.incomePerSecond * 1800);
+
 export const MISSION_TEMPLATES: readonly MissionTemplate[] = [
   {
     id: "collect_times",
     metric: "collect_count",
     title: "Colete moedas {n} vezes",
-    target: () => 10n,
-    eligible: (c) => c.ownedCount > 0 || c.canBuy,
+    target: byTier([10n, 20n, 40n, 60n]),
+    eligible: (c) => (c.manualCount ?? c.ownedCount) > 0 || c.ownedCount === 0,
   },
   {
     id: "earn_coins",
     metric: "coins_earned",
+    group: "earn",
     title: "Fature {n} moedas",
     target: (c) => niceRound(Math.max(100, c.incomePerSecond * 600)),
     eligible: () => true,
   },
   {
+    id: "earn_big",
+    metric: "coins_earned",
+    group: "earn",
+    title: "Fature {n} moedas",
+    target: (c) => niceRound(Math.max(1000, c.incomePerSecond * 3600)),
+    eligible: (c) => missionTier(c) >= 1,
+  },
+  {
     id: "upgrade_times",
     metric: "upgrade_count",
     title: "Melhore negócios {n} vezes",
-    target: () => 5n,
+    target: byTier([5n, 15n, 30n, 50n]),
     eligible: (c) => c.ownedCount > 0,
   },
   {
@@ -65,14 +106,14 @@ export const MISSION_TEMPLATES: readonly MissionTemplate[] = [
     metric: "purchase_count",
     title: "Construa {n} negócio novo",
     target: () => 1n,
-    eligible: (c) => c.canBuy,
+    eligible: (c) => c.canBuy && (c.cheapestBuy === undefined || reachable(c.cheapestBuy, c)),
   },
   {
     id: "hire_helper",
     metric: "hire_count",
     title: "Contrate {n} ajudante",
     target: () => 1n,
-    eligible: (c) => c.canHire,
+    eligible: (c) => c.canHire && (c.cheapestHire === undefined || reachable(c.cheapestHire, c)),
   },
   {
     id: "afk_collect",
@@ -86,7 +127,14 @@ export const MISSION_TEMPLATES: readonly MissionTemplate[] = [
     metric: "visit_cidade",
     title: "Visite a Cidade {n} vez",
     target: () => 1n,
-    eligible: (c) => c.cityUnlocked,
+    eligible: (c) => c.cityUnlocked && missionTier(c) <= 1,
+  },
+  {
+    id: "watch_ads",
+    metric: "ad_watched",
+    title: "Assista {n} anúncios da Loja",
+    target: () => 2n,
+    eligible: (c) => c.ownedCount > 0,
   },
 ];
 
@@ -99,21 +147,31 @@ export function missionRewardCoins(ctx: MissionContext): bigint {
 }
 
 /**
- * Escolhe as missões do dia: sempre "colete N vezes" (se elegível) + sorteio estável
- * (mesmo jogador e mesmo dia → mesmas missões) entre as demais elegíveis.
+ * Escolhe as missões do dia: iniciante sempre recebe "colete N vezes" (aprende o básico); os
+ * demais, um sorteio estável (mesmo jogador e mesmo dia → mesmas missões) entre as elegíveis,
+ * no máximo uma por grupo.
  */
 export function pickDailyMissions(playerId: string, day: string, ctx: MissionContext) {
   const eligible = MISSION_TEMPLATES.filter((t) => t.eligible(ctx));
-  const fixed = eligible.filter((t) => t.id === "collect_times");
+  const fixedId = missionTier(ctx) === 0 ? "collect_times" : null;
+  const fixed = eligible.filter((t) => t.id === fixedId);
   const rest = eligible
-    .filter((t) => t.id !== "collect_times")
+    .filter((t) => t.id !== fixedId)
     .map((t) => ({
       t,
       h: createHash("sha256").update(`${playerId}|${day}|${t.id}`).digest("hex"),
     }))
     .sort((a, b) => (a.h < b.h ? -1 : 1))
     .map((x) => x.t);
-  return [...fixed, ...rest].slice(0, MISSIONS_PER_DAY);
+  const picked: MissionTemplate[] = [];
+  const groups = new Set<string>();
+  for (const t of [...fixed, ...rest]) {
+    if (picked.length >= MISSIONS_PER_DAY) break;
+    if (t.group && groups.has(t.group)) continue;
+    if (t.group) groups.add(t.group);
+    picked.push(t);
+  }
+  return picked;
 }
 
 export function templateById(id: string): MissionTemplate | undefined {

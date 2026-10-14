@@ -2,6 +2,22 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-14 — Correções pedidas pelo titular (lote 1 de 2)
+
+- **Auto-coleta ao vivo:** sem moeda parada esperando; cada ciclo dos ajudantes do mapa aberto
+  aparece na hora (+lucro uma vez só) e o saldo anda; o servidor paga os ciclos completos antes
+  de comprar/melhorar/contratar (`settleLive`) — fim da "duplicação".
+- **Melhorias não voltam mais:** resposta de presença/atualização pedida antes de um toque é
+  descartada; a fila de confirmações só termina depois de acertar o estado.
+- **Números abreviados** (9.999 · 12,3K · 1,23M · 45,6B · 7,89T · 1,5aa) no saldo e em toda a tela;
+  painel do negócio não sai mais da tela (texto corta com "…").
+- **Loja, Missões e Conquistas na hora:** resgates, diamantes diários do VIP e compras com
+  diamantes respondem no toque; servidor confirma em seguida.
+- **Prédios no lugar** no Porto e no Centro (base na borda de baixo de cada quadra).
+- **Missões por fase:** sem missão de iniciante para quem evoluiu, sem missão impossível, alvos
+  maiores, novas "Fature (1 h de renda)" e "Assista 2 anúncios"; tela troca sozinha quando vira o dia.
+- Testes: backend **110**; jogo **131** unitários e **171** com integração.
+
 ## 2026-10-14 — Etapa 6 · V1.2a: Idiomas inglês e espanhol (ADR 0012)
 
 - 258 textos traduzidos (interface, erros, tutorial, mapas, negócios, missões, conquistas, Loja)

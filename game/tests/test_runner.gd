@@ -42,16 +42,23 @@ func _unit_tests() -> void:
 	check(Fmt.coins("0") == "0", "coins 0")
 	check(Fmt.coins("100") == "100", "coins 100")
 	check(Fmt.coins("1000") == "1.000", "coins 1.000")
-	check(Fmt.coins("8000000") == "8.000.000", "coins 8.000.000")
-	check(Fmt.coins("123456789012345678") == "123.456.789.012.345.678", "coins além de float")
-	check(Fmt.coins("-1500") == "-1.500", "coins negativo")
+	check(Fmt.coins("9999") == "9.999" and Fmt.coins("10000") == "10K", "coins inteiro até 9.999")
+	check(Fmt.coins("12345") == "12,3K" and Fmt.coins("123456") == "123K", "coins abreviado em K")
+	check(Fmt.coins("8000000") == "8M" and Fmt.coins("174183741") == "174M", "coins abreviado em M")
+	check(Fmt.coins("1999999999") == "1,99B", "coins trunca (não arredonda para cima)")
+	check(Fmt.coins("7890000000000") == "7,89T", "coins abreviado em T")
+	check(Fmt.coins("123456789012345678") == "123aa" and Fmt.coins("1" + "0".repeat(18)) == "1ab",
+			"coins além de float vira aa, ab")
+	check(Fmt.suffix(30) == "az" and Fmt.suffix(31) == "ba", "sufixos seguem az → ba")
+	check(Fmt.coins("-1500") == "-1.500" and Fmt.coins("-25000") == "-25K", "coins negativo")
+	check(Fmt.full("8000000") == "8.000.000", "número inteiro com milhar")
 	check(Fmt.duration(10) == "10 s", "duração 10 s")
 	check(Fmt.duration(90) == "1 min 30 s", "duração 90 s")
 	check(Fmt.duration(3700) == "1 h 01 min", "duração 3700 s")
 	check(Fmt.duration(480_000) == "5 d 13 h", "duração em dias")
 	check(Fmt.rate(12.0) == "+12/s", "renda inteira")
 	check(Fmt.rate(2.5) == "+2,5/s", "renda com decimal")
-	check(Fmt.rate(1250.4) == "+1.250/s", "renda grande")
+	check(Fmt.rate(1250.4) == "+1.250/s" and Fmt.rate(18302.0) == "+18,3K/s", "renda grande")
 
 	check(Layout.visual_tier(1) == 1 and Layout.visual_tier(9) == 1, "arte nível 1 (1–9)")
 	check(Layout.visual_tier(10) == 2 and Layout.visual_tier(24) == 2, "arte nível 2 (10–24)")
@@ -108,6 +115,7 @@ func _unit_tests() -> void:
 	check(await _trail_tests() == true, "seção trilha de mapas executou até o fim")
 	check(await _fast_collect_tests() == true, "seção coleta rápida executou até o fim")
 	check(await _i18n_tests() == true, "seção idiomas executou até o fim")
+	check(await _live_tests() == true, "seção auto-coleta ao vivo executou até o fim")
 	_sections_done += 1
 
 
@@ -161,6 +169,60 @@ func _fast_collect_tests() -> bool:
 	return true
 
 
+## Auto-coleta ao vivo, respostas velhas descartadas e resgates na hora (pedidos do titular).
+func _live_tests() -> bool:
+	var real_url: String = Api.base_url
+	Api.base_url = "http://127.0.0.1:9/api/v1"
+	GameState.current_district = "praia"
+	var b := _biz("agua", true, 1, true)
+	b.automatic = true
+	b.cycleStartedAt = "2026-01-01T00:00:00.000Z"
+	b.secondsRemaining = 0.05
+	b.pendingAmount = "20"
+	GameState._apply_state({"player": {"tutorialCompleted": true, "autoCollect": true},
+		"wallet": {"coins": "100", "gems": "3"}, "businesses": [b]})
+	var got := []
+	var on_collected := func(items): got.append_array(items)
+	GameState.collected.connect(on_collected)
+	check(not GameState.is_ready(GameState.business("agua")), "ao vivo: com auto-coleta não aparece moeda para tocar")
+	check(GameState.coins() == "120", "ao vivo: saldo já conta o que o ajudante produziu")
+	await get_tree().create_timer(0.15).timeout
+	await get_tree().process_frame
+	check(got.size() == 1 and got[0].amount == "10" and GameState.coins() == "130",
+			"ao vivo: ciclo terminou → +lucro aparece uma vez e o saldo anda")
+	await get_tree().process_frame
+	check(got.size() == 1, "ao vivo: o mesmo ciclo não aparece duas vezes")
+	check(GameState.seconds_remaining(GameState.business("agua")) > 9.0,
+			"ao vivo: a barra recomeça sozinha (próximo ciclo)")
+	GameState.collected.disconnect(on_collected)
+
+	# Resposta de fundo pedida antes de uma melhoria chega velha: não desfaz a melhoria.
+	var old_state := {"player": {"tutorialCompleted": true, "autoCollect": true},
+		"wallet": {"coins": "100", "gems": "3"}, "businesses": [_biz("agua", true, 1, true)]}
+	var rev: int = GameState._local_rev
+	GameState._local_rev += 1  # (uma melhoria no toque)
+	GameState._apply_background(old_state, rev)
+	check(int(GameState.business("agua").get("level", 0)) != 1 or GameState.coins() != "100",
+			"resposta velha da presença não desfaz o que foi feito no toque")
+
+	# Missões e conquistas: resgate na hora.
+	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "0", "gems": "0"}, "businesses": []})
+	GameState.missions = {"missions": [{"id": "m1", "completed": true, "claimed": false, "rewardCoins": "50", "rewardGems": 1}]}
+	GameState.achievements = [{"id": "a1", "unlocked": true, "claimed": false, "rewardGems": 5}]
+	GameState.claim_mission("m1")
+	check(GameState.missions.missions[0].claimed and GameState.coins() == "50" and GameState.gems() == "1",
+			"missão: prêmio entra no toque")
+	GameState.claim_achievement("a1")
+	check(GameState.achievements[0].claimed and GameState.gems() == "6", "conquista: diamantes entram no toque")
+	await GameState.settled()
+	Api.base_url = real_url
+	GameState.state = {}
+	GameState.missions = {}
+	GameState.achievements = []
+	GameState.loaded = false
+	return true
+
+
 ## Trilha de mapas (pedido do titular): 4 mapas + "Em breve"; bloqueados sob nuvens.
 func _trail_tests() -> bool:
 	var Trail := load("res://scripts/map_trail.gd")
@@ -205,14 +267,15 @@ func _i18n_tests() -> bool:
 	check(GameState.message_for("INSUFFICIENT_FUNDS") == "Not enough coins.", "idiomas: erros do servidor traduzidos")
 	check(tr("Escolha com cuidado: você só pode trocar de nome uma vez.\nDe 3 a 20 caracteres. O nome aparece no ranking.")
 			.begins_with("Choose carefully"), "idiomas: texto com quebra de linha traduzido")
-	check(Fmt.coins("1234567") == "1,234,567" and Fmt.rate(2.5) == "+2.5/s", "idiomas: números no padrão inglês")
+	check(Fmt.full("1234567") == "1,234,567" and Fmt.coins("1234567") == "1.23M" and Fmt.rate(2.5) == "+2.5/s",
+			"idiomas: números no padrão inglês")
 	var mission := {"title": "Fature 1.000 moedas", "titleTemplate": "Fature {n} moedas", "target": "1000"}
 	check(Hud.mission_title(mission) == "Earn 1,000 coins", "idiomas: missão traduzida com o alvo formatado")
 	check(Hud.mission_title({"title": "Fature 1.000 moedas", "target": "1000"}) == "Fature 1.000 moedas",
 			"idiomas: servidor antigo sem modelo mostra o título pronto")
 
 	Lang.set_choice("es")
-	check(tr("Vender o império") == "Vender el imperio" and Fmt.coins("1234567") == "1.234.567",
+	check(tr("Vender o império") == "Vender el imperio" and Fmt.full("1234567") == "1.234.567",
 			"idiomas: espanhol com milhar em ponto")
 	Lang.choice = "pt_BR"
 	Lang.load_settings()

@@ -67,6 +67,8 @@ const DISTRICTS := {
 	# Porto e Centro: cenas editadas a partir da cidade (mesma malha de ruas e lotes).
 	"porto": {
 		"title": "Porto da Marina",
+		# Lotes = ponto de apoio do prédio (base), perto da borda de baixo de cada quadra — no
+		# centro da quadra o prédio "subia" para a rua/cais (pedido do titular).
 		"base": "porto_base.jpg",
 		"top_color": Color("006ea1"),
 		"bottom_color": Color("006291"),
@@ -74,12 +76,12 @@ const DISTRICTS := {
 		"zoom": 1.0,
 		"char_scale": 0.42,
 		"lots": {
-			"peixaria": Vector2(376, 530),
-			"loja_surf": Vector2(209, 620),
-			"frutos_mar": Vector2(563, 640),
-			"marina": Vector2(387, 725),
-			"estaleiro": Vector2(165, 805),
-			"terminal": Vector2(565, 830),
+			"peixaria": Vector2(378, 578),
+			"loja_surf": Vector2(212, 668),
+			"frutos_mar": Vector2(560, 700),
+			"marina": Vector2(387, 805),
+			"estaleiro": Vector2(165, 855),
+			"terminal": Vector2(565, 878),
 		},
 		"waypoints": [
 			Vector2(300, 470), Vector2(355, 568), Vector2(420, 598), Vector2(250, 668),
@@ -100,12 +102,12 @@ const DISTRICTS := {
 		"zoom": 1.0,
 		"char_scale": 0.42,
 		"lots": {
-			"joalheria": Vector2(373, 532),
-			"banco": Vector2(200, 632),
-			"torre": Vector2(560, 665),
-			"convencoes": Vector2(158, 805),
-			"estadio": Vector2(578, 845),
-			"aeroporto": Vector2(347, 952),
+			"joalheria": Vector2(375, 578),
+			"banco": Vector2(205, 680),
+			"torre": Vector2(562, 712),
+			"convencoes": Vector2(160, 866),
+			"estadio": Vector2(575, 900),
+			"aeroporto": Vector2(347, 998),
 		},
 		"waypoints": [
 			Vector2(300, 470), Vector2(355, 568), Vector2(420, 598), Vector2(250, 668),

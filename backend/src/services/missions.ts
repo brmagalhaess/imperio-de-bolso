@@ -14,6 +14,7 @@ import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { previousDistrict } from "../economy/districts.js";
 import { dayBounds, gameDay } from "../lib/time.js";
 import { track } from "./analytics.js";
+import { autoCollectActive } from "./entitlements.js";
 import { getPlayerState, starsOf } from "./game.js";
 import { applyCoins, applyGems } from "./wallet.js";
 
@@ -34,7 +35,7 @@ export interface MissionView {
   rewardGems: number;
 }
 
-async function missionContext(db: Reader, playerId: string): Promise<MissionContext> {
+async function missionContext(db: Reader, playerId: string, now: Date): Promise<MissionContext> {
   const [defs, owned, stars] = await Promise.all([
     db.businessDefinition.findMany(),
     db.playerBusiness.findMany({ where: { playerId }, include: { business: true } }),
@@ -49,7 +50,20 @@ async function missionContext(db: Reader, playerId: string): Promise<MissionCont
     return prev === null || (unlocked(prev) && complete(prev));
   };
   const cityUnlocked = unlocked("cidade");
+  const [player, wallet] = await Promise.all([
+    db.player.findUnique({ where: { id: playerId } }),
+    db.playerWallet.findUnique({ where: { playerId } }),
+  ]);
+  const autoCollect = player ? await autoCollectActive(db, player, now) : false;
+  const buyable = defs.filter((d) => !ownedIds.has(d.id) && unlocked(d.district));
+  const hireable = owned.filter((pb) => !pb.managerUnlocked);
+  const min = (xs: bigint[]) =>
+    xs.length === 0 ? null : Number(xs.reduce((a, b) => (b < a ? b : a)));
   return {
+    manualCount: owned.filter((pb) => !(autoCollect && pb.managerUnlocked)).length,
+    cheapestBuy: min(buyable.map((d) => d.cost)),
+    cheapestHire: min(hireable.map((pb) => pb.business.managerCost)),
+    coins: Number(wallet?.coins ?? 0n),
     incomePerSecond: owned.reduce(
       (sum, pb) =>
         sum + Number(profitPerCycle(pb.business, pb.level, stars)) / pb.business.cycleSeconds,
@@ -68,7 +82,7 @@ export async function ensureDailyMissions(db: Reader, playerId: string, now: Dat
   const day = gameDay(now);
   const existing = await db.playerMission.findMany({ where: { playerId, day } });
   if (existing.length > 0) return existing;
-  const ctx = await missionContext(db, playerId);
+  const ctx = await missionContext(db, playerId, now);
   const reward = missionRewardCoins(ctx);
   await db.playerMission.createMany({
     data: pickDailyMissions(playerId, day, ctx).map((t) => ({

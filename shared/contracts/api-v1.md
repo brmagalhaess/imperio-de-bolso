@@ -64,6 +64,11 @@ Não comprado: `owned: false`, `level: 0`, `profitPerCycle` do nível 1, `nextUp
 ### `GET /businesses`
 `200 { businesses: Business[], serverTime }`
 
+**Auto-coleta ao vivo:** com auto-coleta ativa (Loja/VIP) e presença recente, comprar, melhorar
+e contratar pagam antes os ciclos já completos dos ajudantes do mapa aberto (`production_auto`
+no ledger) — o saldo usado é o mesmo que o jogo mostra (ele soma `pendingAmount` e os ciclos
+locais dos negócios `automatic` do mapa aberto).
+
 ### `POST /businesses/purchase` — `Idempotency-Key`
 Corpo `{ businessSlug }`. Debita `cost`, cria o negócio no nível 1 e inicia o primeiro ciclo.
 - `201 { purchased, state: PlayerState }`
@@ -108,7 +113,10 @@ Sem Idempotency-Key (não mexe em saldo); idempotente. `200 PlayerState` com
 ### `GET /missions`
 `200 { day, resetsAt, missions: [{ id, template, title, titleTemplate, target, progress, completed,
 claimed, rewardCoins, rewardGems }], serverTime }` — 3 missões do dia (Brasília), criadas na 1ª
-consulta. `title` vem pronto em pt-BR; `titleTemplate` traz o modelo com `{n}` (ex.: "Fature {n}
+consulta. Missões por fase do jogador (número de negócios): alvos crescem; "colete" só para quem
+tem moeda para tocar; construir/contratar só se der para pagar em até 30 min de renda; no máximo
+uma de faturar por dia. Modelos: `collect_times`, `earn_coins`, `earn_big`, `upgrade_times`,
+`buy_business`, `hire_helper`, `afk_collect`, `visit_city`, `watch_ads`. `title` vem pronto em pt-BR; `titleTemplate` traz o modelo com `{n}` (ex.: "Fature {n}
 moedas"), que o cliente traduz e preenche com `target` no formato do idioma (V1.2).
 
 Textos de catálogo (nomes de negócios, títulos/descrições de conquistas, itens da Loja) seguem em

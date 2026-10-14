@@ -234,7 +234,8 @@ export function purchaseBusiness(slug: string, now: Date) {
       if (owned < total) throw Errors.districtLocked(def.district, requires);
     }
 
-    await applyCoins(tx, wallet, -def.cost, `business_purchase:${slug}`, idempotencyKey, now);
+    const current = await settleLive(tx, wallet, now, `${idempotencyKey}:live`);
+    await applyCoins(tx, current, -def.cost, `business_purchase:${slug}`, idempotencyKey, now);
     await tx.playerBusiness.create({
       data: {
         playerId: wallet.playerId,
@@ -267,10 +268,13 @@ export function upgradeBusiness(slug: string, now: Date) {
     const newLevel = pb.level + 1;
 
     // Produzindo sozinho: o que já foi produzido é pago no nível antigo antes de subir.
-    let current = wallet;
-    if (isAutomatic(pb)) {
+    let current = await settleLive(tx, wallet, now, `${idempotencyKey}:live`);
+    const stillPending = await tx.playerBusiness.findUniqueOrThrow({
+      where: { playerId_businessId: { playerId: wallet.playerId, businessId: def.id } },
+    });
+    if (isAutomatic(stillPending)) {
       current = (
-        await settleAutomatic(tx, wallet, now, `${idempotencyKey}:settle`, { businessId: def.id })
+        await settleAutomatic(tx, current, now, `${idempotencyKey}:settle`, { businessId: def.id })
       ).wallet;
     }
     await applyCoins(
@@ -420,6 +424,24 @@ async function settleAutomatic(
   return { wallet: updated, items, total, elapsedMs, capped };
 }
 
+/**
+ * Auto-coleta no mapa aberto: o jogo mostra cada ciclo dos ajudantes na hora em que termina.
+ * Antes de gastar moedas (comprar, melhorar, contratar), o servidor paga os ciclos já completos
+ * desse mapa — assim o saldo que o jogador vê é o mesmo que o servidor usa.
+ */
+async function settleLive(
+  tx: Tx,
+  wallet: LockedWallet,
+  now: Date,
+  ledgerKey: string,
+): Promise<LockedWallet> {
+  const player = await tx.player.findUniqueOrThrow({ where: { id: wallet.playerId } });
+  if (!player.currentDistrict || !freshPresence(player, now)) return wallet;
+  if (!(await autoCollectActive(tx, player, now))) return wallet;
+  return (await settleAutomatic(tx, wallet, now, ledgerKey, { district: player.currentDistrict }))
+    .wallet;
+}
+
 /** Negócios com ajudante de um mapa saem do modo manual e passam a produzir AFK desde `at`. */
 async function startAfk(tx: Tx, playerId: string, district: string, at: Date): Promise<void> {
   const manual = await tx.playerBusiness.findMany({
@@ -551,7 +573,8 @@ export function hireManager(slug: string, now: Date) {
     if (!pb) throw Errors.businessNotOwned(slug);
     if (pb.managerUnlocked) throw Errors.managerAlreadyHired(slug);
 
-    await applyCoins(tx, wallet, -def.managerCost, `manager_hire:${slug}`, idempotencyKey, now);
+    const current = await settleLive(tx, wallet, now, `${idempotencyKey}:live`);
+    await applyCoins(tx, current, -def.managerCost, `manager_hire:${slug}`, idempotencyKey, now);
     await tx.playerBusiness.update({ where, data: { managerUnlocked: true } });
     await trackMission(tx, wallet.playerId, "hire_count", 1n, now);
     await track(tx, wallet.playerId, "manager_hired", { business: slug });

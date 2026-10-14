@@ -5,6 +5,8 @@
 ## veterano: resumo offline → ajudantes trabalhando → Construir (praia) → Cidade → Construir.
 extends Node
 
+const Layout := preload("res://scripts/layout.gd")
+
 var main: Node
 
 
@@ -26,6 +28,38 @@ func _ready() -> void:
 	while not GameState.loaded:
 		await get_tree().process_frame
 	var hud: Control = main.get_node("UI/HUD")
+	if mode == "saldo":
+		for i in 4:
+			await _wait(2.0)
+			print("cur=%s wallet=%s live=%d coins=%s" % [GameState.current_district, GameState.state.wallet.coins, GameState.live_coins(), GameState.coins()])
+			for b in GameState.businesses():
+				if b.get("automatic", false):
+					print("  auto %s d=%s live=%s pend=%s rem=%s cyc=%s" % [b.slug, b.district, GameState.is_live(b), b.pendingAmount, b.secondsRemaining, b.cycleSeconds])
+		get_tree().quit()
+		return
+	if mode == "distritos" or mode == "vitrine":
+		hud._modal.close()
+		await _wait(1.5)
+		if mode == "vitrine":  # só na tela: todos construídos no nível 25 (servidor intocado)
+			GameState._presence_timer.stop()
+			for b in GameState.businesses():
+				b["owned"] = true
+				b["level"] = 25
+				b["managed"] = true
+			GameState.state_changed.emit()
+		for id in Layout.DISTRICT_ORDER:
+			hud._modal.close()
+			if mode == "vitrine":
+				for b in GameState.businesses():
+					b["owned"] = true
+					b["level"] = 25
+					b["managed"] = true
+				GameState.state_changed.emit()
+			main._show_district(id)
+			await _wait(1.2)
+			print("PASSO " + id)
+		get_tree().quit()
+		return
 	if mode == "idioma":
 		await _wait(2.0)
 		hud._modal.close()

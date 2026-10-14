@@ -106,6 +106,7 @@ func _ready() -> void:
 	GameState.offline_summary.connect(show_offline_summary)
 	GameState.state_changed.connect(_sync_helper_cards)
 	GameState.state_changed.connect(func(): _modal.refresh_store_cards())
+	GameState.catalog_changed.connect(func(): _modal.refresh_store_cards())
 	GameState.busy_changed.connect(func(_b): _modal.refresh_store_cards())
 	GameState.missions_changed.connect(_sync_rewards)
 	GameState.achievements_changed.connect(_sync_rewards)
@@ -482,7 +483,6 @@ func _buy_with_gems(item_id: String) -> void:
 		show_toast(tr("Coleta antecipada: +%s moedas") % Fmt.coins(data.coins))
 	else:
 		show_toast(tr("Auto-coleta ativa!"))
-	await GameState.refresh_catalog()
 	_modal.refresh_store_cards()
 
 
@@ -781,6 +781,10 @@ func _sync_rewards() -> void:
 	if _reward_cards.is_empty() or not _modal.visible:
 		return
 	if _reward_kind == "missions":
+		# Virou o dia com a tela aberta: missões novas (ids novos) → monta a tela de novo.
+		if GameState.missions.get("missions", []).any(func(m): return not _reward_cards.has(m.id)):
+			open_missions_menu()
+			return
 		for m in GameState.missions.get("missions", []):
 			if _reward_cards.has(m.id):
 				_modal.set_reward_card(_reward_cards[m.id], _mission_item(m))
@@ -1026,6 +1030,8 @@ func _build_sheet() -> void:
 	_title.add_theme_font_size_override("font_size", 38)
 	_title.add_theme_color_override("font_color", Style.TEAL_DARK)
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_title.clip_text = true
+	_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	head.add_child(_title)
 	head.add_child(Style.close_button(close_sheet))
 
@@ -1054,6 +1060,9 @@ func _make_button(parent: Control, handler: Callable) -> Button:
 	b.custom_minimum_size.y = Style.MIN_TOUCH
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b.add_theme_font_size_override("font_size", 32)
+	# Texto longo nunca alarga o painel para fora da tela (pedido do titular): corta com "…".
+	b.clip_text = true
+	b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	b.pressed.connect(handler)
 	parent.add_child(b)
 	return b

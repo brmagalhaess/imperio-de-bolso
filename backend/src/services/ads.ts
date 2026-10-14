@@ -11,6 +11,7 @@ import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { dayBounds } from "../lib/time.js";
 import { track } from "./analytics.js";
 import { getPlayerState } from "./game.js";
+import { trackMission } from "./missions.js";
 import { productionFor } from "./store.js";
 import { applyCoins } from "./wallet.js";
 
@@ -128,6 +129,7 @@ export function claimAd(sessionId: string, now: Date) {
     }
     await applyCoins(tx, wallet, s.rewardCoins, `ad:${placement}`, idempotencyKey, now);
     await tx.adReward.update({ where: { id: s.id }, data: { status: "CLAIMED", claimedAt: now } });
+    await trackMission(tx, wallet.playerId, "ad_watched", 1n, now);
     await track(tx, wallet.playerId, "rewarded_ad_completed", { placement });
     return {
       statusCode: 200,

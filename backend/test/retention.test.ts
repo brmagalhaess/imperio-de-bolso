@@ -74,6 +74,9 @@ describe("missões diárias", () => {
       canHire: true,
       hasHelper: true,
       cityUnlocked: true,
+      cheapestBuy: 100,
+      cheapestHire: 50,
+      coins: 1_000,
     };
     const a = pickDailyMissions("p1", "2026-01-01", ctxM).map((t) => t.id);
     expect(pickDailyMissions("p1", "2026-01-01", ctxM).map((t) => t.id)).toEqual(a);

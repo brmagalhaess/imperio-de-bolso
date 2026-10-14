@@ -19,6 +19,8 @@ signal missions_changed
 signal achievements_changed
 ## Prestígio atualizado / império vendido (gained = estrelas ganhas).
 signal prestige_changed
+## Catálogo da Loja recarregado (contadores do dia, direitos do VIP).
+signal catalog_changed
 signal empire_sold(gained: int)
 
 ## Sinal de presença (o servidor considera "fora do mapa" após 45 s sem sinal).
@@ -79,6 +81,16 @@ var current_district := "praia"
 var _received_at_ms := 0
 ## Moedas tocadas aguardando a confirmação do servidor (coleta rápida).
 var _collecting := {}
+## Conta as mudanças feitas no toque (previsões). Resposta "de fundo" (presença, atualização)
+## pedida antes de uma delas chega velha e é descartada — senão desfazia melhorias recém-feitas
+## (pedido do titular: "a auto coleta está voltando as minhas melhorias").
+var _local_rev := 0
+var _resync_pending := false
+## Loja precisa ser recarregada depois da confirmação (contadores e direitos).
+var _catalog_dirty := false
+var _pinging := false
+## Auto-coleta ao vivo: ciclos dos ajudantes já mostrados (slug → ciclos desde a última resposta).
+var _live_shown := {}
 var _presence_timer: Timer
 var _reconnect_timer: Timer
 
@@ -86,9 +98,7 @@ var _reconnect_timer: Timer
 func _ready() -> void:
 	_presence_timer = Timer.new()
 	_presence_timer.wait_time = PRESENCE_INTERVAL
-	_presence_timer.timeout.connect(func():
-		if not busy:
-			enter_district(current_district, false))
+	_presence_timer.timeout.connect(_ping)
 	add_child(_presence_timer)
 	_reconnect_timer = Timer.new()
 	_reconnect_timer.wait_time = RECONNECT_INTERVAL
@@ -118,10 +128,15 @@ func boot() -> bool:
 	return true
 
 
-func refresh() -> void:
+## `force`: aplica mesmo com previsões na fila (desfazer uma previsão recusada pelo servidor).
+func refresh(force := false) -> void:
+	var rev := _local_rev
 	var res := await Api.get_state()
 	if res.ok:
-		_apply_state(res.data)
+		if force:
+			_apply_state(res.data)
+		else:
+			_apply_background(res.data, rev)
 		_set_online(true)
 	elif res.network_error:
 		_set_online(false)
@@ -132,19 +147,32 @@ func resume() -> void:
 	await enter_district(current_district, true)
 
 
+## Sinal periódico de presença: espera as confirmações da fila (nunca corre na frente delas).
+func _ping() -> void:
+	if _pinging or busy:
+		return
+	_pinging = true
+	await settled()
+	await enter_district(current_district, false)
+	_pinging = false
+
+
 ## Avisa o servidor do mapa aberto; ao entrar num mapa recebe o AFK dos ajudantes dele.
 ## `show_summary` mostra "Bem-vindo de volta" se ficou fora ≥ 1 min e houve ganho.
 func enter_district(district: String, show_summary: bool) -> void:
 	current_district = district
+	var rev := _local_rev
 	var res := await Api.presence(district)
 	if not res.ok:
 		if res.network_error:
 			_set_online(false)
 		return
 	_set_online(true)
-	_apply_state(res.data.state)
+	_apply_background(res.data.state, rev)
+	# Ficando no mesmo mapa (auto-coleta), os ganhos já apareceram ao vivo, ciclo a ciclo.
 	if not res.data.settled.is_empty():
-		collected.emit(res.data.settled)
+		if res.data.get("returned", true):
+			collected.emit(res.data.settled)
 		refresh_missions()
 	if show_summary and int(res.data.elapsedSeconds) >= OFFLINE_SUMMARY_MIN_SECONDS \
 			and str(res.data.total) != "0":
@@ -176,52 +204,57 @@ func hire_manager(slug: String) -> bool:
 	return await _optimistic(Api.hire_manager.bind(slug), _predict_hire.bind(slug), "hire")
 
 
+## Listas com resgate na fila não são trocadas pela resposta velha (o botão voltaria a
+## "Resgatar"); a fila, ao esvaziar, pede de novo.
 func refresh_missions() -> void:
 	var res := await Api.missions()
-	if res.ok:
+	if res.ok and _queued == 0:
 		missions = res.data
 		missions_changed.emit()
 
 
 func refresh_achievements() -> void:
 	var res := await Api.achievements()
-	if res.ok:
+	if res.ok and _queued == 0:
 		achievements = res.data.achievements
 		achievements_changed.emit()
 
 
+## Resgates respondem no toque (pedido do titular: Loja e Perfil estavam lentos); o servidor
+## confirma na fila e, se recusar, tudo volta ao estado dele.
 func claim_mission(mission_id: String) -> bool:
-	if busy:
-		return false
-	_set_busy(true)
-	var res := await Api.claim_mission(mission_id)
-	_set_busy(false)
-	if not res.ok:
-		_fail(res.error_code)
-		refresh_missions()
-		return false
-	missions.missions = res.data.missions
-	_apply_state(res.data.state)
-	Audio.play("reward")
+	var ok := await _optimistic(Api.claim_mission.bind(mission_id), func() -> bool:
+		for m in missions.get("missions", []):
+			if m.id == mission_id and m.completed and not m.claimed:
+				m["claimed"] = true
+				_add_coins(m.rewardCoins)
+				_add_gems(m.rewardGems)
+				return true
+		return false, "reward")
 	missions_changed.emit()
-	return true
+	return ok
 
 
 func claim_achievement(achievement_id: String) -> bool:
-	if busy:
-		return false
-	_set_busy(true)
-	var res := await Api.claim_achievement(achievement_id)
-	_set_busy(false)
-	if not res.ok:
-		_fail(res.error_code)
-		refresh_achievements()
-		return false
-	achievements = res.data.achievements
-	_apply_state(res.data.state)
-	Audio.play("reward")
+	var ok := await _optimistic(Api.claim_achievement.bind(achievement_id), func() -> bool:
+		for a in achievements:
+			if a.id == achievement_id and a.unlocked and not a.claimed:
+				a["claimed"] = true
+				_add_gems(a.rewardGems)
+				return true
+		return false, "reward")
 	achievements_changed.emit()
-	return true
+	return ok
+
+
+func _add_coins(amount: Variant) -> void:
+	var wallet: Dictionary = state.get("wallet", {})
+	wallet["coins"] = str(str(wallet.get("coins", "0")).to_int() + str(amount).to_int())
+
+
+func _add_gems(amount: Variant) -> void:
+	var wallet: Dictionary = state.get("wallet", {})
+	wallet["gems"] = str(str(wallet.get("gems", "0")).to_int() + str(amount).to_int())
 
 
 ## Quantos prêmios esperam resgate (selo nos botões).
@@ -235,8 +268,9 @@ func claimable_achievements() -> int:
 
 func refresh_catalog() -> void:
 	var res := await Api.store_catalog(current_district)
-	if res.ok:
+	if res.ok and _queued == 0:
 		catalog = res.data
+		catalog_changed.emit()
 
 
 func store_item(item_id: String) -> Dictionary:
@@ -254,19 +288,33 @@ func auto_collect_until() -> Variant:
 	return state.get("player", {}).get("autoCollectUntil")
 
 
-## Compra com diamantes (auto-coleta, turbo). Devolve a resposta (moedas do turbo etc.).
+## Compra com diamantes (auto-coleta, coleta antecipada), na hora. Devolve a previsão
+## ({coins} da coleta antecipada ou {autoCollect}); o servidor confirma em seguida.
 func buy_with_gems(item_id: String) -> Dictionary:
-	if busy:
-		return {}
-	_set_busy(true)
-	var res := await Api.store_buy(item_id, current_district)
-	_set_busy(false)
-	if not res.ok:
-		_fail(res.error_code)
-		return {}
-	_apply_state(res.data.state)
-	Audio.play("bonus")
-	return res.data
+	var item := store_item(item_id)
+	var result := {}
+	var ok := await _optimistic(Api.store_buy.bind(item_id, current_district), func() -> bool:
+		var cost := str(item.get("costGems", "")).to_int()
+		if item.is_empty() or cost <= 0 or gems().to_int() < cost:
+			return false
+		if item.get("kind", "") == "boost" and str(item.get("estimateCoins", "0")).to_int() <= 0:
+			return false
+		_add_gems(-cost)
+		if item.get("kind", "") == "boost":
+			_add_coins(item.estimateCoins)
+			result["coins"] = str(item.estimateCoins)  # (lambda copia variáveis: muta, não reatribui)
+		else:
+			var player: Dictionary = state.get("player", {})
+			player["autoCollect"] = true
+			var base := Time.get_unix_time_from_system()
+			if player.get("autoCollectUntil") != null:
+				base = max(base, Time.get_unix_time_from_datetime_string(str(player.autoCollectUntil).substr(0, 19)))
+			player["autoCollectUntil"] = Time.get_datetime_string_from_unix_time(
+					int(base) + int(item.get("hours", 24)) * 3600) + "Z"
+			result["autoCollect"] = true
+		_catalog_dirty = true
+		return true, "bonus")
+	return result if ok else {}
 
 
 ## Compra de TESTE (modo sandbox): nada é cobrado; o servidor registra como loja "mock".
@@ -285,20 +333,16 @@ func buy_sandbox(product_id: String) -> bool:
 	return true
 
 
-## Recompensa diária do VIP (diamantes).
+## Recompensa diária do VIP (diamantes), na hora.
 func claim_vip_daily() -> bool:
-	if busy:
-		return false
-	_set_busy(true)
-	var res := await Api.vip_daily()
-	_set_busy(false)
-	if not res.ok:
-		_fail(res.error_code)
-		return false
-	_apply_state(res.data.state)
-	Audio.play("reward")
-	await refresh_catalog()
-	return true
+	return await _optimistic(Api.vip_daily, func() -> bool:
+		var ent: Dictionary = catalog.get("entitlements", {})
+		if vip_until() == null or ent.get("vipDailyClaimed", false):
+			return false
+		ent["vipDailyClaimed"] = true
+		_add_gems(int(ent.get("vipDailyGems", 5)))
+		_catalog_dirty = true
+		return true, "reward")
 
 
 ## Troca de nome (uma vez). Devolve true se o servidor aceitou.
@@ -422,11 +466,14 @@ func settled() -> void:
 
 
 func _optimistic(call: Callable, predict: Callable, sfx: String) -> bool:
+	# O servidor paga os ciclos ao vivo antes de gastar (settleLive): a previsão faz o mesmo.
+	_bank_live()
 	if not loaded or not predict.call():
 		# Sem como prever (ex.: sem saldo): pergunta ao servidor, que explica o motivo.
 		return await _run(call, sfx)
 	Audio.play(sfx)
 	_predict_districts()
+	_local_rev += 1
 	state_changed.emit()
 	_confirm(call)  # sem await: a interface já respondeu
 	return true
@@ -439,20 +486,29 @@ func _confirm(call: Callable) -> void:
 	_inflight = true
 	var res: Dictionary = await call.call()
 	_inflight = false
-	_queued -= 1
-	command_done.emit()
 	if res.ok:
 		_set_online(true)
-		if _queued == 0:
+		if _queued == 1:  # última da fila: vale o estado oficial
 			_apply_state(res.data.state)
-			refresh_missions()
-			refresh_achievements()
+			refresh_missions.call_deferred()
+			refresh_achievements.call_deferred()
 			refresh_prestige()
-		return
-	if res.network_error:
-		_set_online(false)
-	_fail(res.error_code)
-	await refresh()  # desfaz a previsão: vale o que o servidor disser
+			if _catalog_dirty:
+				_catalog_dirty = false
+				refresh_catalog.call_deferred()
+	else:
+		if res.network_error:
+			_set_online(false)
+		_fail(res.error_code)
+		await refresh(true)  # desfaz a previsão: vale o que o servidor disser
+		refresh_missions.call_deferred()
+		refresh_achievements.call_deferred()
+		if _catalog_dirty:
+			_catalog_dirty = false
+			refresh_catalog.call_deferred()
+	# Só sai da fila depois de acertar o estado (settled() = estado oficial na tela).
+	_queued -= 1
+	command_done.emit()
 
 
 func _spend(amount: Variant) -> bool:
@@ -521,6 +577,7 @@ func collect_fast(slug: String) -> void:
 	if b.is_empty() or not is_ready(b) or _collecting.has(slug):
 		return
 	_collecting[slug] = true
+	_local_rev += 1
 	# Novo ciclo começa agora (como o servidor faz ao coletar).
 	b["secondsRemaining"] = float(b.cycleSeconds) + (Time.get_ticks_msec() - _received_at_ms) / 1000.0
 	var wallet: Dictionary = state.get("wallet", {})
@@ -531,8 +588,73 @@ func collect_fast(slug: String) -> void:
 	_collecting.erase(slug)
 
 
+## Saldo na tela: o da carteira + os ciclos dos ajudantes que a auto-coleta já completou no
+## mapa aberto (o servidor paga esses ciclos no próximo sinal ou antes de qualquer gasto).
 func coins() -> String:
-	return str(state.get("wallet", {}).get("coins", "0"))
+	var wallet := str(state.get("wallet", {}).get("coins", "0"))
+	var live := live_coins()
+	return wallet if live == 0 else str(wallet.to_int() + live)
+
+
+## Auto-coleta ao vivo: negócio com ajudante produzindo sozinho no mapa aberto.
+## Sem auto-coleta, "automático" é o AFK de outro mapa (pago com resumo ao voltar), nunca ao vivo.
+func is_live(b: Dictionary) -> bool:
+	return b.get("owned", false) and b.get("automatic", false) and auto_collect() \
+			and str(b.get("district", "")) == current_district
+
+
+## Ciclos que terminaram desde a última resposta do servidor (relógio do aparelho).
+func _live_cycles(b: Dictionary) -> int:
+	if not is_live(b):
+		return 0
+	var elapsed := (Time.get_ticks_msec() - _received_at_ms) / 1000.0
+	var first := float(b.get("secondsRemaining", 0))
+	if elapsed < first:
+		return 0
+	return 1 + int((elapsed - first) / max(1.0, float(b.cycleSeconds)))
+
+
+## Moedas ainda não pagas pelo servidor dos negócios ao vivo (pendentes + ciclos locais).
+func live_coins() -> int:
+	var total := 0
+	for b in businesses():
+		if is_live(b):
+			total += str(b.get("pendingAmount", "0")).to_int() \
+					+ str(b.profitPerCycle).to_int() * _live_cycles(b)
+	return total
+
+
+## Passa os ganhos ao vivo para a carteira (antes de uma previsão de gasto, como o servidor).
+func _bank_live() -> void:
+	var wallet: Dictionary = state.get("wallet", {})
+	for b in businesses():
+		if not is_live(b):
+			continue
+		var cycles := _live_cycles(b)
+		var amount := str(b.get("pendingAmount", "0")).to_int() + str(b.profitPerCycle).to_int() * cycles
+		if amount != 0:
+			wallet["coins"] = str(str(wallet.get("coins", "0")).to_int() + amount)
+		b["pendingAmount"] = "0"
+		b["secondsRemaining"] = float(b.secondsRemaining) + cycles * float(b.cycleSeconds)
+		_live_shown[b.slug] = 0
+
+
+## A cada quadro: ciclo ao vivo terminou → "+lucro" sobe do negócio e o saldo anda (uma vez só).
+func _process(_delta: float) -> void:
+	if not loaded:
+		return
+	var items := []
+	for b in businesses():
+		if not is_live(b):
+			continue
+		var cycles := _live_cycles(b)
+		var shown := int(_live_shown.get(b.slug, 0))
+		if cycles > shown:
+			items.append({"slug": b.slug, "amount": str(str(b.profitPerCycle).to_int() * (cycles - shown))})
+			_live_shown[b.slug] = cycles
+	if not items.is_empty():
+		collected.emit(items)
+		state_changed.emit()
 
 
 func businesses() -> Array:
@@ -546,16 +668,24 @@ func business(slug: String) -> Dictionary:
 	return {}
 
 
-## Segundos até o fim do ciclo, estimados localmente desde a última resposta.
+## Segundos até o fim do ciclo, estimados localmente desde a última resposta. No ciclo
+## automático o relógio dá a volta sozinho (o ajudante já começa o próximo).
 func seconds_remaining(b: Dictionary) -> float:
 	if not b.get("owned", false) or b.get("cycleStartedAt") == null:
 		return 0.0
 	var elapsed := (Time.get_ticks_msec() - _received_at_ms) / 1000.0
-	return max(0.0, float(b.secondsRemaining) - elapsed)
+	var left := float(b.secondsRemaining) - elapsed
+	if b.get("automatic", false) and left <= 0.0:
+		var cycle: float = max(1.0, float(b.cycleSeconds))
+		return cycle - fmod(-left, cycle)
+	return max(0.0, left)
 
 
+## Moeda para tocar: só na produção manual (com auto-coleta não há moeda — pedido do titular:
+## a moeda ficava parada esperando e o valor parecia duplicar).
 func is_ready(b: Dictionary) -> bool:
-	return b.get("owned", false) and b.get("cycleStartedAt") != null and seconds_remaining(b) <= 0.0
+	return b.get("owned", false) and b.get("cycleStartedAt") != null \
+			and not b.get("automatic", false) and seconds_remaining(b) <= 0.0
 
 
 ## Fração 0..1 do ciclo atual, para barras de progresso.
@@ -625,7 +755,23 @@ func _apply_state(new_state: Dictionary) -> void:
 	state = new_state
 	loaded = true
 	_received_at_ms = Time.get_ticks_msec()
+	_live_shown.clear()  # ciclos ao vivo recomeçam da resposta nova (pagos ou pendentes nela)
 	state_changed.emit()
+
+
+## Estado pedido em segundo plano: só vale se nada mudou no toque desde o pedido e não há
+## confirmação na fila. Senão descarta e, quando a fila esvaziar, pede o estado de novo.
+func _apply_background(new_state: Dictionary, rev: int) -> void:
+	if rev == _local_rev and _queued == 0:
+		_apply_state(new_state)
+		return
+	if _resync_pending:
+		return
+	_resync_pending = true
+	await settled()
+	_resync_pending = false
+	if _queued == 0:
+		await refresh()
 
 
 func _set_online(value: bool) -> void:
