@@ -25,6 +25,10 @@ model Player {
   displayName         String    @map("display_name")
   // Troca de nome permitida uma única vez (Perfil).
   nameChangedAt       DateTime? @map("name_changed_at") @db.Timestamptz(3)
+  // Prestígio (ADR 0011): estrelas de investidor = bônus permanente de lucro.
+  prestigeStars       Int       @default(0) @map("prestige_stars")
+  prestigeCount       Int       @default(0) @map("prestige_count")
+  lastPrestigeAt      DateTime? @map("last_prestige_at") @db.Timestamptz(3)
   tutorialCompletedAt DateTime? @map("tutorial_completed_at") @db.Timestamptz(3)
   // Presença por mapa (ADR 0006): mapa aberto agora e último sinal do jogo.
   currentDistrict     String?   @map("current_district")

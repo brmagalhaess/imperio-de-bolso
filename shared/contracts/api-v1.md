@@ -156,6 +156,13 @@ Corpo `{ events: [{ name, props? }] }` (1–20). Nomes permitidos: `tutorial_sta
 `{ displayName }` → `200 PlayerState` (`player.canChangeName: false`). Uma vez por conta.
 `422 NAME_INVALID`, `422 NAME_NOT_ALLOWED`, `409 NAME_TAKEN`, `409 NAME_ALREADY_CHANGED`.
 
+### `GET /prestige` · `POST /prestige` (ADR 0011)
+`GET` → `{ stars, bonusPercent, count, earnedSinceLast, starsToGain, nextBonusPercent, requires,
+requirementMet, available }`. `POST` (comando, `Idempotency-Key`) vende o império →
+`200 { gained, prestige, state }`; `409 PRESTIGE_NOT_AVAILABLE` sem a cidade completa ou sem
+estrela a ganhar. `PlayerState.player` ganha `prestigeStars` e `prestigeBonusPercent`; o
+`profitPerCycle` dos negócios já vem com o bônus.
+
 ### `POST /player/delete`
 `{ confirm: "EXCLUIR" }` → `200 { deleted: true }`. Irreversível (ADR 0009): apaga jogador,
 carteira, ledger, negócios, missões, conquistas, anúncios e eventos. Recibos/assinaturas ficam

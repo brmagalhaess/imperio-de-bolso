@@ -114,6 +114,15 @@ func change_name(display_name: String) -> Dictionary:
 	return await _authed(HTTPClient.METHOD_POST, "/player/name", {"displayName": display_name}, "")
 
 
+## Prestígio — "Vender o império" (ADR 0011).
+func prestige() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_GET, "/prestige", null, "")
+
+
+func sell_empire() -> Dictionary:
+	return await _command("/prestige", {})
+
+
 ## Exclusão de conta (LGPD, ADR 0009): irreversível. Esquece a sessão salva no aparelho.
 func delete_account() -> Dictionary:
 	var res := await _authed(HTTPClient.METHOD_POST, "/player/delete", {"confirm": "EXCLUIR"}, "")

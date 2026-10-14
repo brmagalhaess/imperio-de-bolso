@@ -23,6 +23,20 @@ func _ready() -> void:
 	while not GameState.loaded:
 		await get_tree().process_frame
 	var hud: Control = main.get_node("UI/HUD")
+	if mode == "prestigio":
+		await _wait(2.0)
+		hud._modal.close()
+		await GameState.refresh_prestige()
+		hud.open_profile_menu()
+		await _wait(1.0)
+		hud._modal._scroll.scroll_vertical = 100000
+		await _wait(1.2)
+		print("PASSO perfil prestigio")
+		hud.open_prestige_form()
+		await _wait(1.2)
+		print("PASSO vender")
+		get_tree().quit()
+		return
 	if mode == "mapas":
 		# Trilha de mapas + cenas novas (porto e centro) mostradas direto, para captura.
 		await _wait(2.0)

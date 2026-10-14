@@ -25,7 +25,12 @@ async function stats(db: Reader, playerId: string): Promise<AchievementStats> {
     ownedByDistrict[pb.business.district] = (ownedByDistrict[pb.business.district] ?? 0) + 1;
   const totalByDistrict: Record<string, number> = {};
   for (const d of defs) totalByDistrict[d.district] = (totalByDistrict[d.district] ?? 0) + 1;
+  const player = await db.player.findUnique({
+    where: { id: playerId },
+    select: { prestigeCount: true },
+  });
   return {
+    prestigeCount: player?.prestigeCount ?? 0,
     ownedCount: owned.length,
     praiaComplete: (ownedByDistrict.praia ?? 0) >= (totalByDistrict.praia ?? 4),
     ownedByDistrict,

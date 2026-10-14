@@ -18,6 +18,7 @@ import {
   verifyPurchase,
 } from "../services/purchases.js";
 import { deleteAccount } from "../services/account.js";
+import { getPrestige, sellEmpire } from "../services/prestige.js";
 import { changeName } from "../services/profile.js";
 import { buyWithGems, claimVipDaily, getCatalog } from "../services/store.js";
 import { claimAchievement, listAchievements } from "../services/achievements.js";
@@ -241,6 +242,15 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
   });
 
   // Exclusão de conta (LGPD, ADR 0009): irreversível; exige a confirmação digitada.
+  // Prestígio — "Vender o império" (ADR 0011).
+  app.get("/prestige", { preHandler: authenticate }, async (request) =>
+    getPrestige(db, playerIdOf(request)),
+  );
+
+  app.post("/prestige", { preHandler: authenticate }, async (request, reply) =>
+    command(request, reply, "prestige.sell", (at) => sellEmpire(config.STARTING_COINS, at)),
+  );
+
   app.post("/player/delete", { preHandler: authenticate }, async (request) => {
     z.object({ confirm: z.literal("EXCLUIR") }).parse(request.body);
     await deleteAccount(db, playerIdOf(request));

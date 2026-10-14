@@ -581,6 +581,7 @@ func open_profile_menu() -> void:
 		show_toast(tr("Código copiado!")))
 	if player.get("canChangeName", false):
 		_modal.add_action(tr("Alterar nome (só 1 vez)"), open_name_form, Style.TEAL_LIGHT, Style.TEAL_DARK)
+	_add_prestige_section()
 	_modal.add_section(tr("Conquistas"))
 	for a in GameState.achievements:
 		var ach: Dictionary = a
@@ -595,6 +596,44 @@ func open_profile_menu() -> void:
 ## pelo site; o painel admin encontra o jogador por ele.
 static func player_code() -> String:
 	return str(GameState.state.get("player", {}).get("id", "")).substr(0, 8).to_upper()
+
+
+# --- Prestígio: "Vender o império" (ADR 0011) ---------------------------------
+
+func _add_prestige_section() -> void:
+	var p: Dictionary = GameState.prestige
+	if p.is_empty():
+		return
+	var stars := int(p.get("stars", 0))
+	var gain := int(p.get("starsToGain", 0))
+	_modal.add_section(tr("Prestígio"))
+	var status: String
+	if not p.get("requirementMet", false):
+		status = tr("Complete a cidade para poder vender o império.")
+	elif gain < 1:
+		status = tr("Fature mais para ganhar a primeira estrela desta rodada.")
+	else:
+		status = tr("Vender agora rende +%d ⭐ (lucro +%d%% para sempre).") % [gain, int(p.get("nextBonusPercent", 0))]
+	_modal.add_message(null, tr("⭐ %d estrelas · lucro +%d%%") % [stars, int(p.get("bonusPercent", 0))],
+			tr("Venda o império para recomeçar da praia com mais lucro em tudo.") + "\n" + status)
+	if p.get("available", false):
+		_modal.add_action(tr("Vender o império (+%d ⭐)") % gain, open_prestige_form, Style.ORANGE, Style.ORANGE_DARK)
+
+
+func open_prestige_form() -> void:
+	_reward_kind = "prestige"
+	_reward_cards.clear()
+	var p: Dictionary = GameState.prestige
+	_modal.open(tr("Vender o império"))
+	_modal.add_message(null, tr("+%d ⭐ · lucro +%d%% para sempre") % [int(p.get("starsToGain", 0)), int(p.get("nextBonusPercent", 0))],
+			tr("Você recomeça na praia com 100 moedas. Negócios, níveis, ajudantes, moedas e mapas voltam ao início.\nFicam: diamantes, conquistas, Passe VIP, auto-coleta comprada e o ranking da semana."))
+	_modal.add_action(tr("Vender e recomeçar"), func():
+		if await GameState.sell_empire():
+			show_toast(tr("Império vendido! +%d ⭐ — agora seu lucro é +%d%%.") % [
+					int(GameState.prestige.get("stars", 0)) - int(p.get("stars", 0)), int(GameState.prestige.get("bonusPercent", 0))])
+		else:
+			open_profile_menu(), Style.ORANGE, Style.ORANGE_DARK)
+	_modal.add_action(tr("Agora não"), open_profile_menu, Style.GREY, Style.GREY_DARK)
 
 
 ## Exclusão de conta (LGPD, ADR 0009): irreversível, com confirmação digitada.

@@ -448,6 +448,22 @@ func _store_tests() -> bool:
 	await get_tree().process_frame
 	has_rename = hud._modal._list.get_children().any(func(c): return not c.is_queued_for_deletion() and c is Button and c.text.begins_with("Alterar nome"))
 	check(not has_rename, "depois de trocar, a opção some")
+	# Prestígio no Perfil (ADR 0011): só oferece vender quando o servidor diz que dá.
+	GameState.prestige = {"stars": 7, "bonusPercent": 14, "starsToGain": 3, "nextBonusPercent": 20,
+		"requirementMet": true, "available": true}
+	hud.open_profile_menu()
+	await get_tree().process_frame
+	var prof_texts: String = " ".join(hud._modal._list.find_children("*", "Label", true, false).map(func(l): return l.text))
+	var sell_btn: Array = hud._modal._list.find_children("*", "Button", true, false).filter(func(b): return b.text.begins_with("Vender o império"))
+	check(prof_texts.contains("⭐ 7 estrelas · lucro +14%") and sell_btn.size() == 1 and sell_btn[0].text.contains("+3"),
+			"prestígio: perfil mostra estrelas, bônus e o botão de vender")
+	GameState.prestige.available = false
+	GameState.prestige.requirementMet = false
+	hud.open_profile_menu()
+	await get_tree().process_frame
+	sell_btn = hud._modal._list.find_children("*", "Button", true, false).filter(func(b): return not b.is_queued_for_deletion() and b.text.begins_with("Vender o império"))
+	check(sell_btn.is_empty(), "prestígio: sem botão antes de completar a cidade")
+	GameState.prestige = {}
 	var live := func() -> Array: return hud._modal._list.get_children().filter(func(c): return not c.is_queued_for_deletion())
 	var del_btn: Array = live.call().filter(func(c): return c is Button and c.text == "Excluir conta")
 	check(del_btn.size() == 1, "perfil oferece excluir a conta (LGPD)")
@@ -491,6 +507,11 @@ func _integration_test() -> void:
 	check(GameState.missions.get("missions", []).size() == 3, "servidor entrega 3 missões do dia")
 	await GameState.refresh_achievements()
 	check(GameState.achievements.size() >= 10, "servidor entrega as conquistas")
+	await GameState.refresh_prestige()
+	check(int(GameState.prestige.get("stars", -1)) == 0 and not GameState.prestige.get("available", true),
+			"prestígio: conta nova sem estrelas e sem venda liberada")
+	var early_sell := await Api.sell_empire()
+	check(early_sell.error_code == "PRESTIGE_NOT_AVAILABLE", "prestígio: servidor recusa vender antes da cidade")
 	var lb := await Api.leaderboard()
 	check(lb.ok and lb.data.has("entries"), "ranking semanal responde")
 

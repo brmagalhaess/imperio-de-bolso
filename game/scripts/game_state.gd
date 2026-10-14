@@ -17,6 +17,9 @@ signal connection_changed(online: bool)
 ## Missões do dia / conquistas atualizadas (para selos e telas abertas).
 signal missions_changed
 signal achievements_changed
+## Prestígio atualizado / império vendido (gained = estrelas ganhas).
+signal prestige_changed
+signal empire_sold(gained: int)
 
 ## Sinal de presença (o servidor considera "fora do mapa" após 45 s sem sinal).
 const PRESENCE_INTERVAL := 15.0
@@ -56,6 +59,7 @@ const MESSAGES := {
 	"NAME_NOT_ALLOWED": "Esse nome não é permitido.",
 	"NAME_TAKEN": "Esse nome já está em uso.",
 	"NAME_ALREADY_CHANGED": "Você já trocou de nome uma vez.",
+	"PRESTIGE_NOT_AVAILABLE": "Complete a cidade e fature mais para vender o império.",
 	"VALIDATION_ERROR": "Dados inválidos. Confira e tente de novo.",
 }
 
@@ -63,6 +67,8 @@ var state: Dictionary = {}
 ## {day, resetsAt, missions:[...]} do servidor.
 var missions: Dictionary = {}
 var achievements: Array = []
+## Situação do prestígio ({stars, bonusPercent, starsToGain, available, ...}).
+var prestige: Dictionary = {}
 ## Catálogo da Loja ({sandbox, items, entitlements}).
 var catalog: Dictionary = {}
 var loaded := false
@@ -108,6 +114,7 @@ func boot() -> bool:
 	refresh_missions()
 	refresh_achievements()
 	refresh_catalog()  # Loja abre já preenchida
+	refresh_prestige()
 	return true
 
 
@@ -308,6 +315,34 @@ func change_name(display_name: String) -> bool:
 	return true
 
 
+func refresh_prestige() -> void:
+	var res := await Api.prestige()
+	if res.ok:
+		prestige = res.data
+		prestige_changed.emit()
+
+
+## Vender o império: o servidor zera os negócios e soma as estrelas; o jogo volta à praia.
+func sell_empire() -> bool:
+	if busy:
+		return false
+	await settled()
+	_set_busy(true)
+	var res := await Api.sell_empire()
+	_set_busy(false)
+	if not res.ok:
+		_fail(res.error_code)
+		return false
+	prestige = res.data.prestige
+	_apply_state(res.data.state)
+	Audio.play("reward")
+	prestige_changed.emit()
+	empire_sold.emit(int(res.data.gained))
+	refresh_missions()
+	refresh_achievements()
+	return true
+
+
 ## Exclusão de conta: o servidor apaga tudo e o jogo recomeça do zero com uma conta nova.
 func delete_account() -> bool:
 	if busy:
@@ -412,6 +447,7 @@ func _confirm(call: Callable) -> void:
 			_apply_state(res.data.state)
 			refresh_missions()
 			refresh_achievements()
+			refresh_prestige()
 		return
 	if res.network_error:
 		_set_online(false)
@@ -575,6 +611,7 @@ func _run(call: Callable, sfx := "") -> bool:
 			collected.emit(res.data.settled)
 		refresh_missions()  # progresso das missões vem do servidor
 		refresh_achievements()
+		refresh_prestige()
 		return true
 	if res.network_error:
 		_set_online(false)

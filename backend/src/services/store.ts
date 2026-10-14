@@ -6,7 +6,7 @@ import { dayBounds, gameDay } from "../lib/time.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { track } from "./analytics.js";
 import { vipUntil } from "./entitlements.js";
-import { getPlayerState } from "./game.js";
+import { getPlayerState, starsOf } from "./game.js";
 import { applyCoins, applyGems } from "./wallet.js";
 
 // Loja (ADR 0008): itens comprados com diamantes e vitrine dos itens de dinheiro real/anúncio.
@@ -20,14 +20,17 @@ export async function productionFor(
   district: string,
   seconds: number,
 ): Promise<bigint> {
-  const owned = await db.playerBusiness.findMany({
-    where: { playerId, business: { district } },
-    include: { business: true },
-  });
+  const [owned, stars] = await Promise.all([
+    db.playerBusiness.findMany({
+      where: { playerId, business: { district } },
+      include: { business: true },
+    }),
+    starsOf(db, playerId),
+  ]);
   return owned.reduce(
     (sum, pb) =>
       sum +
-      profitPerCycle(pb.business, pb.level) *
+      profitPerCycle(pb.business, pb.level, stars) *
         BigInt(Math.floor(seconds / pb.business.cycleSeconds)),
     0n,
   );

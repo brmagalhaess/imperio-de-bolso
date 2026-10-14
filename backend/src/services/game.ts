@@ -2,6 +2,7 @@ import type { Db, Tx } from "../db/prisma.js";
 import type { BusinessDefinition, PlayerBusiness } from "../generated/prisma/client.js";
 import { Errors } from "../errors.js";
 import { DISTRICTS, previousDistrict } from "../economy/districts.js";
+import { bonusPercent } from "../economy/prestige.js";
 import { nextUpgradeCost, profitPerCycle } from "../economy/formulas.js";
 import { OFFLINE_CAP_MS, settle } from "../economy/offline.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
@@ -65,6 +66,9 @@ export interface PlayerStateView {
     vipUntil: string | null;
     /** Pode trocar o nome (só uma vez). */
     canChangeName: boolean;
+    /** Estrelas de prestígio e bônus de lucro em % (ADR 0011). */
+    prestigeStars: number;
+    prestigeBonusPercent: number;
   };
   wallet: { coins: string; gems: string };
   businesses: BusinessView[];
@@ -110,10 +114,20 @@ function cycleStatus(pb: PlayerBusiness | undefined, cycleSeconds: number, now: 
   };
 }
 
+/** Estrelas de prestígio do jogador (bônus permanente de lucro — ADR 0011). */
+export async function starsOf(db: Reader, playerId: string): Promise<number> {
+  const p = await db.player.findUnique({
+    where: { id: playerId },
+    select: { prestigeStars: true },
+  });
+  return p?.prestigeStars ?? 0;
+}
+
 function toBusinessView(
   def: BusinessDefinition,
   pb: PlayerBusiness | undefined,
   now: Date,
+  stars = 0,
 ): BusinessView {
   const level = pb?.level ?? 1;
   const status = cycleStatus(pb, def.cycleSeconds, now);
@@ -128,7 +142,7 @@ function toBusinessView(
     owned: Boolean(pb),
     level: pb ? level : 0,
     maxLevel: def.maxLevel,
-    profitPerCycle: profitPerCycle(def, level).toString(),
+    profitPerCycle: profitPerCycle(def, level, stars).toString(),
     nextUpgradeCost: upgrade === null ? null : upgrade.toString(),
     cycleStartedAt: status.startedAt?.toISOString() ?? null,
     cycleEndsAt: status.endsAt?.toISOString() ?? null,
@@ -137,7 +151,7 @@ function toBusinessView(
     managed: pb?.managerUnlocked ?? false,
     automatic: isAutomatic(pb),
     managerCost: def.managerCost.toString(),
-    pendingAmount: (profitPerCycle(def, level) * BigInt(status.pendingCycles)).toString(),
+    pendingAmount: (profitPerCycle(def, level, stars) * BigInt(status.pendingCycles)).toString(),
   };
 }
 
@@ -146,12 +160,13 @@ export async function listBusinesses(
   playerId: string,
   now: Date,
 ): Promise<BusinessView[]> {
-  const [defs, owned] = await Promise.all([
+  const [defs, owned, stars] = await Promise.all([
     db.businessDefinition.findMany({ orderBy: { sortOrder: "asc" } }),
     db.playerBusiness.findMany({ where: { playerId } }),
+    starsOf(db, playerId),
   ]);
   const byBusiness = new Map(owned.map((pb) => [pb.businessId, pb]));
-  return defs.map((def) => toBusinessView(def, byBusiness.get(def.id), now));
+  return defs.map((def) => toBusinessView(def, byBusiness.get(def.id), now, stars));
 }
 
 /** Distrito liberado quando todos os negócios do distrito anterior foram comprados. */
@@ -184,6 +199,8 @@ export async function getPlayerState(
           : null,
       vipUntil: (await vipUntil(db, player.id, now))?.toISOString() ?? null,
       canChangeName: player.nameChangedAt === null,
+      prestigeStars: player.prestigeStars,
+      prestigeBonusPercent: bonusPercent(player.prestigeStars),
     },
     wallet: { coins: player.wallet.coins.toString(), gems: player.wallet.gems.toString() },
     businesses,
@@ -306,9 +323,10 @@ export function collectProduction(slug: string | undefined, now: Date) {
       throw Errors.nothingToCollect();
     }
 
+    const stars = await starsOf(tx, wallet.playerId);
     const collected = ready.map((pb) => ({
       slug: pb.business.slug,
-      amount: profitPerCycle(pb.business, pb.level),
+      amount: profitPerCycle(pb.business, pb.level, stars),
     }));
     const total = collected.reduce((sum, c) => sum + c.amount, 0n);
 
@@ -373,6 +391,7 @@ async function settleAutomatic(
     },
     include: { business: true },
   });
+  const stars = automatic.length > 0 ? await starsOf(tx, wallet.playerId) : 0;
   const items: SettledItem[] = [];
   let total = 0n;
   let elapsedMs = 0;
@@ -384,7 +403,7 @@ async function settleAutomatic(
       carryMs: pb.carryMs,
       cycleSeconds: pb.business.cycleSeconds,
     });
-    const amount = profitPerCycle(pb.business, pb.level) * BigInt(s.cycles);
+    const amount = profitPerCycle(pb.business, pb.level, stars) * BigInt(s.cycles);
     total += amount;
     elapsedMs = Math.max(elapsedMs, s.elapsedMs);
     capped ||= s.capped;

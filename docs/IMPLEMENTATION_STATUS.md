@@ -2,6 +2,19 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-14 — Etapa 6 · V1.1: Prestígio "Vender o império" (ADR 0011)
+
+Revisados antes: docs/README.md §4/§69, PROMPT_MESTRE (Etapa 6), BACKLOG, conversa original.
+- Servidor: estrelas de investidor (+2% de lucro cada) aplicadas em toda produção; venda zera
+  negócios/moedas/mapas e mantém diamantes, conquistas, VIP e ranking; conquista "Investidor";
+  migração `*_prestige`. Backend **107 testes**.
+- Jogo: seção Prestígio no Perfil (acima das conquistas) e confirmação; volta à praia após vender.
+  Jogo 141 verificações com integração.
+- Também nesta rodada: resposta imediata em coletar/comprar/melhorar/contratar (fila de
+  confirmação), rolagem por toque nas listas, iPhone testado com conta gratuita (ID `.dev`).
+- Pendências fora do código: contas Google Play (validação do site) e Apple (pagamento em
+  processamento); `ADMIN_TOKEN` do staging diferente do arquivo local.
+
 ## 2026-10-13 — Mapas 3 e 4, trilha de mapas, toque e iOS (ADR 0010)
 
 - **Novos mapas** Porto da Marina e Centro Financeiro (6 negócios cada; 22 no total), arte

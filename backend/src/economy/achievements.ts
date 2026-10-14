@@ -3,6 +3,8 @@
 export interface AchievementStats {
   ownedCount: number;
   praiaComplete: boolean;
+  /** Vezes que vendeu o império (prestígio). */
+  prestigeCount?: number;
   /** Negócios comprados por mapa (para "complete o mapa"). */
   ownedByDistrict?: Record<string, number>;
   totalByDistrict?: Record<string, number>;
@@ -52,6 +54,13 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
     progress: (s: AchievementStats) =>
       count(s.ownedByDistrict?.[district] ?? 0, s.totalByDistrict?.[district] ?? 6),
   })),
+  {
+    id: "first_prestige",
+    title: "Investidor",
+    description: "Venda o império pela primeira vez",
+    rewardGems: 10,
+    progress: (s) => count(s.prestigeCount ?? 0, 1),
+  },
   {
     id: "helpers_1",
     title: "Primeiro ajudante",

@@ -14,7 +14,7 @@ import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { previousDistrict } from "../economy/districts.js";
 import { dayBounds, gameDay } from "../lib/time.js";
 import { track } from "./analytics.js";
-import { getPlayerState } from "./game.js";
+import { getPlayerState, starsOf } from "./game.js";
 import { applyCoins, applyGems } from "./wallet.js";
 
 type Reader = Db | Tx;
@@ -32,9 +32,10 @@ export interface MissionView {
 }
 
 async function missionContext(db: Reader, playerId: string): Promise<MissionContext> {
-  const [defs, owned] = await Promise.all([
+  const [defs, owned, stars] = await Promise.all([
     db.businessDefinition.findMany(),
     db.playerBusiness.findMany({ where: { playerId }, include: { business: true } }),
+    starsOf(db, playerId),
   ]);
   const ownedIds = new Set(owned.map((pb) => pb.businessId));
   // Um mapa abre quando todos os negócios do mapa anterior foram comprados (em cadeia).
@@ -47,7 +48,8 @@ async function missionContext(db: Reader, playerId: string): Promise<MissionCont
   const cityUnlocked = unlocked("cidade");
   return {
     incomePerSecond: owned.reduce(
-      (sum, pb) => sum + Number(profitPerCycle(pb.business, pb.level)) / pb.business.cycleSeconds,
+      (sum, pb) =>
+        sum + Number(profitPerCycle(pb.business, pb.level, stars)) / pb.business.cycleSeconds,
       0,
     ),
     ownedCount: owned.length,

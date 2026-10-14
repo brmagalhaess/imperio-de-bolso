@@ -29,6 +29,10 @@ func _ready() -> void:
 	hud.retry_requested.connect(_boot)
 	hud.tutorial.target_provider = _tutorial_target
 	GameState.connection_failed.connect(hud.show_error)
+	# Vendeu o império: recomeça na praia (os outros mapas voltam a ficar bloqueados).
+	GameState.empire_sold.connect(func(_gained):
+		current = ""
+		go_to_district("praia"))
 	_boot()
 
 

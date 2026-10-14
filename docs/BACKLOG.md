@@ -73,5 +73,9 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [ ] QA, segurança, teste fechado
 
 ## Etapa 6 — Versão completa (após validação)
+- [x] V1.1 Prestígio "Vender o império" (ADR 0011) e bairros novos (porto, centro — ADR 0010)
+- [ ] V1.2 Temporadas, passe, cosméticos e idiomas (en-US, es-ES)
+- [ ] V1.3 Amigos, visitas e compartilhamento (depende de vincular conta Google/Apple)
+- [ ] V2.0 Imóveis, cadeias produtivas, corporações e LiveOps
 Prestígio, bairros, 50+ negócios, imóveis, eventos, temporadas, passe, cosméticos, social,
 idiomas e LiveOps — divididos em versões com critérios de aceite próprios.
