@@ -22,3 +22,4 @@
 | [0016](ADRs/0016-mapas-5-a-8.md) | Mapas 5–8 (46 negócios) e fórmulas de economia em inteiros exatos com teto 9×10^18 | aceita |
 | [0017](ADRs/0017-podio-semanal.md) | Pódio semanal: prêmios de 1º/2º/3º no ranking geral e na liga, entregues com aviso; prestígio não tira do ranking | aceita |
 | [0018](ADRs/0018-versao-1-sem-dinheiro-real.md) | Versão 1.0 nas lojas sem dinheiro real e sem anúncios (`PURCHASES_ENABLED`/`ADS_ENABLED`) | aceita |
+| [0019](ADRs/0019-publicacao-apple.md) | Publicação Apple: app criado na App Store Connect, chave de API (Gerente de apps), assinatura de distribuição manual e `tools/apple/release.sh` | aceita |
