@@ -8,7 +8,7 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
   no Ranking e entregues com aviso "Parabéns!" ao entrar. Confirmado em teste: vender o império
   não tira o jogador do ranking.
 - Versão 1.0 sem dinheiro real e sem anúncios (ADR 0018), chaves no servidor.
-- Testes: backend **131**; jogo **143** verificações. (O Docker local tinha travado porque o disco
+- Testes: backend **129**; jogo **143** verificações. (O Docker local tinha travado porque o disco
   externo onde ele guarda os dados foi remontado; reiniciado com autorização do titular.)
 
 ## 2026-10-14 — Lote 2: velocidade, retenção, mapas 5–8, iPad e contas vinculadas
