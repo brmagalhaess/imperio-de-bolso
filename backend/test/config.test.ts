@@ -13,14 +13,31 @@ describe("configuração", () => {
     expect(() => loadConfig({ ...base, ADMIN_TOKEN: "curto" })).toThrow(/ADMIN_TOKEN/);
   });
 
-  it("produção recusa loja/anúncios em modo mock", () => {
+  it("produção: compras e anúncios começam desligados (versão 1.0, ADR 0018)", () => {
     const prod = { ...base, NODE_ENV: "production", JWT_SECRET: "y".repeat(40) };
+    expect(loadConfig(prod)).toMatchObject({ PURCHASES_ENABLED: false, ADS_ENABLED: false });
+    expect(loadConfig(base)).toMatchObject({ PURCHASES_ENABLED: true, ADS_ENABLED: true });
+  });
+
+  it("produção recusa loja/anúncios ligados em modo mock", () => {
+    const prod = {
+      ...base,
+      NODE_ENV: "production",
+      JWT_SECRET: "y".repeat(40),
+      PURCHASES_ENABLED: "true",
+      ADS_ENABLED: "true",
+    };
     expect(() => loadConfig(prod)).toThrow(/mock/);
     expect(loadConfig({ ...prod, STORE_MODE: "live", ADS_MODE: "admob" }).STORE_MODE).toBe("live");
   });
 
   it("teste fechado libera mock em produção só com BETA_SANDBOX=true explícito", () => {
-    const prod = { ...base, NODE_ENV: "production", JWT_SECRET: "y".repeat(40) };
+    const prod = {
+      ...base,
+      NODE_ENV: "production",
+      JWT_SECRET: "y".repeat(40),
+      PURCHASES_ENABLED: "true",
+    };
     expect(loadConfig({ ...prod, BETA_SANDBOX: "true" }).STORE_MODE).toBe("mock");
     expect(() => loadConfig({ ...prod, BETA_SANDBOX: "false" })).toThrow(/mock/);
     expect(() => loadConfig({ ...prod, BETA_SANDBOX: "yes" })).toThrow();

@@ -66,6 +66,8 @@ const MESSAGES := {
 	"NAME_ALREADY_CHANGED": "Você já trocou de nome uma vez.",
 	"PRESTIGE_NOT_AVAILABLE": "Complete a cidade e fature mais para vender o império.",
 	"VALIDATION_ERROR": "Dados inválidos. Confira e tente de novo.",
+	"PURCHASES_DISABLED": "Compras ainda não disponíveis nesta versão.",
+	"ADS_DISABLED": "Anúncios ainda não disponíveis nesta versão.",
 	"DAILY_REWARD_CLAIMED": "Você já pegou o prêmio de hoje. Volte amanhã!",
 	"MISSION_CHEST_LOCKED": "Resgate as 3 missões do dia para abrir o baú.",
 	"MISSION_CHEST_CLAIMED": "O baú de hoje já foi aberto.",
@@ -290,6 +292,15 @@ func refresh_catalog() -> void:
 	if res.ok and _queued == 0:
 		catalog = res.data
 		catalog_changed.emit()
+
+
+## Compras em dinheiro real / anúncios ligados no servidor (versão 1.0 sai sem — ADR 0018).
+func purchases_enabled() -> bool:
+	return bool(catalog.get("purchasesEnabled", false))
+
+
+func ads_enabled() -> bool:
+	return bool(catalog.get("adsEnabled", false))
 
 
 func store_item(item_id: String) -> Dictionary:

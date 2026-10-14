@@ -263,3 +263,24 @@ describe("SSV do AdMob (produção)", () => {
     expect(claim.json().coins).toBe("900");
   });
 });
+
+describe("versão sem dinheiro real e sem anúncios (ADR 0018)", () => {
+  it("itens em R$ e anúncios somem do catálogo e as rotas recusam", async () => {
+    ctx = await createTestContext({ PURCHASES_ENABLED: "false", ADS_ENABLED: "false" });
+    const g = await newGuest(ctx.app);
+    const cat = (await get(ctx.app, g, "/store/catalog")).json();
+    expect(cat).toMatchObject({ purchasesEnabled: false, adsEnabled: false, sandbox: false });
+    const kinds = new Set(cat.items.map((i: { kind: string }) => i.kind));
+    expect([...kinds].sort()).toEqual(["auto_collect", "boost", "turbo"]);
+    const buy = await post(ctx.app, g, "/purchases/verify", {
+      store: "mock",
+      productId: "br.com.imperiodebolso.gems_50",
+      purchaseToken: "mock-abc",
+    });
+    expect(buy.json().error.code).toBe("PURCHASES_DISABLED");
+    const ad = await post(ctx.app, g, "/ads/start", { placement: "ad_boost" });
+    expect(ad.json().error.code).toBe("ADS_DISABLED");
+    const missions = (await get(ctx.app, g, "/missions")).json().missions;
+    expect(missions.map((m: { template: string }) => m.template)).not.toContain("watch_ads");
+  });
+});

@@ -1,6 +1,7 @@
 import type { Db, Tx } from "../db/prisma.js";
 import { AppError, Errors } from "../errors.js";
 import { profitPerCycle } from "../economy/formulas.js";
+import { features } from "../lib/features.js";
 import { STORE_ITEMS, VIP_DAILY_GEMS, storeItem } from "../economy/store.js";
 import { dayBounds, gameDay } from "../lib/time.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
@@ -65,8 +66,14 @@ export async function getCatalog(
     }),
     db.vipDailyClaim.findUnique({ where: { playerId_day: { playerId, day: gameDay(now) } } }),
   ]);
+  // Versão sem dinheiro real / sem anúncios (ADR 0018): esses itens nem aparecem.
+  const visible = STORE_ITEMS.filter(
+    (i) =>
+      (features.purchases || (i.kind !== "iap" && i.kind !== "subscription")) &&
+      (features.ads || i.kind !== "ad"),
+  );
   const items = await Promise.all(
-    STORE_ITEMS.map(async (i) => {
+    visible.map(async (i) => {
       const seconds = i.kind === "boost" ? i.hours * 3600 : i.kind === "ad" ? i.minutes * 60 : 0;
       return {
         ...i,
@@ -82,7 +89,9 @@ export async function getCatalog(
     }),
   );
   return {
-    sandbox: storeMode === "mock",
+    sandbox: storeMode === "mock" && (features.purchases || features.ads),
+    purchasesEnabled: features.purchases,
+    adsEnabled: features.ads,
     district,
     items,
     entitlements: {

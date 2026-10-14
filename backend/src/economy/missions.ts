@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { features } from "../lib/features.js";
 
 // Missões diárias (docs/README.md §3: três por dia). Catálogo em código, versionado no Git.
 // Cada missão mede uma métrica que o servidor incrementa ao processar comandos.
@@ -134,7 +135,7 @@ export const MISSION_TEMPLATES: readonly MissionTemplate[] = [
     metric: "ad_watched",
     title: "Assista {n} anúncios da Loja",
     target: () => 2n,
-    eligible: (c) => c.ownedCount > 0,
+    eligible: (c) => c.ownedCount > 0 && features.ads,
   },
 ];
 

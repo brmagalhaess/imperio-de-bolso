@@ -1,4 +1,5 @@
 import fastifyHelmet from "@fastify/helmet";
+import { setFeatures } from "./lib/features.js";
 import fastifyJwt from "@fastify/jwt";
 import fastifyRateLimit from "@fastify/rate-limit";
 import Fastify, { type FastifyInstance } from "fastify";
@@ -28,6 +29,7 @@ export interface AppDeps {
 }
 
 export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
+  setFeatures({ purchases: deps.config.PURCHASES_ENABLED, ads: deps.config.ADS_ENABLED });
   const app = Fastify({
     trustProxy: deps.config.TRUST_PROXY,
     // Logs sem dados sensíveis (plano §28): nada de corpo, cabeçalho Authorization ou query.

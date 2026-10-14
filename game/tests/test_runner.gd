@@ -565,7 +565,7 @@ func _store_tests() -> bool:
 	# Loja: cartões de diamantes ficam habilitados/esmaecidos sem recriar a lista.
 	var hud: Control = Hud.new()
 	add_child(hud)
-	GameState.catalog = {"sandbox": true, "district": "praia", "entitlements": {"vipDailyGems": 5}, "items": [
+	GameState.catalog = {"sandbox": true, "purchasesEnabled": true, "adsEnabled": true, "district": "praia", "entitlements": {"vipDailyGems": 5}, "items": [
 		{"id": "ad_boost", "kind": "ad", "title": "Coleta antecipada de 15 min", "estimateCoins": "900",
 			"usedToday": 5, "dailyLimit": 5},
 		{"id": "auto_collect_24h", "kind": "auto_collect", "title": "Auto-coleta por 24 horas", "costGems": "20"},
@@ -594,6 +594,21 @@ func _store_tests() -> bool:
 	check(not gem_button.disabled and hud._modal._store_cards[6].button == gem_button,
 			"com diamantes: o mesmo botão habilita (sem recriar)")
 	check(buttons[7].disabled, "item mais caro continua esmaecido")
+
+	# Versão 1.0 (ADR 0018): sem dinheiro real e sem anúncios, esses itens nem aparecem.
+	var full_count: int = hud._modal._store_cards.size()
+	GameState.catalog.purchasesEnabled = false
+	GameState.catalog.adsEnabled = false
+	await hud.open_store_menu()
+	await get_tree().process_frame  # cartões antigos saem da árvore (queue_free)
+	var titles: Array = hud._modal._store_cards.map(func(h): return h.title.text)
+	var actions: Array = hud._modal._list.find_children("*", "Button", true, false).map(func(b): return b.text)
+	check(hud._modal._store_cards.size() == full_count - 6 and not titles.has("Passe VIP")
+			and not actions.has("Restaurar compras") and not actions.has("Assistir"),
+			"versão sem dinheiro real: some VIP, diamantes em R$, anúncio e restaurar compras")
+	GameState.catalog.purchasesEnabled = true
+	GameState.catalog.adsEnabled = true
+	await hud.open_store_menu()
 
 	# Rolagem por toque começando num item da Loja (pedido do titular).
 	var ts: Node = hud._modal.touch_scroll

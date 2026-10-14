@@ -153,7 +153,8 @@ func show_offline_summary(district: String, total: String, elapsed_seconds: int,
 	if capped:
 		_modal.add_message(null, "", tr("Os ajudantes trabalham até %s fora de cada mapa. Volte antes para não perder nada!")
 				% Fmt.duration(cap_seconds))
-	_modal.add_action(tr("Assistir anúncio e dobrar"), func(): watch_ad("offline_double"), PURPLE, PURPLE_DARK)
+	if GameState.ads_enabled():
+		_modal.add_action(tr("Assistir anúncio e dobrar"), func(): watch_ad("offline_double"), PURPLE, PURPLE_DARK)
 	_modal.add_action(tr("Coletar"), func(): pass, Style.ORANGE, Style.ORANGE_DARK)
 
 
@@ -415,17 +416,8 @@ func open_store_menu() -> void:
 
 	# Coleta antecipada: recebe agora X tempo de produção do mapa atual (pedido do titular).
 	_modal.add_section(tr("Coleta antecipada · %s") % Layout.title(current_district))
-	_modal.add_store_card(func():
-		var ad := GameState.store_item("ad_boost")
-		var used := int(ad.get("usedToday", 0))
-		var limit := int(ad.get("dailyLimit", 5))
-		return {
-			"title": ad.get("title", tr("Coleta antecipada")), "icon": COIN_TEX,
-			"subtitle": tr("Grátis com anúncio · ≈ %s moedas\nHoje: %d/%d") % [
-				Fmt.coins(ad.get("estimateCoins", "0")), used, limit],
-			"button": tr("Assistir") if used < limit else "%d/%d" % [used, limit],
-			"color": PURPLE, "edge": PURPLE_DARK, "enabled": used < limit,
-		}, func(): watch_ad("ad_boost"))
+	if GameState.ads_enabled():
+		_add_ad_boost_card()
 	for id in ["boost_1h", "boost_4h"]:
 		var item_id: String = id
 		_modal.add_store_card(func():
@@ -466,6 +458,9 @@ func open_store_menu() -> void:
 				"enabled": GameState.gems().to_int() >= cost.to_int(),
 			}, func(): _buy_with_gems(item_id))
 
+	if not GameState.purchases_enabled():
+		_modal.refit()  # versão 1.0: sem itens em dinheiro real (ADR 0018)
+		return
 	_modal.add_section(tr("Passe VIP"))
 	_modal.add_store_card(func():
 		var vip := GameState.store_item("vip_monthly")
@@ -511,6 +506,21 @@ func open_store_menu() -> void:
 
 	_modal.add_action(tr("Restaurar compras"), _restore_purchases, Style.TEAL_LIGHT, Style.TEAL_DARK)
 	_modal.refit()
+
+
+## Coleta antecipada grátis com anúncio (só com anúncios ligados — ADR 0018).
+func _add_ad_boost_card() -> void:
+	_modal.add_store_card(func():
+		var ad := GameState.store_item("ad_boost")
+		var used := int(ad.get("usedToday", 0))
+		var limit := int(ad.get("dailyLimit", 5))
+		return {
+			"title": ad.get("title", tr("Coleta antecipada")), "icon": COIN_TEX,
+			"subtitle": tr("Grátis com anúncio · ≈ %s moedas\nHoje: %d/%d") % [
+				Fmt.coins(ad.get("estimateCoins", "0")), used, limit],
+			"button": tr("Assistir") if used < limit else "%d/%d" % [used, limit],
+			"color": PURPLE, "edge": PURPLE_DARK, "enabled": used < limit,
+		}, func(): watch_ad("ad_boost"))
 
 
 func _buy_with_gems(item_id: String) -> void:

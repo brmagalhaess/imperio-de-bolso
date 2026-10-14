@@ -131,6 +131,17 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
     if (!exists) throw Errors.unauthorized();
   };
 
+  // Versão sem dinheiro real / sem anúncios (ADR 0018).
+  const purchasesOn = async () => {
+    if (!config.PURCHASES_ENABLED) {
+      throw new AppError(409, "PURCHASES_DISABLED", "Compras ainda não disponíveis");
+    }
+  };
+  const adsOn = async () => {
+    if (!config.ADS_ENABLED)
+      throw new AppError(409, "ADS_DISABLED", "Anúncios ainda não disponíveis");
+  };
+
   // Criar/retomar conta convidada: limite mais rígido por IP (evita criação em massa).
   app.post(
     "/auth/guest",
@@ -358,26 +369,30 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
     return command(request, reply, "store.buy", (at) => buyWithGems(itemId, district, at));
   });
 
-  app.post("/purchases/verify", { preHandler: authenticate }, async (request, reply) => {
-    const { store, productId, purchaseToken } = VerifyBody.parse(request.body);
-    const verifier = verifierFor(store, config.STORE_MODE);
-    return command(request, reply, "purchases.verify", (at) =>
-      verifyPurchase(store, productId, purchaseToken, verifier, at),
-    );
-  });
+  app.post(
+    "/purchases/verify",
+    { preHandler: [authenticate, purchasesOn] },
+    async (request, reply) => {
+      const { store, productId, purchaseToken } = VerifyBody.parse(request.body);
+      const verifier = verifierFor(store, config.STORE_MODE);
+      return command(request, reply, "purchases.verify", (at) =>
+        verifyPurchase(store, productId, purchaseToken, verifier, at),
+      );
+    },
+  );
 
-  app.post("/purchases/restore", { preHandler: authenticate }, async (request) =>
+  app.post("/purchases/restore", { preHandler: [authenticate, purchasesOn] }, async (request) =>
     restorePurchases(db, playerIdOf(request), now()),
   );
 
   const ssvKeys = deps.admobKeys ?? admobKeyResolver(config.ADMOB_KEYS_URL);
 
-  app.post("/ads/start", { preHandler: authenticate }, async (request, reply) => {
+  app.post("/ads/start", { preHandler: [authenticate, adsOn] }, async (request, reply) => {
     const { placement, district } = AdStartBody.parse(request.body);
     return command(request, reply, "ads.start", (at) => startAd(placement, district, at));
   });
 
-  app.post("/ads/claim", { preHandler: authenticate }, async (request, reply) => {
+  app.post("/ads/claim", { preHandler: [authenticate, adsOn] }, async (request, reply) => {
     const { sessionId } = AdSessionBody.parse(request.body);
     return command(request, reply, "ads.claim", (at) => claimAd(sessionId, at));
   });

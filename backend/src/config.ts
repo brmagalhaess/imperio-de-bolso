@@ -18,6 +18,10 @@ const ConfigSchema = z.object({
     .enum(["true", "false"])
     .default("false")
     .transform((v) => v === "true"),
+  // Versão 1.0 nas lojas sai sem dinheiro real e sem anúncios (ADR 0018): itens em R$ e
+  // anúncios somem do catálogo e as rotas recusam. Padrão: ligados fora da produção.
+  PURCHASES_ENABLED: z.enum(["true", "false"]).optional(),
+  ADS_ENABLED: z.enum(["true", "false"]).optional(),
   ADMOB_KEYS_URL: z.url().default("https://www.gstatic.com/admob/reward/verifier-keys.json"),
   // Atrás do proxy do Dockploy (Traefik), confie no X-Forwarded-For para o IP real.
   TRUST_PROXY: z
@@ -38,7 +42,11 @@ const ConfigSchema = z.object({
   ),
 });
 
-export type AppConfig = z.infer<typeof ConfigSchema>;
+type ParsedConfig = z.infer<typeof ConfigSchema>;
+export type AppConfig = Omit<ParsedConfig, "PURCHASES_ENABLED" | "ADS_ENABLED"> & {
+  PURCHASES_ENABLED: boolean;
+  ADS_ENABLED: boolean;
+};
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   const parsed = ConfigSchema.safeParse(env);
@@ -46,14 +54,20 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     const issues = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ");
     throw new Error(`Configuração inválida: ${issues}`);
   }
-  const config = parsed.data;
+  const dev = parsed.data.NODE_ENV !== "production";
+  const config: AppConfig = {
+    ...parsed.data,
+    PURCHASES_ENABLED: (parsed.data.PURCHASES_ENABLED ?? (dev ? "true" : "false")) === "true",
+    ADS_ENABLED: (parsed.data.ADS_ENABLED ?? (dev ? "true" : "false")) === "true",
+  };
   if (config.NODE_ENV === "production" && /troque|dev-only|change-me/i.test(config.JWT_SECRET)) {
     throw new Error("JWT_SECRET de exemplo não pode ser usado em produção");
   }
   if (
     config.NODE_ENV === "production" &&
     !config.BETA_SANDBOX &&
-    (config.STORE_MODE === "mock" || config.ADS_MODE === "mock")
+    ((config.PURCHASES_ENABLED && config.STORE_MODE === "mock") ||
+      (config.ADS_ENABLED && config.ADS_MODE === "mock"))
   ) {
     throw new Error(
       "STORE_MODE/ADS_MODE mock não podem ser usados em produção (exceto BETA_SANDBOX=true)",

@@ -43,6 +43,8 @@ services:
       BETA_SANDBOX: ${BETA_SANDBOX:-false}
       ADMIN_TOKEN: ${ADMIN_TOKEN:-}
       # Contas vinculadas (ADR 0015): vazio = vínculo desligado.
+      PURCHASES_ENABLED: ${PURCHASES_ENABLED:-false}
+      ADS_ENABLED: ${ADS_ENABLED:-false}
       GOOGLE_CLIENT_IDS: ${GOOGLE_CLIENT_IDS:-}
       APPLE_AUDIENCES: ${APPLE_AUDIENCES:-}
       TRUST_PROXY: "true"
