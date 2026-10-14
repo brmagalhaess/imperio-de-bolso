@@ -832,13 +832,15 @@ func open_ranking_menu(tab := -1) -> void:
 		if int(lg.get("demote", 0)) > 0:
 			rules.append(tr("Descem: %d") % int(lg.demote))
 		_modal.add_message(null, tr("Liga %s") % tr(str(lg.get("name", "Bronze"))),
-				tr("Jogadores na sua liga: %d · %s\nTermina em %s.") % [int(lg.get("size", 0)), " · ".join(rules), Fmt.duration(ends)])
+				tr("Jogadores na sua liga: %d · %s\nTermina em %s.") % [int(lg.get("size", 0)), " · ".join(rules), Fmt.duration(ends)]
+				+ "\n" + _prizes_text(data.get("prizes", {}).get("liga", [])))
 		entries = lg.get("entries", [])
 		me = lg.get("me")
 	elif shown_tab == 1:
 		var ends := _iso_seconds(data.week.end) - _iso_seconds(data.serverTime)
 		_modal.add_message(null, tr("Desafio dos 7 dias"),
-				tr("Quem faturar mais com seus negócios até domingo vence.\nTermina em %s.") % Fmt.duration(ends))
+				tr("Quem faturar mais com seus negócios até domingo vence.\nTermina em %s.") % Fmt.duration(ends)
+				+ "\n" + _prizes_text(data.get("prizes", {}).get("semana", [])))
 	else:
 		_modal.add_message(null, tr("Estrelas de investidor"),
 				tr("Quem acumulou mais estrelas vendendo o império (Perfil → Prestígio)."))
@@ -854,6 +856,46 @@ func open_ranking_menu(tab := -1) -> void:
 
 
 # --- Calendário de 7 dias e evento de fim de semana (ADR 0014) -----------------
+
+## Avisos ao entrar: primeiro o pódio da semana (se ganhou), depois o prêmio do dia.
+func maybe_show_popups() -> void:
+	await maybe_show_podium()
+	await maybe_show_daily()
+
+
+## "Parabéns! Você ficou em 1º lugar…" com o botão de resgatar (ADR 0017).
+func maybe_show_podium() -> void:
+	while not GameState.podium.is_empty():
+		while _modal.visible or map_trail.visible:
+			await get_tree().create_timer(0.4).timeout
+		if GameState.podium.is_empty():
+			return
+		open_podium_reward(GameState.podium[0])
+		while _modal.visible and _reward_kind == "podium":
+			await get_tree().create_timer(0.3).timeout
+
+
+func open_podium_reward(r: Dictionary) -> void:
+	close_sheet()
+	_reward_cards.clear()
+	_reward_kind = "podium"
+	_modal.open(tr("Parabéns!"))
+	var where := tr("no ranking da semana") if r.kind == "semana" else tr("na Liga %s") % tr(str(r.get("league", "Bronze")))
+	_modal.add_message(_gem_tex, tr("%dº lugar") % int(r.rank),
+			tr("Você ficou em %dº lugar %s. Seu prêmio:") % [int(r.rank), where] + "\n" + tr("+%d diamantes") % int(r.gems))
+	_modal.add_action(tr("Resgatar +%d diamantes") % int(r.gems), func():
+		var gems := int(r.gems)
+		if await GameState.claim_podium(str(r.week), str(r.kind)):
+			show_toast(tr("+%d diamantes!") % gems)
+		_modal.close(), Style.ORANGE, Style.ORANGE_DARK)
+
+
+## Linha "Prêmios: 1º 100 · 2º 60 · 3º 30 diamantes" do Ranking.
+func _prizes_text(values: Array) -> String:
+	if values.size() < 3:
+		return ""
+	return tr("Prêmios: 1º %d · 2º %d · 3º %d diamantes") % [int(values[0]), int(values[1]), int(values[2])]
+
 
 ## Abre o calendário sozinho quando o prêmio do dia está esperando (depois do tutorial e de
 ## qualquer janela aberta, como o resumo "Bem-vindo de volta").

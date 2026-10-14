@@ -201,6 +201,14 @@ func claim_event() -> Dictionary:
 	return await _command("/event/claim", {})
 
 
+func weekly_rewards() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_GET, "/rewards/weekly", null, "")
+
+
+func claim_weekly_reward(week: String, kind: String) -> Dictionary:
+	return await _command("/rewards/weekly/claim", {"week": week, "kind": kind})
+
+
 func leaderboard_stars() -> Dictionary:
 	return await _authed(HTTPClient.METHOD_GET, "/leaderboard/stars", null, "")
 

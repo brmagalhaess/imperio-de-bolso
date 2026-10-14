@@ -186,3 +186,87 @@ describe("ligas semanais e ranking de estrelas", () => {
 });
 
 const g0 = (p: Guest[]) => p[0]!;
+
+describe("pódio semanal e prestígio no ranking", () => {
+  const earn = (playerId: string, delta: bigint) =>
+    ctx.db.walletLedger.create({
+      data: {
+        playerId,
+        currency: "COINS",
+        delta,
+        balanceAfter: 0n,
+        reason: "production_collect",
+        createdAt: ctx.clock.now,
+      },
+    });
+
+  it("vender o império não tira o jogador do ranking da semana nem da liga", async () => {
+    ctx = await createTestContext();
+    const g = await newGuest(ctx.app);
+    await get(ctx.app, g, "/leaderboard"); // entra na liga
+    await earn(g.playerId, 50_000_000n);
+    for (const slug of [
+      "agua",
+      "pipoca",
+      "sorveteria",
+      "quiosque_coco",
+      "mercadinho",
+      "restaurante",
+      "supermercado",
+      "academia",
+      "hotel",
+      "shopping",
+    ]) {
+      await ctx.db.playerBusiness.create({
+        data: {
+          playerId: g.playerId,
+          businessId: (await ctx.db.businessDefinition.findUniqueOrThrow({ where: { slug } })).id,
+          level: 1,
+          cycleStartedAt: ctx.clock.now,
+          lastSettlementAt: ctx.clock.now,
+        },
+      });
+    }
+    expect((await post(ctx.app, g, "/prestige", {})).statusCode).toBe(200);
+    const lb = (await get(ctx.app, g, "/leaderboard")).json();
+    expect(lb.me).toMatchObject({ rank: 1, score: "50000000" });
+    expect(lb.league.me).toMatchObject({ rank: 1, score: "50000000" });
+  });
+
+  it("1º, 2º e 3º lugar ganham diamantes na semana seguinte; resgate uma vez", async () => {
+    ctx = await createTestContext();
+    const players: Guest[] = [];
+    for (let i = 0; i < 4; i++) {
+      const p = await newGuest(ctx.app);
+      players.push(p);
+      await get(ctx.app, p, "/leaderboard");
+      await earn(p.playerId, BigInt((i + 1) * 1_000));
+    }
+    const lb = (await get(ctx.app, players[0]!, "/leaderboard")).json();
+    expect(lb.prizes).toEqual({ semana: [100, 60, 30], liga: [30, 20, 10] });
+    expect((await get(ctx.app, players[3]!, "/rewards/weekly")).json().pending).toEqual([]);
+
+    ctx.clock.advance(7 * 24 * HOUR);
+    const first = (await get(ctx.app, players[3]!, "/rewards/weekly")).json();
+    expect(first.pending).toEqual([
+      { week: "2025-12-29", kind: "liga", rank: 1, league: "Bronze", gems: 30 },
+      { week: "2025-12-29", kind: "semana", rank: 1, gems: 100, league: null },
+    ]);
+    const third = (await get(ctx.app, players[1]!, "/rewards/weekly")).json();
+    expect(third.pending.map((r: { rank: number }) => r.rank)).toEqual([3, 3]);
+    expect((await get(ctx.app, players[0]!, "/rewards/weekly")).json().pending).toEqual([]); // 4º
+
+    const claim = await post(ctx.app, players[3]!, "/rewards/weekly/claim", {
+      week: "2025-12-29",
+      kind: "semana",
+    });
+    expect(claim.statusCode).toBe(200);
+    expect(await gemsOf(players[3]!.playerId)).toBe(100n);
+    const again = await post(ctx.app, players[3]!, "/rewards/weekly/claim", {
+      week: "2025-12-29",
+      kind: "semana",
+    });
+    expect(again.json().error.code).toBe("WEEKLY_REWARD_CLAIMED");
+    expect((await get(ctx.app, players[3]!, "/rewards/weekly")).json().pending).toHaveLength(1);
+  });
+});

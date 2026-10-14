@@ -265,6 +265,15 @@ func _growth_tests() -> bool:
 	GameState.claim_daily()
 	check(GameState.daily.claimedToday and GameState.gems() == "5" and hud._daily_button.badge == 0,
 			"prêmio diário: diamantes entram no toque e o selo some")
+	GameState.podium = [{"week": "2025-12-29", "kind": "semana", "rank": 1, "league": null, "gems": 100}]
+	hud.open_podium_reward(GameState.podium[0])
+	await get_tree().process_frame
+	var podium_texts: Array = hud._modal._list.find_children("*", "Label", true, false).map(func(l): return l.text)
+	check(podium_texts.has("1º lugar") and podium_texts.any(func(t): return t.contains("ranking da semana")),
+			"pódio: aviso de 1º lugar com o prêmio")
+	GameState.claim_podium("2025-12-29", "semana")
+	check(GameState.podium.is_empty() and GameState.gems() == "105", "pódio: diamantes entram no toque")
+	check(hud._prizes_text([100, 60, 30]) == "Prêmios: 1º 100 · 2º 60 · 3º 30 diamantes", "ranking mostra os prêmios do pódio")
 	GameState.weekend = {"active": true, "completed": true, "claimed": false, "prizeGems": 20}
 	GameState.event_changed.emit()
 	check(hud._event_button.visible and hud._event_button.badge == 1, "evento ativo: botão aparece com selo da meta batida")
@@ -274,6 +283,7 @@ func _growth_tests() -> bool:
 	GameState.state = {}
 	GameState.daily = {}
 	GameState.weekend = {}
+	GameState.podium = []
 	GameState.loaded = false
 	return true
 

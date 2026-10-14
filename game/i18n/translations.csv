@@ -7,6 +7,7 @@ keys,pt_BR,en,es
 %d compra(s) encontrada(s) nesta conta.,%d compra(s) encontrada(s) nesta conta.,%d purchase(s) found on this account.,%d compra(s) encontrada(s) en esta cuenta.
 %d de %d negócios,%d de %d negócios,%d of %d businesses,%d de %d negocios
 %d negócios · %d ajudantes · %s diamantes%s,%d negócios · %d ajudantes · %s diamantes%s,%d businesses · %d helpers · %s gems%s,%d negocios · %d ayudantes · %s diamantes%s
+%dº lugar,%dº lugar,%d place,%dº lugar
 "%s
 
 COMPRA DE TESTE: nenhum valor será cobrado.","%s
@@ -174,6 +175,7 @@ Essa missão expirou. Veja as de hoje!,Essa missão expirou. Veja as de hoje!,Th
 Esse bônus não está mais disponível.,Esse bônus não está mais disponível.,This bonus is no longer available.,Este bono ya no está disponible.
 Esse nome já está em uso.,Esse nome já está em uso.,This name is already taken.,Ese nombre ya está en uso.
 Esse nome não é permitido.,Esse nome não é permitido.,This name is not allowed.,Ese nombre no está permitido.
+Esse prêmio não está mais disponível.,Esse prêmio não está mais disponível.,This prize is no longer available.,Este premio ya no está disponible.
 Estaleiro,Estaleiro,Shipyard,Astillero
 Estação de Esqui,Estação de Esqui,Ski Resort,Estación de Esquí
 Este negócio está produzindo sozinho.,Este negócio está produzindo sozinho.,This business is producing on its own.,Este negocio está produciendo solo.
@@ -273,6 +275,7 @@ Oficina Mecânica,Oficina Mecânica,Car Repair Shop,Taller Mecánico
 Os ajudantes coletam sozinhos enquanto você joga,Os ajudantes coletam sozinhos enquanto você joga,Helpers collect on their own while you play,Los ayudantes recogen solos mientras juegas
 Os ajudantes trabalham até %s fora de cada mapa. Volte antes para não perder nada!,Os ajudantes trabalham até %s fora de cada mapa. Volte antes para não perder nada!,Helpers work up to %s away from each map. Come back sooner so you don't miss anything!,Los ayudantes trabajan hasta %s fuera de cada mapa. ¡Vuelve antes para no perder nada!
 Ouro,Ouro,Gold,Oro
+Parabéns!,Parabéns!,Congratulations!,¡Felicidades!
 Parque Aquático,Parque Aquático,Water Park,Parque Acuático
 Passe VIP,Passe VIP,VIP Pass,Pase VIP
 Pegar,Pegar,Claim,Tomar
@@ -297,6 +300,7 @@ Pronto! Agora é com você: construa seu império.,Pronto! Agora é com você: c
 Prêmio diário,Prêmio diário,Daily reward,Premio diario
 Prêmio do evento já resgatado.,Prêmio do evento já resgatado.,Event prize already claimed.,Premio del evento ya reclamado.
 Prêmio já resgatado.,Prêmio já resgatado.,Reward already claimed.,Premio ya reclamado.
+Prêmios: 1º %d · 2º %d · 3º %d diamantes,Prêmios: 1º %d · 2º %d · 3º %d diamantes,Prizes: 1st %d · 2nd %d · 3rd %d gems,Premios: 1º %d · 2º %d · 3º %d diamantes
 Pular,Pular,Skip,Saltar
 Punhado de diamantes,Punhado de diamantes,Handful of gems,Puñado de diamantes
 Quem acumulou mais estrelas vendendo o império (Perfil → Prestígio).,Quem acumulou mais estrelas vendendo o império (Perfil → Prestígio).,Who has collected the most stars by selling the empire (Profile → Prestige).,Quién acumuló más estrellas vendiendo el imperio (Perfil → Prestigio).
@@ -315,6 +319,7 @@ Rei da montanha,Rei da montanha,King of the mountain,Rey de la montaña
 Rei da praia,Rei da praia,King of the beach,Rey de la playa
 Resgatado,Resgatado,Claimed,Reclamado
 Resgatar,Resgatar,Claim,Reclamar
+Resgatar +%d diamantes,Resgatar +%d diamantes,Claim +%d gems,Reclamar +%d diamantes
 Resgate as 3 missões do dia para abrir o baú.,Resgate as 3 missões do dia para abrir o baú.,Claim today's 3 missions to open the chest.,Reclama las 3 misiones del día para abrir el cofre.
 Resgate as 3 missões: +%d diamantes e Turbo 2× por %d min (%d/%d),Resgate as 3 missões: +%d diamantes e Turbo 2× por %d min (%d/%d),Claim the 3 missions: +%d gems and 2× Turbo for %d min (%d/%d),Reclama las 3 misiones: +%d diamantes y Turbo 2× por %d min (%d/%d)
 Resort de Luxo,Resort de Luxo,Luxury Resort,Resort de Lujo
@@ -377,6 +382,7 @@ Vincular com a Apple,Vincular com a Apple,Link with Apple,Vincular con Apple
 Vincular com o Google,Vincular com o Google,Link with Google,Vincular con Google
 Visite a Cidade {n} vez,Visite a Cidade {n} vez,Visit the City {n} time,Visita la Ciudad {n} vez
 Você está aqui · ,Você está aqui · ,You are here · ,Estás aquí · 
+Você ficou em %dº lugar %s. Seu prêmio:,Você ficou em %dº lugar %s. Seu prêmio:,You finished in place %d %s. Your prize:,Quedaste en el %dº lugar %s. Tu premio:
 Você já assistiu o máximo de anúncios hoje.,Você já assistiu o máximo de anúncios hoje.,You've watched the maximum number of ads today.,Ya viste el máximo de anuncios hoy.
 Você já pegou o prêmio de hoje. Volte amanhã!,Você já pegou o prêmio de hoje. Volte amanhã!,You already claimed today's reward. Come back tomorrow!,Ya tomaste el premio de hoy. ¡Vuelve mañana!
 Você já resgatou os diamantes de hoje.,Você já resgatou os diamantes de hoje.,You've already claimed today's gems.,Ya reclamaste los diamantes de hoy.
@@ -394,6 +400,8 @@ a ilha,a ilha,the island,la isla
 a praia,a praia,the beach,la playa
 a serra,a serra,the mountains,la sierra
 ajudantes +%s,ajudantes +%s,helpers +%s,ayudantes +%s
+na Liga %s,na Liga %s,in the %s League,en la Liga %s
+no ranking da semana,no ranking da semana,in the weekly leaderboard,en el ranking semanal
 o centro,o centro,the Financial Center,el centro
 o centro espacial,o centro espacial,the Space Center,el centro espacial
 o polo industrial,o polo industrial,the Industrial Park,el polo industrial

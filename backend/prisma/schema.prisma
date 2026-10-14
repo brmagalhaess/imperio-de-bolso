@@ -48,6 +48,8 @@ model Player {
   loginStreak         Int       @default(0) @map("login_streak")
   lastLoginRewardDay  String?   @map("last_login_reward_day")
   missionChestDay     String?   @map("mission_chest_day")
+  // Pódio semanal (ADR 0017): última semana já conferida para prêmios de 1º/2º/3º lugar.
+  rewardsCheckedWeek  String?   @map("rewards_checked_week")
   createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
 
   wallet         PlayerWallet?
@@ -64,6 +66,7 @@ model Player {
   leagueWeeks    PlayerLeagueWeek[]
   gameEvents     PlayerEvent[]
   identities     PlayerIdentity[]
+  weeklyRewards  PlayerWeeklyReward[]
 
   @@map("players")
 }
@@ -320,4 +323,21 @@ model PlayerIdentity {
   @@id([provider, subject])
   @@unique([playerId, provider])
   @@map("player_identities")
+}
+
+/// Prêmio do pódio da semana (ADR 0017): 1º, 2º e 3º lugar no ranking geral e na liga.
+model PlayerWeeklyReward {
+  playerId  String    @map("player_id") @db.Uuid
+  week      String // segunda-feira da semana premiada, AAAA-MM-DD (Brasília)
+  kind      String // "semana" (ranking geral) ou "liga"
+  rank      Int
+  league    Int?
+  gems      Int
+  claimedAt DateTime? @map("claimed_at") @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, week, kind])
+  @@map("player_weekly_rewards")
 }

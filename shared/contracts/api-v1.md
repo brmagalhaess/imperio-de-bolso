@@ -214,6 +214,12 @@ em `POST /store/buy` → `200 { bought, turboUntil, state }` (soma tempo se já 
   (Bronze, Prata, Ouro, Platina, Diamante). `GET /leaderboard/stars` → `{ entries, me }` com
   `score` = estrelas de prestígio.
 
+### Pódio semanal (ADR 0017)
+- `GET /leaderboard` traz `prizes: { semana: [100, 60, 30], liga: [30, 20, 10] × (nível+1) }`.
+- `GET /rewards/weekly` → `{ pending: [{ week, kind: semana|liga, rank, league|null, gems }] }`
+  (confere a semana anterior na primeira visita). `POST /rewards/weekly/claim` `{ week, kind }` —
+  `Idempotency-Key` → `{ claimed, state }`; `404 WEEKLY_REWARD_NOT_FOUND`, `409 WEEKLY_REWARD_CLAIMED`.
+
 ### Contas vinculadas (ADR 0015)
 - `GET /auth/identities` → `{ linked: ["google"|"apple"], available: [...] }`.
 - `POST /auth/link` `{ provider: google|apple, idToken }` → mesmo formato. `401

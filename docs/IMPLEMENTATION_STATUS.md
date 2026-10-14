@@ -2,6 +2,15 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-14 — Pódio semanal (ADR 0017)
+
+- Prêmios de 1º/2º/3º no ranking da semana (100/60/30 💎) e na liga (30/20/10 × nível), exibidos
+  no Ranking e entregues com aviso "Parabéns!" ao entrar. Confirmado em teste: vender o império
+  não tira o jogador do ranking.
+- Testes: `loyalty.test.ts` 8/8 e jogo 142 verificações. **Bateria completa do backend não rodou
+  depois desta mudança**: o disco do Docker local encheu (banco de testes em somente leitura) —
+  aguardando o titular liberar espaço.
+
 ## 2026-10-14 — Lote 2: velocidade, retenção, mapas 5–8, iPad e contas vinculadas
 
 - **Aceleradores (ADR 0013):** ajudante +25%, marcos de nível 10/25/50/75/100 +50% cada, VIP +50%,

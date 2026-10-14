@@ -1,4 +1,9 @@
 import type { Db } from "../db/prisma.js";
+import { AppError } from "../errors.js";
+import type { CommandContext, CommandResult } from "../lib/idempotency.js";
+import { track } from "./analytics.js";
+import { getPlayerState } from "./game.js";
+import { applyGems } from "./wallet.js";
 import { gameDay, weekBounds } from "../lib/time.js";
 import { PRODUCTION_REASONS } from "./achievements.js";
 
@@ -43,6 +48,7 @@ export async function getLeaderboard(db: Db, playerId: string, now: Date) {
     entries: rows.filter((r) => Number(r.rank) <= LEADERBOARD_SIZE).map(view),
     me: me ? view(me) : null,
     league: await getLeague(db, playerId, now),
+    prizes: podiumPrizes(await leagueOf(db, playerId, now)),
     serverTime: now.toISOString(),
   };
 }
@@ -163,5 +169,125 @@ export async function getStarsRanking(db: Db, playerId: string, now: Date) {
     entries: rows.filter((r) => Number(r.rank) <= LEADERBOARD_SIZE).map(view),
     me: me ? view(me) : null,
     serverTime: now.toISOString(),
+  };
+}
+
+// --- Pódio semanal (ADR 0017) ---------------------------------------------------
+// Fechada a semana, 1º, 2º e 3º lugar do ranking geral e de cada liga ganham diamantes.
+// Conferido na primeira visita da semana seguinte; o jogador resgata pelo aviso no jogo.
+// Vender o império não tira ninguém do ranking: a pontuação é o faturamento já registrado.
+
+export const WEEK_PRIZES = [100, 60, 30] as const;
+export const LEAGUE_PRIZES = [30, 20, 10] as const;
+
+/** Prêmios em diamantes do pódio: ranking geral e liga (× nível da liga: Bronze 1 … Diamante 5). */
+export function podiumPrizes(tier: number) {
+  return { semana: [...WEEK_PRIZES], liga: LEAGUE_PRIZES.map((g) => g * (tier + 1)) };
+}
+
+async function weekRank(
+  db: Db,
+  playerId: string,
+  week: Date,
+): Promise<{ rank: number; score: bigint } | null> {
+  const { start, end } = weekBounds(week);
+  const rows = await db.$queryRaw<{ playerId: string; score: bigint; rank: bigint }[]>`
+    WITH scores AS (
+      SELECT player_id, SUM(delta) AS score
+      FROM wallet_ledger
+      WHERE currency = 'COINS' AND reason = ANY(${PRODUCTION_REASONS})
+        AND created_at >= ${start} AND created_at < ${end}
+      GROUP BY player_id
+    ), ranked AS (
+      SELECT player_id AS "playerId", score, RANK() OVER (ORDER BY score DESC) AS rank FROM scores
+    )
+    SELECT * FROM ranked WHERE "playerId" = ${playerId}::uuid`;
+  const r = rows[0];
+  return r ? { rank: Number(r.rank), score: BigInt(r.score) } : null;
+}
+
+/** Confere a semana anterior uma vez e registra os prêmios de pódio do jogador. */
+export async function ensureWeeklyRewards(db: Db, playerId: string, now: Date): Promise<void> {
+  const prev = new Date(now.getTime() - WEEK_MS);
+  const prevId = weekId(prev);
+  const player = await db.player.findUniqueOrThrow({
+    where: { id: playerId },
+    select: { rewardsCheckedWeek: true },
+  });
+  if (player.rewardsCheckedWeek === prevId) return;
+  const data: {
+    playerId: string;
+    week: string;
+    kind: string;
+    rank: number;
+    league?: number;
+    gems: number;
+  }[] = [];
+  const general = await weekRank(db, playerId, prev);
+  if (general && general.score > 0n && general.rank <= WEEK_PRIZES.length) {
+    data.push({
+      playerId,
+      week: prevId,
+      kind: "semana",
+      rank: general.rank,
+      gems: WEEK_PRIZES[general.rank - 1]!,
+    });
+  }
+  const lw = await db.playerLeagueWeek.findUnique({
+    where: { playerId_week: { playerId, week: prevId } },
+  });
+  if (lw) {
+    const standings = await leagueScores(db, prev, lw.league);
+    const i = standings.findIndex((r) => r.playerId === playerId);
+    const me = standings[i];
+    if (me && me.score > 0n && i < LEAGUE_PRIZES.length) {
+      data.push({
+        playerId,
+        week: prevId,
+        kind: "liga",
+        rank: i + 1,
+        league: lw.league,
+        gems: podiumPrizes(lw.league).liga[i]!,
+      });
+    }
+  }
+  if (data.length > 0) await db.playerWeeklyReward.createMany({ data, skipDuplicates: true });
+  await db.player.update({ where: { id: playerId }, data: { rewardsCheckedWeek: prevId } });
+}
+
+export async function getWeeklyRewards(db: Db, playerId: string, now: Date) {
+  await ensureWeeklyRewards(db, playerId, now);
+  const rows = await db.playerWeeklyReward.findMany({
+    where: { playerId, claimedAt: null },
+    orderBy: [{ week: "asc" }, { kind: "asc" }],
+  });
+  return {
+    pending: rows.map((r) => ({
+      week: r.week,
+      kind: r.kind,
+      rank: r.rank,
+      league: r.league === null ? null : LEAGUES[r.league],
+      gems: r.gems,
+    })),
+    serverTime: now.toISOString(),
+  };
+}
+
+export function claimWeeklyReward(week: string, kind: string, now: Date) {
+  return async ({ tx, wallet, idempotencyKey }: CommandContext): Promise<CommandResult> => {
+    const where = { playerId_week_kind: { playerId: wallet.playerId, week, kind } };
+    const row = await tx.playerWeeklyReward.findUnique({ where });
+    if (!row) throw new AppError(404, "WEEKLY_REWARD_NOT_FOUND", "Prêmio não encontrado");
+    if (row.claimedAt) throw new AppError(409, "WEEKLY_REWARD_CLAIMED", "Prêmio já resgatado");
+    await applyGems(tx, wallet, BigInt(row.gems), `podium:${kind}:${week}`, idempotencyKey, now);
+    await tx.playerWeeklyReward.update({ where, data: { claimedAt: now } });
+    await track(tx, wallet.playerId, "podium_claimed", { kind, rank: row.rank });
+    return {
+      statusCode: 200,
+      body: {
+        claimed: { week, kind, gems: row.gems },
+        state: await getPlayerState(tx, wallet.playerId, now),
+      },
+    };
   };
 }

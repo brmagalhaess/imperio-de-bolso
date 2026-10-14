@@ -30,7 +30,12 @@ import { changeName } from "../services/profile.js";
 import { buyWithGems, claimVipDaily, getCatalog } from "../services/store.js";
 import { claimAchievement, listAchievements } from "../services/achievements.js";
 import { createGuest, resumeGuest } from "../services/auth.js";
-import { getLeaderboard, getStarsRanking } from "../services/leaderboard.js";
+import {
+  claimWeeklyReward,
+  getLeaderboard,
+  getStarsRanking,
+  getWeeklyRewards,
+} from "../services/leaderboard.js";
 import {
   claimDailyReward,
   claimEvent,
@@ -273,6 +278,18 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
   app.get("/leaderboard/stars", { preHandler: authenticate }, async (request) =>
     getStarsRanking(db, playerIdOf(request), now()),
   );
+
+  // Pódio semanal (ADR 0017): prêmios de 1º/2º/3º lugar da semana anterior.
+  app.get("/rewards/weekly", { preHandler: authenticate }, async (request) =>
+    getWeeklyRewards(db, playerIdOf(request), now()),
+  );
+
+  app.post("/rewards/weekly/claim", { preHandler: authenticate }, async (request, reply) => {
+    const { week, kind } = z
+      .object({ week: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), kind: z.enum(["semana", "liga"]) })
+      .parse(request.body);
+    return command(request, reply, "rewards.weekly", (at) => claimWeeklyReward(week, kind, at));
+  });
 
   // --- Retenção (ADR 0014) ---------------------------------------------------
 

@@ -72,6 +72,8 @@ const MESSAGES := {
 	"EVENT_NOT_ACTIVE": "O evento acabou. Volte no próximo fim de semana!",
 	"EVENT_GOAL_NOT_REACHED": "Fature mais para alcançar a meta do evento.",
 	"EVENT_ALREADY_CLAIMED": "Prêmio do evento já resgatado.",
+	"WEEKLY_REWARD_CLAIMED": "Prêmio já resgatado.",
+	"WEEKLY_REWARD_NOT_FOUND": "Esse prêmio não está mais disponível.",
 }
 
 var state: Dictionary = {}
@@ -84,6 +86,8 @@ var prestige: Dictionary = {}
 var catalog: Dictionary = {}
 ## Calendário de 7 dias ({day, claimedToday, rewards}) e evento ({active, district, …}).
 var daily: Dictionary = {}
+## Prêmios do pódio da semana esperando resgate ([{week, kind, rank, league, gems}]).
+var podium: Array = []
 var weekend: Dictionary = {}
 var loaded := false
 var busy := false
@@ -139,6 +143,7 @@ func boot() -> bool:
 	refresh_prestige()
 	refresh_event()
 	await refresh_daily()
+	await refresh_podium()
 	return true
 
 
@@ -418,6 +423,24 @@ func open_mission_chest() -> bool:
 		return true, "reward")
 	missions_changed.emit()
 	return ok
+
+
+func refresh_podium() -> void:
+	var res := await Api.weekly_rewards()
+	if res.ok:
+		podium = res.data.get("pending", [])
+
+
+## Prêmio do pódio (1º/2º/3º da semana), na hora.
+func claim_podium(week: String, kind: String) -> bool:
+	return await _optimistic(Api.claim_weekly_reward.bind(week, kind), func() -> bool:
+		for i in podium.size():
+			var r: Dictionary = podium[i]
+			if r.week == week and r.kind == kind:
+				_add_gems(int(r.gems))
+				podium.remove_at(i)
+				return true
+		return false, "reward")
 
 
 func refresh_event() -> void:
