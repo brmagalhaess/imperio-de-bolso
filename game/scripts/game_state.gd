@@ -166,7 +166,7 @@ func has_managers() -> bool:
 
 
 func hire_manager(slug: String) -> bool:
-	return await _run(Api.hire_manager.bind(slug), "hire")
+	return await _optimistic(Api.hire_manager.bind(slug), _predict_hire.bind(slug), "hire")
 
 
 func refresh_missions() -> void:
@@ -358,15 +358,123 @@ func tutorial_completed() -> bool:
 
 
 func purchase(slug: String) -> bool:
-	return await _run(Api.purchase.bind(slug), "buy")
+	return await _optimistic(Api.purchase.bind(slug), _predict_purchase.bind(slug), "buy")
 
 
 func upgrade(slug: String) -> bool:
-	return await _run(Api.upgrade.bind(slug), "upgrade")
+	return await _optimistic(Api.upgrade.bind(slug), _predict_upgrade.bind(slug), "upgrade")
 
 
 func collect(slug: String) -> bool:
 	return await _run(Api.collect.bind(slug))
+
+
+# --- Resposta na hora (pedido do titular: pela internet cada ação levava ~0,5 s) -----------
+# O jogo aplica a previsão do resultado no toque (saldo, nível, ajudante, som) e o servidor —
+# que continua sendo a autoridade — confirma em ordem, em segundo plano. Se recusar, o estado
+# volta ao do servidor. Enquanto houver confirmações na fila, só a última resposta é aplicada
+# (evita o número "voltar" entre toques rápidos).
+
+signal command_done
+var _inflight := false
+var _queued := 0
+
+
+## true quando não há confirmação pendente (testes e telas que precisam do estado oficial).
+func settled() -> void:
+	while _queued > 0:
+		await command_done
+
+
+func _optimistic(call: Callable, predict: Callable, sfx: String) -> bool:
+	if not loaded or not predict.call():
+		# Sem como prever (ex.: sem saldo): pergunta ao servidor, que explica o motivo.
+		return await _run(call, sfx)
+	Audio.play(sfx)
+	_predict_districts()
+	state_changed.emit()
+	_confirm(call)  # sem await: a interface já respondeu
+	return true
+
+
+func _confirm(call: Callable) -> void:
+	_queued += 1
+	while _inflight:
+		await command_done
+	_inflight = true
+	var res: Dictionary = await call.call()
+	_inflight = false
+	_queued -= 1
+	command_done.emit()
+	if res.ok:
+		_set_online(true)
+		if _queued == 0:
+			_apply_state(res.data.state)
+			refresh_missions()
+			refresh_achievements()
+		return
+	if res.network_error:
+		_set_online(false)
+	_fail(res.error_code)
+	await refresh()  # desfaz a previsão: vale o que o servidor disser
+
+
+func _spend(amount: Variant) -> bool:
+	if amount == null or not can_afford(amount):
+		return false
+	state.wallet["coins"] = str(coins().to_int() - str(amount).to_int())
+	return true
+
+
+func _predict_purchase(slug: String) -> bool:
+	var b := business(slug)
+	if b.is_empty() or b.get("owned", false) or not district_unlocked(str(b.get("district", "praia"))):
+		return false
+	if not _spend(b.cost):
+		return false
+	b["owned"] = true
+	b["level"] = 1
+	b["cycleStartedAt"] = "previsto"
+	b["secondsRemaining"] = float(b.cycleSeconds) + (Time.get_ticks_msec() - _received_at_ms) / 1000.0
+	b["nextUpgradeCost"] = str(roundi(str(b.cost).to_float() * 1.15))
+	return true
+
+
+func _predict_upgrade(slug: String) -> bool:
+	var b := business(slug)
+	if b.is_empty() or not b.get("owned", false) or b.get("nextUpgradeCost") == null:
+		return false
+	if not _spend(b.nextUpgradeCost):
+		return false
+	var level := int(b.level) + 1
+	b["level"] = level
+	# Mesmas fórmulas do servidor (docs/README.md §6); a resposta oficial corrige qualquer diferença.
+	b["profitPerCycle"] = str(roundi(str(b.profitPerCycle).to_float() * 1.12))
+	var max_level := int(b.get("maxLevel", 100))
+	b["nextUpgradeCost"] = null if level >= max_level else str(roundi(str(b.cost).to_float() * pow(1.15, level)))
+	return true
+
+
+func _predict_hire(slug: String) -> bool:
+	var b := business(slug)
+	if b.is_empty() or not b.get("owned", false) or b.get("managed", false):
+		return false
+	if not _spend(b.managerCost):
+		return false
+	b["managed"] = true
+	return true
+
+
+## Mapa liberado quando todos os negócios do anterior estão comprados (previsão local).
+func _predict_districts() -> void:
+	var owned_all := {}
+	for b in businesses():
+		var d := str(b.get("district", ""))
+		owned_all[d] = owned_all.get(d, true) and bool(b.get("owned", false))
+	for d in state.get("districts", []):
+		var req: Variant = d.get("requires")
+		if req != null and not d.unlocked and owned_all.get(str(req), false):
+			d["unlocked"] = true
 
 
 ## Coleta pela moeda com resposta na hora (pedido do titular: pela internet a moeda demorava
@@ -383,18 +491,8 @@ func collect_fast(slug: String) -> void:
 	wallet["coins"] = str(coins().to_int() + str(b.profitPerCycle).to_int())
 	collected.emit([{"slug": slug, "amount": str(b.profitPerCycle)}])
 	state_changed.emit()
-	var res := await Api.collect(slug)
+	await _confirm(Api.collect.bind(slug))
 	_collecting.erase(slug)
-	if res.ok:
-		_set_online(true)
-		_apply_state(res.data.state)
-		refresh_missions()
-		refresh_achievements()
-		return
-	if res.network_error:
-		_set_online(false)
-	_fail(res.error_code)
-	await refresh()  # desfaz a previsão: vale o que o servidor disser
 
 
 func coins() -> String:

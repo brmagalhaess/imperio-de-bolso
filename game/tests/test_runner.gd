@@ -135,6 +135,23 @@ func _fast_collect_tests() -> bool:
 	GameState.collected.disconnect(on_collected)
 	while GameState._collecting.has("agua"):
 		await get_tree().process_frame
+
+	# Compra, melhoria e ajudante também respondem no toque (mesmas contas do servidor).
+	var water := _biz("agua", false)
+	water.cost = "100"
+	water.profitPerCycle = "10"
+	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "1000", "gems": "0"},
+		"businesses": [water], "districts": [{"id": "praia", "unlocked": true, "requires": null}]})
+	check(await GameState.purchase("agua") and GameState.business("agua").owned and GameState.coins() == "900",
+			"resposta na hora: compra aparece e desconta no toque")
+	check(str(GameState.business("agua").nextUpgradeCost) == "115", "previsão: melhoria do nível 2 custa 115 (= servidor)")
+	check(await GameState.upgrade("agua") and int(GameState.business("agua").level) == 2 and GameState.coins() == "785",
+			"resposta na hora: melhoria sobe o nível no toque")
+	check(str(GameState.business("agua").profitPerCycle) == "11" and str(GameState.business("agua").nextUpgradeCost) == "132",
+			"previsão: lucro 11 e próxima melhoria 132 no nível 2 (= servidor)")
+	check(await GameState.hire_manager("agua") and GameState.business("agua").managed and GameState.coins() == "635",
+			"resposta na hora: ajudante contratado no toque")
+	await GameState.settled()
 	Api.base_url = real_url
 	GameState.state = {}
 	GameState.loaded = false
