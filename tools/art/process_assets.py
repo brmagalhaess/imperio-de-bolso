@@ -24,6 +24,79 @@ OUT = ROOT / "game/assets/optimized"
 
 # id final → (arquivo de origem escolhido, {"width" ou "height": px a 2×})
 SPRITES = {
+    # Mapas 5–8 (2026-10-14): Polo Industrial, Serra Nevada, Ilha Paraíso, Centro Espacial
+    "oficina_lv1": ("g_oficina_lv1/g_oficina_lv1_v01.jpeg", {"width": 300}),
+    "oficina_lv2": ("g_oficina_lv2/g_oficina_lv2_v01.jpeg", {"width": 315}),
+    "oficina_lv3": ("g_oficina_lv3/g_oficina_lv3_v01.jpeg", {"width": 330}),
+    "moveis_lv1": ("g_moveis_lv1/g_moveis_lv1_v01.jpeg", {"width": 300}),
+    "moveis_lv2": ("g_moveis_lv2/g_moveis_lv2_v01.jpeg", {"width": 315}),
+    "moveis_lv3": ("g_moveis_lv3/g_moveis_lv3_v01.jpeg", {"width": 330}),
+    "metalurgica_lv1": ("g_metalurgica_lv1/g_metalurgica_lv1_v01.jpeg", {"width": 300}),
+    "metalurgica_lv2": ("g_metalurgica_lv2/g_metalurgica_lv2_v01.jpeg", {"width": 315}),
+    "metalurgica_lv3": ("g_metalurgica_lv3/g_metalurgica_lv3_v01.jpeg", {"width": 330}),
+    "montadora_lv1": ("g_montadora_lv1/g_montadora_lv1_v01.jpeg", {"width": 300}),
+    "montadora_lv2": ("g_montadora_lv2/g_montadora_lv2_v01.jpeg", {"width": 315}),
+    "montadora_lv3": ("g_montadora_lv3/g_montadora_lv3_v01.jpeg", {"width": 330}),
+    "refinaria_lv1": ("g_refinaria_lv1/g_refinaria_lv1_v01.jpeg", {"width": 300}),
+    "refinaria_lv2": ("g_refinaria_lv2/g_refinaria_lv2_v01.jpeg", {"width": 315}),
+    "refinaria_lv3": ("g_refinaria_lv3/g_refinaria_lv3_v01.jpeg", {"width": 330}),
+    "usina_solar_lv1": ("g_usina_solar_lv1/g_usina_solar_lv1_v01.jpeg", {"width": 300}),
+    "usina_solar_lv2": ("g_usina_solar_lv2/g_usina_solar_lv2_v01.jpeg", {"width": 315}),
+    "usina_solar_lv3": ("g_usina_solar_lv3/g_usina_solar_lv3_v01.jpeg", {"width": 330}),
+    "chocolateria_lv1": ("g_chocolateria_lv1/g_chocolateria_lv1_v01.jpeg", {"width": 300}),
+    "chocolateria_lv2": ("g_chocolateria_lv2/g_chocolateria_lv2_v01.jpeg", {"width": 315}),
+    "chocolateria_lv3": ("g_chocolateria_lv3/g_chocolateria_lv3_v01.jpeg", {"width": 330}),
+    "pousada_lv1": ("g_pousada_lv1/g_pousada_lv1_v01.jpeg", {"width": 300}),
+    "pousada_lv2": ("g_pousada_lv2/g_pousada_lv2_v01.jpeg", {"width": 315}),
+    "pousada_lv3": ("g_pousada_lv3/g_pousada_lv3_v01.jpeg", {"width": 330}),
+    "aluguel_esqui_lv1": ("g_aluguel_esqui_lv1/g_aluguel_esqui_lv1_v01.jpeg", {"width": 300}),
+    "aluguel_esqui_lv2": ("g_aluguel_esqui_lv2/g_aluguel_esqui_lv2_v01.jpeg", {"width": 315}),
+    "aluguel_esqui_lv3": ("g_aluguel_esqui_lv3/g_aluguel_esqui_lv3_v01.jpeg", {"width": 330}),
+    "teleferico_lv1": ("g_teleferico_lv1/g_teleferico_lv1_v01.jpeg", {"width": 300}),
+    "teleferico_lv2": ("g_teleferico_lv2/g_teleferico_lv2_v01.jpeg", {"width": 315}),
+    "teleferico_lv3": ("g_teleferico_lv3/g_teleferico_lv3_v01.jpeg", {"width": 330}),
+    "spa_termal_lv1": ("g_spa_termal_lv1/g_spa_termal_lv1_v01.jpeg", {"width": 300}),
+    "spa_termal_lv2": ("g_spa_termal_lv2/g_spa_termal_lv2_v01.jpeg", {"width": 315}),
+    "spa_termal_lv3": ("g_spa_termal_lv3/g_spa_termal_lv3_v01.jpeg", {"width": 330}),
+    "estacao_esqui_lv1": ("g_estacao_esqui_lv1/g_estacao_esqui_lv1_v01.jpeg", {"width": 300}),
+    "estacao_esqui_lv2": ("g_estacao_esqui_lv2/g_estacao_esqui_lv2_v01.jpeg", {"width": 315}),
+    "estacao_esqui_lv3": ("g_estacao_esqui_lv3/g_estacao_esqui_lv3_v01.jpeg", {"width": 330}),
+    "escola_mergulho_lv1": ("g_escola_mergulho_lv1/g_escola_mergulho_lv1_v01.jpeg", {"width": 300}),
+    "escola_mergulho_lv2": ("g_escola_mergulho_lv2/g_escola_mergulho_lv2_v01.jpeg", {"width": 315}),
+    "escola_mergulho_lv3": ("g_escola_mergulho_lv3/g_escola_mergulho_lv3_v01.jpeg", {"width": 330}),
+    "bangalos_lv1": ("g_bangalos_lv1/g_bangalos_lv1_v01.jpeg", {"width": 300}),
+    "bangalos_lv2": ("g_bangalos_lv2/g_bangalos_lv2_v01.jpeg", {"width": 315}),
+    "bangalos_lv3": ("g_bangalos_lv3/g_bangalos_lv3_v01.jpeg", {"width": 330}),
+    "parque_aquatico_lv1": ("g_parque_aquatico_lv1/g_parque_aquatico_lv1_v01.jpeg", {"width": 300}),
+    "parque_aquatico_lv2": ("g_parque_aquatico_lv2/g_parque_aquatico_lv2_v01.jpeg", {"width": 315}),
+    "parque_aquatico_lv3": ("g_parque_aquatico_lv3/g_parque_aquatico_lv3_v01.jpeg", {"width": 330}),
+    "clube_golfe_lv1": ("g_clube_golfe_lv1/g_clube_golfe_lv1_v01.jpeg", {"width": 300}),
+    "clube_golfe_lv2": ("g_clube_golfe_lv2/g_clube_golfe_lv2_v01.jpeg", {"width": 315}),
+    "clube_golfe_lv3": ("g_clube_golfe_lv3/g_clube_golfe_lv3_v01.jpeg", {"width": 330}),
+    "heliponto_lv1": ("g_heliponto_lv1/g_heliponto_lv1_v01.jpeg", {"width": 300}),
+    "heliponto_lv2": ("g_heliponto_lv2/g_heliponto_lv2_v01.jpeg", {"width": 315}),
+    "heliponto_lv3": ("g_heliponto_lv3/g_heliponto_lv3_v01.jpeg", {"width": 330}),
+    "resort_lv1": ("g_resort_lv1/g_resort_lv1_v01.jpeg", {"width": 300}),
+    "resort_lv2": ("g_resort_lv2/g_resort_lv2_v01.jpeg", {"width": 315}),
+    "resort_lv3": ("g_resort_lv3/g_resort_lv3_v01.jpeg", {"width": 330}),
+    "observatorio_lv1": ("g_observatorio_lv1/g_observatorio_lv1_v01.jpeg", {"width": 300}),
+    "observatorio_lv2": ("g_observatorio_lv2/g_observatorio_lv2_v01.jpeg", {"width": 315}),
+    "observatorio_lv3": ("g_observatorio_lv3/g_observatorio_lv3_v01.jpeg", {"width": 330}),
+    "museu_espaco_lv1": ("g_museu_espaco_lv1/g_museu_espaco_lv1_v01.jpeg", {"width": 300}),
+    "museu_espaco_lv2": ("g_museu_espaco_lv2/g_museu_espaco_lv2_v01.jpeg", {"width": 315}),
+    "museu_espaco_lv3": ("g_museu_espaco_lv3/g_museu_espaco_lv3_v01.jpeg", {"width": 330}),
+    "fabrica_satelites_lv1": ("g_fabrica_satelites_lv1/g_fabrica_satelites_lv1_v01.jpeg", {"width": 300}),
+    "fabrica_satelites_lv2": ("g_fabrica_satelites_lv2/g_fabrica_satelites_lv2_v01.jpeg", {"width": 315}),
+    "fabrica_satelites_lv3": ("g_fabrica_satelites_lv3/g_fabrica_satelites_lv3_v01.jpeg", {"width": 330}),
+    "centro_controle_lv1": ("g_centro_controle_lv1/g_centro_controle_lv1_v01.jpeg", {"width": 300}),
+    "centro_controle_lv2": ("g_centro_controle_lv2/g_centro_controle_lv2_v01.jpeg", {"width": 315}),
+    "centro_controle_lv3": ("g_centro_controle_lv3/g_centro_controle_lv3_v01.jpeg", {"width": 330}),
+    "foguete_lv1": ("g_foguete_lv1/g_foguete_lv1_v01.jpeg", {"width": 300}),
+    "foguete_lv2": ("g_foguete_lv2/g_foguete_lv2_v01.jpeg", {"width": 315}),
+    "foguete_lv3": ("g_foguete_lv3/g_foguete_lv3_v01.jpeg", {"width": 330}),
+    "porto_espacial_lv1": ("g_porto_espacial_lv1/g_porto_espacial_lv1_v01.jpeg", {"width": 300}),
+    "porto_espacial_lv2": ("g_porto_espacial_lv2/g_porto_espacial_lv2_v01.jpeg", {"width": 315}),
+    "porto_espacial_lv3": ("g_porto_espacial_lv3/g_porto_espacial_lv3_v01.jpeg", {"width": 330}),
     # Porto da Marina e Centro Financeiro (2026-10-13)
     "peixaria_lv1": ("g_peixaria_lv1/g_peixaria_lv1_v01.jpeg", {"width": 290}),
     "peixaria_lv2": ("g_peixaria_lv2/g_peixaria_lv2_v01.jpeg", {"width": 305}),
@@ -99,6 +172,22 @@ SPRITES = {
 
 # Folhas: arquivo → lista de ids na ordem de leitura (linhas de cima p/ baixo, esq. → dir.)
 SHEETS = {
+    "g_helpers_industrial/g_helpers_industrial_v01.png": (
+        ["helper_oficina", "helper_moveis", "helper_metalurgica", "helper_montadora", "helper_refinaria", "helper_usina_solar"],
+        {"height": 140},
+    ),
+    "g_helpers_serra/g_helpers_serra_v01.png": (
+        ["helper_chocolateria", "helper_pousada", "helper_aluguel_esqui", "helper_teleferico", "helper_spa_termal", "helper_estacao_esqui"],
+        {"height": 140},
+    ),
+    "g_helpers_ilha/g_helpers_ilha_v01.png": (
+        ["helper_escola_mergulho", "helper_bangalos", "helper_parque_aquatico", "helper_clube_golfe", "helper_heliponto", "helper_resort"],
+        {"height": 140},
+    ),
+    "g_helpers_espaco/g_helpers_espaco_v01.png": (
+        ["helper_observatorio", "helper_museu_espaco", "helper_fabrica_satelites", "helper_centro_controle", "helper_foguete", "helper_porto_espacial"],
+        {"height": 140},
+    ),
     "g_characters2/g_characters2_v01.png": (
         ["char_vendor", "char_woman", "char_boy", "char_grandma", "char_tourist", "char_kid"],
         {"height": 132},
@@ -136,6 +225,10 @@ SCENES = {
     "city_base": ("g_city_base/g_city_base_v01.png", (1080, 1920)),
     "porto_base": ("g_porto_base/g_porto_base_v01.jpeg", (1080, 1920)),
     "centro_base": ("g_centro_base/g_centro_base_v02.jpeg", (1080, 1920)),
+    "industrial_base": ("g_industrial_base/g_industrial_base_v01.jpeg", (1080, 1920)),
+    "serra_base": ("g_serra_base/g_serra_base_v01.jpeg", (1080, 1920)),
+    "ilha_base": ("g_ilha_base/g_ilha_base_v01.jpeg", (1080, 1920)),
+    "espaco_base": ("g_espaco_base/g_espaco_base_v01.jpeg", (1080, 1920)),
 }
 
 BG_TOLERANCE = 30  # distância máxima de cor até o fundo (0–441)
@@ -239,6 +332,9 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
 
     for name, (rel, target) in SPRITES.items():
+        if not (SRC / rel).exists():
+            print(f"(ainda sem origem) {name}: {rel}")
+            continue
         im = Image.open(SRC / rel)
         im.thumbnail((1024, 1024), Image.LANCZOS)
         out = trim_and_resize(cutout(im), target)

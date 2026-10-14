@@ -24,6 +24,7 @@ export interface AppDeps {
   logger?: boolean;
   /** Chaves do SSV do AdMob (testes injetam as suas). */
   admobKeys?: import("./lib/admob-ssv.js").KeyResolver;
+  idKeys?: import("./lib/id-token.js").JwkResolver;
 }
 
 export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
@@ -103,7 +104,13 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
 
   await app.register(
     (instance) =>
-      v1Routes(instance, { config: deps.config, db: deps.db, now, admobKeys: deps.admobKeys }),
+      v1Routes(instance, {
+        config: deps.config,
+        db: deps.db,
+        now,
+        admobKeys: deps.admobKeys,
+        idKeys: deps.idKeys,
+      }),
     {
       prefix: "/api/v1",
     },

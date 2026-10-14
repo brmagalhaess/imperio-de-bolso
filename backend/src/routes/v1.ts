@@ -9,6 +9,13 @@ import {
   type CommandResult,
 } from "../lib/idempotency.js";
 import { admobKeyResolver, type KeyResolver, SsvError, verifySsv } from "../lib/admob-ssv.js";
+import { type JwkResolver, remoteJwkResolver } from "../lib/id-token.js";
+import {
+  linkConfig,
+  linkIdentity,
+  listIdentities,
+  signInWithIdentity,
+} from "../services/identities.js";
 import { claimAd, mockComplete, ssvVerified, startAd } from "../services/ads.js";
 import { CLIENT_EVENTS, track } from "../services/analytics.js";
 import {
@@ -23,7 +30,14 @@ import { changeName } from "../services/profile.js";
 import { buyWithGems, claimVipDaily, getCatalog } from "../services/store.js";
 import { claimAchievement, listAchievements } from "../services/achievements.js";
 import { createGuest, resumeGuest } from "../services/auth.js";
-import { getLeaderboard } from "../services/leaderboard.js";
+import { getLeaderboard, getStarsRanking } from "../services/leaderboard.js";
+import {
+  claimDailyReward,
+  claimEvent,
+  claimMissionChest,
+  getDailyReward,
+  getEvent,
+} from "../services/retention.js";
 import { claimMission, listMissions } from "../services/missions.js";
 import {
   collectProduction,
@@ -42,6 +56,8 @@ export interface V1Deps {
   now: () => Date;
   /** Chaves públicas do SSV do AdMob (injetável nos testes). */
   admobKeys?: KeyResolver;
+  /** Chaves públicas do Google/Apple para ID tokens (injetável nos testes). */
+  idKeys?: JwkResolver;
 }
 
 const Slug = z.string().regex(/^[a-z0-9_-]{1,64}$/);
@@ -52,6 +68,10 @@ const GuestAuthBody = z
     message: "Informe guestId e guestSecret juntos, ou nenhum dos dois",
   });
 const BusinessBody = z.object({ businessSlug: Slug });
+const IdentityBody = z.object({
+  provider: z.enum(["google", "apple"]),
+  idToken: z.string().min(20).max(8192),
+});
 const CollectBody = z.object({ businessSlug: Slug.optional() });
 const PresenceBody = z.object({ district: Slug });
 const MissionClaimBody = z.object({ missionId: z.uuid() });
@@ -89,6 +109,8 @@ function playerIdOf(request: FastifyRequest): string {
 
 export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void> {
   const { db, now, config } = deps;
+  const links = linkConfig(config.GOOGLE_CLIENT_IDS, config.APPLE_AUDIENCES);
+  const idKeys = deps.idKeys ?? remoteJwkResolver();
 
   const authenticate = async (request: FastifyRequest) => {
     try {
@@ -130,6 +152,37 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
       });
     },
   );
+
+  // Contas vinculadas (ADR 0015) ------------------------------------------------
+  app.post(
+    "/auth/social",
+    {
+      config: { rateLimit: { max: config.RATE_LIMIT_AUTH_PER_MINUTE, timeWindow: "1 minute" } },
+    },
+    async (request, reply) => {
+      const { provider, idToken } = IdentityBody.parse(request.body);
+      const session = await signInWithIdentity(db, provider, idToken, links, idKeys, now());
+      const accessToken = await reply.jwtSign(
+        { sub: session.playerId },
+        { expiresIn: config.JWT_EXPIRES_IN },
+      );
+      return {
+        ...session,
+        accessToken,
+        tokenType: "Bearer",
+        expiresIn: config.JWT_EXPIRES_IN,
+      };
+    },
+  );
+
+  app.get("/auth/identities", { preHandler: authenticate }, async (request) =>
+    listIdentities(db, playerIdOf(request), links),
+  );
+
+  app.post("/auth/link", { preHandler: authenticate }, async (request) => {
+    const { provider, idToken } = IdentityBody.parse(request.body);
+    return linkIdentity(db, playerIdOf(request), provider, idToken, links, idKeys, now());
+  });
 
   app.get("/player/state", { preHandler: authenticate }, async (request) =>
     getPlayerState(db, playerIdOf(request), now()),
@@ -215,6 +268,32 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
 
   app.get("/leaderboard", { preHandler: authenticate }, async (request) =>
     getLeaderboard(db, playerIdOf(request), now()),
+  );
+
+  app.get("/leaderboard/stars", { preHandler: authenticate }, async (request) =>
+    getStarsRanking(db, playerIdOf(request), now()),
+  );
+
+  // --- Retenção (ADR 0014) ---------------------------------------------------
+
+  app.get("/daily-reward", { preHandler: authenticate }, async (request) =>
+    getDailyReward(db, playerIdOf(request), now()),
+  );
+
+  app.post("/daily-reward/claim", { preHandler: authenticate }, async (request, reply) =>
+    command(request, reply, "daily.claim", (at) => claimDailyReward(at)),
+  );
+
+  app.post("/missions/chest", { preHandler: authenticate }, async (request, reply) =>
+    command(request, reply, "missions.chest", (at) => claimMissionChest(at)),
+  );
+
+  app.get("/event", { preHandler: authenticate }, async (request) =>
+    getEvent(db, playerIdOf(request), now()),
+  );
+
+  app.post("/event/claim", { preHandler: authenticate }, async (request, reply) =>
+    command(request, reply, "event.claim", (at) => claimEvent(at)),
   );
 
   app.post("/analytics/events", { preHandler: authenticate }, async (request, reply) => {

@@ -16,3 +16,7 @@
 | [0010](ADRs/0010-mapas-porto-centro-trilha.md) | Mapas 3 e 4 (Porto, Centro), 22 negócios, conquistas por mapa e tela de Mapas em trilha com nuvens e "Em breve" | aceita |
 | [0011](ADRs/0011-prestigio-vender-imperio.md) | Prestígio "Vender o império": estrelas = √(faturamento ÷ 1 mi), +2%/estrela, libera com a cidade completa | aceita |
 | [0012](ADRs/0012-idiomas-en-es.md) | Idiomas en/es: CSV com chave em pt-BR, servidor em pt-BR + `titleTemplate` nas missões, idioma automático ou escolhido nas Configurações | aceita |
+| [0013](ADRs/0013-aceleradores-velocidade.md) | Aceleradores somados: ajudante +25%, marcos de nível +50%, VIP +50%, Turbo 2×; produção medida em "trabalho" | aceita |
+| [0014](ADRs/0014-retencao-diario-ligas-evento.md) | Retenção: missões por fase, calendário de 7 dias, baú das missões, ligas semanais, ranking de estrelas e evento de fim de semana | aceita |
+| [0015](ADRs/0015-contas-vinculadas.md) | Contas vinculadas Google/Apple (verificação de ID token no servidor, só o `sub`) e iPad | aceita (login nativo pendente) |
+| [0016](ADRs/0016-mapas-5-a-8.md) | Mapas 5–8 (46 negócios) e fórmulas de economia em inteiros exatos com teto 9×10^18 | aceita |

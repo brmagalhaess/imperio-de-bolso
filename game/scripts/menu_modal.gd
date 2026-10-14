@@ -165,6 +165,26 @@ func add_action(text_value: String, on_press: Callable, color := Style.GREEN,
 	_list.add_child(button)
 
 
+## Abas no topo da lista (Ranking: Liga · Semana · Estrelas). `on_select(índice)`.
+func add_tabs(labels: Array, selected: int, on_select: Callable) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	_list.add_child(row)
+	for i in labels.size():
+		var b := Button.new()
+		b.text = labels[i]
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.custom_minimum_size = Vector2(0, 72)
+		b.add_theme_font_size_override("font_size", 24)
+		if i == selected:
+			Style.style_button(b, Style.ORANGE, Style.ORANGE_DARK)
+		else:
+			Style.style_button(b, Style.GREY, Style.GREY_DARK)
+		var index: int = i
+		b.pressed.connect(func(): on_select.call(index))
+		row.add_child(b)
+
+
 ## Linha com valor e botão "Alterar" (Configurações → Idioma). Devolve o botão (para testes).
 func add_option(text_value: String, value_text: String, on_press: Callable) -> Button:
 	var row := _card_row()

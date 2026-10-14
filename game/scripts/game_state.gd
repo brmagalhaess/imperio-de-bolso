@@ -21,6 +21,9 @@ signal achievements_changed
 signal prestige_changed
 ## Catálogo da Loja recarregado (contadores do dia, direitos do VIP).
 signal catalog_changed
+## Calendário de 7 dias / evento de fim de semana atualizados (ADR 0014).
+signal daily_changed
+signal event_changed
 signal empire_sold(gained: int)
 
 ## Sinal de presença (o servidor considera "fora do mapa" após 45 s sem sinal).
@@ -63,6 +66,12 @@ const MESSAGES := {
 	"NAME_ALREADY_CHANGED": "Você já trocou de nome uma vez.",
 	"PRESTIGE_NOT_AVAILABLE": "Complete a cidade e fature mais para vender o império.",
 	"VALIDATION_ERROR": "Dados inválidos. Confira e tente de novo.",
+	"DAILY_REWARD_CLAIMED": "Você já pegou o prêmio de hoje. Volte amanhã!",
+	"MISSION_CHEST_LOCKED": "Resgate as 3 missões do dia para abrir o baú.",
+	"MISSION_CHEST_CLAIMED": "O baú de hoje já foi aberto.",
+	"EVENT_NOT_ACTIVE": "O evento acabou. Volte no próximo fim de semana!",
+	"EVENT_GOAL_NOT_REACHED": "Fature mais para alcançar a meta do evento.",
+	"EVENT_ALREADY_CLAIMED": "Prêmio do evento já resgatado.",
 }
 
 var state: Dictionary = {}
@@ -73,6 +82,9 @@ var achievements: Array = []
 var prestige: Dictionary = {}
 ## Catálogo da Loja ({sandbox, items, entitlements}).
 var catalog: Dictionary = {}
+## Calendário de 7 dias ({day, claimedToday, rewards}) e evento ({active, district, …}).
+var daily: Dictionary = {}
+var weekend: Dictionary = {}
 var loaded := false
 var busy := false
 var online := true
@@ -125,6 +137,8 @@ func boot() -> bool:
 	refresh_achievements()
 	refresh_catalog()  # Loja abre já preenchida
 	refresh_prestige()
+	refresh_event()
+	await refresh_daily()
 	return true
 
 
@@ -303,6 +317,16 @@ func buy_with_gems(item_id: String) -> Dictionary:
 		if item.get("kind", "") == "boost":
 			_add_coins(item.estimateCoins)
 			result["coins"] = str(item.estimateCoins)  # (lambda copia variáveis: muta, não reatribui)
+		elif item.get("kind", "") == "turbo":
+			var player: Dictionary = state.get("player", {})
+			var base := server_now()
+			if player.get("turboUntil") != null:
+				base = max(base, Time.get_unix_time_from_datetime_string(str(player.turboUntil).substr(0, 19)))
+			else:
+				_change_speed(100)  # ligou agora: tudo 2× mais rápido na hora
+			player["turboUntil"] = Time.get_datetime_string_from_unix_time(
+					int(base) + int(item.get("hours", 1)) * 3600) + "Z"
+			result["turbo"] = true
 		else:
 			var player: Dictionary = state.get("player", {})
 			player["autoCollect"] = true
@@ -357,6 +381,72 @@ func change_name(display_name: String) -> bool:
 		return false
 	_apply_state(res.data)
 	return true
+
+
+# --- Retenção (ADR 0014) -----------------------------------------------------
+
+func refresh_daily() -> void:
+	var res := await Api.daily_reward()
+	if res.ok:
+		daily = res.data
+		daily_changed.emit()
+
+
+## Prêmio do dia do calendário, na hora (o servidor confirma em seguida).
+func claim_daily() -> bool:
+	var ok := await _optimistic(Api.claim_daily_reward, func() -> bool:
+		if daily.is_empty() or daily.get("claimedToday", true):
+			return false
+		var r: Dictionary = daily.rewards[int(daily.day) - 1]
+		if r.get("coins") != null:
+			_add_coins(r.coins)
+		_add_gems(int(r.get("gems", 0)))
+		daily["claimedToday"] = true
+		return true, "reward")
+	daily_changed.emit()
+	return ok
+
+
+## Baú das 3 missões do dia (diamantes + Turbo).
+func open_mission_chest() -> bool:
+	var ok := await _optimistic(Api.open_mission_chest, func() -> bool:
+		var chest: Dictionary = missions.get("chest", {})
+		if chest.is_empty() or not chest.get("available", false) or chest.get("claimed", false):
+			return false
+		chest["claimed"] = true
+		_add_gems(int(chest.get("gems", 0)))
+		return true, "reward")
+	missions_changed.emit()
+	return ok
+
+
+func refresh_event() -> void:
+	var res := await Api.weekend_event()
+	if res.ok:
+		weekend = res.data
+		event_changed.emit()
+
+
+func claim_event() -> bool:
+	var ok := await _optimistic(Api.claim_event, func() -> bool:
+		if not weekend.get("completed", false) or weekend.get("claimed", true):
+			return false
+		weekend["claimed"] = true
+		_add_gems(int(weekend.get("prizeGems", 0)))
+		return true, "reward")
+	event_changed.emit()
+	return ok
+
+
+## Hora do servidor agora (ISO da última resposta + tempo do relógio monotônico).
+func server_now() -> float:
+	var base := Time.get_unix_time_from_datetime_string(str(state.get("serverTime", "1970-01-01T00:00:00")).substr(0, 19))
+	return base + (Time.get_ticks_msec() - _received_at_ms) / 1000.0
+
+
+## Turbo 2× ativo até (ISO) ou null.
+func turbo_until() -> Variant:
+	return state.get("player", {}).get("turboUntil")
 
 
 func refresh_prestige() -> void:
@@ -540,6 +630,8 @@ func _predict_upgrade(slug: String) -> bool:
 		return false
 	var level := int(b.level) + 1
 	b["level"] = level
+	if SPEED_MILESTONES.has(level):
+		_set_speed(b, int(b.get("speedPercent", 100)) + 50)
 	# Mesmas fórmulas do servidor (docs/README.md §6); a resposta oficial corrige qualquer diferença.
 	b["profitPerCycle"] = str(roundi(str(b.profitPerCycle).to_float() * 1.12))
 	var max_level := int(b.get("maxLevel", 100))
@@ -554,7 +646,26 @@ func _predict_hire(slug: String) -> bool:
 	if not _spend(b.managerCost):
 		return false
 	b["managed"] = true
+	_set_speed(b, int(b.get("speedPercent", 100)) + 25)  # ajudante: +25% (ADR 0013)
 	return true
+
+
+## Marcos de nível que aceleram o negócio em +50% cada (ADR 0013, igual ao servidor).
+const SPEED_MILESTONES := [10, 25, 50, 75, 100]
+
+
+## Nova velocidade do negócio: o ciclo efetivo encolhe na hora (o servidor confirma depois).
+func _set_speed(b: Dictionary, percent: int) -> void:
+	b["speedPercent"] = percent
+	var base := float(b.get("baseCycleSeconds", b.get("cycleSeconds", 10)))
+	b["cycleSeconds"] = max(1.0, base * 100.0 / percent)
+
+
+## Turbo/VIP ligado: todos os negócios comprados mudam de velocidade.
+func _change_speed(delta: int) -> void:
+	for b in businesses():
+		if b.get("owned", false):
+			_set_speed(b, int(b.get("speedPercent", 100)) + delta)
 
 
 ## Mapa liberado quando todos os negócios do anterior estão comprados (previsão local).

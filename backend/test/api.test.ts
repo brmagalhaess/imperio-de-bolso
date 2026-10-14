@@ -65,13 +65,13 @@ describe("saúde e autenticação", () => {
 });
 
 describe("catálogo e estado", () => {
-  it("lista os 22 negócios (4 mapas), nenhum comprado, com saldo em string", async () => {
+  it("lista os 46 negócios (8 mapas), nenhum comprado, com saldo em string", async () => {
     const guest = await newGuest(ctx.app);
     const res = await get(ctx.app, guest, "/player/state");
     expect(res.statusCode).toBe(200);
     const state = res.json();
     expect(state.wallet).toEqual({ coins: "100", gems: "0" });
-    expect(state.businesses).toHaveLength(22);
+    expect(state.businesses).toHaveLength(46);
     expect(state.businesses.every((b: { owned: boolean }) => !b.owned)).toBe(true);
     expect(state.businesses[0]).toMatchObject({
       slug: "agua",
@@ -82,7 +82,7 @@ describe("catálogo e estado", () => {
     expect(state.serverTime).toBe("2026-01-01T12:00:00.000Z");
 
     const list = await get(ctx.app, guest, "/businesses");
-    expect(list.json().businesses).toHaveLength(22);
+    expect(list.json().businesses).toHaveLength(46);
   });
 });
 
@@ -317,6 +317,10 @@ describe("distritos", () => {
       { id: "cidade", unlocked: false, requires: "praia" },
       { id: "porto", unlocked: false, requires: "cidade" },
       { id: "centro", unlocked: false, requires: "porto" },
+      { id: "industrial", unlocked: false, requires: "centro" },
+      { id: "serra", unlocked: false, requires: "industrial" },
+      { id: "ilha", unlocked: false, requires: "serra" },
+      { id: "espaco", unlocked: false, requires: "ilha" },
     ]);
     expect(state.businesses.find((b: { slug: string }) => b.slug === "mercadinho").district).toBe(
       "cidade",
@@ -357,6 +361,10 @@ describe("distritos", () => {
       true,
       true,
       true,
+      false,
+      false,
+      false,
+      false,
     ]);
     const ach = (await get(ctx.app, guest, "/achievements")).json().achievements;
     const byId = (id: string) => ach.find((a: { id: string }) => a.id === id);
@@ -444,15 +452,17 @@ describe("ajudantes e produção AFK por mapa (ADR 0006)", () => {
       ctx.clock.advance(15);
       await presence(guest, "cidade"); // jogando na cidade
     }
-    const back = await presence(guest, "praia"); // 90 s fora + 4 s = 9 ciclos
+    // Ajudante = +25% de velocidade (ADR 0013): (4 s + 90 s) × 1,25 = 117,5 s de trabalho
+    // → 11 ciclos de 10 s; sobram 7,5 s de trabalho = 6 s reais do ciclo efetivo de 8 s.
+    const back = await presence(guest, "praia");
     expect(back.json()).toMatchObject({
       returned: true,
-      total: "90",
+      total: "110",
       elapsedSeconds: 90,
-      settled: [{ slug: "agua", cycles: 9 }],
+      settled: [{ slug: "agua", cycles: 11 }],
     });
-    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 90n);
-    expect(await agua(guest)).toMatchObject({ automatic: false, secondsRemaining: 6 });
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 110n);
+    expect(await agua(guest)).toMatchObject({ automatic: false, secondsRemaining: 2 });
   });
 
   it("jogo fechado: AFK conta a partir do último sinal, com limite de 4 horas", async () => {
@@ -460,8 +470,9 @@ describe("ajudantes e produção AFK por mapa (ADR 0006)", () => {
     const before = await coinsOf(ctx.db, guest.playerId);
     ctx.clock.advance(10 * 3_600); // sem sinal por 10 h
     const back = await presence(guest, "praia");
-    expect(back.json()).toMatchObject({ total: "14400", capped: true, elapsedSeconds: 14_400 });
-    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 14_400n);
+    // 4 h × 1,25 (ajudante) = 1.800 ciclos de 10 moedas.
+    expect(back.json()).toMatchObject({ total: "18000", capped: true, elapsedSeconds: 14_400 });
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 18_000n);
   });
 
   it("o limite de 4 horas é por mapa: só o mapa visitado é pago", async () => {
@@ -541,7 +552,7 @@ describe("ajudantes e produção AFK por mapa (ADR 0006)", () => {
     ctx.clock.advance(100);
     const results = await Promise.all(Array.from({ length: 6 }, () => presence(guest, "praia")));
     expect(results.every((r) => r.statusCode === 200)).toBe(true);
-    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 100n);
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 120n); // 100 s × 1,25 → 12 ciclos
   });
 
   it("reenvio da mesma presença (mesma chave) não paga de novo", async () => {
@@ -552,8 +563,8 @@ describe("ajudantes e produção AFK por mapa (ADR 0006)", () => {
     const k = key();
     await presence(guest, "praia", k);
     const replay = await presence(guest, "praia", k);
-    expect(replay.json().total).toBe("50");
-    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 50n);
+    expect(replay.json().total).toBe("60"); // 50 s × 1,25 → 6 ciclos
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 60n);
   });
 
   it("melhorar um negócio em AFK paga o produzido no nível antigo antes de subir", async () => {
@@ -563,7 +574,7 @@ describe("ajudantes e produção AFK por mapa (ADR 0006)", () => {
     ctx.clock.advance(100);
     const res = await post(ctx.app, guest, "/businesses/upgrade", { businessSlug: "agua" });
     expect(res.statusCode).toBe(200);
-    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 100n - 115n);
+    expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 120n - 115n);
   });
 
   it("coleta manual não vale para negócio produzindo AFK", async () => {
@@ -579,7 +590,7 @@ describe("ajudantes e produção AFK por mapa (ADR 0006)", () => {
     await presence(guest, "cidade");
     const before = await coinsOf(ctx.db, guest.playerId);
     ctx.clock.advance(35);
-    expect(await agua(guest)).toMatchObject({ pendingAmount: "30", automatic: true });
+    expect(await agua(guest)).toMatchObject({ pendingAmount: "40", automatic: true }); // 35 s × 1,25
     expect(await coinsOf(ctx.db, guest.playerId)).toBe(before);
     expect((await presence(guest, "lua")).statusCode).toBe(404);
   });

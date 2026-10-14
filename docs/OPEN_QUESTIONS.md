@@ -33,3 +33,7 @@ Dúvidas que não bloqueiam o trabalho atual. Bloqueios reais ficam em `IMPLEMEN
 12. **Nome do jogo em outros idiomas:** hoje "Império de Bolso" em todos. Opções: manter a marca
     ou usar "Pocket Empire" (en) / "Imperio de Bolsillo" (es) no jogo e nas lojas. Decisão do
     titular (verificar disponibilidade do nome nas lojas antes).
+13. **Preços em diamantes do Turbo** (10/30/120 💎) e prêmios do calendário/baú/evento são
+    proposta inicial (ADR 0013/0014) — revisar com dados do teste fechado.
+14. **Evento de fim de semana:** hoje sempre "lucro 2× no mapa mais avançado + meta". Variar o
+    tipo de evento (ex.: ajudantes 2×, descontos) fica para depois, se o titular quiser.

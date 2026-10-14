@@ -14,6 +14,7 @@ export type StoreItem =
     }
   | { id: string; kind: "auto_collect"; title: string; costGems: bigint; hours: number }
   | { id: string; kind: "boost"; title: string; costGems: bigint; hours: number }
+  | { id: string; kind: "turbo"; title: string; costGems: bigint; hours: number }
   | {
       id: string;
       kind: "ad";
@@ -57,7 +58,12 @@ export const STORE_ITEMS: readonly StoreItem[] = [
     title: "Passe VIP",
     priceBRL: "14,90",
     periodDays: 30,
-    benefits: ["Auto-coleta em todos os mapas", "5 diamantes por dia", "Selo VIP no perfil"],
+    benefits: [
+      "Auto-coleta em todos os mapas",
+      "Produção +50% mais rápida",
+      "5 diamantes por dia",
+      "Selo VIP no perfil",
+    ],
   },
   {
     id: "auto_collect_24h",
@@ -76,6 +82,10 @@ export const STORE_ITEMS: readonly StoreItem[] = [
   // "Coleta antecipada" (pedido do titular): recebe agora X horas de produção do mapa atual.
   { id: "boost_1h", kind: "boost", title: "Coleta antecipada de 1 hora", costGems: 10n, hours: 1 },
   { id: "boost_4h", kind: "boost", title: "Coleta antecipada de 4 horas", costGems: 30n, hours: 4 },
+  // Turbo (ADR 0013): produção 2× em todos os mapas pelo período; soma tempo se já ativo.
+  { id: "turbo_1h", kind: "turbo", title: "Turbo 2× por 1 hora", costGems: 10n, hours: 1 },
+  { id: "turbo_4h", kind: "turbo", title: "Turbo 2× por 4 horas", costGems: 30n, hours: 4 },
+  { id: "turbo_24h", kind: "turbo", title: "Turbo 2× por 24 horas", costGems: 120n, hours: 24 },
   {
     id: "ad_boost",
     kind: "ad",

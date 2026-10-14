@@ -13,11 +13,29 @@ export interface EconomyDefinition {
   maxLevel: number;
 }
 
-function roundToBigInt(value: number): bigint {
-  if (!Number.isFinite(value) || value > Number.MAX_SAFE_INTEGER) {
+/**
+ * Teto de qualquer valor econômico: cabe no BIGINT do banco (9,22×10^18) e no inteiro de 64
+ * bits do jogo, com folga para somar.
+ */
+export const MAX_ECONOMY_VALUE = 9_000_000_000_000_000_000n;
+
+// Crescimentos como frações exatas (1,15 = 23/20; 1,12 = 28/25): conta inteira, sem perda de
+// precisão do float acima de 2^53 (os mapas novos passam disso no nível 100).
+const COST_NUM = 23n;
+const COST_DEN = 20n;
+const REVENUE_NUM = 28n;
+const REVENUE_DEN = 25n;
+
+/** round(base × (num/den)^exp) em inteiros (meio arredonda para cima, como Math.round). */
+function grow(base: bigint, num: bigint, den: bigint, exp: number): bigint {
+  const n = BigInt(exp);
+  const top = base * num ** n;
+  const bottom = den ** n;
+  const value = (top * 2n + bottom) / (bottom * 2n);
+  if (value > MAX_ECONOMY_VALUE) {
     throw new RangeError(`valor econômico fora da faixa segura: ${value}`);
   }
-  return BigInt(Math.round(value));
+  return value;
 }
 
 function assertLevel(level: number, maxLevel: number): void {
@@ -30,7 +48,7 @@ function assertLevel(level: number, maxLevel: number): void {
 export function upgradeCostTo(def: EconomyDefinition, targetLevel: number): bigint {
   assertLevel(targetLevel, def.maxLevel);
   if (targetLevel === 1) return def.cost;
-  return roundToBigInt(Number(def.cost) * UPGRADE_COST_GROWTH ** (targetLevel - 1));
+  return grow(def.cost, COST_NUM, COST_DEN, targetLevel - 1);
 }
 
 /** Custo da próxima melhoria a partir do nível atual; null se já está no máximo. */
@@ -42,7 +60,7 @@ export function nextUpgradeCost(def: EconomyDefinition, currentLevel: number): b
 /** Receita bruta por ciclo: round(base × 1,12^(n−1)). */
 export function revenueAt(def: EconomyDefinition, level: number): bigint {
   assertLevel(level, def.maxLevel);
-  return roundToBigInt(Number(def.revenue) * REVENUE_GROWTH ** (level - 1));
+  return grow(def.revenue, REVENUE_NUM, REVENUE_DEN, level - 1);
 }
 
 /** Lucro por ciclo = receita bruta − custo operacional, nunca negativo. */

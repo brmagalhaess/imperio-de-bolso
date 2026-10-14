@@ -42,6 +42,9 @@ services:
       ADS_MODE: ${ADS_MODE:-admob}
       BETA_SANDBOX: ${BETA_SANDBOX:-false}
       ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+      # Contas vinculadas (ADR 0015): vazio = vínculo desligado.
+      GOOGLE_CLIENT_IDS: ${GOOGLE_CLIENT_IDS:-}
+      APPLE_AUDIENCES: ${APPLE_AUDIENCES:-}
       TRUST_PROXY: "true"
       RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-600}
       RATE_LIMIT_AUTH_PER_MINUTE: ${RATE_LIMIT_AUTH_PER_MINUTE:-20}

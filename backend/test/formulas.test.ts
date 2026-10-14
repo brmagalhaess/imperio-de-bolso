@@ -5,6 +5,7 @@ import {
   profitPerCycle,
   revenueAt,
   upgradeCostTo,
+  MAX_ECONOMY_VALUE,
 } from "../src/economy/formulas.js";
 
 const agua = BUSINESS_CATALOG[0]!;
@@ -55,7 +56,7 @@ describe("fórmulas de economia", () => {
         const revenue = revenueAt(def, level);
         expect(cost).toBeGreaterThanOrEqual(prevCost);
         expect(revenue).toBeGreaterThanOrEqual(prevRevenue);
-        expect(cost).toBeLessThanOrEqual(BigInt(Number.MAX_SAFE_INTEGER));
+        expect(cost).toBeLessThanOrEqual(MAX_ECONOMY_VALUE); // cabe no BIGINT e no int64 do jogo
         prevCost = cost;
         prevRevenue = revenue;
       }

@@ -16,6 +16,7 @@ import { dayBounds, gameDay } from "../lib/time.js";
 import { track } from "./analytics.js";
 import { autoCollectActive } from "./entitlements.js";
 import { getPlayerState, starsOf } from "./game.js";
+import { missionChestView } from "./retention.js";
 import { applyCoins, applyGems } from "./wallet.js";
 
 type Reader = Db | Tx;
@@ -148,6 +149,7 @@ export async function listMissions(db: Reader, playerId: string, now: Date) {
     day: gameDay(now),
     resetsAt: dayBounds(now).end.toISOString(),
     missions: missions.map(toView),
+    chest: await missionChestView(db, playerId, now),
     serverTime: now.toISOString(),
   };
 }

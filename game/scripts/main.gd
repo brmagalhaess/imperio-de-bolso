@@ -43,6 +43,7 @@ func _boot() -> void:
 		# Jogador novo: já mostra o carrinho de água para a primeira compra.
 		if not GameState.business("agua").get("owned", true):
 			districts["praia"].select("agua")
+		hud.maybe_show_daily()  # prêmio do dia esperando (ADR 0014)
 
 
 ## Troca de distrito com fade (usado pelo Mapa e pela lista Construir).

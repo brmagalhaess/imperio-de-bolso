@@ -1,6 +1,9 @@
 import type { Tx } from "../db/prisma.js";
 import { AppError, Errors } from "../errors.js";
 
+/** Maior saldo de moedas possível (cabe com folga em 9,22×10^18). */
+export const MAX_COINS = 9_000_000_000_000_000_000n;
+
 export interface LockedWallet {
   playerId: string;
   coins: bigint;
@@ -37,6 +40,8 @@ export async function applyCoins(
   /** Relógio do servidor (o mesmo das regras); padrão: agora. */
   at: Date = new Date(),
 ): Promise<LockedWallet> {
+  // Teto do saldo (BIGINT do banco e int64 do jogo): ganhos acima disso são descartados.
+  if (delta > 0n && wallet.coins + delta > MAX_COINS) delta = MAX_COINS - wallet.coins;
   const balanceAfter = wallet.coins + delta;
   if (balanceAfter < 0n) throw Errors.insufficientFunds(-delta, wallet.coins);
 

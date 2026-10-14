@@ -36,10 +36,18 @@ model Player {
   // Auto-coleta no mapa aberto (Loja, ADR 0008): comprada com diamantes até esta data;
   // o Passe VIP ativo também liga.
   autoCollectUntil    DateTime? @map("auto_collect_until") @db.Timestamptz(3)
+  // Turbo da Loja (ADR 0013): produção 2× de turboFrom até turboUntil.
+  turboFrom           DateTime? @map("turbo_from") @db.Timestamptz(3)
+  turboUntil          DateTime? @map("turbo_until") @db.Timestamptz(3)
   // Último AFK pago ao voltar a um mapa (para o anúncio "dobrar" — uma vez por resumo).
   lastAfkTotal        BigInt    @default(0) @map("last_afk_total")
   lastAfkAt           DateTime? @map("last_afk_at") @db.Timestamptz(3)
   lastAfkDoubled      Boolean   @default(false) @map("last_afk_doubled")
+  // Retenção (ADR 0014): calendário de 7 dias (dia da sequência e último dia resgatado) e baú
+  // das missões do dia.
+  loginStreak         Int       @default(0) @map("login_streak")
+  lastLoginRewardDay  String?   @map("last_login_reward_day")
+  missionChestDay     String?   @map("mission_chest_day")
   createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
 
   wallet         PlayerWallet?
@@ -53,6 +61,9 @@ model Player {
   subscriptions  Subscription[]
   adRewards      AdReward[]
   vipDailyClaims VipDailyClaim[]
+  leagueWeeks    PlayerLeagueWeek[]
+  gameEvents     PlayerEvent[]
+  identities     PlayerIdentity[]
 
   @@map("players")
 }
@@ -264,4 +275,49 @@ model VipDailyClaim {
 
   @@id([playerId, day])
   @@map("vip_daily_claims")
+}
+
+/// Liga semanal do jogador (ADR 0014): definida na primeira visita da semana, a partir da
+/// posição na liga da semana anterior (sobe os 20% do topo, desce os 20% de baixo).
+model PlayerLeagueWeek {
+  playerId String @map("player_id") @db.Uuid
+  week     String // segunda-feira da semana, AAAA-MM-DD (Brasília)
+  league   Int
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, week])
+  @@index([week, league])
+  @@map("player_league_weeks")
+}
+
+/// Evento de fim de semana (ADR 0014): mapa com lucro 2× e meta de faturamento com prêmio.
+model PlayerEvent {
+  playerId  String    @map("player_id") @db.Uuid
+  eventId   String    @map("event_id")
+  district  String
+  target    BigInt
+  claimedAt DateTime? @map("claimed_at") @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, eventId])
+  @@map("player_events")
+}
+
+/// Conta vinculada (ADR 0015): "Entrar com Google/Apple" para recuperar o progresso em outro
+/// aparelho. `subject` é o id estável do usuário no provedor (claim "sub"); e-mail e nome
+/// não são guardados (LGPD: só o necessário).
+model PlayerIdentity {
+  provider  String
+  subject   String
+  playerId  String   @map("player_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([provider, subject])
+  @@unique([playerId, provider])
+  @@map("player_identities")
 }

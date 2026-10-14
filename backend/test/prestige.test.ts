@@ -94,9 +94,7 @@ describe("vender o império", () => {
     expect(state.businesses.every((b: { owned: boolean }) => !b.owned)).toBe(true);
     expect(state.districts.map((d: { unlocked: boolean }) => d.unlocked)).toEqual([
       true,
-      false,
-      false,
-      false,
+      ...Array(7).fill(false),
     ]);
     // Lucro com bônus: água 10 → 11 (+14%).
     const agua = state.businesses.find((b: { slug: string }) => b.slug === "agua");
@@ -128,7 +126,7 @@ describe("vender o império", () => {
     await setCoins(ctx.db, g.playerId, 0n);
     ctx.clock.advance(100); // 10 ciclos fora do mapa (sem presença)
     const res = await post(ctx.app, g, "/presence", { district: "praia" });
-    // 10 de lucro × 2 (+100% com 50 estrelas) × 10 ciclos.
-    expect(res.json().total).toBe("200");
+    // 10 de lucro × 2 (+100% com 50 estrelas) × 12 ciclos (100 s × 1,25 do ajudante).
+    expect(res.json().total).toBe("240");
   });
 });

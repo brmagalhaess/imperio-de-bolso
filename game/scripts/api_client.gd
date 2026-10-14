@@ -169,6 +169,42 @@ func ad_claim(session_id: String) -> Dictionary:
 	return await _command("/ads/claim", {"sessionId": session_id})
 
 
+# --- Contas vinculadas (ADR 0015) ---
+
+func identities() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_GET, "/auth/identities", null, "")
+
+
+func link_identity(provider: String, id_token: String) -> Dictionary:
+	return await _authed(HTTPClient.METHOD_POST, "/auth/link", {"provider": provider, "idToken": id_token}, "")
+
+
+# --- Retenção (ADR 0014) ---
+
+func daily_reward() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_GET, "/daily-reward", null, "")
+
+
+func claim_daily_reward() -> Dictionary:
+	return await _command("/daily-reward/claim", {})
+
+
+func open_mission_chest() -> Dictionary:
+	return await _command("/missions/chest", {})
+
+
+func weekend_event() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_GET, "/event", null, "")
+
+
+func claim_event() -> Dictionary:
+	return await _command("/event/claim", {})
+
+
+func leaderboard_stars() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_GET, "/leaderboard/stars", null, "")
+
+
 func complete_tutorial() -> Dictionary:
 	return await _authed(HTTPClient.METHOD_POST, "/tutorial/complete", {}, "")
 

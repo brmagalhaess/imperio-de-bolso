@@ -4,7 +4,14 @@ import { Errors } from "../errors.js";
 import { DISTRICTS, previousDistrict } from "../economy/districts.js";
 import { bonusPercent } from "../economy/prestige.js";
 import { nextUpgradeCost, profitPerCycle } from "../economy/formulas.js";
+import { EVENT_PROFIT_PERCENT, weekendEvent } from "../economy/events.js";
 import { OFFLINE_CAP_MS, settle } from "../economy/offline.js";
+import {
+  type SpeedContext,
+  effectiveCycleMs,
+  speedPercentAt,
+  workBetween,
+} from "../economy/speed.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { track } from "./analytics.js";
 import { autoCollectActive, vipUntil } from "./entitlements.js";
@@ -29,7 +36,11 @@ export interface BusinessView {
   sortOrder: number;
   district: string;
   cost: string;
+  /** Ciclo efetivo (com aceleradores), em segundos — pode ter casas decimais. */
   cycleSeconds: number;
+  /** Ciclo do catálogo e velocidade total em % (100 = normal; ADR 0013). */
+  baseCycleSeconds: number;
+  speedPercent: number;
   owned: boolean;
   level: number;
   maxLevel: number;
@@ -69,6 +80,8 @@ export interface PlayerStateView {
     /** Estrelas de prestígio e bônus de lucro em % (ADR 0011). */
     prestigeStars: number;
     prestigeBonusPercent: number;
+    /** Turbo 2× da Loja ativo até (ISO) ou null. */
+    turboUntil: string | null;
   };
   wallet: { coins: string; gems: string };
   businesses: BusinessView[];
@@ -81,7 +94,62 @@ export function isAutomatic(pb: PlayerBusiness | undefined): boolean {
   return Boolean(pb?.managerUnlocked && pb.cycleStartedAt === null);
 }
 
-function cycleStatus(pb: PlayerBusiness | undefined, cycleSeconds: number, now: Date) {
+/** Diamantes/VIP/Turbo que aceleram a produção do jogador (ADR 0013). */
+export async function speedContext(db: Reader, playerId: string, now: Date): Promise<SpeedContext> {
+  const [player, vip] = await Promise.all([
+    db.player.findUnique({
+      where: { id: playerId },
+      select: { turboFrom: true, turboUntil: true },
+    }),
+    vipUntil(db, playerId, now),
+  ]);
+  return {
+    vipUntil: vip,
+    turboFrom: player?.turboFrom ?? null,
+    turboUntil: player?.turboUntil ?? null,
+  };
+}
+
+const NO_SPEED: SpeedContext = { vipUntil: null, turboUntil: null };
+
+/** Mapa do evento de fim de semana deste jogador agora (quem já entrou no evento), ou null. */
+export async function eventDistrict(
+  db: Reader,
+  playerId: string,
+  now: Date,
+): Promise<string | null> {
+  const ev = weekendEvent(now);
+  if (!ev) return null;
+  const row = await db.playerEvent.findUnique({
+    where: { playerId_eventId: { playerId, eventId: ev.id } },
+  });
+  return row?.district ?? null;
+}
+
+/** Lucro por ciclo agora: fórmula + prestígio + evento (lucro 2× no mapa do evento). */
+export function profitNow(
+  def: BusinessDefinition,
+  level: number,
+  stars: number,
+  evDistrict: string | null,
+): bigint {
+  const p = profitPerCycle(def, level, stars);
+  return evDistrict === def.district ? (p * BigInt(100 + EVENT_PROFIT_PERCENT)) / 100n : p;
+}
+
+/** Trabalho do ajudante entre dois instantes (função para settle). */
+function workOf(pb: PlayerBusiness, ctx: SpeedContext) {
+  return (fromMs: number, toMs: number) => workBetween(pb, ctx, fromMs, toMs);
+}
+
+function cycleStatus(
+  pb: PlayerBusiness | undefined,
+  cycleSeconds: number,
+  now: Date,
+  ctx: SpeedContext = NO_SPEED,
+) {
+  const speed = pb ? speedPercentAt(pb, ctx, now) : 100;
+  const cycleMs = effectiveCycleMs(cycleSeconds, speed);
   if (pb && isAutomatic(pb)) {
     // Ciclo "virtual" do ajudante: posição atual dentro do ciclo, a partir da última liquidação.
     const s = settle({
@@ -89,21 +157,24 @@ function cycleStatus(pb: PlayerBusiness | undefined, cycleSeconds: number, now: 
       lastSettlementAt: pb.lastSettlementAt,
       carryMs: pb.carryMs,
       cycleSeconds,
+      work: workOf(pb, ctx),
     });
-    const startedAt = new Date(now.getTime() - s.carryMs);
-    const endsAt = new Date(startedAt.getTime() + cycleSeconds * 1000);
+    // Falta (em trabalho) para fechar o ciclo, convertida para tempo real na velocidade atual.
+    const remainingMs = Math.ceil(((cycleSeconds * 1000 - s.carryMs) * 100) / speed);
+    const endsAt = new Date(now.getTime() + remainingMs);
+    const startedAt = new Date(endsAt.getTime() - cycleMs);
     return {
       startedAt,
       endsAt,
       ready: false,
-      secondsRemaining: Math.max(1, Math.ceil((endsAt.getTime() - now.getTime()) / 1000)),
+      secondsRemaining: Math.max(1, Math.ceil(remainingMs / 1000)),
       pendingCycles: s.cycles,
     };
   }
   if (!pb?.cycleStartedAt) {
     return { startedAt: null, endsAt: null, ready: false, secondsRemaining: 0, pendingCycles: 0 };
   }
-  const endsAt = new Date(pb.cycleStartedAt.getTime() + cycleSeconds * 1000);
+  const endsAt = new Date(pb.cycleStartedAt.getTime() + cycleMs);
   const remainingMs = endsAt.getTime() - now.getTime();
   return {
     startedAt: pb.cycleStartedAt,
@@ -128,9 +199,12 @@ function toBusinessView(
   pb: PlayerBusiness | undefined,
   now: Date,
   stars = 0,
+  ctx: SpeedContext = NO_SPEED,
+  evDistrict: string | null = null,
 ): BusinessView {
   const level = pb?.level ?? 1;
-  const status = cycleStatus(pb, def.cycleSeconds, now);
+  const status = cycleStatus(pb, def.cycleSeconds, now, ctx);
+  const speed = pb ? speedPercentAt(pb, ctx, now) : 100;
   const upgrade = pb ? nextUpgradeCost(def, level) : null;
   return {
     slug: def.slug,
@@ -138,11 +212,13 @@ function toBusinessView(
     sortOrder: def.sortOrder,
     district: def.district,
     cost: def.cost.toString(),
-    cycleSeconds: def.cycleSeconds,
+    cycleSeconds: effectiveCycleMs(def.cycleSeconds, speed) / 1000,
+    baseCycleSeconds: def.cycleSeconds,
+    speedPercent: speed,
     owned: Boolean(pb),
     level: pb ? level : 0,
     maxLevel: def.maxLevel,
-    profitPerCycle: profitPerCycle(def, level, stars).toString(),
+    profitPerCycle: profitNow(def, level, stars, evDistrict).toString(),
     nextUpgradeCost: upgrade === null ? null : upgrade.toString(),
     cycleStartedAt: status.startedAt?.toISOString() ?? null,
     cycleEndsAt: status.endsAt?.toISOString() ?? null,
@@ -151,7 +227,9 @@ function toBusinessView(
     managed: pb?.managerUnlocked ?? false,
     automatic: isAutomatic(pb),
     managerCost: def.managerCost.toString(),
-    pendingAmount: (profitPerCycle(def, level, stars) * BigInt(status.pendingCycles)).toString(),
+    pendingAmount: (
+      profitNow(def, level, stars, evDistrict) * BigInt(status.pendingCycles)
+    ).toString(),
   };
 }
 
@@ -160,13 +238,15 @@ export async function listBusinesses(
   playerId: string,
   now: Date,
 ): Promise<BusinessView[]> {
-  const [defs, owned, stars] = await Promise.all([
+  const [defs, owned, stars, ctx, ev] = await Promise.all([
     db.businessDefinition.findMany({ orderBy: { sortOrder: "asc" } }),
     db.playerBusiness.findMany({ where: { playerId } }),
     starsOf(db, playerId),
+    speedContext(db, playerId, now),
+    eventDistrict(db, playerId, now),
   ]);
   const byBusiness = new Map(owned.map((pb) => [pb.businessId, pb]));
-  return defs.map((def) => toBusinessView(def, byBusiness.get(def.id), now, stars));
+  return defs.map((def) => toBusinessView(def, byBusiness.get(def.id), now, stars, ctx, ev));
 }
 
 /** Distrito liberado quando todos os negócios do distrito anterior foram comprados. */
@@ -201,6 +281,8 @@ export async function getPlayerState(
       canChangeName: player.nameChangedAt === null,
       prestigeStars: player.prestigeStars,
       prestigeBonusPercent: bonusPercent(player.prestigeStars),
+      turboUntil:
+        player.turboUntil && player.turboUntil > now ? player.turboUntil.toISOString() : null,
     },
     wallet: { coins: player.wallet.coins.toString(), gems: player.wallet.gems.toString() },
     businesses,
@@ -317,20 +399,22 @@ export function collectProduction(slug: string | undefined, now: Date) {
     if (slug && isAutomatic(all[0])) throw Errors.managerActive(slug);
     const owned = all.filter((pb) => !isAutomatic(pb));
 
-    const ready = owned.filter((pb) => cycleStatus(pb, pb.business.cycleSeconds, now).ready);
+    const ctx = await speedContext(tx, wallet.playerId, now);
+    const ready = owned.filter((pb) => cycleStatus(pb, pb.business.cycleSeconds, now, ctx).ready);
     if (ready.length === 0) {
       const first = owned[0];
       if (slug && first) {
-        const status = cycleStatus(first, first.business.cycleSeconds, now);
+        const status = cycleStatus(first, first.business.cycleSeconds, now, ctx);
         throw Errors.notReady(slug, status.secondsRemaining);
       }
       throw Errors.nothingToCollect();
     }
 
     const stars = await starsOf(tx, wallet.playerId);
+    const ev = await eventDistrict(tx, wallet.playerId, now);
     const collected = ready.map((pb) => ({
       slug: pb.business.slug,
-      amount: profitPerCycle(pb.business, pb.level, stars),
+      amount: profitNow(pb.business, pb.level, stars, ev),
     }));
     const total = collected.reduce((sum, c) => sum + c.amount, 0n);
 
@@ -396,6 +480,8 @@ async function settleAutomatic(
     include: { business: true },
   });
   const stars = automatic.length > 0 ? await starsOf(tx, wallet.playerId) : 0;
+  const ctx = automatic.length > 0 ? await speedContext(tx, wallet.playerId, now) : NO_SPEED;
+  const ev = automatic.length > 0 ? await eventDistrict(tx, wallet.playerId, now) : null;
   const items: SettledItem[] = [];
   let total = 0n;
   let elapsedMs = 0;
@@ -406,8 +492,9 @@ async function settleAutomatic(
       lastSettlementAt: pb.lastSettlementAt,
       carryMs: pb.carryMs,
       cycleSeconds: pb.business.cycleSeconds,
+      work: workOf(pb, ctx),
     });
-    const amount = profitPerCycle(pb.business, pb.level, stars) * BigInt(s.cycles);
+    const amount = profitNow(pb.business, pb.level, stars, ev) * BigInt(s.cycles);
     total += amount;
     elapsedMs = Math.max(elapsedMs, s.elapsedMs);
     capped ||= s.capped;
@@ -453,15 +540,18 @@ async function startAfk(tx: Tx, playerId: string, district: string, at: Date): P
     },
     include: { business: true },
   });
+  const ctx = manual.length > 0 ? await speedContext(tx, playerId, at) : NO_SPEED;
   for (const pb of manual) {
     const cycleMs = pb.business.cycleSeconds * 1000;
-    const progress = at.getTime() - (pb.cycleStartedAt as Date).getTime();
+    // Andamento do ciclo manual vira "trabalho" (ms do ciclo base) na velocidade atual.
+    const progress =
+      ((at.getTime() - (pb.cycleStartedAt as Date).getTime()) * speedPercentAt(pb, ctx, at)) / 100;
     await tx.playerBusiness.update({
       where: { playerId_businessId: { playerId, businessId: pb.businessId } },
       data: {
         cycleStartedAt: null,
         lastSettlementAt: at,
-        carryMs: Math.min(Math.max(progress, 0), cycleMs),
+        carryMs: Math.min(Math.max(Math.floor(progress), 0), cycleMs),
       },
     });
   }
@@ -472,11 +562,13 @@ async function resumeManual(tx: Tx, playerId: string, district: string, now: Dat
   const automatic = await tx.playerBusiness.findMany({
     where: { playerId, managerUnlocked: true, cycleStartedAt: null, business: { district } },
   });
+  const ctx = automatic.length > 0 ? await speedContext(tx, playerId, now) : NO_SPEED;
   for (const pb of automatic) {
+    const realCarry = Math.floor((pb.carryMs * 100) / speedPercentAt(pb, ctx, now));
     await tx.playerBusiness.update({
       where: { playerId_businessId: { playerId, businessId: pb.businessId } },
       // Continua de onde o ciclo AFK parou (a sobra vira andamento do ciclo manual).
-      data: { cycleStartedAt: new Date(now.getTime() - pb.carryMs), carryMs: 0 },
+      data: { cycleStartedAt: new Date(now.getTime() - realCarry), carryMs: 0 },
     });
   }
 }

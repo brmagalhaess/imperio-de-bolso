@@ -40,7 +40,7 @@ export function startAd(placement: Placement, district: string | undefined, now:
         throw new AppError(409, "AD_DAILY_LIMIT", "Limite de anúncios de hoje atingido");
       }
       if (!district) throw new AppError(400, "DISTRICT_REQUIRED", "Informe o mapa");
-      reward = await productionFor(tx, wallet.playerId, district, AD_BOOST.minutes * 60);
+      reward = await productionFor(tx, wallet.playerId, district, AD_BOOST.minutes * 60, now);
       if (reward === 0n)
         throw new AppError(409, "NOTHING_TO_BOOST", "Construa um negócio neste mapa primeiro");
     } else {

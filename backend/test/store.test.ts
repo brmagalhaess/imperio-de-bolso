@@ -195,11 +195,11 @@ describe("anúncios recompensados (modo de teste)", () => {
     await post(ctx.app, g, "/presence", { district: "cidade" });
     ctx.clock.advance(100);
     const back = await post(ctx.app, g, "/presence", { district: "praia" });
-    expect(back.json().total).toBe("100");
+    expect(back.json().total).toBe("120"); // 100 s × 1,25 (ajudante) → 12 ciclos
     const before = await coinsOf(ctx.db, g.playerId);
     const r = await watch(g, "offline_double");
-    expect(r.claim!.json().coins).toBe("100");
-    expect(await coinsOf(ctx.db, g.playerId)).toBe(before + 100n);
+    expect(r.claim!.json().coins).toBe("120");
+    expect(await coinsOf(ctx.db, g.playerId)).toBe(before + 120n);
     const twice = await post(ctx.app, g, "/ads/start", { placement: "offline_double" });
     expect(twice.json().error.code).toBe("AD_NOT_AVAILABLE");
   });

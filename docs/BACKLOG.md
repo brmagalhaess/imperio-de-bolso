@@ -75,6 +75,12 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 ## Etapa 6 — Versão completa (após validação)
 - [x] V1.1 Prestígio "Vender o império" (ADR 0011) e bairros novos (porto, centro — ADR 0010)
 - [x] V1.2a Idiomas inglês e espanhol no jogo (ADR 0012)
+- [x] Aceleradores de velocidade (ADR 0013) e Turbo na Loja
+- [x] Retenção: calendário de 7 dias, baú das missões, ligas semanais, ranking de estrelas,
+      evento de fim de semana, missões por fase (ADR 0014)
+- [x] Mapas 5–8 com 24 negócios novos (ADR 0016) · iPad habilitado
+- [x] Contas vinculadas no servidor + tela (ADR 0015)
+- [ ] Login nativo Google (Android) e Apple (iOS) — plugins; depende das contas das lojas
 - [ ] V1.2b Temporadas, passe de temporada e cosméticos
 - [ ] Fichas das lojas e políticas em inglês/espanhol (lançamento fora do Brasil)
 - [ ] V1.3 Amigos, visitas e compartilhamento (depende de vincular conta Google/Apple)

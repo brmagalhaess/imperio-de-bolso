@@ -72,13 +72,17 @@ func _unit_tests() -> void:
 	for slug in Layout.BUSINESS_ART:
 		for level in [1, 10, 25]:
 			all_art = all_art and ResourceLoader.exists(Layout.art_path(slug, level))
-	check(all_art and Layout.BUSINESS_ART.size() == 22, "arte dos 3 níveis existe para os 22 negócios")
+	check(all_art and Layout.BUSINESS_ART.size() == 46, "arte dos 3 níveis existe para os 46 negócios")
 	check(Layout.DISTRICTS.porto.lots.size() == 6 and Layout.DISTRICTS.centro.lots.size() == 6,
 			"6 lotes no porto e 6 no centro")
 	var helpers_art := true
 	for slug in Layout.BUSINESS_ART:
 		helpers_art = helpers_art and ResourceLoader.exists("res://assets/optimized/%s.png" % Layout.helper_texture_name(slug))
-	check(helpers_art, "retrato do ajudante existe para os 22 negócios")
+	check(helpers_art, "retrato do ajudante existe para os 46 negócios")
+	var lots_total := 0
+	for id in Layout.DISTRICT_ORDER:
+		lots_total += Layout.DISTRICTS[id].lots.size()
+	check(Layout.DISTRICT_ORDER.size() == 8 and lots_total == 46, "8 mapas com um lote para cada um dos 46 negócios")
 	var lots_apart := true
 	for lots in [praia, cidade]:
 		var points: Array = lots.values()
@@ -116,6 +120,7 @@ func _unit_tests() -> void:
 	check(await _fast_collect_tests() == true, "seção coleta rápida executou até o fim")
 	check(await _i18n_tests() == true, "seção idiomas executou até o fim")
 	check(await _live_tests() == true, "seção auto-coleta ao vivo executou até o fim")
+	check(await _growth_tests() == true, "seção velocidade e retenção executou até o fim")
 	_sections_done += 1
 
 
@@ -223,6 +228,56 @@ func _live_tests() -> bool:
 	return true
 
 
+## Aceleradores (ADR 0013) e retenção (ADR 0014) do lado do jogo.
+func _growth_tests() -> bool:
+	var real_url: String = Api.base_url
+	Api.base_url = "http://127.0.0.1:9/api/v1"
+	var b := _biz("agua", true, 9)
+	b.cost = "100"
+	b.baseCycleSeconds = 10
+	b.speedPercent = 100
+	b.nextUpgradeCost = "100"
+	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "100000", "gems": "50"},
+		"businesses": [b], "districts": [{"id": "praia", "unlocked": true, "requires": null}],
+		"serverTime": "2026-01-01T12:00:00.000Z"})
+	GameState.upgrade("agua")
+	var w := GameState.business("agua")
+	check(int(w.level) == 10 and int(w.speedPercent) == 150 and is_equal_approx(float(w.cycleSeconds), 10.0 / 1.5),
+			"velocidade: marco do nível 10 deixa o negócio 50% mais rápido na hora")
+	GameState.hire_manager("agua")
+	check(int(GameState.business("agua").speedPercent) == 175, "velocidade: ajudante soma +25%")
+	await GameState.settled()
+
+	GameState._apply_state({"player": {"tutorialCompleted": true, "turboUntil": "2026-01-01T12:30:00.000Z"},
+		"wallet": {"coins": "0", "gems": "0"}, "businesses": [], "serverTime": "2026-01-01T12:00:00.000Z"})
+	var hud: Control = Hud.new()
+	add_child(hud)
+	await get_tree().process_frame
+	await get_tree().process_frame  # (o sinal vem antes do _process do quadro)
+	check(hud._turbo_pill.visible and hud._turbo_label.text.contains("Turbo 2×") and hud._turbo_label.text.contains("min"),
+			"Turbo ativo aparece no topo com o tempo que falta")
+
+	GameState.daily = {"day": 2, "claimedToday": false, "rewards": [
+		{"day": 1, "coins": "200", "gems": 0, "turboMinutes": 0},
+		{"day": 2, "coins": null, "gems": 5, "turboMinutes": 0}]}
+	GameState.daily_changed.emit()
+	check(hud._daily_button.badge == 1, "prêmio diário esperando: selo no botão Diário")
+	GameState.claim_daily()
+	check(GameState.daily.claimedToday and GameState.gems() == "5" and hud._daily_button.badge == 0,
+			"prêmio diário: diamantes entram no toque e o selo some")
+	GameState.weekend = {"active": true, "completed": true, "claimed": false, "prizeGems": 20}
+	GameState.event_changed.emit()
+	check(hud._event_button.visible and hud._event_button.badge == 1, "evento ativo: botão aparece com selo da meta batida")
+	await GameState.settled()
+	hud.queue_free()
+	Api.base_url = real_url
+	GameState.state = {}
+	GameState.daily = {}
+	GameState.weekend = {}
+	GameState.loaded = false
+	return true
+
+
 ## Trilha de mapas (pedido do titular): 4 mapas + "Em breve"; bloqueados sob nuvens.
 func _trail_tests() -> bool:
 	var Trail := load("res://scripts/map_trail.gd")
@@ -234,7 +289,7 @@ func _trail_tests() -> bool:
 			{"id": "porto", "unlocked": false}, {"id": "centro", "unlocked": false}]})
 	await trail.open("praia")
 	var ids: Array = trail._cards.map(func(c): return c.get_meta("district"))
-	check(ids == ["praia", "cidade", "porto", "centro", "em_breve"], "trilha: 4 mapas em ordem + Em breve no fim")
+	check(ids == Layout.DISTRICT_ORDER + ["em_breve"] and ids.size() == 9, "trilha: 8 mapas em ordem + Em breve no fim")
 	check(trail._nodes[0].y > trail._nodes[4].y, "trilha: primeiro mapa embaixo, Em breve em cima")
 	var texts := func(card: Control) -> String:
 		return " ".join(card.find_children("*", "Label", true, false).map(func(l): return l.text))
@@ -522,13 +577,13 @@ func _store_tests() -> bool:
 	check(ad_button.text == "5/5" and ad_button.disabled and ad_sub.contains("Hoje: 5/5"),
 			"coleta antecipada grátis mostra o uso de hoje e trava no limite")
 	check(ad_sub.contains("900"), "coleta antecipada mostra a estimativa de moedas")
-	var gem_button: Button = buttons[3]  # auto-coleta 24h
+	var gem_button: Button = buttons[6]  # auto-coleta 24h (depois de coleta antecipada e Turbo)
 	check(gem_button.text == "20" and gem_button.disabled, "sem diamantes: botão esmaecido com o preço")
 	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "0", "gems": "25"},
 		"businesses": []})
-	check(not gem_button.disabled and hud._modal._store_cards[3].button == gem_button,
+	check(not gem_button.disabled and hud._modal._store_cards[6].button == gem_button,
 			"com diamantes: o mesmo botão habilita (sem recriar)")
-	check(buttons[4].disabled, "item mais caro continua esmaecido")
+	check(buttons[7].disabled, "item mais caro continua esmaecido")
 
 	# Rolagem por toque começando num item da Loja (pedido do titular).
 	var ts: Node = hud._modal.touch_scroll
@@ -602,7 +657,7 @@ func _integration_test() -> void:
 	check(await GameState.boot(), "boot cria convidado e carrega estado")
 	check(GameState.coins() == "100", "saldo inicial 100")
 	check(not GameState.tutorial_completed(), "conta nova começa com tutorial pendente")
-	check(GameState.businesses().size() == 22, "22 negócios no catálogo (4 mapas)")
+	check(GameState.businesses().size() == 46, "46 negócios no catálogo (8 mapas)")
 	check(not await GameState.purchase("pipoca"), "pipoca recusada sem saldo")
 	check(await GameState.purchase("agua"), "compra do carrinho de água")
 	check(GameState.coins() == "0", "saldo após compra")

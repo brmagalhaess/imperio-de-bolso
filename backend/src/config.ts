@@ -28,6 +28,10 @@ const ConfigSchema = z.object({
   RATE_LIMIT_PER_MINUTE: z.coerce.number().int().positive().default(600),
   RATE_LIMIT_AUTH_PER_MINUTE: z.coerce.number().int().positive().default(20),
   // Vazio (ex.: `ADMIN_TOKEN=` no compose) = desligado.
+  // Contas vinculadas (ADR 0015): client ids OAuth do Google e bundle ids/Services IDs da
+  // Apple aceitos como público do ID token, separados por vírgula. Vazio = vínculo desligado.
+  GOOGLE_CLIENT_IDS: z.string().default(""),
+  APPLE_AUDIENCES: z.string().default(""),
   ADMIN_TOKEN: z.preprocess(
     (v) => (v === "" ? undefined : v),
     z.string().min(32, "ADMIN_TOKEN precisa de pelo menos 32 caracteres").optional(),

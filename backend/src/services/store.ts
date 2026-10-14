@@ -6,7 +6,8 @@ import { dayBounds, gameDay } from "../lib/time.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { track } from "./analytics.js";
 import { vipUntil } from "./entitlements.js";
-import { getPlayerState, starsOf } from "./game.js";
+import { effectiveCycleMs, speedPercentAt } from "../economy/speed.js";
+import { eventDistrict, getPlayerState, profitNow, speedContext, starsOf } from "./game.js";
 import { applyCoins, applyGems } from "./wallet.js";
 
 // Loja (ADR 0008): itens comprados com diamantes e vitrine dos itens de dinheiro real/anúncio.
@@ -19,21 +20,25 @@ export async function productionFor(
   playerId: string,
   district: string,
   seconds: number,
+  now: Date,
 ): Promise<bigint> {
-  const [owned, stars] = await Promise.all([
+  const [owned, stars, ctx, ev] = await Promise.all([
     db.playerBusiness.findMany({
       where: { playerId, business: { district } },
       include: { business: true },
     }),
     starsOf(db, playerId),
+    speedContext(db, playerId, now),
+    eventDistrict(db, playerId, now),
   ]);
-  return owned.reduce(
-    (sum, pb) =>
+  // Com aceleradores (ADR 0013): ciclos que caberiam em `seconds` na velocidade atual.
+  return owned.reduce((sum, pb) => {
+    const cycleMs = effectiveCycleMs(pb.business.cycleSeconds, speedPercentAt(pb, ctx, now));
+    return (
       sum +
-      profitPerCycle(pb.business, pb.level, stars) *
-        BigInt(Math.floor(seconds / pb.business.cycleSeconds)),
-    0n,
-  );
+      profitNow(pb.business, pb.level, stars, ev) * BigInt(Math.floor((seconds * 1000) / cycleMs))
+    );
+  }, 0n);
 }
 
 /**
@@ -68,7 +73,9 @@ export async function getCatalog(
         ...("gems" in i ? { gems: i.gems.toString() } : {}),
         ...("costGems" in i ? { costGems: i.costGems.toString() } : {}),
         ...(seconds > 0
-          ? { estimateCoins: (await productionFor(db, playerId, district, seconds)).toString() }
+          ? {
+              estimateCoins: (await productionFor(db, playerId, district, seconds, now)).toString(),
+            }
           : {}),
         ...(i.kind === "ad" ? { usedToday: adsToday } : {}),
       };
@@ -118,13 +125,24 @@ export function claimVipDaily(now: Date) {
 export function buyWithGems(itemId: string, district: string | undefined, now: Date) {
   return async ({ tx, wallet, idempotencyKey }: CommandContext): Promise<CommandResult> => {
     const item = storeItem(itemId);
-    if (!item || (item.kind !== "auto_collect" && item.kind !== "boost")) {
+    if (!item || (item.kind !== "auto_collect" && item.kind !== "boost" && item.kind !== "turbo")) {
       throw Errors.storeItemNotFound(itemId);
     }
     let w = await applyGems(tx, wallet, -item.costGems, `store:${item.id}`, idempotencyKey, now);
     const body: Record<string, unknown> = { bought: item.id };
 
-    if (item.kind === "auto_collect") {
+    if (item.kind === "turbo") {
+      const player = await tx.player.findUniqueOrThrow({ where: { id: wallet.playerId } });
+      const active = player.turboUntil && player.turboUntil > now;
+      const until = new Date(
+        (active ? player.turboUntil!.getTime() : now.getTime()) + item.hours * 3_600_000,
+      );
+      await tx.player.update({
+        where: { id: wallet.playerId },
+        data: { turboUntil: until, turboFrom: active ? player.turboFrom : now },
+      });
+      body.turboUntil = until.toISOString();
+    } else if (item.kind === "auto_collect") {
       const player = await tx.player.findUniqueOrThrow({ where: { id: wallet.playerId } });
       const from =
         player.autoCollectUntil && player.autoCollectUntil > now ? player.autoCollectUntil : now;
@@ -133,7 +151,7 @@ export function buyWithGems(itemId: string, district: string | undefined, now: D
       body.autoCollectUntil = until.toISOString();
     } else {
       if (!district) throw new AppError(400, "DISTRICT_REQUIRED", "Informe o mapa do turbo");
-      const amount = await productionFor(tx, wallet.playerId, district, item.hours * 3600);
+      const amount = await productionFor(tx, wallet.playerId, district, item.hours * 3600, now);
       if (amount === 0n)
         throw new AppError(409, "NOTHING_TO_BOOST", "Construa um negócio neste mapa primeiro");
       w = await applyCoins(tx, w, amount, `boost:${item.id}`, `${idempotencyKey}:coins`, now);

@@ -2,6 +2,19 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-14 — Lote 2: velocidade, retenção, mapas 5–8, iPad e contas vinculadas
+
+- **Aceleradores (ADR 0013):** ajudante +25%, marcos de nível 10/25/50/75/100 +50% cada, VIP +50%,
+  Turbo 2× na Loja (1 h/4 h/24 h); tudo soma; AFK conta cada trecho na velocidade que tinha.
+- **Retenção (ADR 0014):** calendário de 7 dias (abre sozinho), baú das 3 missões, ligas semanais
+  Bronze→Diamante, ranking de estrelas, evento de fim de semana (lucro 2× + meta com diamantes).
+- **Mapas 5–8 (ADR 0016):** Polo Industrial, Serra Nevada, Ilha Paraíso, Centro Espacial — 24
+  negócios novos com arte Higgsfield (~US$ 6,7 dos US$ 8 aprovados); fórmulas em inteiros exatos.
+- **iPad** habilitado (iPhone + iPad, retrato). **Contas vinculadas (ADR 0015):** servidor e tela
+  "Salvar progresso" prontos; login nativo depende das contas das lojas.
+- Testes: backend **125**; jogo **139** unitários e **179** com integração. Telas novas (Loja/Turbo,
+  Diário, Missões/baú, Ranking/liga, Evento) e os 4 mapas construídos conferidos em captura.
+
 ## 2026-10-14 — Correções pedidas pelo titular (lote 1 de 2)
 
 - **Auto-coleta ao vivo:** sem moeda parada esperando; cada ciclo dos ajudantes do mapa aberto

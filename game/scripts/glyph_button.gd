@@ -7,7 +7,7 @@ signal pressed
 
 const Style := preload("res://scripts/ui_style.gd")
 
-enum Glyph { MISSIONS, TROPHY, GEM }
+enum Glyph { MISSIONS, TROPHY, GEM, CALENDAR, STAR }
 
 var glyph: Glyph
 var color: Color
@@ -69,6 +69,22 @@ func _draw() -> void:
 					c + Vector2(8, -18) * u, c + Vector2(16, -8) * u, c + Vector2(0, 18) * u]), Color("7fe3ff"))
 			draw_polyline(PackedVector2Array([c + Vector2(-16, -8) * u, c + Vector2(16, -8) * u]),
 					Color("2bb6e0"), 2 * u)
+		Glyph.CALENDAR:
+			# Folhinha: corpo branco, faixa vermelha e argolas.
+			draw_rect(Rect2(c + Vector2(-18, -14) * u, Vector2(36, 32) * u), white)
+			draw_rect(Rect2(c + Vector2(-18, -14) * u, Vector2(36, 10) * u), Color("ff6b6b"))
+			for x in [-9, 9]:
+				draw_rect(Rect2(c + Vector2(x - 2, -20) * u, Vector2(4, 10) * u), color.darkened(0.3))
+			for row in 2:
+				for col in 3:
+					draw_rect(Rect2(c + Vector2(-12 + col * 9, 0 + row * 8) * u, Vector2(6, 5) * u), color.darkened(0.15))
+		Glyph.STAR:
+			var pts := PackedVector2Array()
+			for i in 10:
+				var r := (20.0 if i % 2 == 0 else 9.0) * u
+				var a := -PI / 2 + i * PI / 5
+				pts.append(c + Vector2(cos(a), sin(a)) * r)
+			draw_colored_polygon(pts, Color("ffd34d"))
 	if badge > 0:
 		var b := Vector2(s.x - 8, 8)
 		draw_circle(b, 15, Color("ff3b3b"))

@@ -43,16 +43,20 @@ for f in sorted((ROOT / "game/scripts").glob("*.gd")):
     if f.name == "layout.gd":
         for m in re.finditer(r'"title":\s*' + STR, src):
             add(unescape(m.group(1)))
-        for m in re.finditer(r'"(?:praia|cidade|porto|centro)":\s*' + STR, src[src.index("short_title"):]):
+        for m in re.finditer(r'"[a-z]+":\s*' + STR, src[src.index("static func short_title"):src.index("static func title")]):
             add(unescape(m.group(1)))
     if f.name == "tutorial.gd":
         block = src[src.index("const TEXTS") : src.index("}", src.index("const TEXTS"))]
         for m in re.finditer(r":\s*" + STR, block):
             add(unescape(m.group(1)))
 
+# Nomes das ligas (vêm do servidor como texto).
+for name in ("Bronze", "Prata", "Ouro", "Platina", "Diamante"):
+    add(name)
+
 back = ROOT / "backend/src/economy"
 cat = (back / "catalog.ts").read_text()
-for m in re.finditer(r'\["[a-z_]+", "([^"]+)"', cat):
+for m in re.finditer(r'\[\s*"[a-z_]+",\s*"([^"]+)"', cat):
     add(m.group(1))
 for name in ("missions.ts", "achievements.ts", "store.ts"):
     src = (back / name).read_text()

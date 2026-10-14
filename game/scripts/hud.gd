@@ -54,6 +54,11 @@ var _reward_cards := {}
 var _reward_kind := ""  # "missions" | "achievements" | ""
 var _missions_button: Control
 var _ranking_button: Control
+var _daily_button: Control
+var _event_button: Control
+var _turbo_pill: PanelContainer
+var _turbo_label: Label
+var _ranking_tab := 0
 var _gems_label: Label
 var _mock_ad: ColorRect
 var _gem_tex: Texture2D = GlyphButton.gem_texture()
@@ -97,6 +102,7 @@ func _ready() -> void:
 			show_toast(_toast.text))
 	_build_toast()
 	_build_offline_pill()
+	_build_turbo_pill()
 	_build_fader()
 	_build_overlay()
 
@@ -113,6 +119,9 @@ func _ready() -> void:
 	GameState.busy_changed.connect(func(_b): _sync_rewards())
 	GameState.busy_changed.connect(func(_b): _sync_helper_cards())
 	GameState.connection_changed.connect(func(online): _offline_pill.visible = not online)
+	GameState.daily_changed.connect(_sync_side)
+	GameState.event_changed.connect(_sync_side)
+	GameState.missions_changed.connect(_sync_side)
 
 
 func show_business(new_slug: String) -> void:
@@ -158,7 +167,7 @@ func open_helpers_menu() -> void:
 	_modal.open(tr("Ajudantes · %s") % Layout.title(current_district))
 	var auto_text := tr("Auto-coleta neste mapa: ativa") if GameState.auto_collect() \
 			else tr("Auto-coleta enquanto você joga neste mapa: em breve na Loja")
-	_modal.add_message(null, "", tr("Ajudantes produzem sozinhos enquanto você está em outro mapa ou com o jogo fechado — até 4 horas por mapa.") + "\n" + auto_text)
+	_modal.add_message(null, "", tr("Ajudantes produzem sozinhos enquanto você está em outro mapa ou com o jogo fechado — até 4 horas por mapa.") + "\n" + tr("Cada ajudante deixa o negócio 25% mais rápido.") + "\n" + auto_text)
 	for b in GameState.businesses():
 		if Layout.district_of(b.slug) != current_district:
 			continue
@@ -238,6 +247,18 @@ func fade(to_dark: bool) -> void:
 func _process(_delta: float) -> void:
 	if _sheet.visible and slug != "":
 		_update_cycle(GameState.business(slug))
+	_update_turbo_pill()
+
+
+## "⚡ Turbo 2× · 43 min" enquanto o Turbo da Loja/prêmios estiver ativo (ADR 0013).
+func _update_turbo_pill() -> void:
+	var until: Variant = GameState.turbo_until() if GameState.loaded else null
+	var left := 0.0
+	if until != null:
+		left = _iso_seconds(str(until)) - GameState.server_now()
+	_turbo_pill.visible = left > 0.0
+	if left > 0.0:
+		_turbo_label.text = tr("⚡ Turbo 2× · %s") % Fmt.duration(left)
 
 
 func _refresh() -> void:
@@ -256,6 +277,9 @@ func _refresh() -> void:
 	if b.owned:
 		_info.text = tr("Nível %d · Lucro %s a cada %s") % [
 			int(b.level), Fmt.coins(b.profitPerCycle), Fmt.duration(b.cycleSeconds)]
+		var speed := int(b.get("speedPercent", 100))
+		if speed > 100:
+			_info.text += tr(" · Velocidade +%d%%") % (speed - 100)
 		if b.get("automatic", false):
 			_info.text += tr(" · Produzindo sozinho")
 		elif b.get("managed", false):
@@ -414,6 +438,21 @@ func open_store_menu() -> void:
 				"enabled": GameState.gems().to_int() >= cost.to_int(),
 			}, func(): _buy_with_gems(item_id))
 
+	# Turbo (ADR 0013): produção 2× em todos os mapas; soma com ajudante, níveis e VIP.
+	_modal.add_section(tr("Turbo 2×"))
+	for id in ["turbo_1h", "turbo_4h", "turbo_24h"]:
+		var item_id: String = id
+		_modal.add_store_card(func():
+			var item := GameState.store_item(item_id)
+			var cost: String = item.get("costGems", "0")
+			var until: Variant = GameState.turbo_until()
+			return {
+				"title": item.get("title", item_id), "icon": COIN_TEX,
+				"subtitle": tr("Produção 2× em todos os mapas") + "\n" + (tr("Ativo até %s") % _date_text(until) if until != null else tr("Soma tempo se já estiver ativo")),
+				"button": cost, "button_icon": _gem_tex, "color": BLUE, "edge": BLUE_DARK,
+				"enabled": GameState.gems().to_int() >= cost.to_int(),
+			}, func(): _buy_with_gems(item_id))
+
 	_modal.add_section(tr("Auto-coleta"))
 	for id in ["auto_collect_24h", "auto_collect_7d"]:
 		var item_id: String = id
@@ -481,6 +520,8 @@ func _buy_with_gems(item_id: String) -> void:
 		return
 	if data.has("coins"):
 		show_toast(tr("Coleta antecipada: +%s moedas") % Fmt.coins(data.coins))
+	elif data.has("turbo"):
+		show_toast(tr("Turbo 2× ligado!"))
 	else:
 		show_toast(tr("Auto-coleta ativa!"))
 	_modal.refresh_store_cards()
@@ -564,6 +605,24 @@ func open_missions_menu() -> void:
 		var mission: Dictionary = m
 		var id: String = mission.id
 		_reward_cards[id] = _modal.add_reward_card(_mission_item(mission), func(): GameState.claim_mission(id))
+	# Baú das missões (ADR 0014): abre com as 3 resgatadas.
+	if GameState.missions.has("chest"):
+		_modal.add_store_card(func():
+			var chest: Dictionary = GameState.missions.get("chest", {})
+			var claimed: bool = chest.get("claimed", false)
+			return {
+				"title": tr("Baú das missões"), "icon": _gem_tex,
+				"subtitle": tr("Resgate as 3 missões: +%d diamantes e Turbo 2× por %d min (%d/%d)") % [
+					int(chest.get("gems", 5)), int(chest.get("turboMinutes", 30)),
+					int(chest.get("progress", 0)), int(chest.get("target", 3))],
+				"button": tr("Aberto") if claimed else tr("Abrir"),
+				"color": Style.TEAL_LIGHT if claimed else Style.ORANGE,
+				"edge": Style.TEAL_DARK if claimed else Style.ORANGE_DARK,
+				"enabled": chest.get("available", false) and not claimed,
+			}, func():
+				if await GameState.open_mission_chest():
+					show_toast(tr("Baú aberto! +%d diamantes e Turbo 2×.") % int(GameState.missions.chest.gems))
+				_modal.refresh_store_cards())
 	GameState.refresh_missions()
 
 
@@ -588,8 +647,24 @@ func open_profile_menu() -> void:
 		var id: String = ach.id
 		_reward_cards[id] = _modal.add_reward_card(_achievement_item(ach), func(): GameState.claim_achievement(id))
 	_modal.add_section(tr("Conta"))
+	_add_save_progress()
 	_modal.add_action(tr("Excluir conta"), open_delete_account_form, Style.RED, Style.RED_DARK)
 	GameState.refresh_achievements()
+
+
+## Salvar progresso (ADR 0015): vincular a conta convidada ao Google (Android) ou à Apple (iOS)
+## para recuperar o jogo em outro aparelho. O login nativo entra com as contas das lojas; até
+## lá o botão avisa que chega em breve.
+func _add_save_progress() -> void:
+	var provider := "apple" if OS.get_name() == "iOS" else "google"
+	var label := tr("Vincular com a Apple") if provider == "apple" else tr("Vincular com o Google")
+	var info: Button = _modal.add_option(tr("Salvar progresso"), tr("Conta convidada: vincule para não perder o progresso ao trocar de aparelho."), func():
+		show_toast(tr("Em breve: disponível quando o jogo estiver na loja.")))
+	info.text = label
+	var res := await Api.identities()
+	if res.ok and Array(res.data.get("linked", [])).has(provider) and is_instance_valid(info):
+		info.text = tr("Vinculado ✓")
+		info.disabled = true
 
 
 ## Código curto da conta (8 primeiros caracteres do id) para suporte e pedidos de exclusão
@@ -717,33 +792,164 @@ func open_name_form() -> void:
 	edit.grab_focus.call_deferred()
 
 
-func open_ranking_menu() -> void:
+## Ranking (ADR 0014): Liga da semana · Geral da semana · Estrelas de prestígio.
+func open_ranking_menu(tab := -1) -> void:
 	close_sheet()
 	_helper_cards.clear()
 	_reward_cards.clear()
 	_reward_kind = "ranking"
+	if tab >= 0:
+		_ranking_tab = tab
 	GameState.track("screen_view", {"screen": "ranking"})
-	_modal.open(tr("Ranking da semana"))
+	_modal.open(tr("Ranking"))
+	var tabs := [tr("Liga"), tr("Semana"), tr("Estrelas")]
+	_modal.add_tabs(tabs, _ranking_tab, func(i): open_ranking_menu(i))
 	_modal.add_message(null, "", tr("Carregando…"))
-	var res := await Api.leaderboard()
-	if _reward_kind != "ranking" or not _modal.visible:
+	var shown_tab := _ranking_tab
+	var res: Dictionary
+	if shown_tab == 2:
+		res = await Api.leaderboard_stars()
+	else:
+		res = await Api.leaderboard()
+	if _reward_kind != "ranking" or not _modal.visible or shown_tab != _ranking_tab:
 		return
 	_modal.clear_list()
+	_modal.add_tabs(tabs, _ranking_tab, func(i): open_ranking_menu(i))
 	if not res.ok:
 		_modal.add_message(null, "", GameState.message_for(res.error_code))
 		return
 	var data: Dictionary = res.data
-	var ends := _iso_seconds(data.week.end) - _iso_seconds(data.serverTime)
-	_modal.add_message(null, tr("Desafio dos 7 dias"),
-			tr("Quem faturar mais com seus negócios até domingo vence.\nTermina em %s.") % Fmt.duration(ends))
-	if data.entries.is_empty():
-		_modal.add_message(null, "", tr("Ninguém faturou nesta semana ainda. Colete moedas e saia na frente!"))
-	for e in data.entries:
-		_modal.add_rank_row(int(e.rank), e.displayName, e.score, e.isMe)
-	if data.me != null and not data.entries.any(func(e): return e.isMe):
+	var entries: Array = data.entries
+	var me: Variant = data.me
+	if shown_tab == 0:
+		var lg: Dictionary = data.get("league", {})
+		var ends := _iso_seconds(data.week.end) - _iso_seconds(data.serverTime)
+		var rules := []
+		if int(lg.get("promote", 0)) > 0:
+			rules.append(tr("Sobem de liga: %d") % int(lg.promote))
+		else:
+			rules.append(tr("Liga mais alta: mantenha o topo!"))
+		if int(lg.get("demote", 0)) > 0:
+			rules.append(tr("Descem: %d") % int(lg.demote))
+		_modal.add_message(null, tr("Liga %s") % tr(str(lg.get("name", "Bronze"))),
+				tr("Jogadores na sua liga: %d · %s\nTermina em %s.") % [int(lg.get("size", 0)), " · ".join(rules), Fmt.duration(ends)])
+		entries = lg.get("entries", [])
+		me = lg.get("me")
+	elif shown_tab == 1:
+		var ends := _iso_seconds(data.week.end) - _iso_seconds(data.serverTime)
+		_modal.add_message(null, tr("Desafio dos 7 dias"),
+				tr("Quem faturar mais com seus negócios até domingo vence.\nTermina em %s.") % Fmt.duration(ends))
+	else:
+		_modal.add_message(null, tr("Estrelas de investidor"),
+				tr("Quem acumulou mais estrelas vendendo o império (Perfil → Prestígio)."))
+	if entries.is_empty():
+		_modal.add_message(null, "", tr("Ninguém faturou nesta semana ainda. Colete moedas e saia na frente!")
+				if shown_tab < 2 else tr("Ninguém vendeu o império ainda. Seja o primeiro!"))
+	for e in entries:
+		_modal.add_rank_row(int(e.rank), e.displayName, ("⭐ " + str(e.score)) if shown_tab == 2 else e.score, e.isMe)
+	if me != null and not entries.any(func(e): return e.isMe):
 		_modal.add_section(tr("Sua posição"))
-		_modal.add_rank_row(int(data.me.rank), data.me.displayName, data.me.score, true)
+		_modal.add_rank_row(int(me.rank), me.displayName, ("⭐ " + str(me.score)) if shown_tab == 2 else me.score, true)
 	_modal.refit()
+
+
+# --- Calendário de 7 dias e evento de fim de semana (ADR 0014) -----------------
+
+## Abre o calendário sozinho quando o prêmio do dia está esperando (depois do tutorial e de
+## qualquer janela aberta, como o resumo "Bem-vindo de volta").
+func maybe_show_daily() -> void:
+	if GameState.daily.is_empty() or GameState.daily.get("claimedToday", true) or not GameState.tutorial_completed():
+		return
+	while _modal.visible or map_trail.visible:
+		await get_tree().create_timer(0.4).timeout
+	if not GameState.daily.get("claimedToday", true):
+		open_daily_menu()
+
+
+func _reward_text(r: Dictionary) -> String:
+	var parts := []
+	if r.get("coins") != null:
+		parts.append(tr("+%s moedas") % Fmt.coins(r.coins))
+	if int(r.get("gems", 0)) > 0:
+		parts.append(tr("+%d diamantes") % int(r.gems))
+	if int(r.get("turboMinutes", 0)) > 0:
+		var m := int(r.turboMinutes)
+		parts.append(tr("Turbo 2× por %s") % ("%d h" % (m / 60) if m % 60 == 0 else "%d min" % m))
+	return " · ".join(parts)
+
+
+func open_daily_menu() -> void:
+	close_sheet()
+	_helper_cards.clear()
+	_reward_cards.clear()
+	_reward_kind = "daily"
+	GameState.track("screen_view", {"screen": "diario"})
+	_modal.open(tr("Prêmio diário"))
+	var d := GameState.daily
+	if d.is_empty():
+		_modal.add_message(null, "", tr("Carregando…"))
+		await GameState.refresh_daily()
+		if _reward_kind == "daily" and _modal.visible:
+			open_daily_menu()
+		return
+	_modal.add_message(null, "", tr("Entre todo dia para ganhar prêmios cada vez maiores. Faltou um dia, volta ao Dia 1."))
+	for r in d.get("rewards", []):
+		var day: int = int(r.day)
+		_modal.add_store_card(func():
+			var today := int(GameState.daily.get("day", 1))
+			var claimed_today: bool = GameState.daily.get("claimedToday", false)
+			var done := day < today or (day == today and claimed_today)
+			var current := day == today and not claimed_today
+			return {
+				"title": tr("Dia %d") % day, "icon": _gem_tex if int(r.get("gems", 0)) > 0 else COIN_TEX,
+				"subtitle": _reward_text(r),
+				"button": tr("Pegar") if current else ("✓" if done else tr("Dia %d") % day),
+				"color": Style.ORANGE if current else (Style.TEAL_LIGHT if done else Style.GREY),
+				"edge": Style.ORANGE_DARK if current else (Style.TEAL_DARK if done else Style.GREY_DARK),
+				"enabled": current,
+			}, func():
+				if await GameState.claim_daily():
+					show_toast(tr("Dia %d: %s") % [day, _reward_text(r)])
+				_modal.refresh_store_cards())
+	_modal.refit()
+
+
+func open_event_menu() -> void:
+	close_sheet()
+	_helper_cards.clear()
+	_reward_cards.clear()
+	_reward_kind = "event"
+	GameState.track("screen_view", {"screen": "evento"})
+	_modal.open(tr("Fim de semana em dobro"))
+	var ev := GameState.weekend
+	if not ev.get("active", false):
+		_modal.add_message(null, "", tr("O evento acontece de sexta a domingo. Volte no fim de semana!"))
+		return
+	var ends := _iso_seconds(ev.endsAt) - _iso_seconds(ev.serverTime)
+	_modal.add_message(Layout.texture("icon_map"), tr("Lucro 2× em %s") % Layout.title(str(ev.district)),
+			tr("Todos os negócios de %s rendem o dobro até domingo.\nTermina em %s.") % [Layout.title(str(ev.district)), Fmt.duration(ends)])
+	_modal.add_store_card(func():
+		var e := GameState.weekend
+		var claimed: bool = e.get("claimed", false)
+		return {
+			"title": tr("Meta: fature %s") % Fmt.coins(e.get("target", "0")), "icon": _gem_tex,
+			"subtitle": tr("%s de %s · prêmio +%d diamantes") % [Fmt.coins(e.get("progress", "0")),
+					Fmt.coins(e.get("target", "0")), int(e.get("prizeGems", 20))],
+			"button": tr("Resgatado") if claimed else tr("Resgatar"),
+			"color": Style.TEAL_LIGHT if claimed else Style.ORANGE,
+			"edge": Style.TEAL_DARK if claimed else Style.ORANGE_DARK,
+			"enabled": e.get("completed", false) and not claimed,
+		}, func():
+			if await GameState.claim_event():
+				show_toast(tr("+%d diamantes!") % int(GameState.weekend.get("prizeGems", 20)))
+			_modal.refresh_store_cards())
+	if ev.district != current_district and GameState.district_unlocked(str(ev.district)):
+		_modal.add_action(tr("Ir para %s") % Layout.title(str(ev.district)), func():
+			_modal.close()
+			district_requested.emit(str(ev.district)))
+	_modal.refit()
+	await GameState.refresh_event()
+	_modal.refresh_store_cards()
 
 
 func _open_rewards(kind: String) -> void:
@@ -774,8 +980,7 @@ func _achievement_item(a: Dictionary) -> Dictionary:
 
 ## Missões/conquistas mudaram: atualiza selos e, se a tela estiver aberta, os cartões no lugar.
 func _sync_rewards() -> void:
-	if _missions_button:
-		_missions_button.badge = GameState.claimable_missions()
+	_sync_side()
 	if _ranking_button:
 		_ranking_button.badge = 0
 	if _reward_cards.is_empty() or not _modal.visible:
@@ -817,6 +1022,11 @@ func _build_side_buttons() -> void:
 			tr("Missões"), open_missions_menu)
 	_ranking_button = _side_button(col, GlyphButton.Glyph.TROPHY, Color("9b7bff"), Color("6a4fd1"),
 			tr("Ranking"), open_ranking_menu)
+	_daily_button = _side_button(col, GlyphButton.Glyph.CALENDAR, Style.TEAL_LIGHT, Style.TEAL_DARK,
+			tr("Diário"), open_daily_menu)
+	_event_button = _side_button(col, GlyphButton.Glyph.STAR, Style.RED, Style.RED_DARK,
+			tr("Evento"), open_event_menu)
+	_set_side_visible(_event_button, false)
 
 
 func _side_button(parent: Control, glyph: int, color: Color, edge: Color, text_value: String,
@@ -833,7 +1043,27 @@ func _side_button(parent: Control, glyph: int, color: Color, edge: Color, text_v
 	label.add_theme_color_override("font_outline_color", Style.TEAL_DARK)
 	label.add_theme_constant_override("outline_size", 8)
 	parent.add_child(label)
+	b.set_meta("label", label)
 	return b
+
+
+func _set_side_visible(b: Control, show: bool) -> void:
+	b.visible = show
+	(b.get_meta("label") as Control).visible = show
+
+
+## Selos: prêmio do dia esperando; evento ativo (com selo se a meta foi batida).
+func _sync_side() -> void:
+	if _daily_button:
+		_daily_button.badge = 1 if not GameState.daily.is_empty() and not GameState.daily.get("claimedToday", true) else 0
+	if _event_button:
+		var ev := GameState.weekend
+		_set_side_visible(_event_button, ev.get("active", false))
+		_event_button.badge = 1 if ev.get("completed", false) and not ev.get("claimed", true) else 0
+	if _missions_button:
+		var chest: Dictionary = GameState.missions.get("chest", {})
+		var chest_ready := 1 if chest.get("available", false) and not chest.get("claimed", true) else 0
+		_missions_button.badge = GameState.claimable_missions() + chest_ready
 
 
 # --- Construção da interface -------------------------------------------------
@@ -1101,6 +1331,22 @@ func _build_offline_pill() -> void:
 	label.add_theme_font_size_override("font_size", 26)
 	_offline_pill.add_child(label)
 	add_child(_offline_pill)
+
+
+func _build_turbo_pill() -> void:
+	_turbo_pill = PanelContainer.new()
+	_turbo_pill.add_theme_stylebox_override("panel", Style.box(Color("fff3c4"), 26, Style.ORANGE, 3))
+	_turbo_pill.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	_turbo_pill.offset_top = 212
+	_turbo_pill.offset_right = -20
+	_turbo_pill.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_turbo_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_turbo_pill.visible = false
+	_turbo_label = Label.new()
+	_turbo_label.add_theme_font_size_override("font_size", 22)
+	_turbo_label.add_theme_color_override("font_color", Color("8a4b00"))
+	_turbo_pill.add_child(_turbo_label)
+	add_child(_turbo_pill)
 
 
 func _build_fader() -> void:

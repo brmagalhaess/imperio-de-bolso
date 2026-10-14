@@ -192,5 +192,35 @@ Qualquer rota: `429 RATE_LIMITED` `{ retryAfterSeconds }` acima do limite por IP
 `Authorization: Bearer <ADMIN_TOKEN>`; desligado sem token. Somente leitura:
 `GET /overview`, `GET /players?search&limit`, `GET /players/:id`, `GET /events?name&limit`.
 
+### Aceleradores (ADR 0013)
+Cada negócio em `PlayerState.businesses[]` traz `cycleSeconds` **efetivo** (pode ter decimais),
+`baseCycleSeconds` (catálogo) e `speedPercent` (100 = normal): ajudante +25, marcos de nível
+10/25/50/75/100 +50 cada, Passe VIP +50, Turbo +100. `player.turboUntil` (ISO ou null).
+Loja: itens `turbo_1h` (10 💎), `turbo_4h` (30 💎), `turbo_24h` (120 💎), `kind: "turbo"`,
+em `POST /store/buy` → `200 { bought, turboUntil, state }` (soma tempo se já ativo).
+
+### Retenção (ADR 0014)
+- `GET /daily-reward` → `{ day (1–7), claimedToday, rewards: [{ day, coins|null, gems,
+  turboMinutes }], serverTime }`. `POST /daily-reward/claim` — `Idempotency-Key` →
+  `{ claimed, reward, state }`; `409 DAILY_REWARD_CLAIMED`. Faltar um dia volta ao dia 1.
+- `GET /missions` traz `chest: { gems, turboMinutes, progress, target, available, claimed }`.
+  `POST /missions/chest` — `Idempotency-Key` → `{ chest, state }`; `409 MISSION_CHEST_LOCKED`,
+  `409 MISSION_CHEST_CLAIMED`.
+- `GET /event` → `{ active: false }` ou `{ active, id, district, profitMultiplier: 2, endsAt,
+  target, progress, prizeGems, completed, claimed }` (sexta 00:00 → segunda 00:00, Brasília;
+  a primeira consulta inscreve o jogador e fixa mapa e meta). `POST /event/claim` —
+  `Idempotency-Key`; `409 EVENT_NOT_ACTIVE | EVENT_GOAL_NOT_REACHED | EVENT_ALREADY_CLAIMED`.
+- `GET /leaderboard` ganha `league: { tier (0–4), name, size, promote, demote, entries, me }`
+  (Bronze, Prata, Ouro, Platina, Diamante). `GET /leaderboard/stars` → `{ entries, me }` com
+  `score` = estrelas de prestígio.
+
+### Contas vinculadas (ADR 0015)
+- `GET /auth/identities` → `{ linked: ["google"|"apple"], available: [...] }`.
+- `POST /auth/link` `{ provider: google|apple, idToken }` → mesmo formato. `401
+  INVALID_ID_TOKEN`, `409 IDENTITY_IN_USE | ALREADY_LINKED`, `503 LINK_NOT_CONFIGURED`.
+- `POST /auth/social` (sem login, limite de autenticação) `{ provider, idToken }` → `{ playerId,
+  guestId, guestSecret, accessToken, tokenType, expiresIn }` com segredo novo (o aparelho antigo
+  deixa de entrar sozinho). `404 IDENTITY_NOT_FOUND`.
+
 ### Ainda não implementados (docs/README.md §11)
-`POST /auth/link`, `GET /config`.
+`GET /config`; login nativo Google/Apple no jogo (plugins — depende das contas das lojas).

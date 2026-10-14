@@ -1,0 +1,578 @@
+[
+ {
+  "id": "g_oficina_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger two-bay car repair garage with two lifts, a tire rack wall and a small parts shop. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/1c21f1fe-e5bc-4629-8447-c9cc103b2f59.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_oficina_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a large modern auto service center with three glass roll-up doors, a car wash bay and a rooftop sign frame without text. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/1c21f1fe-e5bc-4629-8447-c9cc103b2f59.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_moveis_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger furniture factory with two sawtooth roofs, a loading dock and stacked sofas and tables outside. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/377c4ad3-3092-4ff4-ad98-0ee483661cf6.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_moveis_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a large modern furniture factory with a glass showroom front displaying sofas and lamps, and a big warehouse behind. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/377c4ad3-3092-4ff4-ad98-0ee483661cf6.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_metalurgica_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger steel mill with two chimneys, a glowing furnace and a small crane moving steel beams. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/5a2a0819-d537-4cd3-a957-b90c35ad3800.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_metalurgica_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a huge steel works with three tall chimneys, a big overhead crane and stacks of shiny steel coils. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/5a2a0819-d537-4cd3-a957-b90c35ad3800.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_montadora_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger car factory with a longer conveyor carrying two colorful cars and a test track loop. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/4ce0c9f4-a6be-45fe-be83-eb6bdbf5d151.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_montadora_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a huge modern car plant with a glass tower office, robotic arms visible through windows and a row of new cars outside. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/4ce0c9f4-a6be-45fe-be83-eb6bdbf5d151.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_refinaria_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger refinery with more storage tanks, two distillation towers and more silver pipes. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/e90d23f0-c726-4ee9-9002-0b60130a5c9d.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_refinaria_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a huge refinery complex with many tanks, three tall towers with small flames and a network of colorful pipes. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/e90d23f0-c726-4ee9-9002-0b60130a5c9d.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_usina_solar_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger solar plant with more panel rows and two wind turbines. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ce2b18d2-1eee-485b-b34b-b1c47d5076b2.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_usina_solar_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a huge green energy park with a modern glass control center, many solar panel rows and three wind turbines. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ce2b18d2-1eee-485b-b34b-b1c47d5076b2.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_chocolateria_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger two-story alpine chocolate shop with a balcony, chocolate drip decorations on the roof and a hot cocoa terrace. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/77644156-ee90-47ec-b287-a23936049198.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_chocolateria_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a grand chocolate factory chalet with a chocolate waterfall fountain in front and a glass workshop window. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/77644156-ee90-47ec-b287-a23936049198.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_pousada_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger three-story mountain inn with more balconies and a cozy terrace with a fireplace. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/b6978ab1-3824-4a14-8127-0e301ef4b573.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_pousada_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a grand alpine hotel with a tall pointed roof, many lit windows, a heated terrace and pine trees around. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/b6978ab1-3824-4a14-8127-0e301ef4b573.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_aluguel_esqui_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger ski rental shop with two wooden cabins joined, many more skis and snowboards and a snowmobile parked outside. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/8f139eaf-068e-42bf-8329-c0d3324e7b1d.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_aluguel_esqui_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a large modern ski center with a glass front full of equipment, racks of skis and two snowmobiles. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/8f139eaf-068e-42bf-8329-c0d3324e7b1d.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_teleferico_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger cable car station with two gondola cabins and a taller stone tower. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/9eb5bb70-32e2-4281-965f-4fa0ad0f0f29.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_teleferico_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a grand modern cable car terminal with glass walls, three colorful gondolas and a panoramic deck on top. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/9eb5bb70-32e2-4281-965f-4fa0ad0f0f29.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_spa_termal_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger thermal spa with more steaming stone pools and a wooden sauna cabin. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/b74e1bc1-6e03-4495-a38f-a599e42dc904.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_spa_termal_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a luxury thermal resort spa with a glass building, many steaming pools in terraces and a small waterfall. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/b74e1bc1-6e03-4495-a38f-a599e42dc904.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_estacao_esqui_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger ski lodge with a second wing, a taller ski lift tower and benches outside. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/1d48251e-d2c4-491b-9d22-4cabdd9f5b7e.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_estacao_esqui_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a grand ski resort lodge complex with a big chairlift station, warm lit windows and a snowy plaza. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/1d48251e-d2c4-491b-9d22-4cabdd9f5b7e.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_escola_mergulho_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger diving school with a second hut, a longer dock and a small boat moored. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/2c7eb97a-7dba-4359-a893-61101b813180.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_escola_mergulho_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a large diving center with a glass shop, a long pier with two dive boats and colorful tanks racked outside. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/2c7eb97a-7dba-4359-a893-61101b813180.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_bangalos_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: more overwater bungalows: five thatched villas on stilts with private decks and small pools. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/93d5ba39-1b5d-4fa4-9dec-be86534d064a.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_bangalos_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a luxury overwater village with seven villas, a central restaurant pavilion and glowing lanterns along the walkways. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/93d5ba39-1b5d-4fa4-9dec-be86534d064a.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_parque_aquatico_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger water park with more twisting slides, a lazy river and a wave pool. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/a9d82c0f-f9e1-4e54-9b52-ad2bd7c226ba.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_parque_aquatico_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a huge water park with a giant tower of slides, a big wave pool, a lazy river and colorful umbrellas. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/a9d82c0f-f9e1-4e54-9b52-ad2bd7c226ba.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_clube_golfe_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger golf clubhouse with a second floor terrace and a larger putting green with two flags. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db5a5aa8-d2b7-4b8e-b37e-8448b53fa994.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_clube_golfe_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a grand golf club resort with an elegant clubhouse, a fountain, a big green with sand bunkers and golf carts. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db5a5aa8-d2b7-4b8e-b37e-8448b53fa994.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_heliponto_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger heliport with two landing pads and two helicopters on top of a taller glass terminal. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/8283d642-b190-434e-b975-0b7cd683fca1.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_heliponto_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a luxury heliport tower with three landing pads, three helicopters and a glass VIP lounge. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/8283d642-b190-434e-b975-0b7cd683fca1.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_resort_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger beach resort hotel with a second curved wing, a larger pool and cabanas. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/11101a02-5ebb-4296-b984-34fc4824a104.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_resort_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a grand luxury resort complex with two tall curved towers, an infinity pool, palm gardens and cabanas. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/11101a02-5ebb-4296-b984-34fc4824a104.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_observatorio_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger observatory with two silver domes and a radio antenna. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/2c7884a7-7001-409b-85d0-be7e2dc1a2cf.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_observatorio_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a large astronomy center with three domes, a giant telescope visible and a planetarium sphere. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/2c7884a7-7001-409b-85d0-be7e2dc1a2cf.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_museu_espaco_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger space museum with a larger planet sculpture and two rockets displayed outside. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fbda688e-39d5-4285-b770-6e65e0d3f4fd.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_museu_espaco_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a grand space museum with a glass dome, a space shuttle model on display and a big ringed planet sculpture. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fbda688e-39d5-4285-b770-6e65e0d3f4fd.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_fabrica_satelites_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger satellite factory with a second clean-room wing and a satellite dish on the roof. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/56cc7741-e075-4ec5-ab20-94c15eaecccf.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_fabrica_satelites_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a huge high-tech satellite plant with glass walls showing two golden satellites and a big dish antenna. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/56cc7741-e075-4ec5-ab20-94c15eaecccf.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_centro_controle_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger mission control center with a second floor, more glowing windows and two antennas. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/29479a74-1cb1-4be5-a7c5-cf0615da4ae9.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_centro_controle_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a grand futuristic control complex with a glass dome full of screens and a tall antenna tower. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/29479a74-1cb1-4be5-a7c5-cf0615da4ae9.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_foguete_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger rocket base with a taller rocket, a bigger launch tower and two fuel tanks. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/8d373a02-4c28-4cef-9a5c-09026aad4db4.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_foguete_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a huge launch complex with a giant white and red rocket, a tall steel tower with arms and a control bunker. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/8d373a02-4c28-4cef-9a5c-09026aad4db4.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_porto_espacial_lv2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 2: a bigger spaceport terminal with a second curved wing and two space planes parked. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/861ef504-594e-4cdf-82b4-0a0fa47b1730.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_porto_espacial_lv3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME building upgraded to level 3: a grand futuristic spaceport with a glowing terminal, a landing strip and a big space shuttle ready on a pad. Keep the same identity and main colors so it is clearly the same business, just bigger and fancier; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/861ef504-594e-4cdf-82b4-0a0fa47b1730.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ }
+]

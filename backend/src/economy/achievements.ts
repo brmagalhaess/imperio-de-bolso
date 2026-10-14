@@ -45,6 +45,10 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
       ["cidade", "Prefeito da cidade", "Construa os 6 negócios da cidade", 5],
       ["porto", "Capitão do porto", "Construa os 6 negócios do porto", 8],
       ["centro", "Magnata do centro", "Construa os 6 negócios do centro financeiro", 12],
+      ["industrial", "Barão da indústria", "Construa os 6 negócios do polo industrial", 15],
+      ["serra", "Rei da montanha", "Construa os 6 negócios da serra", 18],
+      ["ilha", "Dono do paraíso", "Construa os 6 negócios da ilha", 22],
+      ["espaco", "Magnata das estrelas", "Construa os 6 negócios do centro espacial", 30],
     ] as const
   ).map(([district, title, description, rewardGems]) => ({
     id: `${district}_complete`,
@@ -76,6 +80,13 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
     progress: (s) => count(s.helpers, 5),
   },
   {
+    id: "helpers_20",
+    title: "Empresa de verdade",
+    description: "Contrate 20 ajudantes",
+    rewardGems: 10,
+    progress: (s) => count(s.helpers, 20),
+  },
+  {
     id: "helpers_10",
     title: "Time completo",
     description: "Contrate 10 ajudantes",
@@ -104,6 +115,20 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
     progress: (s) => count(s.maxLevel, 50),
   },
   {
+    id: "level_100",
+    title: "Lenda nacional",
+    description: "Leve um negócio ao nível 100",
+    rewardGems: 15,
+    progress: (s) => count(s.maxLevel, 100),
+  },
+  {
+    id: "prestige_5",
+    title: "Investidor experiente",
+    description: "Venda o império 5 vezes",
+    rewardGems: 20,
+    progress: (s) => count(s.prestigeCount ?? 0, 5),
+  },
+  {
     id: "earned_10k",
     title: "Primeiros 10 mil",
     description: "Fature 10.000 moedas",
@@ -123,6 +148,13 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
     description: "Fature 1.000.000.000 de moedas",
     rewardGems: 10,
     progress: (s) => ({ value: s.lifetimeEarned, target: 1_000_000_000n }),
+  },
+  {
+    id: "earned_1t",
+    title: "Trilionário",
+    description: "Fature 1.000.000.000.000 de moedas",
+    rewardGems: 25,
+    progress: (s) => ({ value: s.lifetimeEarned, target: 1_000_000_000_000n }),
   },
 ];
 

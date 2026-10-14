@@ -3,6 +3,7 @@ keys,pt_BR,en,es
  · Ajudante vende quando você sai do mapa. Coleta automática aqui: Loja, · Ajudante vende quando você sai do mapa. Coleta automática aqui: Loja, · The helper sells when you leave the map. Auto-collect here: Shop, · El ayudante vende cuando sales del mapa. Recolección automática aquí: Tienda
  · Produzindo sozinho, · Produzindo sozinho, · Producing on its own, · Produciendo solo
  · VIP, · VIP, · VIP, · VIP
+ · Velocidade +%d%%, · Velocidade +%d%%, · Speed +%d%%, · Velocidad +%d%%
 %d compra(s) encontrada(s) nesta conta.,%d compra(s) encontrada(s) nesta conta.,%d purchase(s) found on this account.,%d compra(s) encontrada(s) en esta cuenta.
 %d de %d negócios,%d de %d negócios,%d of %d businesses,%d de %d negocios
 %d negócios · %d ajudantes · %s diamantes%s,%d negócios · %d ajudantes · %s diamantes%s,%d businesses · %d helpers · %s gems%s,%d negocios · %d ayudantes · %s diamantes%s
@@ -15,17 +16,22 @@ COMPRA DE TESTE: nenhum valor será cobrado.","%s
 TEST PURCHASE: you will not be charged.","%s
 
 COMPRA DE PRUEBA: no se cobrará nada."
+%s de %s · prêmio +%d diamantes,%s de %s · prêmio +%d diamantes,%s of %s · prize +%d gems,%s de %s · premio +%d diamantes
 %s foi liberado! Abra o Mapa.,%s foi liberado! Abra o Mapa.,%s is unlocked! Open the Map.,¡%s está desbloqueado! Abre el Mapa.
 %s é seu!,%s é seu!,%s is yours!,¡%s es tuyo!
++%d diamantes,+%d diamantes,+%d gems,+%d diamantes
 +%d diamantes por dia para assinantes,+%d diamantes por dia para assinantes,+%d gems per day for subscribers,+%d diamantes al día para suscriptores
 +%d diamantes!,+%d diamantes!,+%d gems!,¡+%d diamantes!
 +%d ⭐ · lucro +%d%% para sempre,+%d ⭐ · lucro +%d%% para sempre,+%d ⭐ · profit +%d%% forever,+%d ⭐ · ganancia +%d%% para siempre
 +%s diamantes,+%s diamantes,+%s gems,+%s diamantes
++%s moedas,+%s moedas,+%s coins,+%s monedas
 +%s moedas!,+%s moedas!,+%s coins!,¡+%s monedas!
 5 diamantes por dia,5 diamantes por dia,5 gems per day,5 diamantes al día
 A %s está esperando por você.,A %s está esperando por você.,%s is waiting for you.,%s te está esperando.
 A produção ainda não terminou.,A produção ainda não terminou.,Production isn't finished yet.,La producción aún no ha terminado.
+Aberto,Aberto,Opened,Abierto
 Abrindo a praia…,Abrindo a praia…,Opening the beach…,Abriendo la playa…
+Abrir,Abrir,Open,Abrir
 Academia,Academia,Gym,Gimnasio
 Aeroporto,Aeroporto,Airport,Aeropuerto
 Agora não,Agora não,Not now,Ahora no
@@ -39,6 +45,7 @@ Algo deu errado. Tente novamente.,Algo deu errado. Tente novamente.,Something we
 Alterar,Alterar,Change,Cambiar
 Alterar nome,Alterar nome,Change name,Cambiar nombre
 Alterar nome (só 1 vez),Alterar nome (só 1 vez),Change name (once only),Cambiar nombre (solo 1 vez)
+Aluguel de Esquis,Aluguel de Esquis,Ski Rental,Alquiler de Esquís
 Anúncio fechado antes do fim: sem prêmio.,Anúncio fechado antes do fim: sem prêmio.,Ad closed before the end: no reward.,Anuncio cerrado antes del final: sin premio.
 Aqui,Aqui,Here,Aquí
 Assinatura mensal,Assinatura mensal,Monthly subscription,Suscripción mensual
@@ -57,18 +64,29 @@ Auto-coleta por 24 horas,Auto-coleta por 24 horas,Auto-collect for 24 hours,Reco
 Auto-coleta por 7 dias,Auto-coleta por 7 dias,Auto-collect for 7 days,Recolección automática por 7 días
 Automático · %s,Automático · %s,Automatic · %s,Automático · %s
 Banco,Banco,Bank,Banco
+Bangalôs na Água,Bangalôs na Água,Overwater Bungalows,Bungalós sobre el Agua
+Barão da indústria,Barão da indústria,Industry baron,Barón de la industria
+Base de Foguetes,Base de Foguetes,Rocket Base,Base de Cohetes
+Baú aberto! +%d diamantes e Turbo 2×.,Baú aberto! +%d diamantes e Turbo 2×.,Chest opened! +%d gems and 2× Turbo.,¡Cofre abierto! +%d diamantes y Turbo 2×.
+Baú das missões,Baú das missões,Mission chest,Cofre de misiones
 Baú de diamantes,Baú de diamantes,Chest of gems,Cofre de diamantes
 Bem-vindo de volta!,Bem-vindo de volta!,Welcome back!,¡Bienvenido de nuevo!
 Bem-vindo à praia! Toque no Carrinho de Água e compre por 100 moedas.,Bem-vindo à praia! Toque no Carrinho de Água e compre por 100 moedas.,Welcome to the beach! Tap the Water Cart and buy it for 100 coins.,¡Bienvenido a la playa! Toca el Carrito de Agua y cómpralo por 100 monedas.
 Benefício exclusivo do Passe VIP.,Benefício exclusivo do Passe VIP.,VIP Pass exclusive benefit.,Beneficio exclusivo del Pase VIP.
 Bloqueado,Bloqueado,Locked,Bloqueado
+Bronze,Bronze,Bronze,Bronce
+Cada ajudante deixa o negócio 25% mais rápido.,Cada ajudante deixa o negócio 25% mais rápido.,Each helper makes the business 25% faster.,Cada ayudante hace el negocio un 25% más rápido.
 Capitão do porto,Capitão do porto,Harbor captain,Capitán del puerto
 Carregando…,Carregando…,Loading…,Cargando…
 Carrinho de Pipoca,Carrinho de Pipoca,Popcorn Cart,Carrito de Palomitas
 Carrinho de Água,Carrinho de Água,Water Cart,Carrito de Agua
+Centro Espacial,Centro Espacial,Space Center,Centro Espacial
 Centro Financeiro,Centro Financeiro,Financial Center,Centro Financiero
+Centro de Controle,Centro de Controle,Mission Control,Centro de Control
 Centro de Convenções,Centro de Convenções,Convention Center,Centro de Convenciones
+Chocolateria,Chocolateria,Chocolate Shop,Chocolatería
 Cidade,Cidade,City,Ciudad
+Clube de Golfe,Clube de Golfe,Golf Club,Club de Golf
 Coleta antecipada,Coleta antecipada,Early collect,Cobro anticipado
 Coleta antecipada de 1 hora,Coleta antecipada de 1 hora,1-hour early collect,Cobro anticipado de 1 hora
 Coleta antecipada de 15 min,Coleta antecipada de 15 min,15-min early collect,Cobro anticipado de 15 min
@@ -98,7 +116,11 @@ Conquistas,Conquistas,Achievements,Logros
 Construa o negócio primeiro,Construa o negócio primeiro,Build the business first,Construye el negocio primero
 Construa os 4 negócios da praia,Construa os 4 negócios da praia,Build all 4 beach businesses,Construye los 4 negocios de la playa
 Construa os 6 negócios da cidade,Construa os 6 negócios da cidade,Build all 6 city businesses,Construye los 6 negocios de la ciudad
+Construa os 6 negócios da ilha,Construa os 6 negócios da ilha,Build all 6 island businesses,Construye los 6 negocios de la isla
+Construa os 6 negócios da serra,Construa os 6 negócios da serra,Build all 6 mountain businesses,Construye los 6 negocios de la sierra
+Construa os 6 negócios do centro espacial,Construa os 6 negócios do centro espacial,Build all 6 Space Center businesses,Construye los 6 negocios del centro espacial
 Construa os 6 negócios do centro financeiro,Construa os 6 negócios do centro financeiro,Build all 6 Financial Center businesses,Construye los 6 negocios del centro financiero
+Construa os 6 negócios do polo industrial,Construa os 6 negócios do polo industrial,Build all 6 Industrial Park businesses,Construye los 6 negocios del polo industrial
 Construa os 6 negócios do porto,Construa os 6 negócios do porto,Build all 6 harbor businesses,Construye los 6 negocios del puerto
 Construa seu primeiro negócio,Construa seu primeiro negócio,Build your first business,Construye tu primer negocio
 Construa um negócio neste mapa primeiro.,Construa um negócio neste mapa primeiro.,Build a business on this map first.,Construye un negocio en este mapa primero.
@@ -106,10 +128,12 @@ Construa {n} negócio novo,Construa {n} negócio novo,Build {n} new business,Con
 Construir,Construir,Build,Construir
 Construir · %s,Construir · %s,Build · %s,Construir · %s
 Conta,Conta,Account,Cuenta
+Conta convidada: vincule para não perder o progresso ao trocar de aparelho.,Conta convidada: vincule para não perder o progresso ao trocar de aparelho.,Guest account: link it so you don't lose your progress when you change devices.,Cuenta de invitado: vincúlala para no perder tu progreso al cambiar de dispositivo.
 Contratado,Contratado,Hired,Contratado
 Contratar ajudante  %s,Contratar ajudante  %s,Hire helper  %s,Contratar ayudante  %s
 Contrate 1 ajudante,Contrate 1 ajudante,Hire 1 helper,Contrata 1 ayudante
 Contrate 10 ajudantes,Contrate 10 ajudantes,Hire 10 helpers,Contrata 10 ayudantes
+Contrate 20 ajudantes,Contrate 20 ajudantes,Hire 20 helpers,Contrata 20 ayudantes
 Contrate 5 ajudantes,Contrate 5 ajudantes,Hire 5 helpers,Contrata 5 ayudantes
 Contrate um ajudante no botão Ajudantes: ele vende sozinho quando você sai da praia (até 4h)!,Contrate um ajudante no botão Ajudantes: ele vende sozinho quando você sai da praia (até 4h)!,Hire a helper with the Helpers button: they sell on their own when you leave the beach (up to 4h)!,¡Contrata un ayudante con el botón Ayudantes: vende solo cuando sales de la playa (hasta 4 h)!
 Contrate {n} ajudante,Contrate {n} ajudante,Hire {n} helper,Contrata {n} ayudante
@@ -118,19 +142,29 @@ Código copiado!,Código copiado!,Code copied!,¡Código copiado!
 Código do jogador (suporte),Código do jogador (suporte),Player code (support),Código de jugador (soporte)
 Dados inválidos. Confira e tente de novo.,Dados inválidos. Confira e tente de novo.,Invalid data. Check it and try again.,Datos no válidos. Revísalos e inténtalo de nuevo.
 Desafio dos 7 dias,Desafio dos 7 dias,7-day challenge,Desafío de 7 días
+Descem: %d,Descem: %d,Move down: %d,Bajan: %d
 Desligada,Desligada,Off,Desactivada
 Desligado,Desligado,Off,Desactivado
+Dia %d,Dia %d,Day %d,Día %d
+Dia %d: %s,Dia %d: %s,Day %d: %s,Día %d: %s
+Diamante,Diamante,Diamond,Diamante
 Diamantes,Diamantes,Gems,Diamantes
 Diamantes diários do VIP,Diamantes diários do VIP,VIP daily gems,Diamantes diarios VIP
 Digite EXCLUIR para confirmar,Digite EXCLUIR para confirmar,Type EXCLUIR to confirm,Escribe EXCLUIR para confirmar
 Digite EXCLUIR para confirmar.,Digite EXCLUIR para confirmar.,Type EXCLUIR to confirm.,Escribe EXCLUIR para confirmar.
 Disponível hoje,Disponível hoje,Available today,Disponible hoy
+Diário,Diário,Daily,Diario
+Dono do paraíso,Dono do paraíso,Owner of paradise,Dueño del paraíso
 Efeitos sonoros,Efeitos sonoros,Sound effects,Efectos de sonido
 "Em %s fora da %s, seus ajudantes faturaram:","Em %s fora da %s, seus ajudantes faturaram:","In %s away from %s, your helpers earned:","En %s fuera de %s, tus ayudantes ganaron:"
 Em breve,Em breve,Coming soon,Próximamente
 Em breve!,Em breve!,Coming soon!,¡Próximamente!
+Em breve: disponível quando o jogo estiver na loja.,Em breve: disponível quando o jogo estiver na loja.,Coming soon: available once the game is in the store.,Próximamente: disponible cuando el juego esté en la tienda.
 Em crescimento,Em crescimento,Growing,En crecimiento
+Empresa de verdade,Empresa de verdade,A real company,Una empresa de verdad
+"Entre todo dia para ganhar prêmios cada vez maiores. Faltou um dia, volta ao Dia 1.","Entre todo dia para ganhar prêmios cada vez maiores. Faltou um dia, volta ao Dia 1.",Log in every day for bigger and bigger rewards. Miss a day and you go back to Day 1.,"Entra todos los días para ganar premios cada vez mayores. Si faltas un día, vuelves al Día 1."
 Equipe montada,Equipe montada,Team assembled,Equipo formado
+Escola de Mergulho,Escola de Mergulho,Diving School,Escuela de Buceo
 "Escolha com cuidado: você só pode trocar de nome uma vez.
 De 3 a 20 caracteres. O nome aparece no ranking.","Escolha com cuidado: você só pode trocar de nome uma vez.
 De 3 a 20 caracteres. O nome aparece no ranking.","Choose carefully: you can only change your name once.
@@ -141,44 +175,68 @@ Esse bônus não está mais disponível.,Esse bônus não está mais disponível
 Esse nome já está em uso.,Esse nome já está em uso.,This name is already taken.,Ese nombre ya está en uso.
 Esse nome não é permitido.,Esse nome não é permitido.,This name is not allowed.,Ese nombre no está permitido.
 Estaleiro,Estaleiro,Shipyard,Astillero
+Estação de Esqui,Estação de Esqui,Ski Resort,Estación de Esquí
 Este negócio está produzindo sozinho.,Este negócio está produzindo sozinho.,This business is producing on its own.,Este negocio está produciendo solo.
 Este negócio já tem ajudante.,Este negócio já tem ajudante.,This business already has a helper.,Este negocio ya tiene ayudante.
+Estrelas,Estrelas,Stars,Estrellas
+Estrelas de investidor,Estrelas de investidor,Investor stars,Estrellas de inversor
 Estádio,Estádio,Stadium,Estadio
+Evento,Evento,Event,Evento
 Excluir conta,Excluir conta,Delete account,Eliminar cuenta
 Excluir para sempre,Excluir para sempre,Delete forever,Eliminar para siempre
 Fature 1.000.000 de moedas,Fature 1.000.000 de moedas,"Earn 1,000,000 coins",Gana 1.000.000 de monedas
 Fature 1.000.000.000 de moedas,Fature 1.000.000.000 de moedas,"Earn 1,000,000,000 coins",Gana 1.000.000.000 de monedas
+Fature 1.000.000.000.000 de moedas,Fature 1.000.000.000.000 de moedas,"Earn 1,000,000,000,000 coins",Gana 1.000.000.000.000 de monedas
 Fature 10.000 moedas,Fature 10.000 moedas,"Earn 10,000 coins",Gana 10.000 monedas
+Fature mais para alcançar a meta do evento.,Fature mais para alcançar a meta do evento.,Earn more to reach the event goal.,Gana más para alcanzar la meta del evento.
 Fature mais para ganhar a primeira estrela desta rodada.,Fature mais para ganhar a primeira estrela desta rodada.,Earn more to get this round's first star.,Gana más para conseguir la primera estrella de esta ronda.
 Fature {n} moedas,Fature {n} moedas,Earn {n} coins,Gana {n} monedas
 Fechar (sem prêmio),Fechar (sem prêmio),Close (no reward),Cerrar (sin premio)
+Fim de semana em dobro,Fim de semana em dobro,Double weekend,Fin de semana doble
 Frutos do Mar,Frutos do Mar,Seafood,Mariscos
+Fábrica de Móveis,Fábrica de Móveis,Furniture Factory,Fábrica de Muebles
+Fábrica de Satélites,Fábrica de Satélites,Satellite Factory,Fábrica de Satélites
 "Grátis com anúncio · ≈ %s moedas
 Hoje: %d/%d","Grátis com anúncio · ≈ %s moedas
 Hoje: %d/%d","Free with ad · ≈ %s coins
 Today: %d/%d","Gratis con anuncio · ≈ %s monedas
 Hoy: %d/%d"
+Heliponto,Heliponto,Heliport,Helipuerto
 Hotel,Hotel,Hotel,Hotel
 Idioma,Idioma,Language,Idioma
+Ilha Paraíso,Ilha Paraíso,Paradise Island,Isla Paraíso
 Ilha da Praia,Ilha da Praia,Beach Island,Isla de la Playa
 Império de Bolso,Império de Bolso,Império de Bolso,Império de Bolso
 Império vendido! +%d ⭐ — agora seu lucro é +%d%%.,Império vendido! +%d ⭐ — agora seu lucro é +%d%%.,Empire sold! +%d ⭐ — your profit is now +%d%%.,¡Imperio vendido! +%d ⭐ — ahora tu ganancia es +%d%%.
 Investidor,Investidor,Investor,Inversor
+Investidor experiente,Investidor experiente,Seasoned investor,Inversor experto
 Ir,Ir,Go,Ir
 Ir para %s,Ir para %s,Go to %s,Ir a %s
 Isso não pode ser desfeito,Isso não pode ser desfeito,This cannot be undone,Esto no se puede deshacer
 Joalheria,Joalheria,Jewelry Store,Joyería
+"Jogadores na sua liga: %d · %s
+Termina em %s.","Jogadores na sua liga: %d · %s
+Termina em %s.","Players in your league: %d · %s
+Ends in %s.","Jugadores en tu liga: %d · %s
+Termina en %s."
 Junte 115 moedas e melhore o carrinho: toque nele e depois em Melhorar.,Junte 115 moedas e melhore o carrinho: toque nele e depois em Melhorar.,"Save 115 coins and upgrade the cart: tap it, then tap Upgrade.",Junta 115 monedas y mejora el carrito: tócalo y luego toca Mejorar.
 Lenda local,Lenda local,Local legend,Leyenda local
+Lenda nacional,Lenda nacional,National legend,Leyenda nacional
 Leve um negócio ao nível 10,Leve um negócio ao nível 10,Get a business to level 10,Lleva un negocio al nivel 10
+Leve um negócio ao nível 100,Leve um negócio ao nível 100,Get a business to level 100,Lleva un negocio al nivel 100
 Leve um negócio ao nível 25,Leve um negócio ao nível 25,Get a business to level 25,Lleva un negocio al nivel 25
 Leve um negócio ao nível 50,Leve um negócio ao nível 50,Get a business to level 50,Lleva un negocio al nivel 50
+Liga,Liga,League,Liga
+Liga %s,Liga %s,%s League,Liga %s
+Liga mais alta: mantenha o topo!,Liga mais alta: mantenha o topo!,Top league: stay on top!,Liga más alta: ¡mantente arriba!
 Ligado,Ligado,On,Activado
 Loja,Loja,Shop,Tienda
 Loja de Surf,Loja de Surf,Surf Shop,Tienda de Surf
 Lucro %s a cada %s,Lucro %s a cada %s,Profit %s every %s,Ganancia %s cada %s
+Lucro 2× em %s,Lucro 2× em %s,2× profit in %s,Ganancia 2× en %s
 MODO DE TESTE: nenhuma compra é cobrada e os anúncios são simulados.,MODO DE TESTE: nenhuma compra é cobrada e os anúncios são simulados.,TEST MODE: no purchase is charged and ads are simulated.,MODO DE PRUEBA: no se cobra ninguna compra y los anuncios son simulados.
 Magnata,Magnata,Tycoon,Magnate
+Magnata das estrelas,Magnata das estrelas,Star tycoon,Magnate de las estrellas
 Magnata do centro,Magnata do centro,Downtown tycoon,Magnate del centro
 Mapa,Mapa,Map,Mapa
 Mapas,Mapas,Maps,Mapas
@@ -187,13 +245,18 @@ Melhorar  %s,Melhorar  %s,Upgrade  %s,Mejorar  %s
 Melhore negócios {n} vezes,Melhore negócios {n} vezes,Upgrade businesses {n} times,Mejora negocios {n} veces
 Melhore seus negócios e contrate ajudantes para lucrar mais.,Melhore seus negócios e contrate ajudantes para lucrar mais.,Upgrade your businesses and hire helpers to earn more.,Mejora tus negocios y contrata ayudantes para ganar más.
 Mercadinho,Mercadinho,Corner Store,Tiendita
+Meta: fature %s,Meta: fature %s,Goal: earn %s,Meta: gana %s
+Metalúrgica,Metalúrgica,Steel Mill,Acería
 Milionário,Milionário,Millionaire,Millonario
 Missões,Missões,Missions,Misiones
 Missões do dia,Missões do dia,Daily missions,Misiones del día
 Moedas insuficientes.,Moedas insuficientes.,Not enough coins.,Monedas insuficientes.
+Montadora de Carros,Montadora de Carros,Car Factory,Fábrica de Autos
+Museu do Espaço,Museu do Espaço,Space Museum,Museo del Espacio
 Música,Música,Music,Música
 Nada pronto para coletar.,Nada pronto para coletar.,Nothing ready to collect.,Nada listo para recoger.
 Ninguém faturou nesta semana ainda. Colete moedas e saia na frente!,Ninguém faturou nesta semana ainda. Colete moedas e saia na frente!,Nobody has earned anything this week yet. Collect coins and take the lead!,Nadie ha ganado esta semana todavía. ¡Recoge monedas y toma la delantera!
+Ninguém vendeu o império ainda. Seja o primeiro!,Ninguém vendeu o império ainda. Seja o primeiro!,Nobody has sold their empire yet. Be the first!,Nadie ha vendido su imperio todavía. ¡Sé el primero!
 Novas missões em %s.,Novas missões em %s.,New missions in %s.,Nuevas misiones en %s.
 Novos mapas estão a caminho!,Novos mapas estão a caminho!,New maps are on the way!,¡Nuevos mapas en camino!
 Nv %d,Nv %d,Lv %d,Nv %d
@@ -202,23 +265,41 @@ Nível %d · Lucro %s a cada %s,Nível %d · Lucro %s a cada %s,Level %d · Prof
 Nível máximo,Nível máximo,Max level,Nivel máximo
 Nível máximo atingido.,Nível máximo atingido.,Max level reached.,Nivel máximo alcanzado.
 O anúncio não foi confirmado. Tente de novo.,O anúncio não foi confirmado. Tente de novo.,The ad wasn't confirmed. Try again.,El anuncio no se confirmó. Inténtalo de nuevo.
+O baú de hoje já foi aberto.,O baú de hoje já foi aberto.,Today's chest has already been opened.,El cofre de hoy ya se abrió.
+O evento acabou. Volte no próximo fim de semana!,O evento acabou. Volte no próximo fim de semana!,The event is over. Come back next weekend!,El evento terminó. ¡Vuelve el próximo fin de semana!
+O evento acontece de sexta a domingo. Volte no fim de semana!,O evento acontece de sexta a domingo. Volte no fim de semana!,The event runs Friday to Sunday. Come back on the weekend!,El evento es de viernes a domingo. ¡Vuelve el fin de semana!
+Observatório,Observatório,Observatory,Observatorio
+Oficina Mecânica,Oficina Mecânica,Car Repair Shop,Taller Mecánico
 Os ajudantes coletam sozinhos enquanto você joga,Os ajudantes coletam sozinhos enquanto você joga,Helpers collect on their own while you play,Los ayudantes recogen solos mientras juegas
 Os ajudantes trabalham até %s fora de cada mapa. Volte antes para não perder nada!,Os ajudantes trabalham até %s fora de cada mapa. Volte antes para não perder nada!,Helpers work up to %s away from each map. Come back sooner so you don't miss anything!,Los ayudantes trabajan hasta %s fuera de cada mapa. ¡Vuelve antes para no perder nada!
+Ouro,Ouro,Gold,Oro
+Parque Aquático,Parque Aquático,Water Park,Parque Acuático
 Passe VIP,Passe VIP,VIP Pass,Pase VIP
+Pegar,Pegar,Claim,Tomar
 Peixaria,Peixaria,Fish Market,Pescadería
 Perfil,Perfil,Profile,Perfil
+Platina,Platina,Platinum,Platino
+Polo Industrial,Polo Industrial,Industrial Park,Polo Industrial
+Porto Espacial,Porto Espacial,Spaceport,Puerto Espacial
 Porto da Marina,Porto da Marina,Marina Harbor,Puerto de la Marina
+Pousada da Serra,Pousada da Serra,Mountain Inn,Posada de la Sierra
+Prata,Prata,Silver,Plata
 Prefeito da cidade,Prefeito da cidade,City mayor,Alcalde de la ciudad
 Prestígio,Prestígio,Prestige,Prestigio
 Primeiro ajudante,Primeiro ajudante,First helper,Primer ayudante
 Primeiro negócio,Primeiro negócio,First business,Primer negocio
 Primeiros 10 mil,Primeiros 10 mil,First 10 thousand,Primeros 10 mil
 Produz sozinho quando você sai do mapa,Produz sozinho quando você sai do mapa,Produces on its own when you leave the map,Produce solo cuando sales del mapa
+Produção +50% mais rápida,Produção +50% mais rápida,Production 50% faster,Producción 50% más rápida
+Produção 2× em todos os mapas,Produção 2× em todos os mapas,2× production on every map,Producción 2× en todos los mapas
 Pronto em %s,Pronto em %s,Ready in %s,Listo en %s
 Pronto! Agora é com você: construa seu império.,Pronto! Agora é com você: construa seu império.,Done! Now it's up to you: build your empire.,¡Listo! Ahora te toca a ti: construye tu imperio.
+Prêmio diário,Prêmio diário,Daily reward,Premio diario
+Prêmio do evento já resgatado.,Prêmio do evento já resgatado.,Event prize already claimed.,Premio del evento ya reclamado.
 Prêmio já resgatado.,Prêmio já resgatado.,Reward already claimed.,Premio ya reclamado.
 Pular,Pular,Skip,Saltar
 Punhado de diamantes,Punhado de diamantes,Handful of gems,Puñado de diamantes
+Quem acumulou mais estrelas vendendo o império (Perfil → Prestígio).,Quem acumulou mais estrelas vendendo o império (Perfil → Prestígio).,Who has collected the most stars by selling the empire (Profile → Prestige).,Quién acumuló más estrellas vendiendo el imperio (Perfil → Prestigio).
 "Quem faturar mais com seus negócios até domingo vence.
 Termina em %s.","Quem faturar mais com seus negócios até domingo vence.
 Termina em %s.","Whoever earns the most with their businesses by Sunday wins.
@@ -227,18 +308,25 @@ Termina en %s."
 Quiosque de Coco,Quiosque de Coco,Coconut Kiosk,Quiosco de Coco
 R$ %s/mês,R$ %s/mês,R$ %s/month,R$ %s/mes
 Ranking,Ranking,Leaderboard,Ranking
-Ranking da semana,Ranking da semana,Weekly leaderboard,Ranking semanal
 Receba {n} vez os ganhos dos ajudantes,Receba {n} vez os ganhos dos ajudantes,Receive your helpers' earnings {n} time,Recibe {n} vez las ganancias de los ayudantes
 Referência,Referência,Reference,Referencia
+Refinaria,Refinaria,Refinery,Refinería
+Rei da montanha,Rei da montanha,King of the mountain,Rey de la montaña
 Rei da praia,Rei da praia,King of the beach,Rey de la playa
 Resgatado,Resgatado,Claimed,Reclamado
 Resgatar,Resgatar,Claim,Reclamar
+Resgate as 3 missões do dia para abrir o baú.,Resgate as 3 missões do dia para abrir o baú.,Claim today's 3 missions to open the chest.,Reclama las 3 misiones del día para abrir el cofre.
+Resgate as 3 missões: +%d diamantes e Turbo 2× por %d min (%d/%d),Resgate as 3 missões: +%d diamantes e Turbo 2× por %d min (%d/%d),Claim the 3 missions: +%d gems and 2× Turbo for %d min (%d/%d),Reclama las 3 misiones: +%d diamantes y Turbo 2× por %d min (%d/%d)
+Resort de Luxo,Resort de Luxo,Luxury Resort,Resort de Lujo
 Restaurante,Restaurante,Restaurant,Restaurante
 Restaurar compras,Restaurar compras,Restore purchases,Restaurar compras
 Saco de diamantes,Saco de diamantes,Bag of gems,Saco de diamantes
+Salvar progresso,Salvar progresso,Save progress,Guardar progreso
 Selo VIP no perfil,Selo VIP no perfil,VIP badge on your profile,Insignia VIP en el perfil
 Sem conexão com o servidor.,Sem conexão com o servidor.,No connection to the server.,Sin conexión con el servidor.
 Sem conexão · reconectando…,Sem conexão · reconectando…,Offline · reconnecting…,Sin conexión · reconectando…
+Semana,Semana,Week,Semana
+Serra Nevada,Serra Nevada,Snowy Mountains,Sierra Nevada
 Sessão expirada. Tentando reconectar…,Sessão expirada. Tentando reconectar…,Session expired. Trying to reconnect…,Sesión expirada. Intentando reconectar…
 "Seu carrinho já está vendendo! Quando a moeda aparecer, toque nela para coletar.","Seu carrinho já está vendendo! Quando a moeda aparecer, toque nela para coletar.","Your cart is already selling! When the coin appears, tap it to collect.","¡Tu carrito ya está vendiendo! Cuando aparezca la moneda, tócala para recoger."
 Seu novo nome,Seu novo nome,Your new name,Tu nuevo nombre
@@ -248,17 +336,35 @@ Compras feitas na loja não são reembolsadas por aqui; o Passe VIP pode ser rec
 Shop purchases are not refunded here; the VIP Pass can be recovered with ""Restore purchases"" on a new account.","Tus negocios, monedas, diamantes, ayudantes, misiones, logros y posición en el ranking se borrarán para siempre, y el juego empieza de cero.
 Las compras de la tienda no se reembolsan aquí; el Pase VIP se puede recuperar en ""Restaurar compras"" en una cuenta nueva."
 Shopping,Shopping,Mall,Centro Comercial
+Sobem de liga: %d,Sobem de liga: %d,Move up: %d,Suben de liga: %d
+Soma tempo se já estiver ativo,Soma tempo se já estiver ativo,Adds time if already active,Suma tiempo si ya está activo
 Sorveteria,Sorveteria,Ice Cream Shop,Heladería
+Spa Termal,Spa Termal,Thermal Spa,Spa Termal
 Sua posição,Sua posição,Your position,Tu posición
 Supermercado,Supermercado,Supermarket,Supermercado
+Teleférico,Teleférico,Cable Car,Teleférico
 Tentar novamente,Tentar novamente,Try again,Reintentar
 Terminal de Cargas,Terminal de Cargas,Cargo Terminal,Terminal de Carga
 Termine a missão para resgatar.,Termine a missão para resgatar.,Finish the mission to claim.,Termina la misión para reclamar.
 Time completo,Time completo,Full team,Equipo completo
+"Todos os negócios de %s rendem o dobro até domingo.
+Termina em %s.","Todos os negócios de %s rendem o dobro até domingo.
+Termina em %s.","Every business in %s earns double until Sunday.
+Ends in %s.","Todos los negocios de %s ganan el doble hasta el domingo.
+Termina en %s."
 Torre de Escritórios,Torre de Escritórios,Office Tower,Torre de Oficinas
 Trabalhando · até 4h fora do mapa,Trabalhando · até 4h fora do mapa,Working · up to 4h away from the map,Trabajando · hasta 4 h fuera del mapa
+Trilionário,Trilionário,Trillionaire,Billonario
 Tudo construído!,Tudo construído!,Everything built!,¡Todo construido!
+Turbo 2×,Turbo 2×,2× Turbo,Turbo 2×
+Turbo 2× ligado!,Turbo 2× ligado!,2× Turbo on!,¡Turbo 2× activado!
+Turbo 2× por %s,Turbo 2× por %s,2× Turbo for %s,Turbo 2× por %s
+Turbo 2× por 1 hora,Turbo 2× por 1 hora,2× Turbo for 1 hour,Turbo 2× por 1 hora
+Turbo 2× por 24 horas,Turbo 2× por 24 horas,2× Turbo for 24 hours,Turbo 2× por 24 horas
+Turbo 2× por 4 horas,Turbo 2× por 4 horas,2× Turbo for 4 hours,Turbo 2× por 4 horas
 "Use de 3 a 20 letras, números, espaço, ponto, hífen ou _.","Use de 3 a 20 letras, números, espaço, ponto, hífen ou _.","Use 3 to 20 letters, numbers, spaces, periods, hyphens or _.","Usa de 3 a 20 letras, números, espacios, puntos, guiones o _."
+Usina Solar,Usina Solar,Solar Plant,Planta Solar
+Venda o império 5 vezes,Venda o império 5 vezes,Sell the empire 5 times,Vende el imperio 5 veces
 Venda o império para recomeçar da praia com mais lucro em tudo.,Venda o império para recomeçar da praia com mais lucro em tudo.,Sell the empire to start over at the beach with more profit on everything.,Vende el imperio para empezar de nuevo en la playa con más ganancia en todo.
 Venda o império pela primeira vez,Venda o império pela primeira vez,Sell the empire for the first time,Vende el imperio por primera vez
 Vender agora rende +%d ⭐ (lucro +%d%% para sempre).,Vender agora rende +%d ⭐ (lucro +%d%% para sempre).,Selling now gives +%d ⭐ (profit +%d%% forever).,Vender ahora da +%d ⭐ (ganancia +%d%% para siempre).
@@ -266,9 +372,13 @@ Vender e recomeçar,Vender e recomeçar,Sell and start over,Vender y empezar de 
 Vender o império,Vender o império,Sell the empire,Vender el imperio
 Vender o império (+%d ⭐),Vender o império (+%d ⭐),Sell the empire (+%d ⭐),Vender el imperio (+%d ⭐)
 Versão %s,Versão %s,Version %s,Versión %s
+Vinculado ✓,Vinculado ✓,Linked ✓,Vinculado ✓
+Vincular com a Apple,Vincular com a Apple,Link with Apple,Vincular con Apple
+Vincular com o Google,Vincular com o Google,Link with Google,Vincular con Google
 Visite a Cidade {n} vez,Visite a Cidade {n} vez,Visit the City {n} time,Visita la Ciudad {n} vez
 Você está aqui · ,Você está aqui · ,You are here · ,Estás aquí · 
 Você já assistiu o máximo de anúncios hoje.,Você já assistiu o máximo de anúncios hoje.,You've watched the maximum number of ads today.,Ya viste el máximo de anuncios hoy.
+Você já pegou o prêmio de hoje. Volte amanhã!,Você já pegou o prêmio de hoje. Volte amanhã!,You already claimed today's reward. Come back tomorrow!,Ya tomaste el premio de hoy. ¡Vuelve mañana!
 Você já resgatou os diamantes de hoje.,Você já resgatou os diamantes de hoje.,You've already claimed today's gems.,Ya reclamaste los diamantes de hoy.
 Você já tem este negócio.,Você já tem este negócio.,You already own this business.,Ya tienes este negocio.
 Você já trocou de nome uma vez.,Você já trocou de nome uma vez.,You've already changed your name once.,Ya cambiaste de nombre una vez.
@@ -280,9 +390,14 @@ Se mantienen: diamantes, logros, Pase VIP, recolección automática comprada y e
 Voltar,Voltar,Back,Volver
 Volte amanhã para mais,Volte amanhã para mais,Come back tomorrow for more,Vuelve mañana por más
 a cidade,a cidade,the city,la ciudad
+a ilha,a ilha,the island,la isla
 a praia,a praia,the beach,la playa
+a serra,a serra,the mountains,la sierra
 ajudantes +%s,ajudantes +%s,helpers +%s,ayudantes +%s
 o centro,o centro,the Financial Center,el centro
+o centro espacial,o centro espacial,the Space Center,el centro espacial
+o polo industrial,o polo industrial,the Industrial Park,el polo industrial
 o porto,o porto,the harbor,el puerto
 ≈ %s moedas na hora,≈ %s moedas na hora,≈ %s coins instantly,≈ %s monedas al instante
+⚡ Turbo 2× · %s,⚡ Turbo 2× · %s,⚡ 2× Turbo · %s,⚡ Turbo 2× · %s
 ⭐ %d estrelas · lucro +%d%%,⭐ %d estrelas · lucro +%d%%,⭐ %d stars · profit +%d%%,⭐ %d estrellas · ganancia +%d%%

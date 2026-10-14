@@ -28,6 +28,44 @@ func _ready() -> void:
 	while not GameState.loaded:
 		await get_tree().process_frame
 	var hud: Control = main.get_node("UI/HUD")
+	if mode == "lote2":
+		await _wait(2.0)
+		hud._modal.close()
+		hud.open_store_menu()
+		await _wait(1.0)
+		hud._modal._scroll.scroll_vertical = 430
+		await _wait(1.0)
+		print("PASSO loja turbo cedo")
+		GameState.daily = {"day": 3, "claimedToday": false, "rewards": [
+			{"day": 1, "coins": "2300000", "gems": 0, "turboMinutes": 0}, {"day": 2, "coins": null, "gems": 5, "turboMinutes": 0},
+			{"day": 3, "coins": "70000000", "gems": 0, "turboMinutes": 0}, {"day": 4, "coins": null, "gems": 0, "turboMinutes": 60},
+			{"day": 5, "coins": null, "gems": 10, "turboMinutes": 0}, {"day": 6, "coins": "140000000", "gems": 0, "turboMinutes": 0},
+			{"day": 7, "coins": null, "gems": 25, "turboMinutes": 120}]}
+		hud.open_daily_menu()
+		await _wait(1.2)
+		print("PASSO diario")
+		hud.open_missions_menu()
+		await _wait(0.6)
+		hud._modal._scroll.scroll_vertical = 100000
+		await _wait(1.0)
+		print("PASSO missoes")
+		hud.open_ranking_menu(0)
+		await _wait(1.5)
+		print("PASSO liga")
+		hud.open_store_menu()
+		await _wait(1.0)
+		hud._modal._scroll.scroll_vertical = 520
+		await _wait(1.0)
+		print("PASSO loja turbo")
+		GameState.weekend = {"active": true, "district": "cidade", "endsAt": "2026-10-19T03:00:00.000Z",
+			"serverTime": "2026-10-17T15:00:00.000Z", "target": "7200000", "progress": "5100000",
+			"prizeGems": 20, "completed": false, "claimed": false}
+		GameState.event_changed.emit()
+		hud.open_event_menu()
+		await _wait(1.2)
+		print("PASSO evento")
+		get_tree().quit()
+		return
 	if mode == "saldo":
 		for i in 4:
 			await _wait(2.0)

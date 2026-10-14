@@ -9,7 +9,7 @@ const ART_SCALE := 0.5
 const BUILDING_SCALE := 0.6
 
 ## Ordem de desbloqueio igual à do servidor (backend/src/economy/districts.ts).
-const DISTRICT_ORDER := ["praia", "cidade", "porto", "centro"]
+const DISTRICT_ORDER := ["praia", "cidade", "porto", "centro", "industrial", "serra", "ilha", "espaco"]
 
 const DISTRICTS := {
 	"praia": {
@@ -119,6 +119,115 @@ const DISTRICTS := {
 		"helper_offset": Vector2(-100, 6),
 		"trail_center": 0.47,
 	},
+	# Mapas 5–8 (2026-10-14): base de cada prédio na borda de baixo da quadra.
+	"industrial": {
+		"title": "Polo Industrial",
+		"base": "industrial_base.jpg",
+		"top_color": Color("1e88cb"),
+		"bottom_color": Color("014572"),
+		"camera_center": Vector2(360, 690),
+		"zoom": 1.0,
+		"char_scale": 0.42,
+		"lots": {
+			"oficina": Vector2(380, 530),
+			"moveis": Vector2(210, 660),
+			"metalurgica": Vector2(580, 878),
+			"montadora": Vector2(390, 800),
+			"refinaria": Vector2(160, 862),
+			"usina_solar": Vector2(350, 995),
+		},
+		# Pessoas andam pelas ruas do molde de quadras (cruzamentos e calçadas).
+		"waypoints": [
+			Vector2(300, 470), Vector2(455, 470), Vector2(368, 588), Vector2(110, 690),
+			Vector2(200, 705), Vector2(545, 722), Vector2(660, 690), Vector2(395, 852),
+			Vector2(250, 950), Vector2(520, 965), Vector2(610, 815), Vector2(150, 640),
+		],
+		"decor": [],
+		"walkers": ["char_tourist", "char_woman", "char_boy", "char_grandma", "char_kid"],
+		"helper_offset": Vector2(-100, 6),
+		"trail_center": 0.5,
+	},
+	"serra": {
+		"title": "Serra Nevada",
+		"base": "serra_base.jpg",
+		"top_color": Color("379de1"),
+		"bottom_color": Color("087cb0"),
+		"camera_center": Vector2(360, 690),
+		"zoom": 1.0,
+		"char_scale": 0.42,
+		"lots": {
+			"chocolateria": Vector2(380, 548),
+			"pousada": Vector2(212, 668),
+			"aluguel_esqui": Vector2(565, 730),
+			"teleferico": Vector2(158, 875),
+			"spa_termal": Vector2(575, 895),
+			"estacao_esqui": Vector2(350, 1010),
+		},
+		# Pessoas andam pelas ruas do molde de quadras (cruzamentos e calçadas).
+		"waypoints": [
+			Vector2(300, 470), Vector2(455, 470), Vector2(368, 588), Vector2(110, 690),
+			Vector2(200, 705), Vector2(545, 722), Vector2(660, 690), Vector2(395, 852),
+			Vector2(250, 950), Vector2(520, 965), Vector2(610, 815), Vector2(150, 640),
+		],
+		"decor": [],
+		"walkers": ["char_tourist", "char_woman", "char_boy", "char_grandma", "char_kid"],
+		"helper_offset": Vector2(-100, 6),
+		"trail_center": 0.5,
+	},
+	"ilha": {
+		"title": "Ilha Paraíso",
+		"base": "ilha_base.jpg",
+		"top_color": Color("0978c3"),
+		"bottom_color": Color("025e83"),
+		"camera_center": Vector2(360, 690),
+		"zoom": 1.0,
+		"char_scale": 0.42,
+		"lots": {
+			"escola_mergulho": Vector2(372, 525),
+			"bangalos": Vector2(207, 660),
+			"parque_aquatico": Vector2(565, 700),
+			"clube_golfe": Vector2(387, 795),
+			"heliponto": Vector2(157, 850),
+			"resort": Vector2(350, 975),
+		},
+		# Pessoas andam pelas ruas do molde de quadras (cruzamentos e calçadas).
+		"waypoints": [
+			Vector2(300, 470), Vector2(455, 470), Vector2(368, 588), Vector2(110, 690),
+			Vector2(200, 705), Vector2(545, 722), Vector2(660, 690), Vector2(395, 852),
+			Vector2(250, 950), Vector2(520, 965), Vector2(610, 815), Vector2(150, 640),
+		],
+		"decor": [],
+		"walkers": ["char_tourist", "char_woman", "char_boy", "char_grandma", "char_kid"],
+		"helper_offset": Vector2(-100, 6),
+		"trail_center": 0.5,
+	},
+	"espaco": {
+		"title": "Centro Espacial",
+		"base": "espaco_base.jpg",
+		"top_color": Color("006b9b"),
+		"bottom_color": Color("052615"),
+		"camera_center": Vector2(360, 690),
+		"zoom": 1.0,
+		"char_scale": 0.42,
+		"lots": {
+			"observatorio": Vector2(380, 545),
+			"museu_espaco": Vector2(212, 668),
+			"fabrica_satelites": Vector2(565, 715),
+			"centro_controle": Vector2(390, 795),
+			"foguete": Vector2(157, 870),
+			"porto_espacial": Vector2(350, 995),
+		},
+		# Pessoas andam pelas ruas do molde de quadras (cruzamentos e calçadas).
+		"waypoints": [
+			Vector2(300, 470), Vector2(455, 470), Vector2(368, 588), Vector2(110, 690),
+			Vector2(200, 705), Vector2(545, 722), Vector2(660, 690), Vector2(395, 852),
+			Vector2(250, 950), Vector2(520, 965), Vector2(610, 815), Vector2(150, 640),
+		],
+		"decor": [],
+		"walkers": ["char_tourist", "char_woman", "char_boy", "char_grandma", "char_kid"],
+		"helper_offset": Vector2(-100, 6),
+		"trail_center": 0.5,
+	},
 }
 
 ## Retrato do ajudante de cada negócio (folhas g_helpers_praia/g_helpers_cidade).
@@ -152,6 +261,30 @@ const BUSINESS_ART := {
 	"convencoes": "convencoes",
 	"estadio": "estadio",
 	"aeroporto": "aeroporto",
+	"oficina": "oficina",
+	"moveis": "moveis",
+	"metalurgica": "metalurgica",
+	"montadora": "montadora",
+	"refinaria": "refinaria",
+	"usina_solar": "usina_solar",
+	"chocolateria": "chocolateria",
+	"pousada": "pousada",
+	"aluguel_esqui": "aluguel_esqui",
+	"teleferico": "teleferico",
+	"spa_termal": "spa_termal",
+	"estacao_esqui": "estacao_esqui",
+	"escola_mergulho": "escola_mergulho",
+	"bangalos": "bangalos",
+	"parque_aquatico": "parque_aquatico",
+	"clube_golfe": "clube_golfe",
+	"heliponto": "heliponto",
+	"resort": "resort",
+	"observatorio": "observatorio",
+	"museu_espaco": "museu_espaco",
+	"fabrica_satelites": "fabrica_satelites",
+	"centro_controle": "centro_controle",
+	"foguete": "foguete",
+	"porto_espacial": "porto_espacial",
 }
 
 
@@ -190,7 +323,8 @@ static func previous_district(district: String) -> String:
 
 ## Nome curto para etiquetas pequenas ("a praia", "a cidade", "o porto", "o centro").
 static func short_title(district: String) -> String:
-	var short: Dictionary = {"praia": "a praia", "cidade": "a cidade", "porto": "o porto", "centro": "o centro"}
+	var short: Dictionary = {"praia": "a praia", "cidade": "a cidade", "porto": "o porto", "centro": "o centro",
+		"industrial": "o polo industrial", "serra": "a serra", "ilha": "a ilha", "espaco": "o centro espacial"}
 	return TranslationServer.translate(short[district]) if short.has(district) else title(district)
 
 
