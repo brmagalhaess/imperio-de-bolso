@@ -2,6 +2,14 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-14 — Apple: app criado e versão 1.0.0 no TestFlight (ADR 0019)
+
+- App "Império de Bolso" criado na App Store Connect (Crown Tech LTDA, ID 6822892071).
+- Versão 1.0.0 (build 1) assinada pela empresa, enviada e processada (VALID); grupo interno
+  "Equipe Crown Tech" no TestFlight com o titular convidado.
+- Falta para a revisão: capturas iPhone/iPad, descrição, palavras-chave, URLs de suporte e
+  privacidade, classificação etária, privacidade do app (questionário) e envio para revisão.
+
 ## 2026-10-14 — Pódio semanal (ADR 0017)
 
 - Prêmios de 1º/2º/3º no ranking da semana (100/60/30 💎) e na liga (30/20/10 × nível), exibidos
