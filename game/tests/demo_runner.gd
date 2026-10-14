@@ -28,6 +28,45 @@ func _ready() -> void:
 	while not GameState.loaded:
 		await get_tree().process_frame
 	var hud: Control = main.get_node("UI/HUD")
+	if mode == "capturas":
+		# Capturas para as lojas (tamanho = janela; ver tools/apple/screenshots.sh).
+		var out := OS.get_environment("CAPTURE_DIR")
+		await _wait(2.5)
+		hud._modal.close()
+		var build_all := func():  # mapas novos construídos (só na tela, servidor intocado)
+			GameState._presence_timer.stop()
+			for b in GameState.businesses():
+				b["owned"] = true
+				b["level"] = 25
+				b["managed"] = true
+			GameState.state_changed.emit()
+		GameState.daily["claimedToday"] = true  # sem o aviso automático por cima das telas
+		var shots := [
+			["01_praia", func(): main._show_district("praia")],
+			["02_cidade", func(): main._show_district("cidade")],
+			["03_mapas", func(): hud.open_map_menu()],
+			["04_missoes", func():
+				hud.map_trail.close()
+				hud.open_missions_menu()],
+			["05_loja", func(): hud.open_store_menu()],
+			["06_diario", func():
+				GameState.daily["claimedToday"] = false
+				hud.open_daily_menu()],
+			["07_espaco", func():
+				build_all.call()
+				main._show_district("espaco")],
+			["08_serra", func(): main._show_district("serra")],
+		]
+		for shot in shots:
+			if shot[0] in ["01_praia", "02_cidade", "07_espaco", "08_serra"]:
+				hud._modal.close()
+			shot[1].call()
+			await _wait(1.6)
+			var img := get_viewport().get_texture().get_image()
+			img.save_png(out.path_join(shot[0] + ".png"))
+			print("PASSO %s %dx%d" % [shot[0], img.get_width(), img.get_height()])
+		get_tree().quit()
+		return
 	if mode == "lote2":
 		await _wait(2.0)
 		hud._modal.close()
