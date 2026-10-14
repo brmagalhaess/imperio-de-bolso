@@ -71,6 +71,8 @@ var online := true
 ## Mapa aberto agora (praia/cidade/porto/centro) — define onde a produção é manual.
 var current_district := "praia"
 var _received_at_ms := 0
+## Moedas tocadas aguardando a confirmação do servidor (coleta rápida).
+var _collecting := {}
 var _presence_timer: Timer
 var _reconnect_timer: Timer
 
@@ -365,6 +367,34 @@ func upgrade(slug: String) -> bool:
 
 func collect(slug: String) -> bool:
 	return await _run(Api.collect.bind(slug))
+
+
+## Coleta pela moeda com resposta na hora (pedido do titular: pela internet a moeda demorava
+## ~0,5 s e dava para tocar 3 vezes). A moeda some, o ganho aparece e o saldo sobe no toque; o
+## servidor (a autoridade) confirma em segundo plano e, se recusar, o estado volta ao dele.
+func collect_fast(slug: String) -> void:
+	var b := business(slug)
+	if b.is_empty() or not is_ready(b) or _collecting.has(slug):
+		return
+	_collecting[slug] = true
+	# Novo ciclo começa agora (como o servidor faz ao coletar).
+	b["secondsRemaining"] = float(b.cycleSeconds) + (Time.get_ticks_msec() - _received_at_ms) / 1000.0
+	var wallet: Dictionary = state.get("wallet", {})
+	wallet["coins"] = str(coins().to_int() + str(b.profitPerCycle).to_int())
+	collected.emit([{"slug": slug, "amount": str(b.profitPerCycle)}])
+	state_changed.emit()
+	var res := await Api.collect(slug)
+	_collecting.erase(slug)
+	if res.ok:
+		_set_online(true)
+		_apply_state(res.data.state)
+		refresh_missions()
+		refresh_achievements()
+		return
+	if res.network_error:
+		_set_online(false)
+	_fail(res.error_code)
+	await refresh()  # desfaz a previsão: vale o que o servidor disser
 
 
 func coins() -> String:

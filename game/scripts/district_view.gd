@@ -144,7 +144,7 @@ func _handle_tap(screen_pos: Vector2) -> void:
 		var local: Vector2 = world - lot.position
 		# Moeda: só coleta, sem abrir o painel (coleta rápida e repetida).
 		if lot.hits_bubble(local):
-			GameState.collect(lot.slug)
+			GameState.collect_fast(lot.slug)
 			get_viewport().set_input_as_handled()
 			return
 		if lot.hits(local):

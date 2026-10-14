@@ -104,6 +104,7 @@ func _unit_tests() -> void:
 	check(await _store_tests() == true, "seção loja executou até o fim")
 	check(await _audio_tests() == true, "seção áudio executou até o fim")
 	check(await _trail_tests() == true, "seção trilha de mapas executou até o fim")
+	check(await _fast_collect_tests() == true, "seção coleta rápida executou até o fim")
 	_sections_done += 1
 
 
@@ -112,6 +113,32 @@ func _biz(slug: String, owned: bool, level := 1, managed := false, district := "
 		"managed": managed, "district": district, "cost": "100", "profitPerCycle": "10",
 		"cycleSeconds": 10, "managerCost": "150", "nextUpgradeCost": "115",
 		"cycleStartedAt": null, "secondsRemaining": 0, "ready": false}
+
+
+## Coleta rápida pela moeda: some e soma na hora, sem esperar o servidor.
+func _fast_collect_tests() -> bool:
+	var b := _biz("agua", true)
+	b.cycleStartedAt = "2026-01-01T00:00:00.000Z"
+	b.secondsRemaining = 0
+	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "5", "gems": "0"}, "businesses": [b]})
+	var got := []
+	var on_collected := func(items): got.append_array(items)
+	GameState.collected.connect(on_collected)
+	var real_url: String = Api.base_url
+	Api.base_url = "http://127.0.0.1:9/api/v1"  # sem servidor: só o efeito imediato importa aqui
+	GameState.collect_fast("agua")  # sem await: verifica o que acontece já no toque
+	check(not GameState.is_ready(GameState.business("agua")), "coleta rápida: a moeda some no toque")
+	check(GameState.coins() == "15" and got.size() == 1 and got[0].amount == "10",
+			"coleta rápida: ganho e saldo aparecem na hora")
+	GameState.collect_fast("agua")
+	check(got.size() == 1, "coleta rápida: tocar de novo não coleta duas vezes")
+	GameState.collected.disconnect(on_collected)
+	while GameState._collecting.has("agua"):
+		await get_tree().process_frame
+	Api.base_url = real_url
+	GameState.state = {}
+	GameState.loaded = false
+	return true
 
 
 ## Trilha de mapas (pedido do titular): 4 mapas + "Em breve"; bloqueados sob nuvens.
