@@ -264,7 +264,7 @@ func add_business(b: Dictionary, state: String, on_press: Callable) -> void:
 	texts.add_child(_text(b.name, 30, Style.INK))
 	var sub := tr("Lucro %s a cada %s") % [Fmt.coins(b.profitPerCycle), Fmt.duration(b.cycleSeconds)]
 	if state == "locked":
-		sub = tr("Complete a praia para abrir")
+		sub = tr("Complete %s para abrir") % Layout.short_title(Layout.previous_district(str(b.get("district", "praia"))))
 	texts.add_child(_text(sub, 22, Style.INK_SOFT, 500))
 
 	var button := Button.new()
@@ -535,49 +535,6 @@ func add_rank_row(rank: int, name_text: String, score: String, me: bool) -> void
 
 
 ## Cartão grande de distrito com miniatura do cenário.
-func add_district(id: String, status: String, is_current: bool, unlocked: bool,
-		on_press: Callable) -> void:
-	var row := _card_row()
-	var thumb := TextureRect.new()
-	var atlas := AtlasTexture.new()
-	atlas.atlas = load("res://assets/optimized/%s" % Layout.DISTRICTS[id].base)
-	var s: Vector2 = atlas.atlas.get_size()
-	atlas.region = Rect2(s.x * 0.12, s.y * 0.28, s.x * 0.76, s.y * 0.42)
-	thumb.texture = atlas
-	thumb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	thumb.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	thumb.custom_minimum_size = Vector2(190, 140)
-	if not unlocked:
-		thumb.modulate = Color(0.55, 0.55, 0.55)
-	row.add_child(thumb)
-
-	var texts := VBoxContainer.new()
-	texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	texts.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_child(texts)
-	texts.add_child(_text(Layout.title(id), 32, Style.INK))
-	texts.add_child(_text(status, 22, Style.INK_SOFT, 500))
-
-	var button := Button.new()
-	button.custom_minimum_size = Vector2(130, 76)
-	button.add_theme_font_size_override("font_size", 28)
-	if is_current:
-		button.text = tr("Aqui")
-		button.disabled = true
-		Style.style_button(button, Style.TEAL_LIGHT, Style.TEAL_DARK)
-		button.add_theme_stylebox_override("disabled", Style.toy_button(Style.TEAL_LIGHT, Style.TEAL_DARK))
-	elif unlocked:
-		button.text = tr("Ir")
-		Style.style_button(button, Style.GREEN, Style.GREEN_DARK)
-		button.pressed.connect(func(): close(); on_press.call())
-	else:
-		button.icon = LOCK
-		button.add_theme_constant_override("icon_max_width", 40)
-		button.disabled = true
-		Style.style_button(button, Style.GREY, Style.GREY_DARK)
-	row.add_child(button)
-
-
 func _card_row() -> HBoxContainer:
 	var panel := PanelContainer.new()
 	var b := Style.box(Style.CREAM_CARD, 26, Style.CREAM_LINE, 3)

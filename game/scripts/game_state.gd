@@ -34,7 +34,7 @@ const MESSAGES := {
 	"NETWORK_ERROR": "Sem conexão com o servidor.",
 	"UNAUTHORIZED": "Sessão expirada. Tentando reconectar…",
 	"COMING_SOON": "Em breve!",
-	"DISTRICT_LOCKED": "Compre os 4 negócios da praia para abrir a cidade.",
+	"DISTRICT_LOCKED": "Complete o mapa anterior para abrir este.",
 	"MANAGER_ACTIVE": "Este negócio está produzindo sozinho.",
 	"MANAGER_ALREADY_HIRED": "Este negócio já tem ajudante.",
 	"MISSION_NOT_COMPLETED": "Termine a missão para resgatar.",
@@ -68,7 +68,7 @@ var catalog: Dictionary = {}
 var loaded := false
 var busy := false
 var online := true
-## Mapa aberto agora (praia/cidade) — define onde a produção é manual.
+## Mapa aberto agora (praia/cidade/porto/centro) — define onde a produção é manual.
 var current_district := "praia"
 var _received_at_ms := 0
 var _presence_timer: Timer

@@ -12,17 +12,24 @@ type Reader = Db | Tx;
 export const PRODUCTION_REASONS = ["production_collect", "production_auto"];
 
 async function stats(db: Reader, playerId: string): Promise<AchievementStats> {
-  const [owned, praiaTotal, earned] = await Promise.all([
+  const [owned, defs, earned] = await Promise.all([
     db.playerBusiness.findMany({ where: { playerId }, include: { business: true } }),
-    db.businessDefinition.count({ where: { district: "praia" } }),
+    db.businessDefinition.findMany({ select: { district: true } }),
     db.walletLedger.aggregate({
       where: { playerId, currency: "COINS", reason: { in: PRODUCTION_REASONS } },
       _sum: { delta: true },
     }),
   ]);
+  const ownedByDistrict: Record<string, number> = {};
+  for (const pb of owned)
+    ownedByDistrict[pb.business.district] = (ownedByDistrict[pb.business.district] ?? 0) + 1;
+  const totalByDistrict: Record<string, number> = {};
+  for (const d of defs) totalByDistrict[d.district] = (totalByDistrict[d.district] ?? 0) + 1;
   return {
     ownedCount: owned.length,
-    praiaComplete: owned.filter((pb) => pb.business.district === "praia").length >= praiaTotal,
+    praiaComplete: (ownedByDistrict.praia ?? 0) >= (totalByDistrict.praia ?? 4),
+    ownedByDistrict,
+    totalByDistrict,
     helpers: owned.filter((pb) => pb.managerUnlocked).length,
     maxLevel: owned.reduce((m, pb) => Math.max(m, pb.level), 0),
     lifetimeEarned: earned._sum.delta ?? 0n,

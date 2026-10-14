@@ -2,6 +2,20 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-13 — Mapas 3 e 4, trilha de mapas, toque e iOS (ADR 0010)
+
+- **Novos mapas** Porto da Marina e Centro Financeiro (6 negócios cada; 22 no total), arte
+  Higgsfield (US$ 3,18 de US$ 4 aprovados), conquistas por mapa; **tela de Mapas em trilha**
+  com nuvens nos bloqueados e "Em breve" no topo.
+- **Toque no celular:** tolerância de 40 px no toque da ilha, folga de rolagem nas listas, sem
+  toque duplicado, fundo da janela fecha ao soltar, agile_event_flushing.
+- **Código do jogador** em destaque no Perfil com botão Copiar.
+- **iOS:** preset e ícone 1024; projeto Xcode gerado e compilado. O template oficial do Godot
+  não traz simulador para Apple Silicon (só x86_64, recusado pelos simuladores iOS 26/27) →
+  testar em iPhone real (precisa do aparelho conectado e do Modo Desenvolvedor) ou compilar o
+  template do Godot. Xcode ainda só com o Personal Team.
+- Testes: backend 103; jogo 87 unitários, 125 com integração.
+
 ## 2026-10-13 — Landing e políticas das lojas; código do jogador
 
 - `landing/` (Next.js 16.3.8, export estático + nginx): home com tela real do jogo, Política de

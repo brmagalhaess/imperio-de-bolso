@@ -3,6 +3,9 @@
 export interface AchievementStats {
   ownedCount: number;
   praiaComplete: boolean;
+  /** Negócios comprados por mapa (para "complete o mapa"). */
+  ownedByDistrict?: Record<string, number>;
+  totalByDistrict?: Record<string, number>;
   helpers: number;
   maxLevel: number;
   /** Total faturado com produção na vida (coleta manual + ajudantes). */
@@ -35,6 +38,20 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
     rewardGems: 3,
     progress: (s) => count(s.praiaComplete ? 1 : 0, 1),
   },
+  ...(
+    [
+      ["cidade", "Prefeito da cidade", "Construa os 6 negócios da cidade", 5],
+      ["porto", "Capitão do porto", "Construa os 6 negócios do porto", 8],
+      ["centro", "Magnata do centro", "Construa os 6 negócios do centro financeiro", 12],
+    ] as const
+  ).map(([district, title, description, rewardGems]) => ({
+    id: `${district}_complete`,
+    title,
+    description,
+    rewardGems,
+    progress: (s: AchievementStats) =>
+      count(s.ownedByDistrict?.[district] ?? 0, s.totalByDistrict?.[district] ?? 6),
+  })),
   {
     id: "helpers_1",
     title: "Primeiro ajudante",

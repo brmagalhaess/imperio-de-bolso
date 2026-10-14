@@ -90,7 +90,7 @@ produz quando o jogador sair; fora do mapa já começa a produzir AFK.
 - `409 BUSINESS_NOT_OWNED`, `409 MANAGER_ALREADY_HIRED`, `409 INSUFFICIENT_FUNDS`, `404`
 
 ### `POST /presence` — `Idempotency-Key`
-Corpo `{ district }` (`praia` | `cidade`). Chamar ao abrir o jogo, ao trocar de mapa e a cada
+Corpo `{ district }` (`praia` | `cidade` | `porto` | `centro`). Chamar ao abrir o jogo, ao trocar de mapa e a cada
 ~15 s. Sem sinal por 45 s o jogador conta como fora do mapa desde o último sinal (ADR 0006).
 Ao entrar num mapa, paga o AFK dos negócios com ajudante dele (`clamp(agora − saída, 0, 4h)` +
 sobra) e eles voltam ao ciclo manual; o mapa deixado passa a produzir AFK.

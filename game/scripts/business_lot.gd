@@ -106,7 +106,8 @@ func _draw_overlay() -> void:
 		if GameState.district_unlocked(str(business.get("district", "praia"))):
 			_pill(font, Vector2(0, 58), Fmt.coins(business.cost), 22, Color("fff3d6"), Color("8a4b00"), true)
 		else:
-			_pill(font, Vector2(0, 58), tr("Complete a praia"), 18, Color("e8e0d0"), Color("6b5d48"))
+			var prev := Layout.previous_district(str(business.get("district", "praia")))
+			_pill(font, Vector2(0, 58), tr("Complete %s") % Layout.short_title(prev), 18, Color("e8e0d0"), Color("6b5d48"))
 		return
 
 	var top := bubble_position()

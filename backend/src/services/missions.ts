@@ -11,6 +11,7 @@ import {
   templateById,
 } from "../economy/missions.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
+import { previousDistrict } from "../economy/districts.js";
 import { dayBounds, gameDay } from "../lib/time.js";
 import { track } from "./analytics.js";
 import { getPlayerState } from "./game.js";
@@ -36,9 +37,14 @@ async function missionContext(db: Reader, playerId: string): Promise<MissionCont
     db.playerBusiness.findMany({ where: { playerId }, include: { business: true } }),
   ]);
   const ownedIds = new Set(owned.map((pb) => pb.businessId));
-  const praia = defs.filter((d) => d.district === "praia");
-  const cityUnlocked = praia.every((d) => ownedIds.has(d.id));
-  const unlocked = (district: string) => district === "praia" || cityUnlocked;
+  // Um mapa abre quando todos os negócios do mapa anterior foram comprados (em cadeia).
+  const complete = (district: string) =>
+    defs.filter((d) => d.district === district).every((d) => ownedIds.has(d.id));
+  const unlocked = (district: string): boolean => {
+    const prev = previousDistrict(district);
+    return prev === null || (unlocked(prev) && complete(prev));
+  };
+  const cityUnlocked = unlocked("cidade");
   return {
     incomePerSecond: owned.reduce(
       (sum, pb) => sum + Number(profitPerCycle(pb.business, pb.level)) / pb.business.cycleSeconds,

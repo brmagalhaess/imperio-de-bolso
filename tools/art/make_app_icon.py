@@ -3,6 +3,7 @@
 Saída em game/assets/app_icon/:
   icon_512.png          ícone de alta resolução (Play Console e config/icon do Godot)
   icon_192.png          ícone legado do Android
+  icon_1024.png         ícone do iOS / App Store (sem transparência)
   adaptive_fg_432.png   primeiro plano do ícone adaptativo (carrinho na zona segura central)
   adaptive_bg_432.png   fundo do ícone adaptativo (mar turquesa com raios de sol)
   monochrome_432.png    ícone temático do Android 13+ (silhueta)
@@ -81,6 +82,8 @@ def main() -> None:
     full.alpha_composite(foreground(S, 0.74))
 
     full.resize((512, 512), Image.LANCZOS).save(OUT / "icon_512.png", optimize=True)
+    # iOS (App Store) exige 1024×1024 sem transparência.
+    full.convert("RGB").resize((1024, 1024), Image.LANCZOS).save(OUT / "icon_1024.png", optimize=True)
     full.resize((192, 192), Image.LANCZOS).save(OUT / "icon_192.png", optimize=True)
     fg_adaptive.resize((432, 432), Image.LANCZOS).save(OUT / "adaptive_fg_432.png", optimize=True)
     bg.resize((432, 432), Image.LANCZOS).save(OUT / "adaptive_bg_432.png", optimize=True)

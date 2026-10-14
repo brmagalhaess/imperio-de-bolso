@@ -63,7 +63,13 @@ func _unit_tests() -> void:
 	for slug in Layout.BUSINESS_ART:
 		for level in [1, 10, 25]:
 			all_art = all_art and ResourceLoader.exists(Layout.art_path(slug, level))
-	check(all_art and Layout.BUSINESS_ART.size() == 10, "arte dos 3 níveis existe para os 10 negócios")
+	check(all_art and Layout.BUSINESS_ART.size() == 22, "arte dos 3 níveis existe para os 22 negócios")
+	check(Layout.DISTRICTS.porto.lots.size() == 6 and Layout.DISTRICTS.centro.lots.size() == 6,
+			"6 lotes no porto e 6 no centro")
+	var helpers_art := true
+	for slug in Layout.BUSINESS_ART:
+		helpers_art = helpers_art and ResourceLoader.exists("res://assets/optimized/%s.png" % Layout.helper_texture_name(slug))
+	check(helpers_art, "retrato do ajudante existe para os 22 negócios")
 	var lots_apart := true
 	for lots in [praia, cidade]:
 		var points: Array = lots.values()
@@ -97,6 +103,7 @@ func _unit_tests() -> void:
 	check(await _build_menu_tests() == true, "seção menus executou até o fim")
 	check(await _store_tests() == true, "seção loja executou até o fim")
 	check(await _audio_tests() == true, "seção áudio executou até o fim")
+	check(await _trail_tests() == true, "seção trilha de mapas executou até o fim")
 	_sections_done += 1
 
 
@@ -105,6 +112,34 @@ func _biz(slug: String, owned: bool, level := 1, managed := false, district := "
 		"managed": managed, "district": district, "cost": "100", "profitPerCycle": "10",
 		"cycleSeconds": 10, "managerCost": "150", "nextUpgradeCost": "115",
 		"cycleStartedAt": null, "secondsRemaining": 0, "ready": false}
+
+
+## Trilha de mapas (pedido do titular): 4 mapas + "Em breve"; bloqueados sob nuvens.
+func _trail_tests() -> bool:
+	var Trail := load("res://scripts/map_trail.gd")
+	var trail: Control = Trail.new()
+	add_child(trail)
+	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "0", "gems": "0"},
+		"businesses": [_biz("agua", true), _biz("mercadinho", false, 1, false, "cidade")],
+		"districts": [{"id": "praia", "unlocked": true}, {"id": "cidade", "unlocked": true},
+			{"id": "porto", "unlocked": false}, {"id": "centro", "unlocked": false}]})
+	await trail.open("praia")
+	var ids: Array = trail._cards.map(func(c): return c.get_meta("district"))
+	check(ids == ["praia", "cidade", "porto", "centro", "em_breve"], "trilha: 4 mapas em ordem + Em breve no fim")
+	check(trail._nodes[0].y > trail._nodes[4].y, "trilha: primeiro mapa embaixo, Em breve em cima")
+	var texts := func(card: Control) -> String:
+		return " ".join(card.find_children("*", "Label", true, false).map(func(l): return l.text))
+	check(texts.call(trail._cards[2]).contains("???") and texts.call(trail._cards[2]).contains("Complete a cidade"),
+			"trilha: mapa bloqueado escondido (nome oculto, diz o que falta)")
+	check(texts.call(trail._cards[0]).contains("Você está aqui"), "trilha: marca o mapa atual")
+	var chosen := []
+	trail.district_chosen.connect(func(id): chosen.append(id))
+	var go: Array = trail._cards[1].find_children("*", "Button", true, false).filter(func(b): return b.text == "Ir")
+	go[0].pressed.emit()
+	check(chosen == ["cidade"] and not trail.visible, "trilha: Ir leva ao mapa e fecha")
+	trail.queue_free()
+	GameState.state = {}
+	return true
 
 
 ## Sons e música (pedido do titular): efeitos e música desligáveis, escolha salva no aparelho.
@@ -378,7 +413,7 @@ func _integration_test() -> void:
 	check(await GameState.boot(), "boot cria convidado e carrega estado")
 	check(GameState.coins() == "100", "saldo inicial 100")
 	check(not GameState.tutorial_completed(), "conta nova começa com tutorial pendente")
-	check(GameState.businesses().size() == 10, "10 negócios no catálogo")
+	check(GameState.businesses().size() == 22, "22 negócios no catálogo (4 mapas)")
 	check(not await GameState.purchase("pipoca"), "pipoca recusada sem saldo")
 	check(await GameState.purchase("agua"), "compra do carrinho de água")
 	check(GameState.coins() == "0", "saldo após compra")

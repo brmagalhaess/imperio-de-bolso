@@ -24,6 +24,43 @@ OUT = ROOT / "game/assets/optimized"
 
 # id final → (arquivo de origem escolhido, {"width" ou "height": px a 2×})
 SPRITES = {
+    # Porto da Marina e Centro Financeiro (2026-10-13)
+    "peixaria_lv1": ("g_peixaria_lv1/g_peixaria_lv1_v01.jpeg", {"width": 290}),
+    "peixaria_lv2": ("g_peixaria_lv2/g_peixaria_lv2_v01.jpeg", {"width": 305}),
+    "peixaria_lv3": ("g_peixaria_lv3/g_peixaria_lv3_v01.jpeg", {"width": 320}),
+    "loja_surf_lv1": ("g_loja_surf_lv1/g_loja_surf_lv1_v01.jpeg", {"width": 290}),
+    "loja_surf_lv2": ("g_loja_surf_lv2/g_loja_surf_lv2_v01.jpeg", {"width": 305}),
+    "loja_surf_lv3": ("g_loja_surf_lv3/g_loja_surf_lv3_v01.jpeg", {"width": 320}),
+    "frutos_mar_lv1": ("g_frutos_mar_lv1/g_frutos_mar_lv1_v01.jpeg", {"width": 290}),
+    "frutos_mar_lv2": ("g_frutos_mar_lv2/g_frutos_mar_lv2_v01.jpeg", {"width": 305}),
+    "frutos_mar_lv3": ("g_frutos_mar_lv3/g_frutos_mar_lv3_v01.jpeg", {"width": 320}),
+    "marina_lv1": ("g_marina_lv1/g_marina_lv1_v01.jpeg", {"width": 290}),
+    "marina_lv2": ("g_marina_lv2/g_marina_lv2_v01.jpeg", {"width": 305}),
+    "marina_lv3": ("g_marina_lv3/g_marina_lv3_v01.jpeg", {"width": 320}),
+    "estaleiro_lv1": ("g_estaleiro_lv1_r2/g_estaleiro_lv1_r2_v01.jpeg", {"width": 290}),
+    "estaleiro_lv2": ("g_estaleiro_lv2/g_estaleiro_lv2_v01.jpeg", {"width": 305}),
+    "estaleiro_lv3": ("g_estaleiro_lv3/g_estaleiro_lv3_v01.jpeg", {"width": 320}),
+    "terminal_lv1": ("g_terminal_lv1/g_terminal_lv1_v01.jpeg", {"width": 290}),
+    "terminal_lv2": ("g_terminal_lv2/g_terminal_lv2_v01.jpeg", {"width": 305}),
+    "terminal_lv3": ("g_terminal_lv3/g_terminal_lv3_v01.jpeg", {"width": 320}),
+    "joalheria_lv1": ("g_joalheria_lv1/g_joalheria_lv1_v01.jpeg", {"width": 300}),
+    "joalheria_lv2": ("g_joalheria_lv2/g_joalheria_lv2_v01.jpeg", {"width": 315}),
+    "joalheria_lv3": ("g_joalheria_lv3/g_joalheria_lv3_v01.jpeg", {"width": 330}),
+    "banco_lv1": ("g_banco_lv1/g_banco_lv1_v01.jpeg", {"width": 300}),
+    "banco_lv2": ("g_banco_lv2/g_banco_lv2_v01.jpeg", {"width": 315}),
+    "banco_lv3": ("g_banco_lv3/g_banco_lv3_v01.jpeg", {"width": 330}),
+    "torre_lv1": ("g_torre_lv1/g_torre_lv1_v01.jpeg", {"width": 300}),
+    "torre_lv2": ("g_torre_lv2/g_torre_lv2_v01.jpeg", {"width": 315}),
+    "torre_lv3": ("g_torre_lv3/g_torre_lv3_v01.jpeg", {"width": 330}),
+    "convencoes_lv1": ("g_convencoes_lv1/g_convencoes_lv1_v01.jpeg", {"width": 300}),
+    "convencoes_lv2": ("g_convencoes_lv2/g_convencoes_lv2_v01.jpeg", {"width": 315}),
+    "convencoes_lv3": ("g_convencoes_lv3/g_convencoes_lv3_v01.jpeg", {"width": 330}),
+    "estadio_lv1": ("g_estadio_lv1/g_estadio_lv1_v01.jpeg", {"width": 300}),
+    "estadio_lv2": ("g_estadio_lv2/g_estadio_lv2_v01.jpeg", {"width": 315}),
+    "estadio_lv3": ("g_estadio_lv3/g_estadio_lv3_v01.jpeg", {"width": 330}),
+    "aeroporto_lv1": ("g_aeroporto_lv1/g_aeroporto_lv1_v01.jpeg", {"width": 300}),
+    "aeroporto_lv2": ("g_aeroporto_lv2/g_aeroporto_lv2_v01.jpeg", {"width": 315}),
+    "aeroporto_lv3": ("g_aeroporto_lv3/g_aeroporto_lv3_v01.jpeg", {"width": 330}),
     "water_cart_lv1": ("g_water_cart_lv1/g_water_cart_lv1_v01.jpeg", {"width": 250}),
     "water_cart_lv2": ("g_water_cart_lv2/g_water_cart_lv2_v01.jpeg", {"width": 260}),
     "water_cart_lv3": ("g_water_cart_lv3/g_water_cart_lv3_v01.jpeg", {"width": 270}),
@@ -76,6 +113,16 @@ SHEETS = {
          "helper_mercadinho"],
         {"height": 140},
     ),
+    "g_helpers_porto/g_helpers_porto_v01.png": (
+        ["helper_peixaria", "helper_loja_surf", "helper_frutos_mar", "helper_marina",
+         "helper_estaleiro", "helper_terminal"],
+        {"height": 140},
+    ),
+    "g_helpers_centro/g_helpers_centro_v01.png": (
+        ["helper_joalheria", "helper_banco", "helper_torre", "helper_convencoes",
+         "helper_estadio", "helper_aeroporto"],
+        {"height": 140},
+    ),
     "g_helpers_cidade/g_helpers_cidade_v01.png": (
         ["helper_restaurante", "helper_supermercado", "helper_academia", "helper_hotel",
          "helper_shopping"],
@@ -87,6 +134,8 @@ SHEET_OVERRIDES = {"icon_coin": {"width": 96}}
 SCENES = {
     "island_base": ("g_island_base/g_island_base_v01.png", (1080, 1920)),
     "city_base": ("g_city_base/g_city_base_v01.png", (1080, 1920)),
+    "porto_base": ("g_porto_base/g_porto_base_v01.jpeg", (1080, 1920)),
+    "centro_base": ("g_centro_base/g_centro_base_v02.jpeg", (1080, 1920)),
 }
 
 BG_TOLERANCE = 30  # distância máxima de cor até o fundo (0–441)

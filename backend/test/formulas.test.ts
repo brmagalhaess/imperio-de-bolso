@@ -10,12 +10,11 @@ import {
 const agua = BUSINESS_CATALOG[0]!;
 
 describe("fórmulas de economia", () => {
-  it("catálogo tem os 10 negócios da documentação", () => {
-    expect(BUSINESS_CATALOG.map((b) => b.slug)).toEqual([
-      "agua",
-      "pipoca",
-      "sorveteria",
-      "quiosque_coco",
+  it("catálogo: os 10 negócios da documentação + porto e centro (6 cada)", () => {
+    const byDistrict = (d: string) =>
+      BUSINESS_CATALOG.filter((b) => b.district === d).map((b) => b.slug);
+    expect(byDistrict("praia")).toEqual(["agua", "pipoca", "sorveteria", "quiosque_coco"]);
+    expect(byDistrict("cidade")).toEqual([
       "mercadinho",
       "restaurante",
       "supermercado",
@@ -23,6 +22,14 @@ describe("fórmulas de economia", () => {
       "hotel",
       "shopping",
     ]);
+    expect(byDistrict("porto")).toHaveLength(6);
+    expect(byDistrict("centro")).toHaveLength(6);
+    // Cada negócio custa mais que o anterior (progressão contínua entre mapas).
+    for (let i = 1; i < BUSINESS_CATALOG.length; i++)
+      expect(BUSINESS_CATALOG[i]!.cost).toBeGreaterThan(BUSINESS_CATALOG[i - 1]!.cost);
+    // Nível 100 do mais caro cabe no BIGINT do PostgreSQL.
+    const top = BUSINESS_CATALOG[BUSINESS_CATALOG.length - 1]!;
+    expect(upgradeCostTo(top, 100)).toBeLessThan(9_223_372_036_854_775_807n);
     expect(agua).toMatchObject({ cost: 100n, revenue: 10n, cycleSeconds: 10 });
   });
 

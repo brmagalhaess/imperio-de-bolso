@@ -14,6 +14,7 @@ const Layout := preload("res://scripts/layout.gd")
 const UiFont := preload("res://scripts/ui_font.gd")
 const Style := preload("res://scripts/ui_style.gd")
 const MenuModal := preload("res://scripts/menu_modal.gd")
+const MapTrail := preload("res://scripts/map_trail.gd")
 const Tutorial := preload("res://scripts/tutorial.gd")
 const GlyphButton := preload("res://scripts/glyph_button.gd")
 const MockAd := preload("res://scripts/mock_ad.gd")
@@ -24,7 +25,11 @@ const BLUE := Color("2bb6e0")
 const BLUE_DARK := Color("1f7fa8")
 
 var slug := ""
-var current_district := "praia"
+var current_district := "praia":
+	set(value):
+		current_district = value
+		if _district_label:
+			_district_label.text = Layout.title(value)
 
 var _coins_label: Label
 var _rate_label: Label
@@ -38,6 +43,8 @@ var _collect_button: Button
 var _hire_button: Button
 var _modal: Control
 var tutorial: Control
+## Tela de Mapas em trilha (mapas flutuando, bloqueados sob nuvens, "Em breve" no topo).
+var map_trail: Control
 ## Botão Ajudantes da barra (alvo da seta no último passo do tutorial).
 var _helpers_button: Control
 ## Cartões da tela de Ajudantes aberta (slug → identificador), atualizados no lugar.
@@ -71,7 +78,11 @@ func _ready() -> void:
 	add_child(tutorial)
 	_modal = MenuModal.new()
 	add_child(_modal)
-	tutorial.blockers = [_sheet, _modal]
+	map_trail = MapTrail.new()
+	add_child(map_trail)
+	map_trail.district_chosen.connect(func(id): district_requested.emit(id))
+	map_trail.visibility_changed.connect(func(): Audio.set_ducked(map_trail.visible or _modal.visible))
+	tutorial.blockers = [_sheet, _modal, map_trail]
 	tutorial.helpers_target = func() -> Variant:
 		if _helpers_button == null:
 			return null
@@ -260,7 +271,8 @@ func _refresh() -> void:
 			_action_button.text = tr("Comprar  %s") % Fmt.coins(b.cost)
 			_action_button.disabled = GameState.busy or not GameState.can_afford(b.cost)
 		else:
-			_action_button.text = tr("Complete a praia")
+			var prev := Layout.previous_district(str(b.get("district", "praia")))
+			_action_button.text = tr("Complete %s") % Layout.title(prev)
 			_action_button.disabled = true
 	var can_hire: bool = b.owned and not b.get("managed", false)
 	_hire_button.visible = can_hire
@@ -295,10 +307,12 @@ func _on_action_pressed() -> void:
 	if b.owned:
 		await GameState.upgrade(slug)
 		return
-	var city_was_open := GameState.district_unlocked("cidade")
+	var was_open := Layout.DISTRICT_ORDER.filter(func(d): return GameState.district_unlocked(d))
 	if await GameState.purchase(slug):
-		if not city_was_open and GameState.district_unlocked("cidade"):
-			show_toast(tr("A Cidade foi liberada! Abra o Mapa."))
+		var opened := Layout.DISTRICT_ORDER.filter(func(d):
+			return GameState.district_unlocked(d) and not was_open.has(d))
+		if not opened.is_empty():
+			show_toast(tr("%s foi liberado! Abra o Mapa.") % Layout.title(opened[0]))
 		else:
 			show_toast(tr("%s é seu!") % b.name)
 
@@ -354,29 +368,12 @@ func _next_district(id: String) -> String:
 
 func open_map_menu() -> void:
 	close_sheet()
+	_modal.close()
 	_helper_cards.clear()
 	_reward_cards.clear()
 	_reward_kind = ""
-	_modal.open(tr("Mapa"))
-	for id in Layout.DISTRICT_ORDER:
-		var unlocked := GameState.district_unlocked(id)
-		var total := 0
-		var owned := 0
-		for b in GameState.businesses():
-			if Layout.district_of(b.slug) == id:
-				total += 1
-				owned += 1 if b.owned else 0
-		var status := tr("%d de %d negócios") % [owned, total]
-		var pending := GameState.pending_in(id)
-		if id == current_district:
-			status = tr("Você está aqui · ") + status
-		elif not unlocked:
-			status = tr("Compre os 4 negócios da praia")
-		elif pending > 0:
-			status += "\n" + tr("Ajudantes juntaram +%s") % Fmt.coins(str(pending))
-		var target: String = id
-		_modal.add_district(id, status, id == current_district, unlocked,
-				func(): district_requested.emit(target))
+	GameState.track("screen_view", {"screen": "mapa"})
+	map_trail.open(current_district)
 
 
 # --- Loja (Etapa 4, ADR 0008) ------------------------------------------------

@@ -23,6 +23,23 @@ func _ready() -> void:
 	while not GameState.loaded:
 		await get_tree().process_frame
 	var hud: Control = main.get_node("UI/HUD")
+	if mode == "mapas":
+		# Trilha de mapas + cenas novas (porto e centro) mostradas direto, para captura.
+		await _wait(2.0)
+		hud._modal.close()
+		hud.open_map_menu()
+		await _wait(1.5)
+		print("PASSO trilha")
+		hud.map_trail._scroll.scroll_vertical = 0
+		await _wait(1.2)
+		print("PASSO trilha topo")
+		hud.map_trail.close()
+		for id in ["porto", "centro"]:
+			main._show_district(id)
+			await _wait(1.5)
+			print("PASSO cena " + id)
+		get_tree().quit()
+		return
 	if mode == "excluir":
 		# Mostra Perfil → Excluir conta (não confirma: aqui a cena atual é o roteiro).
 		await _wait(2.0)

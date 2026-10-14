@@ -9,7 +9,7 @@ const ART_SCALE := 0.5
 const BUILDING_SCALE := 0.6
 
 ## Ordem de desbloqueio igual à do servidor (backend/src/economy/districts.ts).
-const DISTRICT_ORDER := ["praia", "cidade"]
+const DISTRICT_ORDER := ["praia", "cidade", "porto", "centro"]
 
 const DISTRICTS := {
 	"praia": {
@@ -35,6 +35,7 @@ const DISTRICTS := {
 		"walkers": ["char_woman", "char_boy", "char_grandma", "char_tourist", "char_kid"],
 		## Onde o ajudante contratado fica em pé, relativo ao lote.
 		"helper_offset": Vector2(-80, 16),
+		"trail_center": 0.5,
 	},
 	"cidade": {
 		"title": "Cidade",
@@ -60,6 +61,61 @@ const DISTRICTS := {
 		"decor": [],
 		"walkers": ["char_tourist", "char_grandma", "char_woman", "char_boy", "char_kid"],
 		"helper_offset": Vector2(-100, 6),
+		## Recorte da cena usado na trilha de mapas (centro vertical, fração da altura).
+		"trail_center": 0.53,
+	},
+	# Porto e Centro: cenas editadas a partir da cidade (mesma malha de ruas e lotes).
+	"porto": {
+		"title": "Porto da Marina",
+		"base": "porto_base.jpg",
+		"top_color": Color("006ea1"),
+		"bottom_color": Color("006291"),
+		"camera_center": Vector2(360, 690),
+		"zoom": 1.0,
+		"char_scale": 0.42,
+		"lots": {
+			"peixaria": Vector2(376, 530),
+			"loja_surf": Vector2(209, 620),
+			"frutos_mar": Vector2(563, 640),
+			"marina": Vector2(387, 725),
+			"estaleiro": Vector2(165, 805),
+			"terminal": Vector2(565, 830),
+		},
+		"waypoints": [
+			Vector2(300, 470), Vector2(355, 568), Vector2(420, 598), Vector2(250, 668),
+			Vector2(170, 706), Vector2(470, 742), Vector2(560, 748), Vector2(410, 818),
+			Vector2(285, 850), Vector2(520, 885), Vector2(110, 700), Vector2(620, 610),
+		],
+		"decor": [],
+		"walkers": ["char_tourist", "char_woman", "char_boy", "char_grandma", "char_kid"],
+		"helper_offset": Vector2(-100, 6),
+		"trail_center": 0.5,
+	},
+	"centro": {
+		"title": "Centro Financeiro",
+		"base": "centro_base.jpg",
+		"top_color": Color("0178b0"),
+		"bottom_color": Color("053420"),
+		"camera_center": Vector2(360, 690),
+		"zoom": 1.0,
+		"char_scale": 0.42,
+		"lots": {
+			"joalheria": Vector2(373, 532),
+			"banco": Vector2(200, 632),
+			"torre": Vector2(560, 665),
+			"convencoes": Vector2(158, 805),
+			"estadio": Vector2(578, 845),
+			"aeroporto": Vector2(347, 952),
+		},
+		"waypoints": [
+			Vector2(300, 470), Vector2(355, 568), Vector2(420, 598), Vector2(250, 668),
+			Vector2(170, 706), Vector2(470, 742), Vector2(560, 748), Vector2(410, 818),
+			Vector2(285, 850), Vector2(520, 885), Vector2(110, 700), Vector2(620, 610),
+		],
+		"decor": [],
+		"walkers": ["char_woman", "char_tourist", "char_boy", "char_grandma", "char_kid"],
+		"helper_offset": Vector2(-100, 6),
+		"trail_center": 0.47,
 	},
 }
 
@@ -82,6 +138,18 @@ const BUSINESS_ART := {
 	"academia": "gym",
 	"hotel": "hotel",
 	"shopping": "mall",
+	"peixaria": "peixaria",
+	"loja_surf": "loja_surf",
+	"frutos_mar": "frutos_mar",
+	"marina": "marina",
+	"estaleiro": "estaleiro",
+	"terminal": "terminal",
+	"joalheria": "joalheria",
+	"banco": "banco",
+	"torre": "torre",
+	"convencoes": "convencoes",
+	"estadio": "estadio",
+	"aeroporto": "aeroporto",
 }
 
 
@@ -110,6 +178,17 @@ static func district_of(slug: String) -> String:
 		if DISTRICTS[id].lots.has(slug):
 			return id
 	return ""
+
+
+## Mapa anterior na ordem de desbloqueio ("" para o primeiro).
+static func previous_district(district: String) -> String:
+	var i := DISTRICT_ORDER.find(district)
+	return DISTRICT_ORDER[i - 1] if i > 0 else ""
+
+
+## Nome curto para etiquetas pequenas ("a praia", "a cidade", "o porto", "o centro").
+static func short_title(district: String) -> String:
+	return {"praia": "a praia", "cidade": "a cidade", "porto": "o porto", "centro": "o centro"}.get(district, title(district))
 
 
 static func title(district: String) -> String:
