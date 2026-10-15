@@ -205,23 +205,14 @@ describe("pódio semanal e prestígio no ranking", () => {
     const g = await newGuest(ctx.app);
     await get(ctx.app, g, "/leaderboard"); // entra na liga
     await earn(g.playerId, 50_000_000n);
-    for (const slug of [
-      "agua",
-      "pipoca",
-      "sorveteria",
-      "quiosque_coco",
-      "mercadinho",
-      "restaurante",
-      "supermercado",
-      "academia",
-      "hotel",
-      "shopping",
-    ]) {
+    // Império completo (requisito da venda): todos os negócios com ajudante.
+    for (const def of await ctx.db.businessDefinition.findMany()) {
       await ctx.db.playerBusiness.create({
         data: {
           playerId: g.playerId,
-          businessId: (await ctx.db.businessDefinition.findUniqueOrThrow({ where: { slug } })).id,
+          businessId: def.id,
           level: 1,
+          managerUnlocked: true,
           cycleStartedAt: ctx.clock.now,
           lastSettlementAt: ctx.clock.now,
         },

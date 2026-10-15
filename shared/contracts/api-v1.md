@@ -171,7 +171,8 @@ Corpo `{ events: [{ name, props? }] }` (1–20). Nomes permitidos: `tutorial_sta
 
 ### `GET /prestige` · `POST /prestige` (ADR 0011)
 `GET` → `{ stars, bonusPercent, count, earnedSinceLast, starsToGain, nextBonusPercent, requires,
-requirementMet, available }`. `POST` (comando, `Idempotency-Key`) vende o império →
+totalBusinesses, ownedBusinesses, hiredHelpers, requirementMet, available }` — `requires` =
+`"imperio_completo"`: todos os negócios comprados e todos os ajudantes contratados (rev. 2026-10-15). `POST` (comando, `Idempotency-Key`) vende o império →
 `200 { gained, prestige, state }`; `409 PRESTIGE_NOT_AVAILABLE` sem a cidade completa ou sem
 estrela a ganhar. `PlayerState.player` ganha `prestigeStars` e `prestigeBonusPercent`; o
 `profitPerCycle` dos negócios já vem com o bônus.

@@ -658,10 +658,13 @@ func _store_tests() -> bool:
 			"prestígio: perfil mostra estrelas, bônus e o botão de vender")
 	GameState.prestige.available = false
 	GameState.prestige.requirementMet = false
+	GameState.prestige.merge({"totalBusinesses": 46, "ownedBusinesses": 46, "hiredHelpers": 30}, true)
 	hud.open_profile_menu()
 	await get_tree().process_frame
+	prof_texts = " ".join(hud._modal._list.find_children("*", "Label", true, false).filter(func(l): return not l.is_queued_for_deletion()).map(func(l): return l.text))
+	check(prof_texts.contains("Negócios 46/46 · Ajudantes 30/46"), "prestígio: mostra o progresso do império completo")
 	sell_btn = hud._modal._list.find_children("*", "Button", true, false).filter(func(b): return not b.is_queued_for_deletion() and b.text.begins_with("Vender o império"))
-	check(sell_btn.is_empty(), "prestígio: sem botão antes de completar a cidade")
+	check(sell_btn.is_empty(), "prestígio: sem botão antes de completar o império")
 	GameState.prestige = {}
 	var live := func() -> Array: return hud._modal._list.get_children().filter(func(c): return not c.is_queued_for_deletion())
 	var del_btn: Array = live.call().filter(func(c): return c is Button and c.text == "Excluir conta")

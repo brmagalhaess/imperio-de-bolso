@@ -697,7 +697,10 @@ func _add_prestige_section() -> void:
 	_modal.add_section(tr("Prestígio"))
 	var status: String
 	if not p.get("requirementMet", false):
-		status = tr("Complete a cidade para poder vender o império.")
+		var total := int(p.get("totalBusinesses", 0))
+		status = tr("Complete o império para vender: todos os negócios e todos os ajudantes.") \
+				+ "\n" + tr("Negócios %d/%d · Ajudantes %d/%d") % [
+					int(p.get("ownedBusinesses", 0)), total, int(p.get("hiredHelpers", 0)), total]
 	elif gain < 1:
 		status = tr("Fature mais para ganhar a primeira estrela desta rodada.")
 	else:

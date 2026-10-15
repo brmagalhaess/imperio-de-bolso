@@ -10,8 +10,10 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 - Estrelas do prestígio logarítmicas (ADR 0011 revisada): fim do bônus explosivo.
 - Loja: coleta antecipada mostrava 0 (catálogo velho / mapa sem negócio) — agora calculada do
   estado no app; sem negócio no mapa o botão trava com aviso.
-- Testes: jogo **144** verificações OK; typecheck OK. **Backend sem rodar** (PostgreSQL local
-  parado: disco externo do Docker ficou somente-leitura) — deploy no servidor aguardando.
+- Vender o império agora exige o império completo (todos os negócios + todos os ajudantes), com
+  progresso no Perfil (ADR 0011 revisada).
+- Testes: backend **129** OK; jogo **145** unitários e **185** com integração OK. (Docker
+  reiniciado com autorização: o disco externo tinha ficado somente-leitura.)
 
 ## 2026-10-14 — Google Play: versão 1.0.0 enviada para revisão
 

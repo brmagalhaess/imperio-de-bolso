@@ -12,8 +12,12 @@ export const STAR_BONUS_PERCENT = 2;
  */
 export const STAR_SCALE = 1_000_000n;
 export const STARS_PER_DECADE = 20;
-/** Mapa que precisa estar completo para liberar o prestígio. */
-export const PRESTIGE_REQUIRES = "cidade";
+/**
+ * Requisito para vender (revisão 2026-10-15): o império completo — todos os negócios de todos os
+ * mapas comprados e todos os ajudantes contratados. Os níveis ficam livres (nível máximo em tudo
+ * custaria quase o teto de moedas e levaria meses).
+ */
+export const PRESTIGE_REQUIRES = "imperio_completo";
 
 /** Estrelas que o faturamento de produção desde o último prestígio rende. */
 export function starsFor(earned: bigint): number {

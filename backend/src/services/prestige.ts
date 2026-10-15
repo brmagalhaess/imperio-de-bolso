@@ -18,8 +18,11 @@ export interface PrestigeView {
   starsToGain: number;
   /** Bônus total depois de vender agora. */
   nextBonusPercent: number;
-  /** Mapa que precisa estar completo. */
+  /** Requisito: "imperio_completo" (todos os negócios e todos os ajudantes). */
   requires: string;
+  totalBusinesses: number;
+  ownedBusinesses: number;
+  hiredHelpers: number;
   requirementMet: boolean;
   available: boolean;
 }
@@ -27,7 +30,7 @@ export interface PrestigeView {
 /** Situação do prestígio do jogador (tela "Vender o império"). */
 export async function getPrestige(db: Reader, playerId: string): Promise<PrestigeView> {
   const player = await db.player.findUniqueOrThrow({ where: { id: playerId } });
-  const [earned, total, owned] = await Promise.all([
+  const [earned, total, owned, helpers] = await Promise.all([
     db.walletLedger.aggregate({
       where: {
         playerId,
@@ -37,12 +40,13 @@ export async function getPrestige(db: Reader, playerId: string): Promise<Prestig
       },
       _sum: { delta: true },
     }),
-    db.businessDefinition.count({ where: { district: PRESTIGE_REQUIRES } }),
-    db.playerBusiness.count({ where: { playerId, business: { district: PRESTIGE_REQUIRES } } }),
+    db.businessDefinition.count(),
+    db.playerBusiness.count({ where: { playerId } }),
+    db.playerBusiness.count({ where: { playerId, managerUnlocked: true } }),
   ]);
   const earnedSince = earned._sum.delta ?? 0n;
   const starsToGain = starsFor(earnedSince);
-  const requirementMet = total > 0 && owned >= total;
+  const requirementMet = total > 0 && owned >= total && helpers >= total;
   return {
     stars: player.prestigeStars,
     bonusPercent: bonusPercent(player.prestigeStars),
@@ -51,6 +55,9 @@ export async function getPrestige(db: Reader, playerId: string): Promise<Prestig
     starsToGain,
     nextBonusPercent: bonusPercent(player.prestigeStars + starsToGain),
     requires: PRESTIGE_REQUIRES,
+    totalBusinesses: total,
+    ownedBusinesses: owned,
+    hiredHelpers: helpers,
     requirementMet,
     available: requirementMet && starsToGain >= 1,
   };

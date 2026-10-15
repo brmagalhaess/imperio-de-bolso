@@ -13,7 +13,10 @@
   negócios, para sempre. *Revisão 2026-10-15:* a fórmula original (raiz quadrada) dava +15.000%
   no 14º dia na simulação (`backend/scripts/simulate-player.ts`); a logarítmica fica entre +80% e
   +490% por venda e as vendas seguidas somam.
-- **Liberação:** cidade completa e ao menos 1 estrela a ganhar (`GET /prestige`).
+- **Liberação:** ~~cidade completa~~ → *revisão 2026-10-15:* **império completo** — todos os
+  negócios de todos os mapas e todos os ajudantes (níveis livres; nível máximo em tudo custaria
+  quase o teto de moedas) — e ao menos 1 estrela a ganhar (`GET /prestige`). O Perfil mostra o
+  progresso (negócios X/46 · ajudantes Y/46).
 - **Ao vender** (`POST /prestige`, comando idempotente): apaga negócios/níveis/ajudantes, saldo
   volta a 100 moedas (ledger `prestige_reset`), mapas voltam a bloquear, jogador volta à praia.
   **Mantém** diamantes, conquistas, Passe VIP, auto-coleta comprada, missões e ranking semanal.
