@@ -116,13 +116,13 @@ Conquista ainda não alcançada.,Conquista ainda não alcançada.,Achievement no
 Conquistas,Conquistas,Achievements,Logros
 Construa o negócio primeiro,Construa o negócio primeiro,Build the business first,Construye el negocio primero
 Construa os 4 negócios da praia,Construa os 4 negócios da praia,Build all 4 beach businesses,Construye los 4 negocios de la playa
-Construa os 6 negócios da cidade,Construa os 6 negócios da cidade,Build all 6 city businesses,Construye los 6 negocios de la ciudad
-Construa os 6 negócios da ilha,Construa os 6 negócios da ilha,Build all 6 island businesses,Construye los 6 negocios de la isla
-Construa os 6 negócios da serra,Construa os 6 negócios da serra,Build all 6 mountain businesses,Construye los 6 negocios de la sierra
-Construa os 6 negócios do centro espacial,Construa os 6 negócios do centro espacial,Build all 6 Space Center businesses,Construye los 6 negocios del centro espacial
-Construa os 6 negócios do centro financeiro,Construa os 6 negócios do centro financeiro,Build all 6 Financial Center businesses,Construye los 6 negocios del centro financiero
-Construa os 6 negócios do polo industrial,Construa os 6 negócios do polo industrial,Build all 6 Industrial Park businesses,Construye los 6 negocios del polo industrial
-Construa os 6 negócios do porto,Construa os 6 negócios do porto,Build all 6 harbor businesses,Construye los 6 negocios del puerto
+Construa os 9 negócios da cidade,Construa os 9 negócios da cidade,Build all 9 city businesses,Construye los 9 negocios de la ciudad
+Construa os 9 negócios da ilha,Construa os 9 negócios da ilha,Build all 9 island businesses,Construye los 9 negocios de la isla
+Construa os 9 negócios da serra,Construa os 9 negócios da serra,Build all 9 mountain businesses,Construye los 9 negocios de la sierra
+Construa os 9 negócios do centro espacial,Construa os 9 negócios do centro espacial,Build all 9 Space Center businesses,Construye los 9 negocios del centro espacial
+Construa os 9 negócios do centro financeiro,Construa os 9 negócios do centro financeiro,Build all 9 Financial Center businesses,Construye los 9 negocios del centro financiero
+Construa os 9 negócios do polo industrial,Construa os 9 negócios do polo industrial,Build all 9 Industrial Park businesses,Construye los 9 negocios del polo industrial
+Construa os 9 negócios do porto,Construa os 9 negócios do porto,Build all 9 harbor businesses,Construye los 9 negocios del puerto
 Construa seu primeiro negócio,Construa seu primeiro negócio,Build your first business,Construye tu primer negocio
 Construa um negócio neste mapa primeiro.,Construa um negócio neste mapa primeiro.,Build a business on this map first.,Construye un negocio en este mapa primero.
 Construa {n} negócio novo,Construa {n} negócio novo,Build {n} new business,Construye {n} negocio nuevo
@@ -411,3 +411,31 @@ o porto,o porto,the harbor,el puerto
 ⭐ %d estrelas · lucro +%d%%,⭐ %d estrelas · lucro +%d%%,⭐ %d stars · profit +%d%%,⭐ %d estrellas · ganancia +%d%%
 Complete o império para vender: todos os negócios e todos os ajudantes.,Complete o império para vender: todos os negócios e todos os ajudantes.,"Complete the empire to sell: every business and every helper.","Completa el imperio para vender: todos los negocios y todos los ayudantes."
 Negócios %d/%d · Ajudantes %d/%d,Negócios %d/%d · Ajudantes %d/%d,Businesses %d/%d · Helpers %d/%d,Negocios %d/%d · Ayudantes %d/%d
+Padaria,Padaria,Bakery,Panadería
+Farmácia,Farmácia,Pharmacy,Farmacia
+Cinema,Cinema,Movie Theater,Cine
+Feira do Porto,Feira do Porto,Harbor Market,Feria del Puerto
+Clube Náutico,Clube Náutico,Yacht Club,Club Náutico
+Farol,Farol,Lighthouse,Faro
+Hospital,Hospital,Hospital,Hospital
+Universidade,Universidade,University,Universidad
+Bolsa de Valores,Bolsa de Valores,Stock Exchange,Bolsa de Valores
+Fábrica de Brinquedos,Fábrica de Brinquedos,Toy Factory,Fábrica de Juguetes
+Centro de Logística,Centro de Logística,Logistics Center,Centro Logístico
+Parque Eólico,Parque Eólico,Wind Farm,Parque Eólico
+Queijaria,Queijaria,Cheese Shop,Quesería
+Vinícola,Vinícola,Winery,Bodega
+Pista de Patinação,Pista de Patinação,Ice Rink,Pista de Patinaje
+Mercado de Artesanato,Mercado de Artesanato,Craft Market,Mercado de Artesanía
+Aquário Gigante,Aquário Gigante,Giant Aquarium,Acuario Gigante
+Hotel Flutuante,Hotel Flutuante,Floating Hotel,Hotel Flotante
+Escola de Astronautas,Escola de Astronautas,Astronaut School,Escuela de Astronautas
+Laboratório de Robôs,Laboratório de Robôs,Robot Lab,Laboratorio de Robots
+Elevador Espacial,Elevador Espacial,Space Elevator,Ascensor Espacial
+Construa os 6 negócios da cidade,Construa os 6 negócios da cidade,Build all 6 city businesses,Construye los 6 negocios de la ciudad
+Construa os 6 negócios da ilha,Construa os 6 negócios da ilha,Build all 6 island businesses,Construye los 6 negocios de la isla
+Construa os 6 negócios da serra,Construa os 6 negócios da serra,Build all 6 mountain businesses,Construye los 6 negocios de la sierra
+Construa os 6 negócios do centro espacial,Construa os 6 negócios do centro espacial,Build all 6 Space Center businesses,Construye los 6 negocios del centro espacial
+Construa os 6 negócios do centro financeiro,Construa os 6 negócios do centro financeiro,Build all 6 Financial Center businesses,Construye los 6 negocios del centro financiero
+Construa os 6 negócios do polo industrial,Construa os 6 negócios do polo industrial,Build all 6 Industrial Park businesses,Construye los 6 negocios del polo industrial
+Construa os 6 negócios do porto,Construa os 6 negócios do porto,Build all 6 harbor businesses,Construye los 6 negocios del puerto

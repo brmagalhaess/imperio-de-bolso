@@ -1,0 +1,74 @@
+[
+ {
+  "id": "g_cidade_expansao9x16",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "In the exact same glossy cartoon mobile city-builder art style, colors and isometric camera angle as the reference CITY map, draw, in the middle of the image, a SMALLER separate square diorama tile floating on the same open blue sea, seen from the same angle. On this tile there are exactly THREE EMPTY flat building lots (plain light concrete plazas, nothing on them) in one diagonal row, separated by gray roads with crosswalks, like the lots of the reference. The edges of the tile have small trees, benches and lamp posts. A short road bridge leaves the top-center of the tile going up and out of the image (it connects to the main map above). Only sea around the tile, no sky, no horizon. No buildings on the three lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/97616650-d57e-4e79-a6a7-4327f693c2ce.png"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_porto_expansao9x16",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "In the exact same glossy cartoon mobile city-builder art style, colors and isometric camera angle as the reference HARBOR MARINA map, draw, in the middle of the image, a SMALLER separate square diorama tile floating on the same open blue sea, seen from the same angle. On this tile there are exactly THREE EMPTY flat building lots (plain light concrete plazas, nothing on them) in one diagonal row, separated by gray roads with crosswalks, like the lots of the reference. The edges of the tile have wooden piers, small boats and buoys. A short road bridge leaves the top-center of the tile going up and out of the image (it connects to the main map above). Only sea around the tile, no sky, no horizon. No buildings on the three lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/96592678-3244-4378-b7f6-f4f0b303c7a1.jpeg"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_centro_expansao9x16",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "In the exact same glossy cartoon mobile city-builder art style, colors and isometric camera angle as the reference FINANCIAL DISTRICT map, draw, in the middle of the image, a SMALLER separate square diorama tile floating on the same open blue sea, seen from the same angle. On this tile there are exactly THREE EMPTY flat building lots (plain light concrete plazas, nothing on them) in one diagonal row, separated by gray roads with crosswalks, like the lots of the reference. The edges of the tile have fountains, flower beds and lamp posts. A short road bridge leaves the top-center of the tile going up and out of the image (it connects to the main map above). Only sea around the tile, no sky, no horizon. No buildings on the three lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/b0fb5986-cffd-4529-842a-6fb9149916ff.jpeg"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_serra_expansao9x16",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "In the exact same glossy cartoon mobile city-builder art style, colors and isometric camera angle as the reference SNOWY MOUNTAIN TOWN map, draw, in the middle of the image, a SMALLER separate square diorama tile floating on the same open blue sea, seen from the same angle. On this tile there are exactly THREE EMPTY flat building lots (plain light concrete plazas, nothing on them) in one diagonal row, separated by gray roads with crosswalks, like the lots of the reference. The edges of the tile have snowy pine trees, rocks and a frozen stream. A short road bridge leaves the top-center of the tile going up and out of the image (it connects to the main map above). Only sea around the tile, no sky, no horizon. No buildings on the three lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/6d389c9f-f1cb-4b6d-a854-9cea2ccdabb6.jpeg"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_ilha_expansao9x16",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "In the exact same glossy cartoon mobile city-builder art style, colors and isometric camera angle as the reference TROPICAL PARADISE ISLAND map, draw, in the middle of the image, a SMALLER separate square diorama tile floating on the same open blue sea, seen from the same angle. On this tile there are exactly THREE EMPTY flat building lots (plain light concrete plazas, nothing on them) in one diagonal row, separated by gray roads with crosswalks, like the lots of the reference. The edges of the tile have palm trees, white sand and colorful beach umbrellas. A short road bridge leaves the top-center of the tile going up and out of the image (it connects to the main map above). Only sea around the tile, no sky, no horizon. No buildings on the three lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/5626347c-1c77-49da-93a2-6f3b103a8e93.jpeg"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_espaco_expansao9x16",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "In the exact same glossy cartoon mobile city-builder art style, colors and isometric camera angle as the reference SPACE CENTER map, draw, in the middle of the image, a SMALLER separate square diorama tile floating on the same open blue sea, seen from the same angle. On this tile there are exactly THREE EMPTY flat building lots (plain light concrete plazas, nothing on them) in one diagonal row, separated by gray roads with crosswalks, like the lots of the reference. The edges of the tile have antenna dishes, fuel tanks and launch-pad markings. A short road bridge leaves the top-center of the tile going up and out of the image (it connects to the main map above). Only sea around the tile, no sky, no horizon. No buildings on the three lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/109481ac-22eb-4b6a-b932-f9cce61b857b.jpeg"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ }
+]

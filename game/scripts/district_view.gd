@@ -20,6 +20,12 @@ var lots := {}  # slug → BusinessLot
 var _helpers := {}  # slug → Sprite2D do ajudante (visível quando contratado)
 var _sorted: Node2D
 var _press_pos := Vector2.ZERO
+## Mapas maiores (9 negócios): arrastar move a câmera e pinça aproxima (pedido de 2026-10-15).
+const MAX_ZOOM_FACTOR := 1.8
+var _camera: Camera2D
+var _touches := {}  # índice do dedo → posição
+var _dragging := false
+var _pinch_dist := 0.0
 
 
 func _init(p_district: String) -> void:
@@ -83,8 +89,32 @@ func _ready() -> void:
 
 ## Posiciona a câmera para enquadrar este distrito.
 func frame(camera: Camera2D) -> void:
+	_camera = camera
 	camera.position = config.camera_center
 	camera.zoom = Vector2.ONE * config.zoom
+	_touches.clear()
+	_dragging = false
+
+
+func _pannable() -> bool:
+	return config.get("pan", false) and _camera != null
+
+
+## Mantém a câmera dentro do cenário (720×1280) e o zoom entre o enquadramento e 1,8×.
+func _clamp_camera() -> void:
+	var z: float = clamp(_camera.zoom.x, config.zoom, config.zoom * MAX_ZOOM_FACTOR)
+	_camera.zoom = Vector2.ONE * z
+	var half := get_viewport_rect().size / z / 2.0
+	var lo := half
+	var hi := Vector2(720, 1280) - half
+	_camera.position = Vector2(
+			clamp(_camera.position.x, min(lo.x, hi.x), max(lo.x, hi.x)) if lo.x <= hi.x else 360.0,
+			clamp(_camera.position.y, min(lo.y, hi.y), max(lo.y, hi.y)) if lo.y <= hi.y else config.camera_center.y)
+
+
+func _zoom_by(factor: float) -> void:
+	_camera.zoom *= factor
+	_clamp_camera()
 
 
 func _sync() -> void:
@@ -127,12 +157,44 @@ func _on_collected(items: Array) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_visible_in_tree():
 		return
+	if _pannable():
+		if event is InputEventScreenTouch:
+			if event.pressed:
+				_touches[event.index] = event.position
+			else:
+				_touches.erase(event.index)
+			_pinch_dist = _touch_distance()
+		elif event is InputEventScreenDrag:
+			_touches[event.index] = event.position
+			if _touches.size() >= 2:
+				var dist := _touch_distance()
+				if _pinch_dist > 0.0 and dist > 0.0:
+					_zoom_by(dist / _pinch_dist)
+				_pinch_dist = dist
+				_dragging = true
+			elif event.index == 0 and (_dragging or event.position.distance_to(_press_pos) > TAP_MAX_DRAG):
+				_dragging = true
+				_camera.position -= event.relative / _camera.zoom.x
+				_clamp_camera()
+		elif event is InputEventMouseButton and event.pressed:
+			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+				_zoom_by(1.1)
+			elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				_zoom_by(1.0 / 1.1)
 	# Só o primeiro dedo: um segundo dedo encostando não vira toque fantasma.
 	if event is InputEventScreenTouch and event.index == 0:
 		if event.pressed:
 			_press_pos = event.position
-		elif event.position.distance_to(_press_pos) <= TAP_MAX_DRAG:
+			_dragging = false
+		elif not _dragging and event.position.distance_to(_press_pos) <= TAP_MAX_DRAG:
 			_handle_tap(event.position)
+
+
+func _touch_distance() -> float:
+	if _touches.size() < 2:
+		return 0.0
+	var pts: Array = _touches.values()
+	return (pts[0] as Vector2).distance_to(pts[1])
 
 
 func _handle_tap(screen_pos: Vector2) -> void:

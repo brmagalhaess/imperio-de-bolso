@@ -1,0 +1,74 @@
+[
+ {
+  "id": "g_cidade_base9",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image: keep the exact same CITY theme, glossy cartoon mobile city-builder art style, isometric camera angle, colors and edge decorations, but make the square diorama tile BIGGER so it fills almost the whole image from left to right and from the top third down to near the bottom (less sky and less sea). On the tile, the gray roads with crosswalks now form a 3 by 3 grid of NINE equal EMPTY flat building lots (plain light concrete plazas, nothing on them), all nine fully visible and the same size. Keep the themed decorations only on the outer edges of the tile and in the far blurred background, never on the lots. Bright sunny day. No buildings on the nine lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/97616650-d57e-4e79-a6a7-4327f693c2ce.png"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_porto_base9",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image: keep the exact same HARBOR MARINA theme, glossy cartoon mobile city-builder art style, isometric camera angle, colors and edge decorations, but make the square diorama tile BIGGER so it fills almost the whole image from left to right and from the top third down to near the bottom (less sky and less sea). On the tile, the gray roads with crosswalks now form a 3 by 3 grid of NINE equal EMPTY flat building lots (plain light concrete plazas, nothing on them), all nine fully visible and the same size. Keep the themed decorations only on the outer edges of the tile and in the far blurred background, never on the lots. Bright sunny day. No buildings on the nine lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/96592678-3244-4378-b7f6-f4f0b303c7a1.jpeg"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_centro_base9",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image: keep the exact same FINANCIAL DISTRICT theme, glossy cartoon mobile city-builder art style, isometric camera angle, colors and edge decorations, but make the square diorama tile BIGGER so it fills almost the whole image from left to right and from the top third down to near the bottom (less sky and less sea). On the tile, the gray roads with crosswalks now form a 3 by 3 grid of NINE equal EMPTY flat building lots (plain light concrete plazas, nothing on them), all nine fully visible and the same size. Keep the themed decorations only on the outer edges of the tile and in the far blurred background, never on the lots. Bright sunny day. No buildings on the nine lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/b0fb5986-cffd-4529-842a-6fb9149916ff.jpeg"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_serra_base9",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image: keep the exact same SNOWY MOUNTAIN TOWN theme, glossy cartoon mobile city-builder art style, isometric camera angle, colors and edge decorations, but make the square diorama tile BIGGER so it fills almost the whole image from left to right and from the top third down to near the bottom (less sky and less sea). On the tile, the gray roads with crosswalks now form a 3 by 3 grid of NINE equal EMPTY flat building lots (plain light concrete plazas, nothing on them), all nine fully visible and the same size. Keep the themed decorations only on the outer edges of the tile and in the far blurred background, never on the lots. Bright sunny day. No buildings on the nine lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/6d389c9f-f1cb-4b6d-a854-9cea2ccdabb6.jpeg"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_ilha_base9",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image: keep the exact same TROPICAL PARADISE ISLAND theme, glossy cartoon mobile city-builder art style, isometric camera angle, colors and edge decorations, but make the square diorama tile BIGGER so it fills almost the whole image from left to right and from the top third down to near the bottom (less sky and less sea). On the tile, the gray roads with crosswalks now form a 3 by 3 grid of NINE equal EMPTY flat building lots (plain light concrete plazas, nothing on them), all nine fully visible and the same size. Keep the themed decorations only on the outer edges of the tile and in the far blurred background, never on the lots. Bright sunny day. No buildings on the nine lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/5626347c-1c77-49da-93a2-6f3b103a8e93.jpeg"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_espaco_base9",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image: keep the exact same SPACE CENTER theme, glossy cartoon mobile city-builder art style, isometric camera angle, colors and edge decorations, but make the square diorama tile BIGGER so it fills almost the whole image from left to right and from the top third down to near the bottom (less sky and less sea). On the tile, the gray roads with crosswalks now form a 3 by 3 grid of NINE equal EMPTY flat building lots (plain light concrete plazas, nothing on them), all nine fully visible and the same size. Keep the themed decorations only on the outer edges of the tile and in the far blurred background, never on the lots. Bright sunny day. No buildings on the nine lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/109481ac-22eb-4b6a-b932-f9cce61b857b.jpeg"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ }
+]
