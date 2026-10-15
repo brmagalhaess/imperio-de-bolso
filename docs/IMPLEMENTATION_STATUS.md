@@ -2,13 +2,26 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
-## 2026-10-14 — Apple: app criado e versão 1.0.0 no TestFlight (ADR 0019)
+## 2026-10-14 — Google Play: app criado, conteúdo e ficha da loja prontos
 
-- App "Império de Bolso" criado na App Store Connect (Crown Tech LTDA, ID 6822892071).
-- Versão 1.0.0 (build 1) assinada pela empresa, enviada e processada (VALID); grupo interno
-  "Equipe Crown Tech" no TestFlight com o titular convidado.
-- Falta para a revisão: capturas iPhone/iPad, descrição, palavras-chave, URLs de suporte e
-  privacidade, classificação etária, privacidade do app (questionário) e envio para revisão.
+- App "Império de Bolso" (pacote `br.com.imperiodebolso.game`, ID 4973883264134295100) na conta
+  de organização Crown Tech LTDA; site e telefone validados.
+- Conteúdo da app concluído: privacidade, acesso, anúncios (não), classificação IARC (Geral),
+  público 13+, ID de publicidade (não), segurança dos dados (IDs, interações e nome de exibição;
+  nada partilhado; exclusão em `/excluir-conta/`), funcionalidades financeiras/saúde (nenhuma).
+- Definições: Jogo › Simulação; contato `suporte-imperio@crowntech.com.br`.
+- Ficha pt-BR: descrições, ícone 512, destaque 1024×500, 8 capturas de celular e de tablet
+  7"/10" (`docs/lojas/`); arte declarada como gerada por IA.
+- **Pendente:** lançamento de Produção (AAB 1.0.0 `build/android/`, países fora da UE e envio
+  para revisão) — o modo de permissão automático do agente bloqueou a etapa; precisa do OK do
+  titular na sessão ou ser feito por ele no Play Console.
+
+## 2026-10-14 — Apple: versão 1.0.0 enviada para revisão (ADR 0019)
+
+- App "Império de Bolso" na App Store Connect (Crown Tech LTDA, ID 6822892071), build 1 VALID,
+  TestFlight interno "Equipe Crown Tech".
+- Metadados pt-BR/en/es, capturas iPhone 6.9" e iPad 13", 13+, privacidade publicada, 148
+  territórios (sem a UE). Enviada para revisão com lançamento automático após aprovação.
 
 ## 2026-10-14 — Pódio semanal (ADR 0017)
 
