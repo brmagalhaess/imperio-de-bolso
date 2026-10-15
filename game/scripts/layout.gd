@@ -235,8 +235,9 @@ static func helper_texture_name(slug: String) -> String:
 	return "helper_%s" % slug
 
 
-## Faixas de nível visual: nível 1–9 → arte 1, 10–24 → arte 2, 25+ → arte 3.
-const VISUAL_TIERS := [1, 10, 25]
+## Faixas de nível visual: 1–9 → arte 1, 10–24 → 2, 25–49 → 3, 50–99 → 4, 100 → 5
+## (evoluções 4 e 5 pedidas pelo titular em 2026-10-15).
+const VISUAL_TIERS := [1, 10, 25, 50, 100]
 
 const BUSINESS_ART := {
 	"agua": "water_cart",
@@ -285,10 +286,32 @@ const BUSINESS_ART := {
 	"centro_controle": "centro_controle",
 	"foguete": "foguete",
 	"porto_espacial": "porto_espacial",
+	# Mapas maiores (2026-10-15): 3 negócios novos por mapa.
+	"padaria": "padaria",
+	"farmacia": "farmacia",
+	"cinema": "cinema",
+	"feira_porto": "feira_porto",
+	"clube_nautico": "clube_nautico",
+	"farol": "farol",
+	"hospital": "hospital",
+	"universidade": "universidade",
+	"bolsa_valores": "bolsa_valores",
+	"fabrica_brinquedos": "fabrica_brinquedos",
+	"centro_logistica": "centro_logistica",
+	"parque_eolico": "parque_eolico",
+	"queijaria": "queijaria",
+	"vinicola": "vinicola",
+	"pista_patinacao": "pista_patinacao",
+	"mercado_artesanato": "mercado_artesanato",
+	"aquario": "aquario",
+	"hotel_flutuante": "hotel_flutuante",
+	"escola_astronautas": "escola_astronautas",
+	"laboratorio_robos": "laboratorio_robos",
+	"elevador_espacial": "elevador_espacial",
 }
 
 
-## Índice 1..3 da arte para o nível do negócio.
+## Índice 1..5 da arte para o nível do negócio.
 static func visual_tier(level: int) -> int:
 	var tier := 1
 	for i in VISUAL_TIERS.size():
@@ -300,7 +323,12 @@ static func visual_tier(level: int) -> int:
 static func art_path(slug: String, level: int) -> String:
 	if not BUSINESS_ART.has(slug):
 		return ""
-	return "res://assets/optimized/%s_lv%d.png" % [BUSINESS_ART[slug], visual_tier(level)]
+	# Sem a arte da faixa (negócio novo ainda sem todas as evoluções), usa a anterior.
+	for tier in range(visual_tier(level), 0, -1):
+		var path := "res://assets/optimized/%s_lv%d.png" % [BUSINESS_ART[slug], tier]
+		if tier == 1 or ResourceLoader.exists(path):
+			return path
+	return ""
 
 
 static func texture(name: String) -> Texture2D:

@@ -20,56 +20,88 @@ export interface BusinessSeed {
 
 const MAX_LEVEL = 100;
 
-/** Praia 4 negócios; cada mapa seguinte 6 (ordem do catálogo = ordem dos mapas). */
+/** Negócios por mapa (a praia tem 4). Mapas maiores em 2026-10-15: 6 → 9. */
+export const BUSINESSES_PER_MAP = 9;
+
+/** Praia 4 negócios; cada mapa seguinte 9 (ordem do catálogo = ordem dos mapas). */
 function districtOfIndex(i: number): District {
   if (i < 4) return "praia";
-  const d = DISTRICTS[1 + Math.floor((i - 4) / 6)];
+  const d = DISTRICTS[1 + Math.floor((i - 4) / BUSINESSES_PER_MAP)];
   if (!d) throw new RangeError(`negócio ${i} fora dos mapas`);
   return d;
 }
 
 export const BUSINESS_CATALOG: readonly BusinessSeed[] = [
+  // Ilha da Praia (4) — praia mais barata (simulação de 2026-10-15).
   ["agua", "Carrinho de Água", 100n, 10n, 10, 150n],
-  // Praia mais barata (simulação de 2026-10-15): o 2º negócio saía só aos ~6 min de jogo.
   ["pipoca", "Carrinho de Pipoca", 250n, 40n, 20, 1_000n],
   ["sorveteria", "Sorveteria", 1_000n, 150n, 30, 4_000n],
-  // Na ilha da praia a "Lanchonete" da doc virou o Quiosque de Coco (direção visual v2).
   ["quiosque_coco", "Quiosque de Coco", 4_000n, 600n, 45, 16_000n],
+  // Cidade (9) — mapas maiores (2026-10-15): 3 negócios novos por mapa, entre os vizinhos.
   ["mercadinho", "Mercadinho", 25_000n, 1_800n, 60, 100_000n],
+  ["padaria", "Padaria", 45_000n, 3_000n, 80, 180_000n],
   ["restaurante", "Restaurante", 80_000n, 5_000n, 90, 320_000n],
+  ["farmacia", "Farmácia", 140_000n, 8_400n, 100, 560_000n],
   ["supermercado", "Supermercado", 250_000n, 14_000n, 120, 1_000_000n],
   ["academia", "Academia", 700_000n, 35_000n, 180, 2_800_000n],
+  ["cinema", "Cinema", 1_200_000n, 59_000n, 210, 4_800_000n],
   ["hotel", "Hotel", 2_000_000n, 100_000n, 240, 8_000_000n],
   ["shopping", "Shopping", 8_000_000n, 350_000n, 300, 32_000_000n],
-  // Porto da Marina (mapa 3) e Centro Financeiro (mapa 4) — pedido do titular em 2026-10-13.
-  // Continuam a progressão da cidade (~1,7× por negócio; ajudante ~4× o negócio). O teto
-  // vem da fórmula: custo no nível 100 precisa caber no inteiro seguro (~9×10^15).
+  // Porto da Marina (9)
   ["peixaria", "Peixaria", 25_000_000n, 1_000_000n, 300, 100_000_000n],
+  ["feira_porto", "Feira do Porto", 34_000_000n, 1_300_000n, 310, 136_000_000n],
   ["loja_surf", "Loja de Surf", 45_000_000n, 1_700_000n, 320, 180_000_000n],
+  ["clube_nautico", "Clube Náutico", 60_000_000n, 2_200_000n, 330, 240_000_000n],
   ["frutos_mar", "Frutos do Mar", 80_000_000n, 2_900_000n, 340, 320_000_000n],
   ["marina", "Marina", 140_000_000n, 4_900_000n, 360, 560_000_000n],
+  ["farol", "Farol", 190_000_000n, 6_500_000n, 370, 760_000_000n],
   ["estaleiro", "Estaleiro", 250_000_000n, 8_500_000n, 380, 1_000_000_000n],
   ["terminal", "Terminal de Cargas", 450_000_000n, 15_000_000n, 400, 1_800_000_000n],
+  // Centro Financeiro (9)
   ["joalheria", "Joalheria", 800_000_000n, 26_000_000n, 420, 3_200_000_000n],
+  ["hospital", "Hospital", 1_100_000_000n, 34_000_000n, 430, 4_400_000_000n],
   ["banco", "Banco", 1_400_000_000n, 44_000_000n, 440, 5_600_000_000n],
+  ["universidade", "Universidade", 1_800_000_000n, 57_000_000n, 450, 7_200_000_000n],
   ["torre", "Torre de Escritórios", 2_400_000_000n, 74_000_000n, 460, 9_600_000_000n],
   ["convencoes", "Centro de Convenções", 4_000_000_000n, 120_000_000n, 480, 16_000_000_000n],
+  ["bolsa_valores", "Bolsa de Valores", 4_900_000_000n, 150_000_000n, 490, 19_600_000_000n],
   ["estadio", "Estádio", 6_000_000_000n, 176_000_000n, 500, 24_000_000_000n],
   ["aeroporto", "Aeroporto", 8_500_000_000n, 245_000_000n, 520, 34_000_000_000n],
-  // Mapas 5–8 (2026-10-14): ~1,33× por negócio, para o mais caro no nível 100 caber no teto
-  // de 9×10^18 (BIGINT do banco e inteiro de 64 bits do jogo). Lucro ~2,9% do preço por ciclo.
+  // Polo Industrial (9)
   ["oficina", "Oficina Mecânica", 11_000_000_000n, 330_000_000n, 540, 44_000_000_000n],
+  [
+    "fabrica_brinquedos",
+    "Fábrica de Brinquedos",
+    13_000_000_000n,
+    390_000_000n,
+    550,
+    52_000_000_000n,
+  ],
   ["moveis", "Fábrica de Móveis", 15_000_000_000n, 470_000_000n, 560, 60_000_000_000n],
+  ["centro_logistica", "Centro de Logística", 17_000_000_000n, 550_000_000n, 570, 68_000_000_000n],
   ["metalurgica", "Metalúrgica", 20_000_000_000n, 640_000_000n, 580, 80_000_000_000n],
   ["montadora", "Montadora de Carros", 27_000_000_000n, 900_000_000n, 600, 110_000_000_000n],
+  ["parque_eolico", "Parque Eólico", 31_000_000_000n, 1_000_000_000n, 610, 124_000_000_000n],
   ["refinaria", "Refinaria", 36_000_000_000n, 1_200_000_000n, 620, 140_000_000_000n],
   ["usina_solar", "Usina Solar", 48_000_000_000n, 1_700_000_000n, 640, 190_000_000_000n],
+  // Serra Nevada (9)
   ["chocolateria", "Chocolateria", 64_000_000_000n, 2_300_000_000n, 660, 260_000_000_000n],
+  ["queijaria", "Queijaria", 74_000_000_000n, 2_700_000_000n, 670, 296_000_000_000n],
   ["pousada", "Pousada da Serra", 86_000_000_000n, 3_200_000_000n, 680, 340_000_000_000n],
+  ["vinicola", "Vinícola", 97_000_000_000n, 3_700_000_000n, 690, 388_000_000_000n],
   ["aluguel_esqui", "Aluguel de Esquis", 110_000_000_000n, 4_300_000_000n, 700, 440_000_000_000n],
   ["teleferico", "Teleférico", 150_000_000_000n, 6_000_000_000n, 720, 600_000_000_000n],
+  [
+    "pista_patinacao",
+    "Pista de Patinação",
+    170_000_000_000n,
+    6_900_000_000n,
+    720,
+    680_000_000_000n,
+  ],
   ["spa_termal", "Spa Termal", 200_000_000_000n, 8_000_000_000n, 720, 800_000_000_000n],
   ["estacao_esqui", "Estação de Esqui", 270_000_000_000n, 11_000_000_000n, 720, 1_100_000_000_000n],
+  // Ilha Paraíso (9)
   [
     "escola_mergulho",
     "Escola de Mergulho",
@@ -78,7 +110,16 @@ export const BUSINESS_CATALOG: readonly BusinessSeed[] = [
     720,
     1_400_000_000_000n,
   ],
+  [
+    "mercado_artesanato",
+    "Mercado de Artesanato",
+    420_000_000_000n,
+    17_000_000_000n,
+    720,
+    1_680_000_000_000n,
+  ],
   ["bangalos", "Bangalôs na Água", 490_000_000_000n, 20_000_000_000n, 720, 2_000_000_000_000n],
+  ["aquario", "Aquário Gigante", 560_000_000_000n, 23_000_000_000n, 720, 2_240_000_000_000n],
   [
     "parque_aquatico",
     "Parque Aquático",
@@ -88,9 +129,26 @@ export const BUSINESS_CATALOG: readonly BusinessSeed[] = [
     2_600_000_000_000n,
   ],
   ["clube_golfe", "Clube de Golfe", 870_000_000_000n, 35_000_000_000n, 720, 3_500_000_000_000n],
+  [
+    "hotel_flutuante",
+    "Hotel Flutuante",
+    1_000_000_000_000n,
+    41_000_000_000n,
+    720,
+    4_000_000_000_000n,
+  ],
   ["heliponto", "Heliponto", 1_200_000_000_000n, 48_000_000_000n, 720, 4_800_000_000_000n],
   ["resort", "Resort de Luxo", 1_500_000_000_000n, 60_000_000_000n, 720, 6_000_000_000_000n],
+  // Centro Espacial (9)
   ["observatorio", "Observatório", 2_100_000_000_000n, 84_000_000_000n, 720, 8_400_000_000_000n],
+  [
+    "escola_astronautas",
+    "Escola de Astronautas",
+    2_400_000_000_000n,
+    96_000_000_000n,
+    720,
+    9_600_000_000_000n,
+  ],
   [
     "museu_espaco",
     "Museu do Espaço",
@@ -98,6 +156,14 @@ export const BUSINESS_CATALOG: readonly BusinessSeed[] = [
     110_000_000_000n,
     720,
     11_000_000_000_000n,
+  ],
+  [
+    "laboratorio_robos",
+    "Laboratório de Robôs",
+    3_200_000_000_000n,
+    130_000_000_000n,
+    720,
+    12_800_000_000_000n,
   ],
   [
     "fabrica_satelites",
@@ -114,6 +180,14 @@ export const BUSINESS_CATALOG: readonly BusinessSeed[] = [
     200_000_000_000n,
     720,
     20_000_000_000_000n,
+  ],
+  [
+    "elevador_espacial",
+    "Elevador Espacial",
+    5_600_000_000_000n,
+    230_000_000_000n,
+    720,
+    22_400_000_000_000n,
   ],
   ["foguete", "Base de Foguetes", 6_500_000_000_000n, 260_000_000_000n, 720, 26_000_000_000_000n],
   [

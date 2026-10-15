@@ -50,9 +50,19 @@ const dur = (ms: number) =>
       ? `${(ms / 3600_000).toFixed(1)} h`
       : `${(ms / 86_400_000).toFixed(1)} d`;
 
+/** Teste de balanceamento: crescimento da receita por nível (padrão do jogo 1,12). */
+const REV_GROWTH = Number(process.env.REV_GROWTH ?? 0);
+const REV_SCALE: Record<string, number> = JSON.parse(process.env.REV_SCALE ?? "{}");
+
 function simulate(p: Profile) {
   const biz: Biz[] = BUSINESS_CATALOG.map((def) => ({
-    def: p.costOverride?.[def.slug] ? { ...def, cost: BigInt(p.costOverride[def.slug]!) } : def,
+    def: {
+      ...def,
+      ...(p.costOverride?.[def.slug] ? { cost: BigInt(p.costOverride[def.slug]!) } : {}),
+      ...(REV_SCALE[def.district] !== undefined
+        ? { revenue: BigInt(Math.max(1, Math.round(Number(def.revenue) * REV_SCALE[def.district]!))) }
+        : {}),
+    },
     level: 0,
     helper: false,
     cycleLeftMs: 0,
@@ -85,7 +95,10 @@ function simulate(p: Profile) {
   const speedOf = (b: Biz, t: number) =>
     baseSpeedPercent({ level: b.level, managerUnlocked: b.helper }) + (t < turboUntil ? 100 : 0);
   const cycleMs = (b: Biz, t: number) => effectiveCycleMs(b.def.cycleSeconds, speedOf(b, t));
-  const profit = (b: Biz) => Number(profitPerCycle(b.def, Math.max(b.level, 1)));
+  const profit = (b: Biz) =>
+    REV_GROWTH
+      ? Math.round(Number(b.def.revenue) * REV_GROWTH ** (Math.max(b.level, 1) - 1))
+      : Number(profitPerCycle(b.def, Math.max(b.level, 1)));
   const incomePerSec = (t: number) =>
     biz.filter((b) => b.level > 0).reduce((s, b) => s + (profit(b) * 1000) / cycleMs(b, t), 0);
   const earn = (v: number) => {
@@ -266,7 +279,7 @@ function simulate(p: Profile) {
         }
         if (
           prestigeAt < 0 &&
-          biz.filter((b) => b.def.district === "cidade").every((b) => b.level > 0)
+          biz.every((b) => b.level > 0 && b.helper)
         )
           prestigeAt = t;
       }
@@ -397,6 +410,6 @@ for (const p of profiles) {
   console.log(`Vender império liberado em: ${r.prestigeAt < 0 ? "não chegou" : dur(r.prestigeAt)}`);
   const e = r.end;
   console.log(
-    `Fim: ${e.owned}/46 negócios, ${e.helpers} ajudantes, nível médio ${e.avgLevel.toFixed(0)}, renda ${fmt(e.income)}/s, faturou ${fmt(e.totalEarned)}, ${e.gems} 💎`,
+    `Fim: ${e.owned}/67 negócios, ${e.helpers} ajudantes, nível médio ${e.avgLevel.toFixed(0)}, renda ${fmt(e.income)}/s, faturou ${fmt(e.totalEarned)}, ${e.gems} 💎`,
   );
 }

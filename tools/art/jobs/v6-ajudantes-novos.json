@@ -1,0 +1,44 @@
+[
+ {
+  "id": "g_helpers_novos_a",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a baker in a white chef hat holding a baguette; (2) a pharmacist in a white coat holding a medicine box; (3) a cinema usher in a red vest holding a popcorn bucket; (4) a market vendor in an apron holding a fruit basket; (5) a sailor in a white captain uniform holding a small flag; (6) a lighthouse keeper in a yellow raincoat holding a lantern; (7) a nurse in light blue scrubs holding a clipboard. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01f21ab3-c6fe-4cc6-9660-66ca62b5654b.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g_helpers_novos_b",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a professor with glasses holding a book; (2) a stock trader in a suit holding a tablet with a green arrow; (3) a toy maker in colorful overalls holding a teddy bear; (4) a warehouse worker in a yellow vest holding a cardboard box; (5) a wind technician in a harness and helmet holding a wrench; (6) a cheesemaker in an apron holding a cheese wheel; (7) a winemaker in a beret holding a grape bunch. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01f21ab3-c6fe-4cc6-9660-66ca62b5654b.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g_helpers_novos_c",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a skating instructor in a warm jacket wearing ice skates; (2) an artisan with a straw hat holding a woven basket; (3) an aquarist in a wetsuit holding a small fish net; (4) a hotel receptionist in a tropical uniform holding a key; (5) an astronaut cadet in an orange flight suit holding a helmet; (6) a robotics engineer with goggles holding a small robot; (7) a space elevator operator in a silver uniform holding a control tablet. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01f21ab3-c6fe-4cc6-9660-66ca62b5654b.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ }
+]

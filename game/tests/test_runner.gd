@@ -62,17 +62,22 @@ func _unit_tests() -> void:
 
 	check(Layout.visual_tier(1) == 1 and Layout.visual_tier(9) == 1, "arte nível 1 (1–9)")
 	check(Layout.visual_tier(10) == 2 and Layout.visual_tier(24) == 2, "arte nível 2 (10–24)")
-	check(Layout.visual_tier(25) == 3 and Layout.visual_tier(100) == 3, "arte nível 3 (25+)")
+	check(Layout.visual_tier(25) == 3 and Layout.visual_tier(49) == 3, "arte nível 3 (25–49)")
+	check(Layout.visual_tier(50) == 4 and Layout.visual_tier(99) == 4, "arte nível 4 (50–99)")
+	check(Layout.visual_tier(100) == 5, "arte nível 5 (100)")
+	var all_art := true
+	for slug in Layout.BUSINESS_ART:
+		for lv in [1, 10, 25, 50, 100]:
+			all_art = all_art and ResourceLoader.exists(Layout.art_path(slug, lv))
+	check(all_art, "todo negócio tem arte em qualquer nível (usa a evolução anterior se faltar)")
+	check(Layout.art_path("agua", 100).ends_with("water_cart_lv5.png")
+			and Layout.art_path("porto_espacial", 50).ends_with("porto_espacial_lv4.png"), "evoluções 4 e 5 nos níveis 50 e 100")
 	var praia: Dictionary = Layout.DISTRICTS.praia.lots
 	var cidade: Dictionary = Layout.DISTRICTS.cidade.lots
 	check(praia.size() == 4 and cidade.size() == 6, "4 lotes na praia e 6 na cidade")
 	check(Layout.district_of("agua") == "praia" and Layout.district_of("shopping") == "cidade",
 			"distrito de cada negócio")
-	var all_art := true
-	for slug in Layout.BUSINESS_ART:
-		for level in [1, 10, 25]:
-			all_art = all_art and ResourceLoader.exists(Layout.art_path(slug, level))
-	check(all_art and Layout.BUSINESS_ART.size() == 46, "arte dos 3 níveis existe para os 46 negócios")
+	check(Layout.BUSINESS_ART.size() == 67, "arte cadastrada para os 67 negócios")
 	check(Layout.DISTRICTS.porto.lots.size() == 6 and Layout.DISTRICTS.centro.lots.size() == 6,
 			"6 lotes no porto e 6 no centro")
 	var helpers_art := true

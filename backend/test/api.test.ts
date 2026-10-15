@@ -1,3 +1,4 @@
+import { BUSINESS_CATALOG } from "../src/economy/catalog.js";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   coinsOf,
@@ -65,13 +66,13 @@ describe("saúde e autenticação", () => {
 });
 
 describe("catálogo e estado", () => {
-  it("lista os 46 negócios (8 mapas), nenhum comprado, com saldo em string", async () => {
+  it("lista os 67 negócios (8 mapas), nenhum comprado, com saldo em string", async () => {
     const guest = await newGuest(ctx.app);
     const res = await get(ctx.app, guest, "/player/state");
     expect(res.statusCode).toBe(200);
     const state = res.json();
     expect(state.wallet).toEqual({ coins: "100", gems: "0" });
-    expect(state.businesses).toHaveLength(46);
+    expect(state.businesses).toHaveLength(67);
     expect(state.businesses.every((b: { owned: boolean }) => !b.owned)).toBe(true);
     expect(state.businesses[0]).toMatchObject({
       slug: "agua",
@@ -82,7 +83,7 @@ describe("catálogo e estado", () => {
     expect(state.serverTime).toBe("2026-01-01T12:00:00.000Z");
 
     const list = await get(ctx.app, guest, "/businesses");
-    expect(list.json().businesses).toHaveLength(46);
+    expect(list.json().businesses).toHaveLength(67);
   });
 });
 
@@ -345,8 +346,10 @@ describe("distritos", () => {
     const buy = (slug: string) =>
       post(ctx.app, guest, "/businesses/purchase", { businessSlug: slug });
     const praia = ["agua", "pipoca", "sorveteria", "quiosque_coco"];
-    const cidade = ["mercadinho", "restaurante", "supermercado", "academia", "hotel", "shopping"];
-    const porto = ["peixaria", "loja_surf", "frutos_mar", "marina", "estaleiro", "terminal"];
+    const inMap = (d: string) =>
+      BUSINESS_CATALOG.filter((b) => b.district === d).map((b) => b.slug);
+    const cidade = inMap("cidade");
+    const porto = inMap("porto");
     for (const slug of [...praia, ...cidade]) expect((await buy(slug)).statusCode).toBe(201);
     const early = await buy("joalheria");
     expect(early.json().error).toMatchObject({
@@ -370,7 +373,7 @@ describe("distritos", () => {
     const byId = (id: string) => ach.find((a: { id: string }) => a.id === id);
     expect(byId("cidade_complete")).toMatchObject({ unlocked: true });
     expect(byId("porto_complete")).toMatchObject({ unlocked: true });
-    expect(byId("centro_complete")).toMatchObject({ unlocked: false, progress: "1", target: "6" });
+    expect(byId("centro_complete")).toMatchObject({ unlocked: false, progress: "1", target: "9" });
   });
 
   it("com os 4 negócios da praia a cidade libera e a compra passa", async () => {

@@ -670,7 +670,7 @@ func _predict_upgrade(slug: String) -> bool:
 	if SPEED_MILESTONES.has(level):
 		_set_speed(b, int(b.get("speedPercent", 100)) + 50)
 	# Mesmas fórmulas do servidor (docs/README.md §6); a resposta oficial corrige qualquer diferença.
-	b["profitPerCycle"] = str(roundi(str(b.profitPerCycle).to_float() * 1.12))
+	b["profitPerCycle"] = str(roundi(str(b.profitPerCycle).to_float() * 1.1))
 	var max_level := int(b.get("maxLevel", 100))
 	b["nextUpgradeCost"] = null if level >= max_level else str(roundi(str(b.cost).to_float() * pow(1.15, level)))
 	return true

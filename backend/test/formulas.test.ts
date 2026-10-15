@@ -11,20 +11,24 @@ import {
 const agua = BUSINESS_CATALOG[0]!;
 
 describe("fórmulas de economia", () => {
-  it("catálogo: os 10 negócios da documentação + porto e centro (6 cada)", () => {
+  it("catálogo: praia com 4 negócios e os outros 7 mapas com 9 cada", () => {
     const byDistrict = (d: string) =>
       BUSINESS_CATALOG.filter((b) => b.district === d).map((b) => b.slug);
     expect(byDistrict("praia")).toEqual(["agua", "pipoca", "sorveteria", "quiosque_coco"]);
     expect(byDistrict("cidade")).toEqual([
       "mercadinho",
+      "padaria",
       "restaurante",
+      "farmacia",
       "supermercado",
       "academia",
+      "cinema",
       "hotel",
       "shopping",
     ]);
-    expect(byDistrict("porto")).toHaveLength(6);
-    expect(byDistrict("centro")).toHaveLength(6);
+    for (const d of ["porto", "centro", "industrial", "serra", "ilha", "espaco"])
+      expect(byDistrict(d)).toHaveLength(9);
+    expect(BUSINESS_CATALOG).toHaveLength(67);
     // Cada negócio custa mais que o anterior (progressão contínua entre mapas).
     for (let i = 1; i < BUSINESS_CATALOG.length; i++)
       expect(BUSINESS_CATALOG[i]!.cost).toBeGreaterThan(BUSINESS_CATALOG[i - 1]!.cost);
@@ -41,10 +45,10 @@ describe("fórmulas de economia", () => {
     expect(nextUpgradeCost(agua, 1)).toBe(115n);
   });
 
-  it("receita = round(base × 1,12^(n−1))", () => {
+  it("receita = round(base × 1,10^(n−1))", () => {
     expect(revenueAt(agua, 1)).toBe(10n);
     expect(revenueAt(agua, 2)).toBe(11n);
-    expect(revenueAt(agua, 10)).toBe(28n); // 10 × 1,12^9 = 27,73
+    expect(revenueAt(agua, 10)).toBe(24n); // 10 × 1,10^9 = 23,58
   });
 
   it("custos e receitas nunca diminuem com o nível e cabem no limite seguro", () => {

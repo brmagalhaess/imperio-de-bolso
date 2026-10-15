@@ -4,7 +4,9 @@
 import { withPrestige } from "./prestige.js";
 
 export const UPGRADE_COST_GROWTH = 1.15;
-export const REVENUE_GROWTH = 1.12;
+/** 1,10 desde 2026-10-15 (era 1,12): com mapas de 9 negócios o império completo leva ~2–4
+ * semanas em vez de ~1–2 (simulação em scripts/simulate-player.ts). */
+export const REVENUE_GROWTH = 1.1;
 
 export interface EconomyDefinition {
   cost: bigint;
@@ -19,12 +21,12 @@ export interface EconomyDefinition {
  */
 export const MAX_ECONOMY_VALUE = 9_000_000_000_000_000_000n;
 
-// Crescimentos como frações exatas (1,15 = 23/20; 1,12 = 28/25): conta inteira, sem perda de
+// Crescimentos como frações exatas (1,15 = 23/20; 1,10 = 11/10): conta inteira, sem perda de
 // precisão do float acima de 2^53 (os mapas novos passam disso no nível 100).
 const COST_NUM = 23n;
 const COST_DEN = 20n;
-const REVENUE_NUM = 28n;
-const REVENUE_DEN = 25n;
+const REVENUE_NUM = 11n;
+const REVENUE_DEN = 10n;
 
 /** round(base × (num/den)^exp) em inteiros (meio arredonda para cima, como Math.round). */
 function grow(base: bigint, num: bigint, den: bigint, exp: number): bigint {
@@ -57,7 +59,7 @@ export function nextUpgradeCost(def: EconomyDefinition, currentLevel: number): b
   return currentLevel >= def.maxLevel ? null : upgradeCostTo(def, currentLevel + 1);
 }
 
-/** Receita bruta por ciclo: round(base × 1,12^(n−1)). */
+/** Receita bruta por ciclo: round(base × 1,10^(n−1)). */
 export function revenueAt(def: EconomyDefinition, level: number): bigint {
   assertLevel(level, def.maxLevel);
   return grow(def.revenue, REVENUE_NUM, REVENUE_DEN, level - 1);

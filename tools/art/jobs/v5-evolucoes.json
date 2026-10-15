@@ -1,0 +1,1106 @@
+[
+ {
+  "id": "g_water_cart_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a small beach drinks kiosk with a counter, coolers and a wide striped awning. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/7f8eacb2-1de5-4ab1-b5a0-9670e2e6f879.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_water_cart_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a big beach juice and water bar with a wooden deck, bar stools and colorful umbrellas. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/7f8eacb2-1de5-4ab1-b5a0-9670e2e6f879.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_popcorn_cart_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a popcorn kiosk booth with a big popcorn machine and a red-and-white striped roof. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/be6ba61a-621b-418f-86b4-4a5a67779e4c.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_popcorn_cart_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a large popcorn shop pavilion with two machines, a giant popcorn bucket on the roof and a festive canopy. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/be6ba61a-621b-418f-86b4-4a5a67779e4c.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_icecream_cart_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a small ice cream parlor kiosk with a freezer counter and a giant cone decoration. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/492e5001-1593-4165-b65d-1b55c1469925.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_icecream_cart_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a big pastel ice cream parlor with a terrace, ice cream cone towers and a scalloped awning. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/492e5001-1593-4165-b65d-1b55c1469925.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_coconut_kiosk_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a larger thatched coconut bar with a palm-leaf roof and piles of coconuts. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/be669bf2-7d01-464f-ac51-b05264141512.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_coconut_kiosk_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a big tropical beach bar resort hut with two thatched roofs, a deck and hanging lights. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/be669bf2-7d01-464f-ac51-b05264141512.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_market_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger neighborhood grocery store with produce stands and a wide awning. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/49e45c98-22f0-4bb7-bd5c-5d3a63509bee.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_market_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a large modern mini-market with glass front, two floors and rooftop greenery. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/49e45c98-22f0-4bb7-bd5c-5d3a63509bee.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_restaurant_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger restaurant with an outdoor terrace and string lights. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/350c98a1-93eb-41b7-9e24-229641d9a6a6.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_restaurant_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a fancy two-floor gourmet restaurant with rooftop dining and a glass facade. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/350c98a1-93eb-41b7-9e24-229641d9a6a6.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_supermarket_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger supermarket with a parking canopy and shopping cart corral. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/185b6857-5b44-4f16-862b-e2ad6d99d081.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_supermarket_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a huge hypermarket with a curved glass front, solar panels and a loading dock. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/185b6857-5b44-4f16-862b-e2ad6d99d081.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_gym_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger fitness center with large windows and an outdoor training area. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/5e37044c-a2bd-493d-919d-31c5f0745257.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_gym_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a premium sports club with a glass gym tower and a rooftop pool. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/5e37044c-a2bd-493d-919d-31c5f0745257.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_hotel_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a taller hotel with balconies and an entrance canopy. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_hotel_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a luxury skyscraper hotel with a rooftop pool and a grand lobby entrance. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_mall_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger shopping mall with a glass atrium and two wings. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/e6fdff8d-1a7a-4ff6-9828-d10af5e97117.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_mall_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a mega shopping center with a glass dome, three wings and rooftop gardens. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/e6fdff8d-1a7a-4ff6-9828-d10af5e97117.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_peixaria_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger fish market hall with ice displays and a harbor-side awning. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/f21298bf-4c4b-4b04-bee6-a65b5af81bfe.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_peixaria_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a large modern seafood market pavilion with a wave-shaped roof. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/f21298bf-4c4b-4b04-bee6-a65b5af81bfe.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_loja_surf_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger surf shop with a surfboard rack wall and a deck. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/0ac476c5-5d87-4d71-983a-6f792ca20446.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_loja_surf_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a flagship surf store with a wave-shaped roof and a mini surf pool. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/0ac476c5-5d87-4d71-983a-6f792ca20446.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_frutos_mar_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger seafood restaurant on stilts with a waterfront terrace. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/e2b7e2b6-7d75-436b-94ad-5dfa3dab8644.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_frutos_mar_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a luxury seafood restaurant pier with two floors and glass walls. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/e2b7e2b6-7d75-436b-94ad-5dfa3dab8644.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_marina_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger marina club with more piers and a lighthouse-style tower. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/f8446e1f-784e-400d-8faf-f2548de716b5.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_marina_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a luxury yacht club with a modern clubhouse and many docks. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/f8446e1f-784e-400d-8faf-f2548de716b5.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_estaleiro_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger shipyard with a dry dock and a tall crane. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/0b76e97b-84e9-4ad3-a0f1-7a97d39701a9.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_estaleiro_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a huge shipyard with two dry docks, gantry cranes and a large hangar. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/0b76e97b-84e9-4ad3-a0f1-7a97d39701a9.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_terminal_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger cargo terminal with stacked containers and two cranes. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/68adf8da-e10e-43c8-b0bf-1bff712937c4.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_terminal_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a mega container port with tall gantry cranes and container towers. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/68adf8da-e10e-43c8-b0bf-1bff712937c4.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_joalheria_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger jewelry boutique with marble columns and display windows. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/d032a9ab-b9d8-4233-b910-4844892be385.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_joalheria_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a luxury jewelry palace with a golden dome and glass facade. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/d032a9ab-b9d8-4233-b910-4844892be385.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_banco_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger bank with tall columns and a clock frame without numbers. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/52e53396-0ef7-4d54-aac4-4445f0f9887d.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_banco_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a grand bank headquarters tower with a golden top and marble plaza. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/52e53396-0ef7-4d54-aac4-4445f0f9887d.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_torre_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a taller office tower with a glass curtain wall and a helipad. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/a080a03a-2454-45f1-9028-11e9f3d4ebfc.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_torre_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a supertall glass skyscraper with a spire and sky gardens. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/a080a03a-2454-45f1-9028-11e9f3d4ebfc.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_convencoes_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger convention center with a curved roof and banners without text. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/9b586b5c-3d1a-4604-ab82-d228b4fb5116.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_convencoes_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a futuristic convention complex with a giant glass canopy. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/9b586b5c-3d1a-4604-ab82-d228b4fb5116.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_estadio_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger stadium with full stands and floodlight towers. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/22e2e94d-7037-4c08-9560-c7df20ad8d8e.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_estadio_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a mega stadium with a retractable roof and glowing facade. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/22e2e94d-7037-4c08-9560-c7df20ad8d8e.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_aeroporto_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger airport terminal with a control tower and jet bridges. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fb0382c6-44f1-4594-a565-b24117c8cd6f.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_aeroporto_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a huge modern airport with a wave-shaped terminal roof and two towers. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fb0382c6-44f1-4594-a565-b24117c8cd6f.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_oficina_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a big car dealership and service center with a glass showroom. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/d2563aca-dc66-4602-b250-96021fae60ce.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_oficina_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a giant automotive complex with a car tower showroom and service halls. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/d2563aca-dc66-4602-b250-96021fae60ce.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_moveis_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger furniture factory with warehouses and a showroom. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/3e8216a9-3ff9-40cd-ab61-fc2afda16aeb.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_moveis_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a huge furniture plant with automated lines, warehouses and a design showroom. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/3e8216a9-3ff9-40cd-ab61-fc2afda16aeb.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_metalurgica_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger steel mill with tall chimneys and conveyor belts. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/bff87eb9-e5bf-495f-9821-6d436970c517.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_metalurgica_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a giant steelworks with blast furnaces, cranes and glowing molten metal. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/bff87eb9-e5bf-495f-9821-6d436970c517.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_montadora_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger car assembly plant with a test track. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db0bec5d-3fb6-4776-bd31-db06a185c242.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_montadora_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a mega car factory with robot assembly halls, a test track and a car tower. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db0bec5d-3fb6-4776-bd31-db06a185c242.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_refinaria_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger refinery with more tanks and distillation towers. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/b84a5259-5e63-4281-b8c8-1ca9056ada50.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_refinaria_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a huge refinery complex with tall towers, spherical tanks and pipelines. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/b84a5259-5e63-4281-b8c8-1ca9056ada50.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_usina_solar_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger solar farm with more panel rows and a control building. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/1c5178ff-ff8a-449a-9581-751bf268e52e.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_usina_solar_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a giant solar power station with a central solar tower and mirror fields. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/1c5178ff-ff8a-449a-9581-751bf268e52e.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_chocolateria_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger chocolate factory with a chocolate river canal and chimneys. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/8c1eb152-bf75-4a4c-af5a-637febf7af61.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_chocolateria_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a fantastic chocolate palace factory with chocolate fountains and candy towers. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/8c1eb152-bf75-4a4c-af5a-637febf7af61.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_pousada_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger mountain lodge with stone walls and chalets. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/f0313f19-d4f0-4cbe-a175-995ea4697c78.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_pousada_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a luxury alpine hotel with several wooden chalets and a heated terrace. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/f0313f19-d4f0-4cbe-a175-995ea4697c78.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_aluguel_esqui_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger ski rental center with racks of skis and a cafe. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/084072c8-95be-4ab0-9dbc-93a750db4d28.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_aluguel_esqui_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a large ski center with a rental hall, cafe and a small ski lift. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/084072c8-95be-4ab0-9dbc-93a750db4d28.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_teleferico_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger cable car station with two gondola lines. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/b9015db5-5f2b-4831-8ab0-813a53cdd016.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_teleferico_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a grand cable car terminal with three gondola lines and a panoramic restaurant. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/b9015db5-5f2b-4831-8ab0-813a53cdd016.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_spa_termal_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger thermal spa with several steaming pools. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/726adfde-12b3-49d3-a538-6367746ec47d.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_spa_termal_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a luxury thermal resort with terraced hot pools and a glass spa building. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/726adfde-12b3-49d3-a538-6367746ec47d.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_estacao_esqui_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger ski station with lifts and a lodge. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/193738df-92e1-41b0-a56d-360df5327cac.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_estacao_esqui_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a mega ski resort with several lifts, a hotel and snowy slopes. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/193738df-92e1-41b0-a56d-360df5327cac.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_escola_mergulho_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger dive center with a pier and boats. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/459205bd-5f48-4f31-8416-992568813dd5.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_escola_mergulho_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a large diving resort with a pier, dive boats and an underwater observatory. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/459205bd-5f48-4f31-8416-992568813dd5.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_bangalos_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: more overwater bungalows connected by wooden walkways. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/6a9a37f4-f1c6-4f17-b878-7bc2aeeea71d.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_bangalos_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a luxury overwater villa resort with many bungalows and a central pavilion. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/6a9a37f4-f1c6-4f17-b878-7bc2aeeea71d.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_parque_aquatico_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger water park with more slides and pools. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/dae296a4-a53f-411b-b061-7aab15d0b82f.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_parque_aquatico_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a mega water park with giant twisting slides, a wave pool and towers. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/dae296a4-a53f-411b-b061-7aab15d0b82f.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_clube_golfe_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger golf club with a clubhouse and greens. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/d865b879-044d-40f5-a65c-13a3177ea736.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_clube_golfe_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a luxury golf resort with a grand clubhouse, lakes and greens. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/d865b879-044d-40f5-a65c-13a3177ea736.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_heliponto_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger heliport with two helipads and a terminal. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/895a0f4c-f0ea-4a72-bd75-17cb956bd8a2.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_heliponto_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a luxury heliport tower with three helipads and a glass lounge. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/895a0f4c-f0ea-4a72-bd75-17cb956bd8a2.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_resort_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger tropical resort with pools and villas. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/e3fa621c-6cb9-4285-a629-6fdabc8076c2.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_resort_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a grand luxury resort with an infinity pool, towers and palm gardens. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/e3fa621c-6cb9-4285-a629-6fdabc8076c2.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_observatorio_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger observatory with two telescope domes. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/c8b5d3aa-6f27-4eb3-982b-b396e039e2a1.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_observatorio_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a huge space observatory with several domes and a radio dish array. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/c8b5d3aa-6f27-4eb3-982b-b396e039e2a1.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_museu_espaco_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger space museum with a rocket display outside. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/2c2e081b-8383-478c-b896-bc74fef15f66.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_museu_espaco_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a giant futuristic space museum with a dome and full-size rockets. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/2c2e081b-8383-478c-b896-bc74fef15f66.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_fabrica_satelites_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger satellite factory with clean-room halls and antennas. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/68558d17-67e4-4571-aed2-37c31fa6a89f.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_fabrica_satelites_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a huge satellite plant with assembly hangars and large dish antennas. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/68558d17-67e4-4571-aed2-37c31fa6a89f.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_centro_controle_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger mission control center with antenna dishes. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/4eebb787-972f-4b9e-a9a1-6db1b2907a15.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_centro_controle_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a massive mission control complex with a giant dish and glowing screens building. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/4eebb787-972f-4b9e-a9a1-6db1b2907a15.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_foguete_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger rocket launch pad with a taller rocket and service tower. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/c2bde924-62c5-4e43-b6f4-7f278d0940af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_foguete_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a mega launch complex with two giant rockets and launch towers. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/c2bde924-62c5-4e43-b6f4-7f278d0940af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_porto_espacial_lv4",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 4: a bigger spaceport with a landing pad and a hangar. It must be bigger and fancier than the reference, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/bfaee708-ae3c-437a-a4cd-24002a1976d1.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_porto_espacial_lv5",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style, isometric camera angle and square light-gray sidewalk base of the reference building. Draw the SAME business upgraded to level 5: a futuristic mega spaceport with landing pads, a ring terminal and a spaceship. It must be the ultimate, most impressive and luxurious version, much bigger than the reference, with golden accents, keeping the same identity and main colors so it is clearly the same business; the base may be slightly larger. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/bfaee708-ae3c-437a-a4cd-24002a1976d1.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ }
+]

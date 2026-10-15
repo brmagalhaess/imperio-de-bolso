@@ -42,13 +42,13 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
   },
   ...(
     [
-      ["cidade", "Prefeito da cidade", "Construa os 6 negócios da cidade", 5],
-      ["porto", "Capitão do porto", "Construa os 6 negócios do porto", 8],
-      ["centro", "Magnata do centro", "Construa os 6 negócios do centro financeiro", 12],
-      ["industrial", "Barão da indústria", "Construa os 6 negócios do polo industrial", 15],
-      ["serra", "Rei da montanha", "Construa os 6 negócios da serra", 18],
-      ["ilha", "Dono do paraíso", "Construa os 6 negócios da ilha", 22],
-      ["espaco", "Magnata das estrelas", "Construa os 6 negócios do centro espacial", 30],
+      ["cidade", "Prefeito da cidade", "Construa os 9 negócios da cidade", 5],
+      ["porto", "Capitão do porto", "Construa os 9 negócios do porto", 8],
+      ["centro", "Magnata do centro", "Construa os 9 negócios do centro financeiro", 12],
+      ["industrial", "Barão da indústria", "Construa os 9 negócios do polo industrial", 15],
+      ["serra", "Rei da montanha", "Construa os 9 negócios da serra", 18],
+      ["ilha", "Dono do paraíso", "Construa os 9 negócios da ilha", 22],
+      ["espaco", "Magnata das estrelas", "Construa os 9 negócios do centro espacial", 30],
     ] as const
   ).map(([district, title, description, rewardGems]) => ({
     id: `${district}_complete`,
@@ -56,7 +56,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
     description,
     rewardGems,
     progress: (s: AchievementStats) =>
-      count(s.ownedByDistrict?.[district] ?? 0, s.totalByDistrict?.[district] ?? 6),
+      count(s.ownedByDistrict?.[district] ?? 0, s.totalByDistrict?.[district] ?? 9),
   })),
   {
     id: "first_prestige",
