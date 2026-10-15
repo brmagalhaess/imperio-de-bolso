@@ -31,6 +31,8 @@ const PRESENCE_INTERVAL := 15.0
 const RECONNECT_INTERVAL := 5.0
 ## Abaixo disso não mostra o resumo offline (foi só uma pausa curta).
 const OFFLINE_SUMMARY_MIN_SECONDS := 60
+## Teto do saldo no servidor (services/wallet.ts MAX_COINS).
+const MAX_COINS := 9_000_000_000_000_000_000
 
 const MESSAGES := {
 	"INSUFFICIENT_FUNDS": "Moedas insuficientes.",
@@ -327,12 +329,13 @@ func buy_with_gems(item_id: String) -> Dictionary:
 		var cost := str(item.get("costGems", "")).to_int()
 		if item.is_empty() or cost <= 0 or gems().to_int() < cost:
 			return false
-		if item.get("kind", "") == "boost" and str(item.get("estimateCoins", "0")).to_int() <= 0:
+		var estimate := boost_estimate(int(item.get("hours", 0)) * 3600)
+		if item.get("kind", "") == "boost" and estimate.to_int() <= 0:
 			return false
 		_add_gems(-cost)
 		if item.get("kind", "") == "boost":
-			_add_coins(item.estimateCoins)
-			result["coins"] = str(item.estimateCoins)  # (lambda copia variáveis: muta, não reatribui)
+			_add_coins(estimate)
+			result["coins"] = estimate  # (lambda copia variáveis: muta, não reatribui)
 		elif item.get("kind", "") == "turbo":
 			var player: Dictionary = state.get("player", {})
 			var base := server_now()
@@ -804,6 +807,21 @@ func _process(_delta: float) -> void:
 
 func businesses() -> Array:
 	return state.get("businesses", [])
+
+
+## Moedas da coleta antecipada de `seconds` no mapa atual, calculadas do estado (mesma conta do
+## servidor: ciclos que cabem no tempo × lucro). O catálogo da Loja ficava velho e mostrava 0.
+func boost_estimate(seconds: int) -> String:
+	var total := 0
+	for b in businesses():
+		if not b.get("owned", false) or b.get("district", "") != current_district:
+			continue
+		var cycles := int(floor(seconds / max(0.001, float(b.cycleSeconds))))
+		var profit := str(b.profitPerCycle).to_int()
+		if cycles > 0 and profit > (MAX_COINS - total) / cycles:
+			return str(MAX_COINS)
+		total += profit * cycles
+	return str(total)
 
 
 func business(slug: String) -> Dictionary:

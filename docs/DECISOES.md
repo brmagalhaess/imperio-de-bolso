@@ -14,7 +14,7 @@
 | [0008](ADRs/0008-loja-anuncios-compras-sandbox.md) | Loja, anúncios (SSV) e compras em sandbox; mock recusado em produção; plugins verificados e bloqueio explícito | aceita |
 | [0009](ADRs/0009-beta-android-seguranca-exclusao.md) | Beta Android: rate limit, backups criptografados, BETA_SANDBOX, conta recuperável (Backup do Android) e exclusão de conta | aceita |
 | [0010](ADRs/0010-mapas-porto-centro-trilha.md) | Mapas 3 e 4 (Porto, Centro), 22 negócios, conquistas por mapa e tela de Mapas em trilha com nuvens e "Em breve" | aceita |
-| [0011](ADRs/0011-prestigio-vender-imperio.md) | Prestígio "Vender o império": estrelas = √(faturamento ÷ 1 mi), +2%/estrela, libera com a cidade completa | aceita |
+| [0011](ADRs/0011-prestigio-vender-imperio.md) | Prestígio "Vender o império": estrelas = 20×log10(faturamento ÷ 1 mi) (rev. 2026-10-15), +2%/estrela, libera com a cidade completa | aceita |
 | [0012](ADRs/0012-idiomas-en-es.md) | Idiomas en/es: CSV com chave em pt-BR, servidor em pt-BR + `titleTemplate` nas missões, idioma automático ou escolhido nas Configurações | aceita |
 | [0013](ADRs/0013-aceleradores-velocidade.md) | Aceleradores somados: ajudante +25%, marcos de nível +50%, VIP +50%, Turbo 2×; produção medida em "trabalho" | aceita |
 | [0014](ADRs/0014-retencao-diario-ligas-evento.md) | Retenção: missões por fase, calendário de 7 dias, baú das missões, ligas semanais, ranking de estrelas e evento de fim de semana | aceita |

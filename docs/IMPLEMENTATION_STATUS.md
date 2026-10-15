@@ -2,6 +2,17 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-15 — Simulação de jogadores e balanceamento
+
+- `backend/scripts/simulate-player.ts`: perfis novato/curioso/casual/engajado com as fórmulas reais.
+- Praia mais barata (pipoca 250, sorveteria 1.000, quiosque 4.000; ajudantes 1.000/4.000/16.000):
+  2º negócio aos ~1 min (antes ~6 min), praia completa aos ~21 min.
+- Estrelas do prestígio logarítmicas (ADR 0011 revisada): fim do bônus explosivo.
+- Loja: coleta antecipada mostrava 0 (catálogo velho / mapa sem negócio) — agora calculada do
+  estado no app; sem negócio no mapa o botão trava com aviso.
+- Testes: jogo **144** verificações OK; typecheck OK. **Backend sem rodar** (PostgreSQL local
+  parado: disco externo do Docker ficou somente-leitura) — deploy no servidor aguardando.
+
 ## 2026-10-14 — Google Play: versão 1.0.0 enviada para revisão
 
 - App "Império de Bolso" (pacote `br.com.imperiodebolso.game`, ID 4973883264134295100) na conta

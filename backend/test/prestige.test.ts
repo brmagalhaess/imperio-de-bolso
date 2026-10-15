@@ -49,9 +49,13 @@ describe("fórmula das estrelas", () => {
   it("estrelas = ⌊√(faturamento ÷ 1 mi)⌋ e cada estrela vale +2%", () => {
     expect(starsFor(0n)).toBe(0);
     expect(starsFor(999_999n)).toBe(0);
-    expect(starsFor(1_000_000n)).toBe(1);
-    expect(starsFor(50_000_000n)).toBe(7);
-    expect(starsFor(2_000_000_000n)).toBe(44);
+    expect(starsFor(1_000_000n)).toBe(0);
+    expect(starsFor(10_000_000n)).toBe(20);
+    expect(starsFor(50_000_000n)).toBe(33);
+    expect(starsFor(1_000_000_000n)).toBe(60);
+    expect(starsFor(1_000_000_000_000n)).toBe(120);
+    expect(starsFor(9_000_000_000_000_000_000n)).toBe(259);
+    expect(starsFor(10n ** 30n)).toBe(480);
     expect(withPrestige(100n, 7)).toBe(114n);
     expect(withPrestige(10n, 7)).toBe(11n);
     expect(withPrestige(10n, 0)).toBe(10n);

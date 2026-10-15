@@ -423,11 +423,14 @@ func open_store_menu() -> void:
 		_modal.add_store_card(func():
 			var item := GameState.store_item(item_id)
 			var cost: String = item.get("costGems", "0")
+			var estimate := GameState.boost_estimate(int(item.get("hours", 0)) * 3600)
+			var has_income := estimate.to_int() > 0
 			return {
 				"title": item.get("title", item_id), "icon": COIN_TEX,
-				"subtitle": tr("≈ %s moedas na hora") % Fmt.coins(item.get("estimateCoins", "0")),
+				"subtitle": tr("≈ %s moedas na hora") % Fmt.coins(estimate) if has_income
+						else tr("Construa um negócio neste mapa primeiro."),
 				"button": cost, "button_icon": _gem_tex, "color": BLUE, "edge": BLUE_DARK,
-				"enabled": GameState.gems().to_int() >= cost.to_int(),
+				"enabled": has_income and GameState.gems().to_int() >= cost.to_int(),
 			}, func(): _buy_with_gems(item_id))
 
 	# Turbo (ADR 0013): produção 2× em todos os mapas; soma com ajudante, níveis e VIP.
@@ -517,7 +520,7 @@ func _add_ad_boost_card() -> void:
 		return {
 			"title": ad.get("title", tr("Coleta antecipada")), "icon": COIN_TEX,
 			"subtitle": tr("Grátis com anúncio · ≈ %s moedas\nHoje: %d/%d") % [
-				Fmt.coins(ad.get("estimateCoins", "0")), used, limit],
+				Fmt.coins(GameState.boost_estimate(int(ad.get("minutes", 15)) * 60)), used, limit],
 			"button": tr("Assistir") if used < limit else "%d/%d" % [used, limit],
 			"color": PURPLE, "edge": PURPLE_DARK, "enabled": used < limit,
 		}, func(): watch_ad("ad_boost"))

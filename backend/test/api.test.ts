@@ -116,7 +116,7 @@ describe("compra de negócio", () => {
     expect(res.statusCode).toBe(409);
     expect(res.json().error).toMatchObject({
       code: "INSUFFICIENT_FUNDS",
-      details: { required: "500", available: "100" },
+      details: { required: "250", available: "100" },
     });
     expect(await coinsOf(ctx.db, guest.playerId)).toBe(100n);
     expect(await ctx.db.playerBusiness.count()).toBe(0);

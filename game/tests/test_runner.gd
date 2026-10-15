@@ -576,8 +576,12 @@ func _store_tests() -> bool:
 			"productId": "br.com.imperiodebolso.gems_50"},
 		{"id": "vip_monthly", "kind": "subscription", "title": "Passe VIP", "priceBRL": "14,90",
 			"benefits": ["Auto-coleta em todos os mapas"], "productId": "br.com.imperiodebolso.vip_monthly"}]}
+	# Estimativa calculada do estado (o catálogo ficava velho e mostrava 0): 100 por ciclo de 100 s.
+	GameState.current_district = "praia"
 	GameState._apply_state({"player": {"tutorialCompleted": true}, "wallet": {"coins": "0", "gems": "0"},
-		"businesses": []})
+		"businesses": [{"slug": "agua", "district": "praia", "owned": true, "level": 1,
+			"profitPerCycle": "100", "cycleSeconds": 100.0, "cycleStartedAt": null}]})
+	check(GameState.boost_estimate(3600) == "3600", "coleta antecipada de 1 h = ciclos que cabem × lucro")
 	await hud.open_store_menu()
 	var buttons := []
 	for h in hud._modal._store_cards:

@@ -30,10 +30,11 @@ function districtOfIndex(i: number): District {
 
 export const BUSINESS_CATALOG: readonly BusinessSeed[] = [
   ["agua", "Carrinho de Água", 100n, 10n, 10, 150n],
-  ["pipoca", "Carrinho de Pipoca", 500n, 40n, 20, 2_000n],
-  ["sorveteria", "Sorveteria", 2_000n, 150n, 30, 8_000n],
+  // Praia mais barata (simulação de 2026-10-15): o 2º negócio saía só aos ~6 min de jogo.
+  ["pipoca", "Carrinho de Pipoca", 250n, 40n, 20, 1_000n],
+  ["sorveteria", "Sorveteria", 1_000n, 150n, 30, 4_000n],
   // Na ilha da praia a "Lanchonete" da doc virou o Quiosque de Coco (direção visual v2).
-  ["quiosque_coco", "Quiosque de Coco", 8_000n, 600n, 45, 32_000n],
+  ["quiosque_coco", "Quiosque de Coco", 4_000n, 600n, 45, 16_000n],
   ["mercadinho", "Mercadinho", 25_000n, 1_800n, 60, 100_000n],
   ["restaurante", "Restaurante", 80_000n, 5_000n, 90, 320_000n],
   ["supermercado", "Supermercado", 250_000n, 14_000n, 120, 1_000_000n],

@@ -7,6 +7,7 @@ import { DAILY_REWARDS, MISSION_CHEST } from "../src/economy/daily.js";
 import { DISTRICTS } from "../src/economy/districts.js";
 import { nextUpgradeCost, profitPerCycle } from "../src/economy/formulas.js";
 import { OFFLINE_CAP_MS } from "../src/economy/offline.js";
+import { starsFor } from "../src/economy/prestige.js";
 import { baseSpeedPercent, effectiveCycleMs } from "../src/economy/speed.js";
 
 interface Profile {
@@ -334,17 +335,6 @@ const profiles: Profile[] = [
     saveForNext: true,
   },
   {
-    name: "PROPOSTA: novato com pipoca 250, sorveteria 1.000, quiosque 4.000",
-    sessionsPerDay: [30],
-    sessionHours: [20],
-    reactionS: 3,
-    days: 1,
-    missionsPerDay: 0,
-    useGemsForAutoCollect: false,
-    saveForNext: true,
-    costOverride: { pipoca: 250, sorveteria: 1000, quiosque_coco: 4000 },
-  },
-  {
     name: "Curioso (1 sessão de 15 min e some)",
     sessionsPerDay: [15],
     sessionHours: [20],
@@ -399,7 +389,7 @@ for (const p of profiles) {
     const playMin = s.reduce((a, x) => a + x.min, 0);
     const goal = s[s.length - 1]!.nextGoalMs;
     const earned = s[s.length - 1]!.earned;
-    const stars = Math.floor(Math.sqrt(earned / 1e6));
+    const stars = starsFor(BigInt(Math.floor(earned)));
     console.log(
       `Dia ${String(d).padStart(2)}: ${buys} compras em ${playMin} min; maior espera ${mins(gap)}; ${(taps / playMin).toFixed(0)} toques/min; próximo negócio/ajudante em ${dur(goal)}; faturou ${fmt(earned)} → vender daria ${fmt(stars)} estrelas (+${fmt(stars * 2)}% de lucro)`,
     );
