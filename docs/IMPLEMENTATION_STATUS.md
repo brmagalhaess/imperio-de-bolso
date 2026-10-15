@@ -2,7 +2,7 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
-## 2026-10-14 — Google Play: app criado, conteúdo e ficha da loja prontos
+## 2026-10-14 — Google Play: versão 1.0.0 enviada para revisão
 
 - App "Império de Bolso" (pacote `br.com.imperiodebolso.game`, ID 4973883264134295100) na conta
   de organização Crown Tech LTDA; site e telefone validados.
@@ -12,9 +12,8 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 - Definições: Jogo › Simulação; contato `suporte-imperio@crowntech.com.br`.
 - Ficha pt-BR: descrições, ícone 512, destaque 1024×500, 8 capturas de celular e de tablet
   7"/10" (`docs/lojas/`); arte declarada como gerada por IA.
-- **Pendente:** lançamento de Produção (AAB 1.0.0 `build/android/`, países fora da UE e envio
-  para revisão) — o modo de permissão automático do agente bloqueou a etapa; precisa do OK do
-  titular na sessão ou ser feito por ele no Play Console.
+- **Produção 1.0.0 enviada para revisão** (AAB versão 1, 150 países + "resto do mundo", sem a
+  UE; publicação gerida desativada → publica sozinho ao ser aprovado; revisão em até ~7 dias).
 
 ## 2026-10-14 — Apple: versão 1.0.0 enviada para revisão (ADR 0019)
 

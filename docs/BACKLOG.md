@@ -63,7 +63,7 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Exclusão de conta no jogo e na API (LGPD, ADR 0009)
 - [x] Link web de exclusão de conta (landing) — informado na segurança dos dados do Play
 - [x] Apple: versão 1.0.0 enviada para revisão (fora da UE)
-- [ ] Google Play: lançamento de Produção 1.0.0 (ficha e conteúdo prontos; falta enviar o AAB)
+- [x] Google Play: Produção 1.0.0 enviada para revisão (fora da UE)
 - [ ] Vincular conta convidada a Google/Apple (`/auth/link`) para recuperar sem o Backup do Android
 - [ ] Consentimento (UMP/LGPD), ATT no iOS, app-ads.txt
 - [x] ADR do plugin AdMob/IAP para Godot com bloqueio explícito (ADR 0008)
