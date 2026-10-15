@@ -231,3 +231,10 @@ em `POST /store/buy` → `200 { bought, turboUntil, state }` (soma tempo se já 
 
 ### Ainda não implementados (docs/README.md §11)
 `GET /config`; login nativo Google/Apple no jogo (plugins — depende das contas das lojas).
+
+## Denúncia de nome (2026-10-15, ADR 0020)
+
+`POST /players/report` `{ playerId }` → `202 { reported: true }`. Uma denúncia por jogador e alvo;
+`422 REPORT_SELF`, `404 PLAYER_NOT_FOUND`. Com 3 denunciantes diferentes o nome escolhido volta a
+"Empreendedor NNNN". As linhas do ranking (`/leaderboard`, liga e `/leaderboard/stars`) trazem
+`playerId` para isso.

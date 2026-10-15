@@ -74,20 +74,22 @@ func _unit_tests() -> void:
 			and Layout.art_path("porto_espacial", 50).ends_with("porto_espacial_lv4.png"), "evoluções 4 e 5 nos níveis 50 e 100")
 	var praia: Dictionary = Layout.DISTRICTS.praia.lots
 	var cidade: Dictionary = Layout.DISTRICTS.cidade.lots
-	check(praia.size() == 4 and cidade.size() == 6, "4 lotes na praia e 6 na cidade")
+	check(praia.size() == 4 and cidade.size() == 9, "4 lotes na praia e 9 na cidade (ilha de expansão)")
 	check(Layout.district_of("agua") == "praia" and Layout.district_of("shopping") == "cidade",
 			"distrito de cada negócio")
 	check(Layout.BUSINESS_ART.size() == 67, "arte cadastrada para os 67 negócios")
-	check(Layout.DISTRICTS.porto.lots.size() == 6 and Layout.DISTRICTS.centro.lots.size() == 6,
-			"6 lotes no porto e 6 no centro")
+	var nine := true
+	for id in Layout.DISTRICT_ORDER.slice(1):
+		nine = nine and Layout.DISTRICTS[id].lots.size() == 9 and Layout.DISTRICTS[id].get("pan", false)
+	check(nine, "mapas 2–8 com 9 lotes e câmera de arrastar")
 	var helpers_art := true
 	for slug in Layout.BUSINESS_ART:
 		helpers_art = helpers_art and ResourceLoader.exists("res://assets/optimized/%s.png" % Layout.helper_texture_name(slug))
-	check(helpers_art, "retrato do ajudante existe para os 46 negócios")
+	check(helpers_art, "retrato do ajudante existe para os 67 negócios")
 	var lots_total := 0
 	for id in Layout.DISTRICT_ORDER:
 		lots_total += Layout.DISTRICTS[id].lots.size()
-	check(Layout.DISTRICT_ORDER.size() == 8 and lots_total == 46, "8 mapas com um lote para cada um dos 46 negócios")
+	check(Layout.DISTRICT_ORDER.size() == 8 and lots_total == 67, "8 mapas com um lote para cada um dos 67 negócios")
 	var lots_apart := true
 	for lots in [praia, cidade]:
 		var points: Array = lots.values()
@@ -702,7 +704,7 @@ func _integration_test() -> void:
 	check(await GameState.boot(), "boot cria convidado e carrega estado")
 	check(GameState.coins() == "100", "saldo inicial 100")
 	check(not GameState.tutorial_completed(), "conta nova começa com tutorial pendente")
-	check(GameState.businesses().size() == 46, "46 negócios no catálogo (8 mapas)")
+	check(GameState.businesses().size() == 67, "67 negócios no catálogo (8 mapas)")
 	check(not await GameState.purchase("pipoca"), "pipoca recusada sem saldo")
 	check(await GameState.purchase("agua"), "compra do carrinho de água")
 	check(GameState.coins() == "0", "saldo após compra")

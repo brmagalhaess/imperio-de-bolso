@@ -52,7 +52,14 @@ const DISTRICTS := {
 			"academia": Vector2(155, 835),
 			"hotel": Vector2(560, 855),
 			"shopping": Vector2(345, 950),
+			# Ilha de expansão (mapas maiores, 2026-10-15).
+			"padaria": Vector2(501, 1455),
+			"farmacia": Vector2(365, 1546),
+			"cinema": Vector2(228, 1639),
 		},
+		"expansion": {"base": "cidade_expansao.png", "y": 1080, "sea_color": Color("0273a2")},
+		"pan": true,
+		"world_height": 1950,
 		"waypoints": [
 			Vector2(300, 470), Vector2(355, 568), Vector2(420, 598), Vector2(250, 668),
 			Vector2(170, 706), Vector2(470, 742), Vector2(560, 748), Vector2(410, 818),
@@ -82,7 +89,14 @@ const DISTRICTS := {
 			"marina": Vector2(387, 805),
 			"estaleiro": Vector2(165, 855),
 			"terminal": Vector2(565, 878),
+			# Ilha de expansão (mapas maiores, 2026-10-15).
+			"feira_porto": Vector2(506, 1404),
+			"clube_nautico": Vector2(376, 1504),
+			"farol": Vector2(236, 1604),
 		},
+		"expansion": {"base": "porto_expansao.png", "y": 1080, "sea_color": Color("016697")},
+		"pan": true,
+		"world_height": 1950,
 		"waypoints": [
 			Vector2(300, 470), Vector2(355, 568), Vector2(420, 598), Vector2(250, 668),
 			Vector2(170, 706), Vector2(470, 742), Vector2(560, 748), Vector2(410, 818),
@@ -108,7 +122,14 @@ const DISTRICTS := {
 			"convencoes": Vector2(160, 866),
 			"estadio": Vector2(575, 900),
 			"aeroporto": Vector2(347, 998),
+			# Ilha de expansão (mapas maiores, 2026-10-15).
+			"hospital": Vector2(491, 1421),
+			"universidade": Vector2(370, 1503),
+			"bolsa_valores": Vector2(243, 1588),
 		},
+		"expansion": {"base": "centro_expansao.png", "y": 1080, "sea_color": Color("01537e")},
+		"pan": true,
+		"world_height": 1950,
 		"waypoints": [
 			Vector2(300, 470), Vector2(355, 568), Vector2(420, 598), Vector2(250, 668),
 			Vector2(170, 706), Vector2(470, 742), Vector2(560, 748), Vector2(410, 818),
@@ -135,7 +156,14 @@ const DISTRICTS := {
 			"montadora": Vector2(390, 800),
 			"refinaria": Vector2(160, 862),
 			"usina_solar": Vector2(350, 995),
+			# Ilha de expansão (mapas maiores, 2026-10-15).
+			"fabrica_brinquedos": Vector2(517, 1402),
+			"centro_logistica": Vector2(374, 1505),
+			"parque_eolico": Vector2(230, 1592),
 		},
+		"expansion": {"base": "industrial_expansao.png", "y": 1080, "sea_color": Color("025087")},
+		"pan": true,
+		"world_height": 1950,
 		# Pessoas andam pelas ruas do molde de quadras (cruzamentos e calçadas).
 		"waypoints": [
 			Vector2(300, 470), Vector2(455, 470), Vector2(368, 588), Vector2(110, 690),
@@ -162,7 +190,14 @@ const DISTRICTS := {
 			"teleferico": Vector2(158, 875),
 			"spa_termal": Vector2(575, 895),
 			"estacao_esqui": Vector2(350, 1010),
+			# Ilha de expansão (mapas maiores, 2026-10-15).
+			"queijaria": Vector2(499, 1446),
+			"vinicola": Vector2(372, 1534),
+			"pista_patinacao": Vector2(238, 1625),
 		},
+		"expansion": {"base": "serra_expansao.png", "y": 1080, "sea_color": Color("0778b6")},
+		"pan": true,
+		"world_height": 1950,
 		# Pessoas andam pelas ruas do molde de quadras (cruzamentos e calçadas).
 		"waypoints": [
 			Vector2(300, 470), Vector2(455, 470), Vector2(368, 588), Vector2(110, 690),
@@ -189,7 +224,14 @@ const DISTRICTS := {
 			"clube_golfe": Vector2(387, 795),
 			"heliponto": Vector2(157, 850),
 			"resort": Vector2(350, 975),
+			# Ilha de expansão (mapas maiores, 2026-10-15).
+			"mercado_artesanato": Vector2(484, 1430),
+			"aquario": Vector2(376, 1496),
+			"hotel_flutuante": Vector2(266, 1584),
 		},
+		"expansion": {"base": "ilha_expansao.png", "y": 1080, "sea_color": Color("005897")},
+		"pan": true,
+		"world_height": 1950,
 		# Pessoas andam pelas ruas do molde de quadras (cruzamentos e calçadas).
 		"waypoints": [
 			Vector2(300, 470), Vector2(455, 470), Vector2(368, 588), Vector2(110, 690),
@@ -216,7 +258,14 @@ const DISTRICTS := {
 			"centro_controle": Vector2(390, 795),
 			"foguete": Vector2(157, 870),
 			"porto_espacial": Vector2(350, 995),
+			# Ilha de expansão (mapas maiores, 2026-10-15).
+			"escola_astronautas": Vector2(470, 1457),
+			"laboratorio_robos": Vector2(362, 1525),
+			"elevador_espacial": Vector2(255, 1592),
 		},
+		"expansion": {"base": "espaco_expansao.png", "y": 1080, "sea_color": Color("0071a5")},
+		"pan": true,
+		"world_height": 1950,
 		# Pessoas andam pelas ruas do molde de quadras (cruzamentos e calçadas).
 		"waypoints": [
 			Vector2(300, 470), Vector2(455, 470), Vector2(368, 588), Vector2(110, 690),

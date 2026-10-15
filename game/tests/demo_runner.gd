@@ -67,6 +67,28 @@ func _ready() -> void:
 			print("PASSO %s %dx%d" % [shot[0], img.get_width(), img.get_height()])
 		get_tree().quit()
 		return
+	if mode == "ilhas":
+		# Mapas maiores: tudo construído e a câmera arrastada até a ilha de expansão.
+		var out := OS.get_environment("CAPTURE_DIR")
+		await _wait(2.5)
+		hud._modal.close()
+		GameState._presence_timer.stop()
+		for b in GameState.businesses():
+			b["owned"] = true
+			b["level"] = [1, 10, 25, 50, 100][randi() % 5]
+			b["managed"] = true
+		GameState.daily["claimedToday"] = true
+		GameState.state_changed.emit()
+		for id in ["cidade", "porto", "ilha", "espaco"]:
+			main._show_district(id)
+			var view: Node2D = main.districts[id]
+			main.camera.position.y = 99999.0
+			view._clamp_camera()
+			await _wait(1.2)
+			get_viewport().get_texture().get_image().save_png(out.path_join("ilha_%s.png" % id))
+			print("PASSO ilha %s" % id)
+		get_tree().quit()
+		return
 	if mode == "lote2":
 		await _wait(2.0)
 		hud._modal.close()

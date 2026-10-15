@@ -44,11 +44,41 @@ func _ready() -> void:
 		fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(fill)
 
+	# Mapa maior: mar contínuo abaixo do cenário principal, até o fim da ilha de expansão.
+	var exp: Dictionary = config.get("expansion", {})
+	if not exp.is_empty():
+		var sea := ColorRect.new()
+		sea.color = exp.sea_color
+		sea.position = Vector2(-1000, 1000)
+		sea.size = Vector2(2720, float(config.world_height) + 1000.0)
+		sea.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(sea)
+
 	var bg := Sprite2D.new()
 	bg.texture = load("res://assets/optimized/%s" % config.base)
 	bg.centered = false
 	bg.scale = Vector2(720, 1280) / bg.texture.get_size()
 	add_child(bg)
+
+	if not exp.is_empty():
+		var island := Sprite2D.new()
+		island.texture = load("res://assets/optimized/%s" % exp.base)
+		island.centered = false
+		island.scale = Vector2.ONE * (720.0 / island.texture.get_width())
+		island.position = Vector2(0, float(exp.y))
+		add_child(island)
+		# Dica no fim do mapa principal: há mais lotes descendo.
+		var hint := Label.new()
+		hint.text = tr("▼ Arraste para ver mais negócios ▼")
+		hint.add_theme_font_size_override("font_size", 26)
+		hint.add_theme_color_override("font_color", Color.WHITE)
+		hint.add_theme_color_override("font_outline_color", Color("063a52"))
+		hint.add_theme_constant_override("outline_size", 8)
+		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		hint.size = Vector2(720, 40)
+		hint.position = Vector2(0, float(exp.y) + 40.0)
+		hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(hint)
 
 	_sorted = Node2D.new()
 	_sorted.y_sort_enabled = true
@@ -106,7 +136,7 @@ func _clamp_camera() -> void:
 	_camera.zoom = Vector2.ONE * z
 	var half := get_viewport_rect().size / z / 2.0
 	var lo := half
-	var hi := Vector2(720, 1280) - half
+	var hi := Vector2(720, float(config.get("world_height", 1280))) - half
 	_camera.position = Vector2(
 			clamp(_camera.position.x, min(lo.x, hi.x), max(lo.x, hi.x)) if lo.x <= hi.x else 360.0,
 			clamp(_camera.position.y, min(lo.y, hi.y), max(lo.y, hi.y)) if lo.y <= hi.y else config.camera_center.y)
@@ -138,7 +168,22 @@ func _pop(node: Node2D) -> void:
 
 func select(slug: String) -> void:
 	highlight(slug)
+	focus(slug)
 	lot_selected.emit(slug)
+
+
+## Mapa maior: desliza a câmera até o lote (ex.: escolhido na lista Construir, na ilha de baixo).
+func focus(slug: String) -> void:
+	if not _pannable() or not lots.has(slug):
+		return
+	var target: Vector2 = lots[slug].position - Vector2(0, 120)
+	var half := get_viewport_rect().size / _camera.zoom.x / 2.0
+	var lo_y := half.y
+	var hi_y := float(config.get("world_height", 1280)) - half.y
+	target.y = clamp(target.y, min(lo_y, hi_y), max(lo_y, hi_y))
+	target.x = _camera.position.x
+	if absf(target.y - _camera.position.y) > half.y * 0.6:
+		create_tween().tween_property(_camera, "position", target, 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
 ## Só o destaque visual (sem abrir painel); "" tira o destaque de todos.

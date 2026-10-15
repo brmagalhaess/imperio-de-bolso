@@ -60,7 +60,11 @@ function simulate(p: Profile) {
       ...def,
       ...(p.costOverride?.[def.slug] ? { cost: BigInt(p.costOverride[def.slug]!) } : {}),
       ...(REV_SCALE[def.district] !== undefined
-        ? { revenue: BigInt(Math.max(1, Math.round(Number(def.revenue) * REV_SCALE[def.district]!))) }
+        ? {
+            revenue: BigInt(
+              Math.max(1, Math.round(Number(def.revenue) * REV_SCALE[def.district]!)),
+            ),
+          }
         : {}),
     },
     level: 0,
@@ -277,11 +281,7 @@ function simulate(p: Profile) {
             firstSession.purchases.push(t - start);
           }
         }
-        if (
-          prestigeAt < 0 &&
-          biz.every((b) => b.level > 0 && b.helper)
-        )
-          prestigeAt = t;
+        if (prestigeAt < 0 && biz.every((b) => b.level > 0 && b.helper)) prestigeAt = t;
       }
       longestGap = Math.max(longestGap, t - lastBuy);
       if (missionsDone) {

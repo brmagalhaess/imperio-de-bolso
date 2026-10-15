@@ -2,15 +2,18 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
-## 2026-10-15 — Evoluções 4 e 5 e mapas maiores (em andamento)
+## 2026-10-15 — Mapas maiores, 5 evoluções e denúncia no ranking (ADR 0020)
 
 - **Evoluções:** 5 visuais por negócio (níveis 1, 10, 25, 50, 100); 92 artes novas dos 46
   negócios (Higgsfield, US$ 6,44). Sem a arte de uma faixa o jogo usa a anterior.
 - **Mapas maiores (servidor pronto, NÃO publicado):** 3 negócios novos por mapa da cidade em
   diante (67 no total), receita por nível 1,10 (era 1,12) — império completo em ~17 dias
   (engajado) a ~30 (casual) na simulação. Artes: 21 nível 1, 47 de 84 evoluções, 21 ajudantes.
-- **Bloqueio:** créditos da Higgsfield acabaram (faltam ~US$ 3,5–4: 37 evoluções e as ilhas de
-  expansão de cada mapa). Câmera com arrastar/pinça pronta para os mapas maiores (`"pan"`).
+- Ilhas de expansão com os 3 lotes novos em cada mapa (arrastar/pinça). Arte completa: 105
+  visuais dos negócios novos + 21 ajudantes + 7 ilhas.
+- Apple pediu informações (diretriz 2.1, conta nova): notas da revisão preenchidas, resposta em
+  `docs/lojas/apple/resposta-revisao-2.1.md`; falta o vídeo gravado no iPhone pelo titular.
+- Testes: backend **130**; jogo **151** unitários e **191** com integração.
 - Gasto total registrado em arte: ~US$ 26,3 (teto aprovado nesta etapa: +US$ 21).
 
 ## 2026-10-15 — Simulação de jogadores e balanceamento

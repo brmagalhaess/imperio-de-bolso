@@ -23,3 +23,4 @@
 | [0017](ADRs/0017-podio-semanal.md) | Pódio semanal: prêmios de 1º/2º/3º no ranking geral e na liga, entregues com aviso; prestígio não tira do ranking | aceita |
 | [0018](ADRs/0018-versao-1-sem-dinheiro-real.md) | Versão 1.0 nas lojas sem dinheiro real e sem anúncios (`PURCHASES_ENABLED`/`ADS_ENABLED`) | aceita |
 | [0019](ADRs/0019-publicacao-apple.md) | Publicação Apple: app criado na App Store Connect, chave de API (Gerente de apps), assinatura de distribuição manual e `tools/apple/release.sh` | aceita |
+| [0020](ADRs/0020-mapas-maiores-evolucoes.md) | Mapas 2–8 com 9 negócios (ilha de expansão), 5 evoluções, receita 1,10/nível, denúncia de nome | aceita |
