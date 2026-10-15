@@ -62,7 +62,7 @@ export const LEAGUES = ["Bronze", "Prata", "Ouro", "Platina", "Diamante"] as con
 export const LEAGUE_MOVE_SHARE = 0.2;
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-const weekId = (now: Date) => gameDay(weekBounds(now).start);
+export const weekId = (now: Date) => gameDay(weekBounds(now).start);
 
 interface ScoreRow {
   playerId: string;

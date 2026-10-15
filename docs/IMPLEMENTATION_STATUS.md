@@ -2,6 +2,14 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-15 — Painel admin v2 (ADR 0021)
+
+- Abas novas: Economia (67 negócios, 5 faixas visuais, fluxo de moedas/diamantes por tipo),
+  Ranking (top 20, ligas, pódio) e Moderação (trocar nome denunciado / arquivar). Visão geral com
+  D7, funil por mapa, reforços ativos, prêmio diário/missões/baú de hoje, evento e denúncias.
+  Detalhe do jogador completo; ledger com motivos em português.
+- Testes: `backend/test/admin.test.ts` (4) + suíte completa.
+
 ## 2026-10-15 — Mapas maiores, 5 evoluções e denúncia no ranking (ADR 0020)
 
 - **Evoluções:** 5 visuais por negócio (níveis 1, 10, 25, 50, 100); 92 artes novas dos 46

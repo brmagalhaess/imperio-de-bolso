@@ -14,7 +14,7 @@ Arte: [docs/GUIA_ARTE_HIGGSFIELD.md](docs/GUIA_ARTE_HIGGSFIELD.md).
 | `shared/contracts/` | Contrato da API v1 (fonte para cliente e servidor). |
 | `infrastructure/` | Docker Compose local; notas de deploy Dockploy. |
 | `tools/art/` | Geração (API Higgsfield) e tratamento de arte para o Godot. |
-| `admin/` | Painel admin React + Vite, somente leitura (`/api/admin`, ADMIN_TOKEN). |
+| `admin/` | Painel admin React + Vite (`/api/admin`, ADMIN_TOKEN): leitura + moderação de nomes (ADR 0021). |
 | `docs/` | Documentação, backlog, status, ADRs, checklists. |
 | `.github/workflows/` | CI (testes do backend e do jogo). |
 
