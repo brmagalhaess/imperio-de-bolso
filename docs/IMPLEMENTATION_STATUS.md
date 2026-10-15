@@ -11,8 +11,11 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
   (engajado) a ~30 (casual) na simulação. Artes: 21 nível 1, 47 de 84 evoluções, 21 ajudantes.
 - Ilhas de expansão com os 3 lotes novos em cada mapa (arrastar/pinça). Arte completa: 105
   visuais dos negócios novos + 21 ajudantes + 7 ilhas.
-- Apple pediu informações (diretriz 2.1, conta nova): notas da revisão preenchidas, resposta em
-  `docs/lojas/apple/resposta-revisao-2.1.md`; falta o vídeo gravado no iPhone pelo titular.
+- Apple pediu informações (diretriz 2.1, conta nova): respondido com o vídeo gravado no iPhone
+  (comprimido para 5 MB com ffmpeg) e as 6 respostas (`docs/lojas/apple/resposta-revisao-2.1.md`);
+  **reenviado em 2026-10-15 com o build 4** — aguardando revisão.
+- Google Play: lançamento 2 (AAB code 2, mesmo conteúdo) substituiu o 1 em análise (revisão
+  reiniciada).
 - Testes: backend **130**; jogo **151** unitários e **191** com integração.
 - Gasto total registrado em arte: ~US$ 26,3 (teto aprovado nesta etapa: +US$ 21).
 
