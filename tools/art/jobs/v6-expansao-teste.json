@@ -4,7 +4,11 @@
   "model": "xai/grok-imagine-image-2.0",
   "variations": 2,
   "input": {
+<<<<<<< HEAD
    "prompt": "In the exact same glossy cartoon mobile city-builder art style, colors and isometric camera angle as the reference INDUSTRIAL PARK map, draw, in the middle of the image, a SMALLER separate square diorama tile floating on the same open blue sea, seen from the same angle. On this tile there are exactly THREE EMPTY flat building lots (plain light concrete plazas, nothing on them) in one diagonal row, separated by gray roads with crosswalks, like the lots of the reference. The edges of the tile have railway tracks with a small cargo train, containers and forklifts. A short road bridge leaves the top-center of the tile going up and out of the image (it connects to the main map above). Only sea around the tile, no sky, no horizon. No buildings on the three lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+=======
+   "prompt": "In the exact same glossy cartoon mobile city-builder art style, colors and isometric camera angle as the reference INDUSTRIAL PARK map, draw, in the middle of the image, a SMALLER separate square diorama tile floating on the same open blue sea, seen from the same angle. On this tile there are exactly THREE EMPTY flat building lots (plain light concrete plazas, nothing on them) in one diagonal row, separated by gray roads with crosswalks, like the lots of the reference. The edges of the tile have railway tracks with a small cargo train, containers and forklifts. A short road bridge leaves the top-center of the tile going up and out of the image (it connects to the main map above). Only sea around the tile, no sky, no horizon. No buildings on the three lots, no people, no cars, no text, no letters, no numbers, no logos, no UI. ",
+>>>>>>> feature/etapa-0-fundacao
    "image_urls": [
     "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/5cb853d7-677c-4b4b-9836-40a256122c5c.jpeg"
    ],

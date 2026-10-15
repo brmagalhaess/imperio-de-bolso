@@ -1,3 +1,4 @@
+import { reportPlayer } from "../services/reports.js";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import type { AppConfig } from "../config.js";
@@ -340,6 +341,12 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
   app.post("/vip/daily", { preHandler: authenticate }, async (request, reply) =>
     command(request, reply, "vip.daily", (at) => claimVipDaily(at)),
   );
+
+  app.post("/players/report", { preHandler: authenticate }, async (request, reply) => {
+    const { playerId } = z.object({ playerId: z.uuid() }).parse(request.body);
+    reply.code(202);
+    return reportPlayer(db, playerIdOf(request), playerId, now());
+  });
 
   app.post("/player/name", { preHandler: authenticate }, async (request) => {
     const { displayName } = z.object({ displayName: z.string().max(60) }).parse(request.body);

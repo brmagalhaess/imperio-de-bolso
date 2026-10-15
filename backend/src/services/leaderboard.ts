@@ -38,6 +38,7 @@ export async function getLeaderboard(db: Db, playerId: string, now: Date) {
     ORDER BY rank, "displayName"`;
   const view = (r: Row) => ({
     rank: Number(r.rank),
+    playerId: r.playerId,
     displayName: r.displayName,
     score: r.score.toString(),
     isMe: r.playerId === playerId,
@@ -127,6 +128,7 @@ export async function getLeague(db: Db, playerId: string, now: Date) {
   const standings = await leagueScores(db, now, tier);
   const view = (r: ScoreRow, i: number) => ({
     rank: i + 1,
+    playerId: r.playerId,
     displayName: r.displayName,
     score: r.score.toString(),
     isMe: r.playerId === playerId,
@@ -160,6 +162,7 @@ export async function getStarsRanking(db: Db, playerId: string, now: Date) {
     ORDER BY rank, "displayName"`;
   const view = (r: (typeof rows)[number]) => ({
     rank: Number(r.rank),
+    playerId: r.playerId,
     displayName: r.displayName,
     score: String(r.stars),
     isMe: r.playerId === playerId,

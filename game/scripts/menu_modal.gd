@@ -548,8 +548,14 @@ func refresh_store_cards() -> void:
 
 
 ## Linha do ranking (posição, nome, faturamento); `me` destaca o jogador.
-func add_rank_row(rank: int, name_text: String, score: String, me: bool) -> void:
+## `on_press` (opcional): tocar na linha de outro jogador abre denunciar/ocultar.
+func add_rank_row(rank: int, name_text: String, score: String, me: bool, on_press := Callable()) -> void:
 	var panel := PanelContainer.new()
+	if on_press.is_valid():
+		panel.mouse_filter = Control.MOUSE_FILTER_STOP
+		panel.gui_input.connect(func(ev: InputEvent):
+			if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+				on_press.call())
 	var b := Style.box(Color("ffe9b8") if me else Style.CREAM_CARD, 20,
 			Style.ORANGE if me else Style.CREAM_LINE, 3, false)
 	b.content_margin_top = 8

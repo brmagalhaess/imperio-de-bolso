@@ -652,6 +652,14 @@ func _store_tests() -> bool:
 	await get_tree().process_frame
 	has_rename = hud._modal._list.get_children().any(func(c): return not c.is_queued_for_deletion() and c is Button and c.text.begins_with("Alterar nome"))
 	check(not has_rename, "depois de trocar, a opção some")
+	# Ranking: tocar em outro jogador abre denunciar/ocultar (diretriz 1.2 da App Store).
+	hud.open_player_options({"playerId": "00000000-0000-4000-8000-000000000001", "displayName": "Fulano"})
+	await get_tree().process_frame
+	var opt_texts: Array = hud._modal._list.find_children("*", "Button", true, false).map(func(b): return b.text)
+	check(opt_texts.has("Denunciar nome impróprio") and opt_texts.has("Ocultar este jogador"), "ranking: opções de denunciar e ocultar")
+	GameState.hide_player("00000000-0000-4000-8000-000000000001")
+	check(GameState.hidden_players().has("00000000-0000-4000-8000-000000000001"), "ranking: jogador oculto fica salvo no aparelho")
+	hud._modal.close()
 	# Prestígio no Perfil (ADR 0011): só oferece vender quando o servidor diz que dá.
 	GameState.prestige = {"stars": 7, "bonusPercent": 14, "starsToGain": 3, "nextBonusPercent": 20,
 		"requirementMet": true, "available": true}
