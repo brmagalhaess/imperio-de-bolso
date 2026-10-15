@@ -66,6 +66,8 @@ model Player {
   leagueWeeks    PlayerLeagueWeek[]
   gameEvents     PlayerEvent[]
   identities     PlayerIdentity[]
+  reportsMade     PlayerReport[] @relation("reporter")
+  reportsReceived PlayerReport[] @relation("reported")
   weeklyRewards  PlayerWeeklyReward[]
 
   @@map("players")
@@ -340,4 +342,21 @@ model PlayerWeeklyReward {
 
   @@id([playerId, week, kind])
   @@map("player_weekly_rewards")
+}
+
+/// Denúncia de nome impróprio no ranking (diretriz 1.2 da Apple): um por denunciante e alvo.
+/// Com 3 denunciantes diferentes o nome escolhido volta ao padrão (resolvedAt marca isso).
+model PlayerReport {
+  reporterId String    @map("reporter_id") @db.Uuid
+  reportedId String    @map("reported_id") @db.Uuid
+  reason     String    @default("name")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  resolvedAt DateTime? @map("resolved_at") @db.Timestamptz(3)
+
+  reporter Player @relation("reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reported Player @relation("reported", fields: [reportedId], references: [id], onDelete: Cascade)
+
+  @@id([reporterId, reportedId])
+  @@index([reportedId])
+  @@map("player_reports")
 }

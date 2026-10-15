@@ -114,6 +114,11 @@ func change_name(display_name: String) -> Dictionary:
 	return await _authed(HTTPClient.METHOD_POST, "/player/name", {"displayName": display_name}, "")
 
 
+## Denúncia de nome impróprio no ranking (diretriz 1.2 da App Store).
+func report_player(player_id: String) -> Dictionary:
+	return await _authed(HTTPClient.METHOD_POST, "/players/report", {"playerId": player_id}, "")
+
+
 ## Prestígio — "Vender o império" (ADR 0011).
 func prestige() -> Dictionary:
 	return await _authed(HTTPClient.METHOD_GET, "/prestige", null, "")

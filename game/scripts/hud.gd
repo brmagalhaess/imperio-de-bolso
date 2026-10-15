@@ -863,12 +863,34 @@ func open_ranking_menu(tab := -1) -> void:
 	if entries.is_empty():
 		_modal.add_message(null, "", tr("Ninguém faturou nesta semana ainda. Colete moedas e saia na frente!")
 				if shown_tab < 2 else tr("Ninguém vendeu o império ainda. Seja o primeiro!"))
+	var hidden := GameState.hidden_players()
 	for e in entries:
-		_modal.add_rank_row(int(e.rank), e.displayName, ("⭐ " + str(e.score)) if shown_tab == 2 else e.score, e.isMe)
+		if not e.isMe and hidden.has(str(e.get("playerId", ""))):
+			continue
+		var entry: Dictionary = e
+		_modal.add_rank_row(int(e.rank), e.displayName, ("⭐ " + str(e.score)) if shown_tab == 2 else e.score, e.isMe,
+				Callable() if e.isMe or not e.has("playerId") else func(): open_player_options(entry))
 	if me != null and not entries.any(func(e): return e.isMe):
 		_modal.add_section(tr("Sua posição"))
 		_modal.add_rank_row(int(me.rank), me.displayName, ("⭐ " + str(me.score)) if shown_tab == 2 else me.score, true)
 	_modal.refit()
+
+
+## Tocar em outro jogador no ranking: denunciar o nome ou ocultar (diretriz 1.2 da App Store).
+func open_player_options(entry: Dictionary) -> void:
+	var tab := _ranking_tab
+	_reward_kind = "player"
+	_modal.open(str(entry.displayName))
+	_modal.add_message(null, "", tr("Achou este nome ofensivo? Denuncie: com várias denúncias o nome é trocado. Você também pode ocultar este jogador do seu ranking."))
+	_modal.add_action(tr("Denunciar nome impróprio"), func():
+		if await GameState.report_player(str(entry.playerId)):
+			show_toast(tr("Denúncia enviada. Obrigado!"))
+		open_ranking_menu(tab), Style.ORANGE, Style.ORANGE_DARK)
+	_modal.add_action(tr("Ocultar este jogador"), func():
+		GameState.hide_player(str(entry.playerId))
+		show_toast(tr("Jogador oculto do seu ranking."))
+		open_ranking_menu(tab))
+	_modal.add_action(tr("Voltar"), func(): open_ranking_menu(tab))
 
 
 # --- Calendário de 7 dias e evento de fim de semana (ADR 0014) -----------------

@@ -805,6 +805,31 @@ func _process(_delta: float) -> void:
 		state_changed.emit()
 
 
+## Jogadores ocultos no ranking (bloqueio — fica só neste aparelho, user://settings.cfg).
+const SETTINGS_PATH := "user://settings.cfg"
+
+
+func hidden_players() -> Array:
+	var cfg := ConfigFile.new()
+	cfg.load(SETTINGS_PATH)
+	return cfg.get_value("ranking", "hidden", [])
+
+
+func hide_player(player_id: String) -> void:
+	var cfg := ConfigFile.new()
+	cfg.load(SETTINGS_PATH)
+	var hidden: Array = cfg.get_value("ranking", "hidden", [])
+	if not hidden.has(player_id):
+		hidden.append(player_id)
+	cfg.set_value("ranking", "hidden", hidden)
+	cfg.save(SETTINGS_PATH)
+
+
+func report_player(player_id: String) -> bool:
+	var res := await Api.report_player(player_id)
+	return res.ok
+
+
 func businesses() -> Array:
 	return state.get("businesses", [])
 
