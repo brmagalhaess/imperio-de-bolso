@@ -261,6 +261,16 @@ describe("SSV do AdMob (produção)", () => {
 
     const claim = await post(ctx.app, g, "/ads/claim", { sessionId: id });
     expect(claim.json().coins).toBe("900");
+
+    // Teste "Verificar URL" do AdMob: assinado, sem sessão (ou lixo) → 200 sem confirmar nada.
+    for (const data of ["", "lixo", "00000000-0000-4000-8000-000000000000"]) {
+      const probe = await ctx.app.inject({
+        method: "GET",
+        url: `/api/v1/ads/ssv?${signedQuery(data, `probe-${data}`)}`,
+      });
+      expect(probe.statusCode).toBe(200);
+      expect(probe.json()).toEqual({ verified: false });
+    }
   });
 });
 

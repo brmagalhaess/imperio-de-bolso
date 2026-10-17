@@ -29,16 +29,24 @@
   seguem sem IDFA. Não ativar a mensagem de IDFA no "Privacidade e mensagens" do AdMob sem
   adicionar `NSUserTrackingUsageDescription` e revisar a privacidade da App Store.
 
+## Contas e IDs (2026-10-17)
+
+- AdMob da empresa: `pub-9538653038510274` (login brunomagalhaes@crowntech.com.br).
+- App iOS: `ca-app-pub-9538653038510274~3260733869` · bloco Premiado
+  `ca-app-pub-9538653038510274/3843187791` com SSV para `/api/v1/ads/ssv` (URL verificada pelo
+  Google). `app-ads.txt` publicado em `imperio.crowntech.com.br/app-ads.txt`.
+- Build de desenvolvimento usa sempre o bloco de **teste** do Google (ver o anúncio real no
+  aparelho do desenvolvedor é tráfego inválido); só o release usa o bloco real.
+- Callback assinado sem sessão (o teste "Verificar URL") responde `200 { verified: false }`.
+
 ## Para ligar em produção (pendente)
 
-1. Titular cria a conta AdMob da empresa; no AdMob: app iOS (vinculado à App Store) e um bloco
-   **Premiado** com verificação no servidor (SSV) apontando para
-   `https://api-imperio.crowntech.com.br/api/v1/ads/ssv`.
-2. `admob/general/ios/app_id` e `imperio/ads/ios_rewarded_unit` no `project.godot` com os IDs reais.
-3. `app-ads.txt` no site (`imperio.crowntech.com.br/app-ads.txt`) com o `pub-…` da conta.
+1. ~~Conta AdMob, app iOS, bloco Premiado com SSV, IDs no `project.godot`, `app-ads.txt`~~ (feito).
+2. Titular: completar o perfil de pagamentos no AdMob (empresa, BRL); aguardar o Google verificar o
+   app pelo `app-ads.txt` (até 24 h).
 4. App Store Connect → Privacidade do app: declarar os dados coletados pelo SDK do Google
    (identificadores do dispositivo, dados de uso/publicidade, diagnóstico), sem rastreamento.
-5. Dokploy: `ADS_MODE=admob` e `ADS_PLATFORMS=ios`; novo build do iPhone.
+5. Dokploy: `ADS_MODE=admob` (já) e `ADS_PLATFORMS=ios`; novo build do iPhone com o SDK.
 
 ## Consequências
 

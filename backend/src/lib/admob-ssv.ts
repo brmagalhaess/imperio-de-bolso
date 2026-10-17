@@ -34,12 +34,11 @@ export async function verifySsv(rawQuery: string, resolveKey: KeyResolver): Prom
     Buffer.from(signature, "base64url"),
   );
   if (!ok) throw new SsvError("assinatura inválida");
-  const transactionId = params.get("transaction_id");
-  const customData = params.get("custom_data");
-  if (!transactionId || !customData) throw new SsvError("transaction_id/custom_data ausente");
+  // Assinatura válida sem sessão (ex.: o teste "Verificar URL" do AdMob): não é erro — o
+  // ssvVerified só não confirma nada. Responder 200 evita que o Google fique reenviando.
   return {
-    transactionId,
-    customData,
+    transactionId: params.get("transaction_id") ?? "",
+    customData: params.get("custom_data") ?? "",
     rewardAmount: params.get("reward_amount") ?? "",
     adUnit: params.get("ad_unit") ?? "",
     userId: params.get("user_id") ?? "",

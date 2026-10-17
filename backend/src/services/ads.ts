@@ -104,7 +104,10 @@ export async function mockComplete(db: Db, playerId: string, sessionId: string, 
 }
 
 /** Produção: callback SSV já com a assinatura validada. */
+const SESSION_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function ssvVerified(db: Db, params: SsvParams, now: Date): Promise<boolean> {
+  if (!params.transactionId || !SESSION_ID.test(params.customData)) return false;
   return markVerified(db, params.customData, params.transactionId, now);
 }
 

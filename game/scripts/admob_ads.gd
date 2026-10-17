@@ -6,7 +6,8 @@
 extends Node
 
 const API := "res://addons/admob/gdscript/src/"
-## Bloco de anúncio de teste do Google (iOS); o real vem de imperio/ads/ios_rewarded_unit.
+## Bloco de anúncio de teste do Google (iOS). O real (imperio/ads/ios_rewarded_unit) só vale no
+## build de release: no de desenvolvimento ver o próprio anúncio real conta como tráfego inválido.
 const TEST_UNIT_IOS := "ca-app-pub-3940256099942544/1712485313"
 
 var _started := false
@@ -22,7 +23,7 @@ static func available() -> bool:
 
 func unit_id() -> String:
 	var configured := str(ProjectSettings.get_setting("imperio/ads/ios_rewarded_unit", ""))
-	return configured if configured != "" else TEST_UNIT_IOS
+	return configured if configured != "" and not OS.is_debug_build() else TEST_UNIT_IOS
 
 
 ## Consentimento (UMP: LGPD/GDPR e, se configurado no AdMob, a pergunta de rastreamento da
