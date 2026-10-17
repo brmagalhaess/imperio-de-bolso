@@ -27,6 +27,8 @@ const ConfigSchema = z.object({
   // Bundle id esperado nos recibos da App Store (StoreKit 2).
   APPLE_BUNDLE_ID: z.string().default("br.com.imperiodebolso.game"),
   ADS_ENABLED: z.enum(["true", "false"]).optional(),
+  // Anúncios só em algumas plataformas (ex.: ADS_PLATFORMS=ios), como PURCHASES_PLATFORMS.
+  ADS_PLATFORMS: z.string().default(""),
   ADMOB_KEYS_URL: z.url().default("https://www.gstatic.com/admob/reward/verifier-keys.json"),
   // Atrás do proxy do Dockploy (Traefik), confie no X-Forwarded-For para o IP real.
   TRUST_PROXY: z
@@ -72,7 +74,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     config.NODE_ENV === "production" &&
     !config.BETA_SANDBOX &&
     ((config.PURCHASES_ENABLED && config.STORE_MODE === "mock") ||
-      (config.ADS_ENABLED && config.ADS_MODE === "mock"))
+      ((config.ADS_ENABLED || config.ADS_PLATFORMS.trim() !== "") && config.ADS_MODE === "mock"))
   ) {
     throw new Error(
       "STORE_MODE/ADS_MODE mock não podem ser usados em produção (exceto BETA_SANDBOX=true)",

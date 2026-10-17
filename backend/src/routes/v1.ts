@@ -26,7 +26,7 @@ import {
   verifierFor,
   verifyPurchase,
 } from "../services/purchases.js";
-import { features, purchasesFor, STORE_PLATFORM } from "../lib/features.js";
+import { adsFor, features, purchasesFor, STORE_PLATFORM } from "../lib/features.js";
 import { deleteAccount } from "../services/account.js";
 import { getPrestige, sellEmpire } from "../services/prestige.js";
 import { changeName } from "../services/profile.js";
@@ -94,6 +94,7 @@ const VerifyBody = z.object({
 const AdStartBody = z.object({
   placement: z.enum(["ad_boost", "offline_double"]),
   district: Slug.optional(),
+  platform: z.enum(["ios", "android", "other"]).optional(),
 });
 const AdSessionBody = z.object({ sessionId: z.uuid() });
 const RefundBody = z.object({ transactionId: z.string().min(3).max(200) });
@@ -149,9 +150,14 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
       throw new AppError(409, "PURCHASES_DISABLED", "Compras ainda não disponíveis");
     }
   };
-  const adsOn = async () => {
-    if (!config.ADS_ENABLED)
-      throw new AppError(409, "ADS_DISABLED", "Anúncios ainda não disponíveis");
+  // Anúncios podem abrir só no iPhone (ADS_PLATFORMS=ios). O resgate exige a sessão aberta
+  // pelo /ads/start (e, com AdMob, a confirmação SSV do Google), então basta checar na abertura.
+  const adsOn = async (request: FastifyRequest) => {
+    const body = (request.body ?? {}) as { platform?: string; sessionId?: string };
+    const ok = body.sessionId
+      ? features.ads || features.adPlatforms.length > 0
+      : adsFor(body.platform);
+    if (!ok) throw new AppError(409, "ADS_DISABLED", "Anúncios ainda não disponíveis");
   };
 
   // Criar/retomar conta convidada: limite mais rígido por IP (evita criação em massa).
@@ -351,7 +357,16 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
         platform: z.enum(["ios", "android", "other"]).optional(),
       })
       .parse(request.query);
-    return getCatalog(db, playerIdOf(request), now(), config.STORE_MODE, district, platform);
+    const catalog = await getCatalog(
+      db,
+      playerIdOf(request),
+      now(),
+      config.STORE_MODE,
+      district,
+      platform,
+    );
+    // "admob" = anúncio real com confirmação SSV do Google; "mock" = anúncio de teste.
+    return { ...catalog, adsMode: config.ADS_MODE };
   });
 
   app.post("/vip/daily", { preHandler: authenticate }, async (request, reply) =>

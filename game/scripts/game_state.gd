@@ -305,6 +305,8 @@ func refresh_catalog() -> void:
 	var res := await Api.store_catalog(current_district)
 	if res.ok and _queued == 0:
 		catalog = res.data
+		if ads_enabled():
+			_ensure_admob()  # consentimento e primeiro anúncio já carregando
 		if bool(catalog.get("purchasesEnabled", false)) and not catalog.get("sandbox", false):
 			_ensure_apple_store()
 			if apple_store != null:
@@ -320,6 +322,27 @@ func purchases_enabled() -> bool:
 
 func ads_enabled() -> bool:
 	return bool(catalog.get("adsEnabled", false))
+
+
+## Anúncio real do AdMob (iPhone com o plugin). Com o servidor em "mock" o anúncio de teste do
+## Google aparece, mas quem confirma é a rota de teste; em "admob" quem confirma é o SSV.
+var admob: Node
+
+
+func real_ads() -> bool:
+	_ensure_admob()
+	return admob != null
+
+
+func ads_mode() -> String:
+	return str(catalog.get("adsMode", "mock"))
+
+
+func _ensure_admob() -> void:
+	if admob == null and ads_enabled() and preload("res://scripts/admob_ads.gd").available():
+		admob = preload("res://scripts/admob_ads.gd").new()
+		add_child(admob)
+		admob.start()
 
 
 func store_item(item_id: String) -> Dictionary:

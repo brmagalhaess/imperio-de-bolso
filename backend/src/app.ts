@@ -36,6 +36,9 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     purchasePlatforms: deps.config.PURCHASES_PLATFORMS.split(",")
       .map((v) => v.trim())
       .filter(Boolean),
+    adPlatforms: deps.config.ADS_PLATFORMS.split(",")
+      .map((v) => v.trim())
+      .filter(Boolean),
   });
   const app = Fastify({
     trustProxy: deps.config.TRUST_PROXY,

@@ -156,8 +156,14 @@ Corpo `{ events: [{ name, props? }] }` (1–20). Nomes permitidos: `tutorial_sta
   `409 PURCHASE_OWNED_BY_OTHER`, `422 PURCHASE_INVALID`, `404 PRODUCT_NOT_FOUND`,
   `403 MOCK_DISABLED`, `501 STORE_NOT_CONFIGURED` (google/apple até as contas existirem).
 - `POST /purchases/restore` → `{ purchases, activeSubscriptions }`.
-- `POST /ads/start` — `Idempotency-Key`. `{ placement: ad_boost|offline_double, district? }` →
-  `201 { sessionId, rewardCoins, expiresAt }`. `409 AD_DAILY_LIMIT`, `409 AD_NOT_AVAILABLE`.
+- `POST /ads/start` — `Idempotency-Key`. `{ placement: ad_boost|offline_double, district?,
+  platform?: ios|android|other }` → `201 { sessionId, rewardCoins, expiresAt }`.
+  `409 AD_DAILY_LIMIT`, `409 AD_NOT_AVAILABLE`, `409 ADS_DISABLED` (anúncios desligados para a
+  plataforma — ADR 0023: `ADS_PLATFORMS=ios` liga só no iPhone).
+- O catálogo traz `adsEnabled` (por `platform`, como `purchasesEnabled`) e `adsMode`
+  (`admob` = anúncio real confirmado pelo SSV; `mock` = anúncio de teste + `/ads/mock-complete`).
+  Com AdMob o cliente manda o `sessionId` no `custom_data` do SSV e tenta o `/ads/claim` de novo
+  enquanto vier `AD_NOT_VERIFIED` (a confirmação do Google chega em segundos).
 - `GET /ads/ssv` (Google, sem login, assinatura ECDSA) → `200 { verified }` · `400 SSV_INVALID`.
 - `POST /ads/claim` — `Idempotency-Key`. `{ sessionId }` → `200 { claimed, coins, state }`.
   `409 AD_NOT_VERIFIED`, `409 AD_ALREADY_CLAIMED`.

@@ -161,7 +161,8 @@ func restore_purchases() -> Dictionary:
 
 
 func ad_start(placement: String, district := "") -> Dictionary:
-	var body := {"placement": placement}
+	var platform := "ios" if OS.get_name() == "iOS" else ("android" if OS.get_name() == "Android" else "other")
+	var body := {"placement": placement, "platform": platform}  # anúncios por plataforma (ADR 0023)
 	if district != "":
 		body.district = district
 	return await _command("/ads/start", body)

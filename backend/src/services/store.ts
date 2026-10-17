@@ -1,7 +1,7 @@
 import type { Db, Tx } from "../db/prisma.js";
 import { AppError, Errors } from "../errors.js";
 import { profitPerCycle } from "../economy/formulas.js";
-import { features, purchasesFor } from "../lib/features.js";
+import { adsFor, purchasesFor } from "../lib/features.js";
 import { STORE_ITEMS, VIP_DAILY_GEMS, storeItem } from "../economy/store.js";
 import { dayBounds, gameDay } from "../lib/time.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
@@ -55,6 +55,7 @@ export async function getCatalog(
   platform?: string,
 ) {
   const purchases = purchasesFor(platform);
+  const ads = adsFor(platform);
   const player = await db.player.findUniqueOrThrow({ where: { id: playerId } });
   const [vip, adsToday, vipClaim] = await Promise.all([
     vipUntil(db, playerId, now),
@@ -71,8 +72,7 @@ export async function getCatalog(
   // Versão sem dinheiro real / sem anúncios (ADR 0018): esses itens nem aparecem.
   const visible = STORE_ITEMS.filter(
     (i) =>
-      (purchases || (i.kind !== "iap" && i.kind !== "subscription")) &&
-      (features.ads || i.kind !== "ad"),
+      (purchases || (i.kind !== "iap" && i.kind !== "subscription")) && (ads || i.kind !== "ad"),
   );
   const items = await Promise.all(
     visible.map(async (i) => {
@@ -91,9 +91,9 @@ export async function getCatalog(
     }),
   );
   return {
-    sandbox: storeMode === "mock" && (purchases || features.ads),
+    sandbox: storeMode === "mock" && (purchases || ads),
     purchasesEnabled: purchases,
-    adsEnabled: features.ads,
+    adsEnabled: ads,
     district,
     items,
     entitlements: {

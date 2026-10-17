@@ -48,6 +48,8 @@ services:
       PURCHASES_PLATFORMS: ${PURCHASES_PLATFORMS:-ios}
       APPLE_BUNDLE_ID: ${APPLE_BUNDLE_ID:-br.com.imperiodebolso.game}
       ADS_ENABLED: ${ADS_ENABLED:-false}
+      # Anúncios só no iPhone: ADS_PLATFORMS=ios com ADS_MODE=admob (mock é recusado em produção).
+      ADS_PLATFORMS: ${ADS_PLATFORMS:-}
       GOOGLE_CLIENT_IDS: ${GOOGLE_CLIENT_IDS:-}
       APPLE_AUDIENCES: ${APPLE_AUDIENCES:-br.com.imperiodebolso.game}
       TRUST_PROXY: "true"

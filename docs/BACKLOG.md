@@ -59,7 +59,8 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Anúncio recompensado para dobrar o AFK ao voltar (conversa original) — sandbox
 - [x] Contratos de anúncios (sessão + SSV assinado) e compras (verificação, recibo, revogação, restauração) com mocks
 - [x] StoreKit 2 no iPhone (ADR 0022) — falta o contrato de apps pagos da Apple
-- [ ] Integrar plugins reais: AdMob, Google Play Billing (bloqueado: contas)
+- [x] Plugin AdMob no iPhone + anúncios por plataforma (ADR 0023) — falta a conta AdMob da empresa
+- [ ] Integrar plugins reais: AdMob no Android, Google Play Billing (bloqueado: contas)
 - [x] Verificador Apple (JWS) + App Store Server Notifications V2 (estorno)
 - [ ] Verificador Google + RTDN
 - [x] Exclusão de conta no jogo e na API (LGPD, ADR 0009)

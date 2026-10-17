@@ -2,6 +2,20 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-17 — Anúncios recompensados reais só no iPhone (ADR 0023) — preparado
+
+- Servidor: `ADS_PLATFORMS=ios` (catálogo `adsEnabled` por plataforma + `adsMode`; `/ads/start`
+  com `platform`; produção recusa com `ADS_MODE=mock`). Teste novo `ads-platforms.test.ts`.
+- Jogo: plugin AdMob v5.1.0 (Poing Studios, `tools/apple/fetch_admob.sh`, fora do Git) só no iOS;
+  `scripts/admob_ads.gd` (consentimento UMP → SDK → anúncio com `sessionId` no SSV → resgate
+  repetido até o servidor confirmar). Sem o plugin o jogo segue com o anúncio de teste.
+- Build do iPhone compila com o Google Mobile Ads SDK 13.9 (SPM) e abre normalmente no aparelho
+  (App ID de **teste** do Google). Anúncio real ainda não exibido: falta a conta.
+- Testes: backend **139**; jogo **151** (com e sem o plugin instalado).
+- **Pendente:** titular criar a conta AdMob da empresa → app iOS + bloco Premiado com SSV →
+  IDs no `project.godot`, `app-ads.txt`, privacidade na App Store, `ADS_MODE=admob` +
+  `ADS_PLATFORMS=ios` no Dokploy (lista em ADR 0023).
+
 ## 2026-10-17 — 1.0.0 aprovada na App Store; 1.0.1 com login Apple e loja paga no iPhone (ADR 0022)
 
 - Login com Apple no Perfil (plugin Godot Apple Plugins; capability no App ID; iOS mínimo 17).

@@ -604,15 +604,30 @@ func watch_ad(placement: String) -> void:
 	if not start.ok:
 		show_toast(GameState.message_for(start.error_code))
 		return
-	if not await _mock_ad.play():
+	var session: String = start.data.sessionId
+	if GameState.real_ads():
+		var shown: Dictionary = await GameState.admob.show_rewarded(session)
+		if not shown.shown:
+			show_toast(tr("Nenhum anúncio disponível agora. Tente de novo em instantes."))
+			return
+		if not shown.earned:
+			show_toast(tr("Anúncio fechado antes do fim: sem prêmio."))
+			return
+	elif not await _mock_ad.play():
 		show_toast(tr("Anúncio fechado antes do fim: sem prêmio."))
 		return
-	var session: String = start.data.sessionId
-	var done := await Api.ad_mock_complete(session)
-	if not done.ok:
-		show_toast(GameState.message_for(done.error_code))
-		return
+	if GameState.ads_mode() == "mock":
+		var done := await Api.ad_mock_complete(session)
+		if not done.ok:
+			show_toast(GameState.message_for(done.error_code))
+			return
+	# Com AdMob a confirmação (SSV) chega do Google ao servidor alguns segundos depois.
 	var claim := await Api.ad_claim(session)
+	for attempt in 8:
+		if claim.ok or claim.error_code != "AD_NOT_VERIFIED" or GameState.ads_mode() == "mock":
+			break
+		await get_tree().create_timer(1.5).timeout
+		claim = await Api.ad_claim(session)
 	if not claim.ok:
 		show_toast(GameState.message_for(claim.error_code))
 		return

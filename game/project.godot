@@ -16,6 +16,36 @@ boot_splash/image="res://assets/app_icon/adaptive_fg_432.png"
 boot_splash/fullsize=false
 boot_splash/use_filter=true
 
+[admob]
+
+; Anúncios só no iPhone (ADR 0023). Todas as chaves do plugin ficam aqui de propósito: se faltar
+; alguma, o plugin regrava o project.godot sozinho (e perde configurações). App ID de teste do
+; Google até a conta AdMob da empresa existir.
+general/android/enabled=false
+general/android/app_id="ca-app-pub-3940256099942544~3347511713"
+general/android/enable_r8_optimization=false
+general/android/disable_initialization_optimization=false
+general/android/disable_ad_loading_optimization=false
+general/ios/enabled=true
+general/ios/app_id="ca-app-pub-3940256099942544~1458002511"
+mediation/applovin=false
+mediation/bidmachine=false
+mediation/chartboost=false
+mediation/dtexchange=false
+mediation/imobile=false
+mediation/inmobi=false
+mediation/ironsource=false
+mediation/line=false
+mediation/maio=false
+mediation/meta=false
+mediation/mintegral=false
+mediation/moloco=false
+mediation/mytarget=false
+mediation/pangle=false
+mediation/pubmatic=false
+mediation/unity_ads=false
+mediation/vungle=false
+
 [autoload]
 
 Lang="*res://scripts/lang.gd"
@@ -37,6 +67,10 @@ window/size/window_height_override=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=1
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/admob/plugin.cfg")
 
 [imperio]
 

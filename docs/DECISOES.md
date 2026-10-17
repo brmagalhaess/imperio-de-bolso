@@ -26,3 +26,4 @@
 | [0020](ADRs/0020-mapas-maiores-evolucoes.md) | Mapas 2–8 com 9 negócios (ilha de expansão), 5 evoluções, receita 1,10/nível, denúncia de nome | aceita |
 | [0021](ADRs/0021-painel-admin-v2.md) | Painel admin v2: economia, ranking, moderação; únicas escritas = trocar nome denunciado / arquivar denúncia | aceita |
 | [0022](ADRs/0022-loja-paga-ios-e-login-apple.md) | Loja paga só no iPhone (StoreKit 2, recibo JWS verificado no servidor) e login com Apple; iOS 17+ | aceita |
+| [0023](ADRs/0023-anuncios-ios-admob.md) | Anúncios recompensados reais (AdMob) só no iPhone; ADS_PLATFORMS=ios; SSV com sessionId no custom_data | aceita |
