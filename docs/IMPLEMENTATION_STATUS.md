@@ -23,9 +23,8 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
   Privacidade nos 3 idiomas, e capturas 6,9", 6,3", iPhone Duo (tela aberta) e iPad aceitas.
   VIP pronto para "Adicionar para revisão" (a 1ª assinatura vai junto com uma versão nova).
   **Ainda não enviada para revisão.**
-- **Pendente do titular:** contrato de apps pagos (status "Novo") + atualizar a pessoa jurídica +
-  dados bancários/fiscais na App Store Connect (Negócios) — sem isso as compras não funcionam nem
-  na revisão. URL de notificações do servidor (App Store Server Notifications V2) a configurar.
+- **Pendente:** Certificate of Foreign Status (titular) e aprovação do banco pela Apple (até 24 h);
+  com o acordo de apps pagos Ativo, enviar a 1.0.1 + os 4 produtos para revisão.
 
 ## 2026-10-15 — Painel admin v2 (ADR 0021)
 
