@@ -882,13 +882,20 @@ func report_player(player_id: String) -> bool:
 
 ## Vincula a conta Apple a este progresso. Devolve {ok, code, token}: code "IDENTITY_IN_USE"
 ## (a conta Apple já tem outro progresso) vem com o token para oferecer carregar esse progresso.
+## Provedores já vinculados a esta conta ("apple", "google"); o Perfil atualiza ao abrir.
+var linked_providers: Array = []
+
+
 func link_apple() -> Dictionary:
 	var auth := await AppleAuth.request_token()
 	if auth.token == "":
 		return {"ok": false, "code": "CANCELLED", "token": ""}
 	var res := await Api.link_identity("apple", auth.token)
-	if res.ok:
-		track("account_linked", {"provider": "apple"})
+	if res.ok or res.error_code == "ALREADY_LINKED":
+		if not linked_providers.has("apple"):
+			linked_providers.append("apple")
+		if res.ok:
+			track("account_linked", {"provider": "apple"})
 		return {"ok": true, "code": "", "token": ""}
 	return {"ok": false, "code": res.error_code, "token": auth.token}
 

@@ -699,8 +699,7 @@ func open_profile_menu() -> void:
 
 
 ## Salvar progresso (ADR 0015): vincular a conta convidada ao Google (Android) ou à Apple (iOS)
-## para recuperar o jogo em outro aparelho. O login nativo entra com as contas das lojas; até
-## lá o botão avisa que chega em breve.
+## para recuperar o jogo em outro aparelho. Já vinculada, a linha vira só a confirmação (sem botão).
 func _add_save_progress() -> void:
 	var provider := "apple" if OS.get_name() == "iOS" else "google"
 	var label := tr("Vincular com a Apple") if provider == "apple" else tr("Vincular com o Google")
@@ -709,10 +708,23 @@ func _add_save_progress() -> void:
 		_on_link_pressed(holder[0] as Button, provider))
 	holder.append(info)
 	info.text = label
+	if GameState.linked_providers.has(provider):
+		_show_linked(info, provider)
+		return
 	var res := await Api.identities()
-	if res.ok and Array(res.data.get("linked", [])).has(provider) and is_instance_valid(info):
-		info.text = tr("Vinculado ✓")
-		info.disabled = true
+	if res.ok:
+		GameState.linked_providers = Array(res.data.get("linked", []))
+	if GameState.linked_providers.has(provider) and is_instance_valid(info):
+		_show_linked(info, provider)
+
+
+## Troca o botão "Vincular" pela confirmação na própria linha do Perfil.
+func _show_linked(button: Button, provider: String) -> void:
+	var row := button.get_parent()
+	button.visible = false
+	var texts := row.get_child(0) if row != null and row.get_child_count() > 0 else null
+	if texts != null and texts.get_child_count() > 1:
+		(texts.get_child(1) as Label).text = tr("Progresso salvo na sua conta Apple ✓") if provider == "apple" else tr("Progresso salvo na sua conta Google ✓")
 
 
 func _on_link_pressed(button: Button, provider: String) -> void:
@@ -725,8 +737,7 @@ func _on_link_pressed(button: Button, provider: String) -> void:
 		return
 	button.disabled = false
 	if r.ok:
-		button.text = tr("Vinculado ✓")
-		button.disabled = true
+		_show_linked(button, provider)
 		show_toast(tr("Progresso salvo na sua conta Apple!"))
 	elif r.code == "IDENTITY_IN_USE":
 		_offer_load_linked_progress(str(r.token))
