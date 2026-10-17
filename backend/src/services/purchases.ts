@@ -1,5 +1,6 @@
 import type { Db, Tx } from "../db/prisma.js";
 import { AppError } from "../errors.js";
+import { AppleJwsError, verifyAppleJws } from "../lib/apple-jws.js";
 import { itemByProductId } from "../economy/store.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { track } from "./analytics.js";
@@ -15,6 +16,8 @@ export type StoreName = "mock" | "google" | "apple";
 export interface VerifiedTransaction {
   transactionId: string;
   productId: string;
+  /** Fim do período pago da assinatura informado pela loja (senão, conta pelos dias do item). */
+  expiresAt?: Date;
 }
 
 export interface StoreVerifier {
@@ -32,9 +35,77 @@ export const mockVerifier: StoreVerifier = {
 };
 
 /**
- * Google Play Billing / Apple StoreKit 2: dependem de contas e credenciais ainda não criadas
- * (Play Console, App Store Connect). Bloqueio explícito em vez de API inventada — ADR 0008.
+ * Apple StoreKit 2: o jogo manda o `jwsRepresentation` da transação. O servidor confere a
+ * assinatura da Apple (lib/apple-jws.ts), o app (bundle id), o produto e se não foi estornada.
+ * Transações do ambiente Sandbox são aceitas: a revisão da Apple compra em Sandbox no app de
+ * produção (não há cobrança real nelas).
  */
+export function appleVerifier(
+  bundleId: string,
+  now: () => Date,
+  rootFingerprint?: string,
+): StoreVerifier {
+  return {
+    async verify(productId, purchaseToken) {
+      const at = now();
+      const t = decodeAppleTransaction(purchaseToken, at, rootFingerprint);
+      if (t.bundleId !== bundleId) {
+        throw new AppError(422, "PURCHASE_INVALID", "Recibo de outro app");
+      }
+      if (t.productId !== productId) {
+        throw new AppError(422, "PURCHASE_INVALID", "Recibo não corresponde ao produto");
+      }
+      if (t.revocationDate) {
+        throw new AppError(422, "PURCHASE_REVOKED", "Compra estornada");
+      }
+      if (t.expiresAt && t.expiresAt <= at) {
+        throw new AppError(422, "PURCHASE_EXPIRED", "Assinatura vencida");
+      }
+      return { transactionId: t.transactionId, productId: t.productId, expiresAt: t.expiresAt };
+    },
+  };
+}
+
+export interface AppleTransaction {
+  transactionId: string;
+  originalTransactionId: string;
+  bundleId: string;
+  productId: string;
+  environment: string;
+  expiresAt?: Date;
+  revocationDate?: Date;
+}
+
+/** Confere e lê um JWSTransaction da App Store. */
+export function decodeAppleTransaction(
+  jws: string,
+  now: Date,
+  rootFingerprint?: string,
+): AppleTransaction {
+  let p: Record<string, unknown>;
+  try {
+    p = verifyAppleJws(jws, { now, rootFingerprint });
+  } catch (e) {
+    if (e instanceof AppleJwsError) throw new AppError(422, "PURCHASE_INVALID", e.message);
+    throw e;
+  }
+  const str = (v: unknown) => (typeof v === "string" || typeof v === "number" ? String(v) : "");
+  const date = (v: unknown) => (typeof v === "number" ? new Date(v) : undefined);
+  if (!str(p.transactionId) || !str(p.productId)) {
+    throw new AppError(422, "PURCHASE_INVALID", "Recibo incompleto");
+  }
+  return {
+    transactionId: str(p.transactionId),
+    originalTransactionId: str(p.originalTransactionId),
+    bundleId: str(p.bundleId),
+    productId: str(p.productId),
+    environment: str(p.environment),
+    expiresAt: date(p.expiresDate),
+    revocationDate: date(p.revocationDate),
+  };
+}
+
+/** Google Play Billing: depende da conta de serviço da Play Console (ainda não criada). */
 const notConfigured = (store: string): StoreVerifier => ({
   async verify() {
     throw new AppError(
@@ -45,12 +116,22 @@ const notConfigured = (store: string): StoreVerifier => ({
   },
 });
 
-export function verifierFor(store: StoreName, storeMode: string): StoreVerifier {
+export interface VerifierDeps {
+  storeMode: string;
+  appleBundleId: string;
+  now: () => Date;
+  /** Testes: raiz própria no lugar da Apple Root CA - G3. */
+  appleRootFingerprint?: string;
+}
+
+export function verifierFor(store: StoreName, deps: VerifierDeps): StoreVerifier {
   if (store === "mock") {
-    if (storeMode !== "mock")
+    if (deps.storeMode !== "mock")
       throw new AppError(403, "MOCK_DISABLED", "Compras de teste desligadas");
     return mockVerifier;
   }
+  if (store === "apple")
+    return appleVerifier(deps.appleBundleId, deps.now, deps.appleRootFingerprint);
   return notConfigured(store);
 }
 
@@ -129,7 +210,8 @@ export function verifyPurchase(
           transactionId: tr.transactionId,
           status: "ACTIVE",
           startsAt,
-          expiresAt: new Date(startsAt.getTime() + item.periodDays * DAY_MS),
+          // A loja informa o fim do período (renovação mensal da Apple); o mock soma os dias.
+          expiresAt: tr.expiresAt ?? new Date(startsAt.getTime() + item.periodDays * DAY_MS),
         },
       });
     }
@@ -220,4 +302,37 @@ export async function restorePurchases(db: Db, playerId: string, now: Date) {
       expiresAt: s.expiresAt.toISOString(),
     })),
   };
+}
+
+/**
+ * App Store Server Notifications V2 (estorno/revogação). A Apple manda `signedPayload` assinado;
+ * REFUND e REVOKE revogam o benefício da transação. O resto só é registrado.
+ */
+export async function handleAppleNotification(
+  db: Db,
+  signedPayload: string,
+  now: Date,
+  rootFingerprint?: string,
+): Promise<{ type: string; revoked: boolean }> {
+  let n: Record<string, unknown>;
+  try {
+    n = verifyAppleJws(signedPayload, { now, rootFingerprint });
+  } catch (e) {
+    if (e instanceof AppleJwsError) throw new AppError(422, "NOTIFICATION_INVALID", e.message);
+    throw e;
+  }
+  const type = String(n.notificationType ?? "");
+  const data = (n.data ?? {}) as Record<string, unknown>;
+  if ((type === "REFUND" || type === "REVOKE") && typeof data.signedTransactionInfo === "string") {
+    const t = decodeAppleTransaction(data.signedTransactionInfo, now, rootFingerprint);
+    try {
+      await revokePurchase(db, "apple", t.transactionId, now);
+      return { type, revoked: true };
+    } catch (e) {
+      if (e instanceof AppError && e.code === "PURCHASE_NOT_FOUND") return { type, revoked: false };
+      throw e;
+    }
+  }
+  await track(db, null, "apple_notification", { type });
+  return { type, revoked: false };
 }

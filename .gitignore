@@ -28,3 +28,6 @@ game/android/
 *.keystore
 *.jks
 game/i18n/*.translation
+
+# Godot Apple Plugins (binários ~250 MB; instalar com tools/apple/fetch_plugins.sh)
+game/addons/GodotApplePlugins*/

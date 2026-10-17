@@ -19,6 +19,7 @@ export async function createTestContext(
   env: Record<string, string> = {},
   admobKeys?: import("../src/lib/admob-ssv.js").KeyResolver,
   idKeys?: import("../src/lib/id-token.js").JwkResolver,
+  appleRootFingerprint?: string,
 ): Promise<TestContext> {
   const url = process.env.TEST_DATABASE_URL;
   if (!url) throw new Error("TEST_DATABASE_URL não definido");
@@ -45,7 +46,14 @@ export async function createTestContext(
       this.now = new Date(this.now.getTime() + seconds * 1000);
     },
   };
-  const app = await buildApp({ config, db, now: () => clock.now, admobKeys, idKeys });
+  const app = await buildApp({
+    config,
+    db,
+    now: () => clock.now,
+    admobKeys,
+    idKeys,
+    appleRootFingerprint,
+  });
   return {
     app,
     db,

@@ -34,7 +34,14 @@ const OFFLINE_SUMMARY_MIN_SECONDS := 60
 ## Teto do saldo no servidor (services/wallet.ts MAX_COINS).
 const MAX_COINS := 9_000_000_000_000_000_000
 
+const AppleAuth := preload("res://scripts/apple_auth.gd")
+
 const MESSAGES := {
+	"IDENTITY_IN_USE": "Essa conta já está ligada a outro progresso.",
+	"ALREADY_LINKED": "Este progresso já tem uma conta ligada.",
+	"LINK_NOT_CONFIGURED": "Vincular conta ainda não está disponível.",
+	"INVALID_ID_TOKEN": "Não foi possível confirmar a conta. Tente de novo.",
+	"IDENTITY_NOT_FOUND": "Nenhum progresso ligado a essa conta.",
 	"INSUFFICIENT_FUNDS": "Moedas insuficientes.",
 	"PRODUCTION_NOT_READY": "A produção ainda não terminou.",
 	"NOTHING_TO_COLLECT": "Nada pronto para coletar.",
@@ -60,6 +67,10 @@ const MESSAGES := {
 	"STORE_NOT_CONFIGURED": "Compras ainda não disponíveis nesta versão.",
 	"MOCK_DISABLED": "Compras de teste desligadas.",
 	"PURCHASE_INVALID": "Não foi possível confirmar a compra.",
+	"PURCHASE_REVOKED": "Essa compra foi estornada.",
+	"PURCHASE_EXPIRED": "Essa assinatura já venceu.",
+	"PURCHASE_OWNED_BY_OTHER": "Essa compra pertence a outra conta do jogo.",
+	"PRODUCT_NOT_FOUND": "Produto indisponível no momento.",
 	"VIP_REQUIRED": "Benefício exclusivo do Passe VIP.",
 	"VIP_DAILY_CLAIMED": "Você já resgatou os diamantes de hoje.",
 	"NAME_INVALID": "Use de 3 a 20 letras, números, espaço, ponto, hífen ou _.",
@@ -293,6 +304,11 @@ func refresh_catalog() -> void:
 	var res := await Api.store_catalog(current_district)
 	if res.ok and _queued == 0:
 		catalog = res.data
+		if bool(catalog.get("purchasesEnabled", false)) and not catalog.get("sandbox", false):
+			_ensure_apple_store()
+			if apple_store != null:
+				apple_store.load_products(Array(catalog.get("items", [])).filter(
+					func(i): return i.has("productId")).map(func(i): return str(i.productId)))
 		catalog_changed.emit()
 
 
@@ -358,6 +374,40 @@ func buy_with_gems(item_id: String) -> Dictionary:
 		_catalog_dirty = true
 		return true, "bonus")
 	return result if ok else {}
+
+
+## Loja da Apple (StoreKit 2): nó filho criado no boot do iPhone (scripts/apple_store.gd).
+var apple_store: Node
+
+
+func _ensure_apple_store() -> void:
+	if apple_store == null and preload("res://scripts/apple_store.gd").available():
+		apple_store = preload("res://scripts/apple_store.gd").new()
+		add_child(apple_store)
+
+
+## Recibo de uma loja real → servidor (chamado pela loja da Apple). Atualiza o estado.
+func verify_store_purchase(store: String, product_id: String, token: String) -> Dictionary:
+	var res := await Api.verify_purchase(store, product_id, token)
+	if res.ok:
+		_apply_state(res.data.state)
+		_catalog_dirty = true
+		refresh_catalog()
+		Audio.play("bonus")
+	return res
+
+
+## Compra pela App Store. Devolve {ok, message} (message "" = cancelado pelo jogador).
+func buy_apple(product_id: String) -> Dictionary:
+	_ensure_apple_store()
+	if apple_store == null:
+		return {"ok": false, "message": "unavailable"}
+	return await apple_store.buy(product_id)
+
+
+## Loja paga real neste aparelho (iPhone com compras ligadas no servidor).
+func real_store() -> bool:
+	return purchases_enabled() and not catalog.get("sandbox", false) and apple_store != null
 
 
 ## Compra de TESTE (modo sandbox): nada é cobrado; o servidor registra como loja "mock".
@@ -827,6 +877,25 @@ func hide_player(player_id: String) -> void:
 
 func report_player(player_id: String) -> bool:
 	var res := await Api.report_player(player_id)
+	return res.ok
+
+
+## Vincula a conta Apple a este progresso. Devolve {ok, code, token}: code "IDENTITY_IN_USE"
+## (a conta Apple já tem outro progresso) vem com o token para oferecer carregar esse progresso.
+func link_apple() -> Dictionary:
+	var auth := await AppleAuth.request_token()
+	if auth.token == "":
+		return {"ok": false, "code": "CANCELLED", "token": ""}
+	var res := await Api.link_identity("apple", auth.token)
+	if res.ok:
+		track("account_linked", {"provider": "apple"})
+		return {"ok": true, "code": "", "token": ""}
+	return {"ok": false, "code": res.error_code, "token": auth.token}
+
+
+## Troca este aparelho para o progresso ligado à conta Apple (token de `link_apple`).
+func sign_in_apple(id_token: String) -> bool:
+	var res := await Api.social_sign_in("apple", id_token)
 	return res.ok
 
 

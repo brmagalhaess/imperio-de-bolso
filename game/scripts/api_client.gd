@@ -102,7 +102,9 @@ func send_events(events: Array) -> Dictionary:
 # --- Loja, compras e anúncios (ADR 0008) ---
 
 func store_catalog(district := "praia") -> Dictionary:
-	return await _authed(HTTPClient.METHOD_GET, "/store/catalog?district=" + district, null, "")
+	# A plataforma decide se a loja paga aparece (compras podem abrir só no iPhone — ADR 0022).
+	var platform := "ios" if OS.get_name() == "iOS" else ("android" if OS.get_name() == "Android" else "other")
+	return await _authed(HTTPClient.METHOD_GET, "/store/catalog?district=%s&platform=%s" % [district, platform], null, "")
 
 
 func vip_daily() -> Dictionary:
@@ -182,6 +184,19 @@ func identities() -> Dictionary:
 
 func link_identity(provider: String, id_token: String) -> Dictionary:
 	return await _authed(HTTPClient.METHOD_POST, "/auth/link", {"provider": provider, "idToken": id_token}, "")
+
+
+## Entra no progresso já ligado a essa conta Google/Apple (outro aparelho): passa a usar a conta
+## convidada dela neste aparelho (o servidor troca o segredo; o aparelho antigo pede login de novo).
+func social_sign_in(provider: String, id_token: String) -> Dictionary:
+	var res := await _send(HTTPClient.METHOD_POST, "/auth/social", {"provider": provider, "idToken": id_token})
+	if res.ok:
+		_token = res.data.accessToken
+		var session := ConfigFile.new()
+		session.set_value("guest", "guest_id", res.data.guestId)
+		session.set_value("guest", "guest_secret", res.data.guestSecret)
+		session.save(session_path)
+	return res
 
 
 # --- Retenção (ADR 0014) ---

@@ -21,6 +21,11 @@ const ConfigSchema = z.object({
   // Versão 1.0 nas lojas sai sem dinheiro real e sem anúncios (ADR 0018): itens em R$ e
   // anúncios somem do catálogo e as rotas recusam. Padrão: ligados fora da produção.
   PURCHASES_ENABLED: z.enum(["true", "false"]).optional(),
+  // Liga as compras só em algumas plataformas ("ios", "android"), separadas por vírgula —
+  // ex.: PURCHASES_PLATFORMS=ios abre a loja paga no iPhone com a Android ainda sem compras.
+  PURCHASES_PLATFORMS: z.string().default(""),
+  // Bundle id esperado nos recibos da App Store (StoreKit 2).
+  APPLE_BUNDLE_ID: z.string().default("br.com.imperiodebolso.game"),
   ADS_ENABLED: z.enum(["true", "false"]).optional(),
   ADMOB_KEYS_URL: z.url().default("https://www.gstatic.com/admob/reward/verifier-keys.json"),
   // Atrás do proxy do Dockploy (Traefik), confie no X-Forwarded-For para o IP real.

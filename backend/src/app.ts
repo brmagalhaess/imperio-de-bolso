@@ -26,10 +26,17 @@ export interface AppDeps {
   /** Chaves do SSV do AdMob (testes injetam as suas). */
   admobKeys?: import("./lib/admob-ssv.js").KeyResolver;
   idKeys?: import("./lib/id-token.js").JwkResolver;
+  appleRootFingerprint?: string;
 }
 
 export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
-  setFeatures({ purchases: deps.config.PURCHASES_ENABLED, ads: deps.config.ADS_ENABLED });
+  setFeatures({
+    purchases: deps.config.PURCHASES_ENABLED,
+    ads: deps.config.ADS_ENABLED,
+    purchasePlatforms: deps.config.PURCHASES_PLATFORMS.split(",")
+      .map((v) => v.trim())
+      .filter(Boolean),
+  });
   const app = Fastify({
     trustProxy: deps.config.TRUST_PROXY,
     // Logs sem dados sensíveis (plano §28): nada de corpo, cabeçalho Authorization ou query.
@@ -112,6 +119,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
         now,
         admobKeys: deps.admobKeys,
         idKeys: deps.idKeys,
+        appleRootFingerprint: deps.appleRootFingerprint,
       }),
     {
       prefix: "/api/v1",

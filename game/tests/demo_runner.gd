@@ -67,6 +67,28 @@ func _ready() -> void:
 			print("PASSO %s %dx%d" % [shot[0], img.get_width(), img.get_height()])
 		get_tree().quit()
 		return
+	if mode == "loja_paga":
+		# Imagens da revisão das compras (App Store): Loja com diamantes e Passe VIP à venda.
+		var out := OS.get_environment("CAPTURE_DIR")
+		await _wait(2.5)
+		hud._modal.close()
+		GameState.daily["claimedToday"] = true
+		hud.open_store_menu()
+		await _wait(1.5)
+		hud._modal._scroll.scroll_vertical = 100000
+		await _wait(1.0)
+		get_viewport().get_texture().get_image().save_png(out.path_join("loja_diamantes.png"))
+		print("PASSO loja diamantes")
+		var vip_y := 0
+		for c in hud._modal._list.get_children():
+			if c is Label and c.text == tr("Passe VIP"):
+				vip_y = int(c.position.y) - 20
+		hud._modal._scroll.scroll_vertical = vip_y
+		await _wait(1.0)
+		get_viewport().get_texture().get_image().save_png(out.path_join("loja_vip.png"))
+		print("PASSO loja vip")
+		get_tree().quit()
+		return
 	if mode == "ilhas":
 		# Mapas maiores: tudo construído e a câmera arrastada até a ilha de expansão.
 		var out := OS.get_environment("CAPTURE_DIR")

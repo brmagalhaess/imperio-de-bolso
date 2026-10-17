@@ -20,11 +20,13 @@ import {
 import { claimAd, mockComplete, ssvVerified, startAd } from "../services/ads.js";
 import { CLIENT_EVENTS, track } from "../services/analytics.js";
 import {
+  handleAppleNotification,
   restorePurchases,
   revokePurchase,
   verifierFor,
   verifyPurchase,
 } from "../services/purchases.js";
+import { features, purchasesFor, STORE_PLATFORM } from "../lib/features.js";
 import { deleteAccount } from "../services/account.js";
 import { getPrestige, sellEmpire } from "../services/prestige.js";
 import { changeName } from "../services/profile.js";
@@ -64,6 +66,8 @@ export interface V1Deps {
   admobKeys?: KeyResolver;
   /** Chaves públicas do Google/Apple para ID tokens (injetável nos testes). */
   idKeys?: JwkResolver;
+  /** Testes: raiz própria no lugar da Apple Root CA - G3 (recibos da App Store). */
+  appleRootFingerprint?: string;
 }
 
 const Slug = z.string().regex(/^[a-z0-9_-]{1,64}$/);
@@ -132,9 +136,16 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
     if (!exists) throw Errors.unauthorized();
   };
 
-  // Versão sem dinheiro real / sem anúncios (ADR 0018).
-  const purchasesOn = async () => {
-    if (!config.PURCHASES_ENABLED) {
+  // Versão sem dinheiro real / sem anúncios (ADR 0018); compras podem abrir por plataforma
+  // (PURCHASES_PLATFORMS=ios — ADR 0022). A loja do recibo define a plataforma.
+  const purchasesOn = async (request: FastifyRequest) => {
+    const body = (request.body ?? {}) as { store?: string };
+    const anyPlatform = config.PURCHASES_ENABLED || features.purchasePlatforms.length > 0;
+    const ok = body.store
+      ? purchasesFor(STORE_PLATFORM[body.store]) ||
+        (body.store === "mock" && purchasesFor(undefined))
+      : anyPlatform;
+    if (!ok) {
       throw new AppError(409, "PURCHASES_DISABLED", "Compras ainda não disponíveis");
     }
   };
@@ -334,8 +345,13 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
   // --- Loja, compras e anúncios (ADR 0008) ---------------------------------
 
   app.get("/store/catalog", { preHandler: authenticate }, async (request) => {
-    const { district } = z.object({ district: Slug.optional() }).parse(request.query);
-    return getCatalog(db, playerIdOf(request), now(), config.STORE_MODE, district);
+    const { district, platform } = z
+      .object({
+        district: Slug.optional(),
+        platform: z.enum(["ios", "android", "other"]).optional(),
+      })
+      .parse(request.query);
+    return getCatalog(db, playerIdOf(request), now(), config.STORE_MODE, district, platform);
   });
 
   app.post("/vip/daily", { preHandler: authenticate }, async (request, reply) =>
@@ -381,7 +397,12 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
     { preHandler: [authenticate, purchasesOn] },
     async (request, reply) => {
       const { store, productId, purchaseToken } = VerifyBody.parse(request.body);
-      const verifier = verifierFor(store, config.STORE_MODE);
+      const verifier = verifierFor(store, {
+        storeMode: config.STORE_MODE,
+        appleBundleId: config.APPLE_BUNDLE_ID,
+        now,
+        appleRootFingerprint: deps.appleRootFingerprint,
+      });
       return command(request, reply, "purchases.verify", (at) =>
         verifyPurchase(store, productId, purchaseToken, verifier, at),
       );
@@ -390,6 +411,16 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
 
   app.post("/purchases/restore", { preHandler: [authenticate, purchasesOn] }, async (request) =>
     restorePurchases(db, playerIdOf(request), now()),
+  );
+
+  // App Store Server Notifications V2 (URL cadastrada na App Store Connect): estornos revogam.
+  app.post(
+    "/purchases/apple/notifications",
+    { config: { rateLimit: { max: 120, timeWindow: "1 minute" } } },
+    async (request) => {
+      const { signedPayload } = z.object({ signedPayload: z.string().min(10) }).parse(request.body);
+      return handleAppleNotification(db, signedPayload, now(), deps.appleRootFingerprint);
+    },
   );
 
   const ssvKeys = deps.admobKeys ?? admobKeyResolver(config.ADMOB_KEYS_URL);

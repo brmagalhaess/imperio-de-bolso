@@ -2,6 +2,19 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-17 — 1.0.0 aprovada na App Store; 1.0.1 com login Apple e loja paga no iPhone (ADR 0022)
+
+- Login com Apple no Perfil (plugin Godot Apple Plugins; capability no App ID; iOS mínimo 17).
+- Loja paga só no iPhone: StoreKit 2 no jogo; servidor verifica o JWS da Apple (Apple Root CA G3),
+  estorno por App Store Server Notifications V2; `PURCHASES_PLATFORMS=ios` em produção (a 1.0.0
+  não manda a plataforma e segue sem loja paga). Produtos criados na App Store Connect (3
+  diamantes "Pronto para envio"; VIP em processamento).
+- Capturas novas: iPhone 6,3" (exigida — faltava, por isso a busca não mostrava imagens) e iPhone
+  Duo (externa 1398×2034, interna 2007×2853); `tools/apple/capture.sh`.
+- Testes: backend **137** (inclui `apple-purchases.test.ts` com cadeia própria); jogo **151**.
+- **Pendente do titular:** contrato de apps pagos + dados bancários/fiscais na App Store Connect
+  (Negócios) — sem isso as compras não funcionam nem na revisão.
+
 ## 2026-10-15 — Painel admin v2 (ADR 0021)
 
 - Abas novas: Economia (67 negócios, 5 faixas visuais, fluxo de moedas/diamantes por tipo),

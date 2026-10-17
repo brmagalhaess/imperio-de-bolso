@@ -238,3 +238,14 @@ em `POST /store/buy` → `200 { bought, turboUntil, state }` (soma tempo se já 
 `422 REPORT_SELF`, `404 PLAYER_NOT_FOUND`. Com 3 denunciantes diferentes o nome escolhido volta a
 "Empreendedor NNNN". As linhas do ranking (`/leaderboard`, liga e `/leaderboard/stars`) trazem
 `playerId` para isso.
+
+## Loja paga por plataforma e App Store (2026-10-17, ADR 0022)
+
+- `GET /store/catalog?district=…&platform=ios|android|other` — `purchasesEnabled` e os itens em
+  dinheiro dependem da plataforma (`PURCHASES_PLATFORMS`); sem `platform` vale só o global.
+- `POST /purchases/verify` com `store: "apple"`: `purchaseToken` = `jwsRepresentation` da
+  transação StoreKit 2. Erros: `PURCHASE_INVALID` (assinatura/app/produto), `PURCHASE_REVOKED`,
+  `PURCHASE_EXPIRED`, `PURCHASE_OWNED_BY_OTHER`; `409 PURCHASES_DISABLED` se a plataforma da loja
+  está desligada.
+- `POST /purchases/apple/notifications` `{ signedPayload }` — App Store Server Notifications V2
+  (sem token). REFUND/REVOKE revogam → `{ type, revoked }`.

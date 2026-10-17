@@ -12,6 +12,7 @@ signal selection_cleared
 const Fmt := preload("res://scripts/fmt.gd")
 const Layout := preload("res://scripts/layout.gd")
 const UiFont := preload("res://scripts/ui_font.gd")
+const AppleAuth := preload("res://scripts/apple_auth.gd")
 const Style := preload("res://scripts/ui_style.gd")
 const MenuModal := preload("res://scripts/menu_modal.gd")
 const MapTrail := preload("res://scripts/map_trail.gd")
@@ -470,11 +471,16 @@ func open_store_menu() -> void:
 		return {
 			"title": vip.get("title", "Passe VIP"), "icon": Layout.texture("icon_helpers"),
 			"subtitle": " · ".join(Array(vip.get("benefits", [])).map(func(t): return tr(t))) + "\n" + _vip_status(),
-			"button": tr("R$ %s/mês") % vip.get("priceBRL", ""), "color": Style.ORANGE,
+			"button": tr("%s/mês") % _price_label(vip), "color": Style.ORANGE,
 			"edge": Style.ORANGE_DARK, "enabled": true,
 		}, func():
 			var vip := GameState.store_item("vip_monthly")
-			_confirm_sandbox(vip, vip.get("productId", "")))
+			_buy_real_or_sandbox(vip))
+	if GameState.real_store():
+		# Diretriz 3.1.2 da Apple: preço, período, renovação automática e links de termos/privacidade.
+		_modal.add_message(null, "", tr("Assinatura mensal de %s, renovada automaticamente até você cancelar nos Ajustes da sua conta Apple (pelo menos 24 h antes do fim do período). A cobrança é feita na sua conta Apple.") % _price_label(GameState.store_item("vip_monthly")))
+		_modal.add_action(tr("Termos de uso"), func(): OS.shell_open("https://imperio.crowntech.com.br/termos/"), Style.TEAL_LIGHT, Style.TEAL_DARK)
+		_modal.add_action(tr("Política de privacidade"), func(): OS.shell_open("https://imperio.crowntech.com.br/privacidade/"), Style.TEAL_LIGHT, Style.TEAL_DARK)
 	# Recompensa diária de diamantes do VIP (pedido do titular).
 	_modal.add_store_card(func():
 		var ent: Dictionary = GameState.catalog.get("entitlements", {})
@@ -501,11 +507,11 @@ func open_store_menu() -> void:
 			return {
 				"title": item.get("title", item_id), "icon": _gem_tex,
 				"subtitle": tr("+%s diamantes") % Fmt.coins(item.get("gems", "0")),
-				"button": "R$ " + str(item.get("priceBRL", "")), "color": Style.GREEN,
+				"button": _price_label(item), "color": Style.GREEN,
 				"edge": Style.GREEN_DARK, "enabled": true,
 			}, func():
 				var item := GameState.store_item(item_id)
-				_confirm_sandbox(item, item.get("productId", "")))
+				_buy_real_or_sandbox(item))
 
 	_modal.add_action(tr("Restaurar compras"), _restore_purchases, Style.TEAL_LIGHT, Style.TEAL_DARK)
 	_modal.refit()
@@ -540,6 +546,31 @@ func _buy_with_gems(item_id: String) -> void:
 	_modal.refresh_store_cards()
 
 
+## Preço do item: o da App Store (localizado) quando a loja real está ligada; senão o do catálogo.
+func _price_label(item: Dictionary) -> String:
+	if GameState.real_store():
+		var p: String = GameState.apple_store.price(str(item.get("productId", "")))
+		if p != "":
+			return p
+	return "R$ " + str(item.get("priceBRL", ""))
+
+
+## Loja real (iPhone): a própria Apple mostra a confirmação. Teste: nossa confirmação "sem cobrança".
+func _buy_real_or_sandbox(item: Dictionary) -> void:
+	var product_id := str(item.get("productId", ""))
+	if not GameState.real_store():
+		_confirm_sandbox(item, product_id)
+		return
+	var r: Dictionary = await GameState.buy_apple(product_id)
+	if r.ok:
+		show_toast(tr("Compra confirmada: %s") % item.get("title", ""))
+	elif r.message == "PURCHASE_PENDING":
+		show_toast(tr("Compra aguardando aprovação. O item chega assim que for aprovada."))
+	elif r.message != "":
+		show_toast(GameState.message_for(str(r.message)) if GameState.MESSAGES.has(str(r.message)) else tr("Não foi possível concluir a compra."))
+	open_store_menu()
+
+
 ## Confirmação da compra em dinheiro. No modo de teste deixa claro que nada é cobrado.
 func _confirm_sandbox(item: Dictionary, product_id: String) -> void:
 	_reward_kind = "store_confirm"
@@ -559,6 +590,8 @@ func _confirm_sandbox(item: Dictionary, product_id: String) -> void:
 
 
 func _restore_purchases() -> void:
+	if GameState.real_store():
+		await GameState.apple_store.restore()
 	var res := await Api.restore_purchases()
 	if res.ok:
 		show_toast(tr("%d compra(s) encontrada(s) nesta conta.") % res.data.purchases.size())
@@ -671,13 +704,48 @@ func open_profile_menu() -> void:
 func _add_save_progress() -> void:
 	var provider := "apple" if OS.get_name() == "iOS" else "google"
 	var label := tr("Vincular com a Apple") if provider == "apple" else tr("Vincular com o Google")
+	var holder: Array = []  # o botão só existe depois de add_option (lambda copia variáveis)
 	var info: Button = _modal.add_option(tr("Salvar progresso"), tr("Conta convidada: vincule para não perder o progresso ao trocar de aparelho."), func():
-		show_toast(tr("Em breve: disponível quando o jogo estiver na loja.")))
+		_on_link_pressed(holder[0] as Button, provider))
+	holder.append(info)
 	info.text = label
 	var res := await Api.identities()
 	if res.ok and Array(res.data.get("linked", [])).has(provider) and is_instance_valid(info):
 		info.text = tr("Vinculado ✓")
 		info.disabled = true
+
+
+func _on_link_pressed(button: Button, provider: String) -> void:
+	if provider != "apple" or not AppleAuth.available():
+		show_toast(tr("Em breve: disponível quando o jogo estiver na loja."))
+		return
+	button.disabled = true
+	var r: Dictionary = await GameState.link_apple()
+	if not is_instance_valid(button):
+		return
+	button.disabled = false
+	if r.ok:
+		button.text = tr("Vinculado ✓")
+		button.disabled = true
+		show_toast(tr("Progresso salvo na sua conta Apple!"))
+	elif r.code == "IDENTITY_IN_USE":
+		_offer_load_linked_progress(str(r.token))
+	elif r.code != "CANCELLED":
+		show_toast(GameState.message_for(str(r.code)))
+
+
+## A conta Apple já guarda outro progresso (ex.: de outro iPhone): pergunta se carrega aquele.
+func _offer_load_linked_progress(id_token: String) -> void:
+	_reward_kind = "link"
+	_modal.open(tr("Conta Apple já usada"))
+	_modal.add_message(null, "", tr("Essa conta Apple já tem um progresso salvo. Quer carregar aquele progresso neste aparelho? O progresso atual deste aparelho deixa de ser usado."))
+	_modal.add_action(tr("Carregar o progresso salvo"), func():
+		if await GameState.sign_in_apple(id_token):
+			get_tree().reload_current_scene()
+		else:
+			show_toast(tr("Não foi possível carregar. Tente de novo."))
+			_modal.close(), Style.ORANGE, Style.ORANGE_DARK)
+	_modal.add_action(tr("Continuar com este progresso"), func(): open_profile_menu())
 
 
 ## Código curto da conta (8 primeiros caracteres do id) para suporte e pedidos de exclusão
