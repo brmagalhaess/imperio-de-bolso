@@ -14,9 +14,11 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 - Testes: backend **137** (inclui `apple-purchases.test.ts` com cadeia própria); jogo **151**.
 - Perfil: conta já vinculada mostra "Progresso salvo na sua conta Apple ✓" no lugar do botão.
 - App Store Server Notifications V2 configuradas (produção e sandbox) para a rota de estorno.
-- Produção ainda com `STORE_MODE=mock`/`BETA_SANDBOX=true` no Dokploy (por isso a loja mostra
-  "compra de teste"); o titular troca para `live`/`false` antes de enviar a 1.0.1.
-- Versão **1.0.1** criada na App Store Connect com o **build 6** (o 5 foi trocado) (perfil de distribuição recriado
+- Produção passou para `STORE_MODE=live`/`BETA_SANDBOX=false` no Dokploy (antes a loja mostrava
+  "compra de teste"). Vínculo Apple confirmado no servidor (POST /auth/link 200 do iPhone).
+- Negócios Apple: formulário do Brasil e W-8BEN-E ativos; banco em processamento; falta o
+  Certificate of Foreign Status; acordo de apps pagos "informações pendentes".
+- Versão **1.0.1** criada na App Store Connect com o **build 7** (5 e 6 trocados; o 7 corrige a leitura do token do login Apple) (perfil de distribuição recriado
   com o Sign in with Apple), novidades e o bloco de compras/assinatura com links de Termos e
   Privacidade nos 3 idiomas, e capturas 6,9", 6,3", iPhone Duo (tela aberta) e iPad aceitas.
   VIP pronto para "Adicionar para revisão" (a 1ª assinatura vai junto com uma versão nova).
