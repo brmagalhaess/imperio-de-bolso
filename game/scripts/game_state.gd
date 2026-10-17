@@ -40,6 +40,7 @@ const MESSAGES := {
 	"IDENTITY_IN_USE": "Essa conta já está ligada a outro progresso.",
 	"ALREADY_LINKED": "Este progresso já tem uma conta ligada.",
 	"LINK_NOT_CONFIGURED": "Vincular conta ainda não está disponível.",
+	"APPLE_SIGNIN_FAILED": "Não foi possível entrar com a Apple. Tente de novo.",
 	"INVALID_ID_TOKEN": "Não foi possível confirmar a conta. Tente de novo.",
 	"IDENTITY_NOT_FOUND": "Nenhum progresso ligado a essa conta.",
 	"INSUFFICIENT_FUNDS": "Moedas insuficientes.",
@@ -889,8 +890,12 @@ var linked_providers: Array = []
 func link_apple() -> Dictionary:
 	var auth := await AppleAuth.request_token()
 	if auth.token == "":
-		return {"ok": false, "code": "CANCELLED", "token": ""}
+		# Cancelar na folha da Apple não é erro; qualquer outra falha precisa aparecer.
+		var cancelled: bool = str(auth.error).to_lower().contains("cancel") or str(auth.error).contains("1001")
+		print("AppleAuth: sem token (", auth.error, ")")
+		return {"ok": false, "code": "CANCELLED" if cancelled else "APPLE_SIGNIN_FAILED", "token": ""}
 	var res := await Api.link_identity("apple", auth.token)
+	print("AppleAuth: vínculo ", "ok" if res.ok else res.error_code)
 	if res.ok or res.error_code == "ALREADY_LINKED":
 		if not linked_providers.has("apple"):
 			linked_providers.append("apple")
