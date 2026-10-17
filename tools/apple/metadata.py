@@ -20,14 +20,20 @@ def api(method, path, body=None):
     return data
 
 
-version = [v for v in api("GET", f"/v1/apps/{APP}/appStoreVersions")["data"]
-           if v["attributes"]["appStoreState"] in ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED")][0]
-vid = version["id"]
+# Versão em preparação; se não houver (a anterior já está à venda), cria a de store_texts.json.
+editable = [v for v in api("GET", f"/v1/apps/{APP}/appStoreVersions")["data"]
+            if v["attributes"]["appStoreState"] in ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED")]
+if editable:
+    vid = editable[0]["id"]
+else:
+    vid = api("POST", "/v1/appStoreVersions", {"data": {"type": "appStoreVersions",
+        "attributes": {"platform": "IOS", "versionString": T["version"]},
+        "relationships": {"app": {"data": {"type": "apps", "id": APP}}}}})["data"]["id"]
 info = api("GET", f"/v1/apps/{APP}/appInfos")["data"][0]
 iid = info["id"]
 
 api("PATCH", f"/v1/appStoreVersions/{vid}", {"data": {"type": "appStoreVersions", "id": vid, "attributes": {
-    "versionString": "1.0.0", "copyright": T["copyright"], "releaseType": "AFTER_APPROVAL"}}})
+    "versionString": T["version"], "copyright": T["copyright"], "releaseType": "AFTER_APPROVAL"}}})
 
 # Textos da versão (descrição, palavras-chave, texto promocional, URLs).
 existing = {l["attributes"]["locale"]: l["id"] for l in
@@ -36,6 +42,8 @@ for loc in LOCALES:
     x = T[loc]
     attrs = {"description": x["description"], "keywords": x["keywords"], "promotionalText": x["promotionalText"],
              "supportUrl": T["urls"]["support"], "marketingUrl": T["urls"]["marketing"]}
+    if x.get("whatsNew") and T["version"] != "1.0.0":  # a primeira versão não aceita "Novidades"
+        attrs["whatsNew"] = x["whatsNew"]
     if loc in existing:
         api("PATCH", f"/v1/appStoreVersionLocalizations/{existing[loc]}",
             {"data": {"type": "appStoreVersionLocalizations", "id": existing[loc], "attributes": attrs}})

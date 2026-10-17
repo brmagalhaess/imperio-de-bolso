@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
 """Envia as capturas de tela (docs/lojas/capturas) para a versão em preparação na App Store.
-    python3 tools/apple/screenshots.py
+    python3 tools/apple/screenshots.py [TIPO ...]     ex.: python3 tools/apple/screenshots.py APP_IPHONE_61
 Substitui as capturas existentes do idioma principal (pt-BR); os outros idiomas usam as mesmas.
 Gerar as capturas: DEMO=capturas no tests/demo_runner.gd (ver docs/lojas/README.md).
 """
-import hashlib, json, subprocess, urllib.request
+import hashlib, json, subprocess, sys, urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = "6822892071"
-SETS = {"APP_IPHONE_67": "docs/lojas/capturas/iphone-6.9", "APP_IPAD_PRO_3GEN_129": "docs/lojas/capturas/ipad-13"}
+# 6,3" (Dynamic Island médio) é a que aparece na busca da App Store; iPhone Duo usa a tela aberta.
+SETS = {"APP_IPHONE_67": "docs/lojas/capturas/iphone-6.9", "APP_IPHONE_61": "docs/lojas/capturas/iphone-6.3",
+        "APP_IPHONE_DUO": "docs/lojas/capturas/iphone-duo-interna",
+        "APP_IPAD_PRO_3GEN_129": "docs/lojas/capturas/ipad-13"}
+if sys.argv[1:]:
+    SETS = {k: v for k, v in SETS.items() if k in sys.argv[1:]}
 
 
 def api(method, path, body=None):
