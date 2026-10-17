@@ -12,6 +12,10 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 - Build do iPhone compila com o Google Mobile Ads SDK 13.9 (SPM) e abre normalmente no aparelho
   (App ID de **teste** do Google). Anúncio real ainda não exibido: falta a conta.
 - Testes: backend **139**; jogo **151** (com e sem o plugin instalado).
+- **Incidente (~7 min fora do ar, 17:22–17:29 UTC):** o Dokploy estava com `ADS_MODE=live`
+  (valor inválido; os aceitos são `mock`/`admob`) e a API não subiu no deploy deste commit.
+  Corrigido para `ADS_MODE=admob` (anúncios seguem desligados com `ADS_PLATFORMS` vazio).
+  Lição: conferir as variáveis do Dokploy contra o `prod.env.example` antes de cada deploy.
 - **Pendente:** titular criar a conta AdMob da empresa → app iOS + bloco Premiado com SSV →
   IDs no `project.godot`, `app-ads.txt`, privacidade na App Store, `ADS_MODE=admob` +
   `ADS_PLATFORMS=ios` no Dokploy (lista em ADR 0023).
