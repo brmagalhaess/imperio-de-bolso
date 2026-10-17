@@ -141,9 +141,9 @@ def setup_vip(territories):
         return
     points = all_pages(f"/v1/subscriptions/{sub}/pricePoints?filter%5Bterritory%5D=BRA&limit=200")
     point = next(p for p in points if p["attributes"]["customerPrice"] in ("14.9", "14.90"))
-    # Preço base no Brasil + equivalentes da Apple nos outros países onde o jogo está.
-    targets = [point] + [e for e in all_pages(f"/v1/subscriptionPricePoints/{point['id']}/equalizations?limit=200&include=territory")
-                         if e["relationships"]["territory"]["data"]["id"] in territories]
+    # Preço base no Brasil + equivalentes da Apple em TODOS os países (175): a Apple recusa enviar a
+    # assinatura se faltar preço em algum, mesmo onde o app não é vendido (ex.: UE).
+    targets = [point] + all_pages(f"/v1/subscriptionPricePoints/{point['id']}/equalizations?limit=200&include=territory")
     for p in targets:
         asc("POST", "/v1/subscriptionPrices", {"data": {"type": "subscriptionPrices",
             "attributes": {"preserveCurrentPrice": False},

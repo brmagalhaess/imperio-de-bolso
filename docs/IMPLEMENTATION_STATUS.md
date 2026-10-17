@@ -2,6 +2,20 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-17 — 1.0.1 ENVIADA para revisão da Apple (build 8 + 4 compras)
+
+- Acordo de apps pagos **Ativo** (banco e formulários fiscais aprovados).
+- Envio com 6 itens: versão 1.0.1 (build 8, com o SDK do AdMob), Passe VIP mensal, grupo
+  "Passe VIP" e os 3 pacotes de diamantes. Notas para o revisor atualizadas (loja, login Apple).
+- VIP travava com "falta preço": a Apple exige preço em todos os 175 países, inclusive os 27 da
+  UE onde o app não é vendido — criados pelas equivalências; `iap_setup.py` corrigido.
+- Privacidade do app publicada: + localização aproximada, ID do dispositivo, dados de
+  publicidade e diagnóstico (SDK do Google, sem vínculo e sem rastreamento) e histórico de
+  compras (vinculado, funcionalidade).
+- **Anúncios ficam desligados no servidor** (`ADS_PLATFORMS` vazio) até o AdMob aprovar o app
+  (perfil de pagamento da empresa + `app-ads.txt`); depois é só ligar `ADS_PLATFORMS=ios` no
+  Dokploy, sem build novo.
+
 ## 2026-10-17 — Anúncios recompensados reais só no iPhone (ADR 0023) — preparado
 
 - Servidor: `ADS_PLATFORMS=ios` (catálogo `adsEnabled` por plataforma + `adsMode`; `/ads/start`

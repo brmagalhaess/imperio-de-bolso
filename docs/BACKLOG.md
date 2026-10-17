@@ -67,7 +67,8 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Link web de exclusão de conta (landing) — informado na segurança dos dados do Play
 - [x] Apple: versão 1.0.0 enviada para revisão (fora da UE)
 - [x] Google Play: Produção 1.0.0 enviada para revisão (fora da UE)
-- [ ] Apple 1.0.1 (build 5, loja paga, capturas 6,3" e iPhone Duo) — enviar para revisão após o contrato
+- [x] Apple 1.0.1 enviada (build 8, loja paga, login Apple, capturas 6,3" e iPhone Duo, SDK AdMob)
+- [ ] Ligar anúncios no iPhone (`ADS_PLATFORMS=ios`) quando o AdMob aprovar o app
 - [ ] Vincular conta convidada a Google/Apple (`/auth/link`) para recuperar sem o Backup do Android
 - [ ] Consentimento (UMP/LGPD), ATT no iOS, app-ads.txt
 - [x] ADR do plugin AdMob/IAP para Godot com bloqueio explícito (ADR 0008)
