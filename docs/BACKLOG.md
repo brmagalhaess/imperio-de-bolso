@@ -58,12 +58,15 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Passe VIP: recompensa diária de diamantes
 - [x] Anúncio recompensado para dobrar o AFK ao voltar (conversa original) — sandbox
 - [x] Contratos de anúncios (sessão + SSV assinado) e compras (verificação, recibo, revogação, restauração) com mocks
-- [ ] Integrar plugins reais: AdMob, Google Play Billing, StoreKit 2 (bloqueado: contas + aparelho)
-- [ ] Verificadores Google/Apple + notificações de reembolso (RTDN / App Store Server Notifications)
+- [x] StoreKit 2 no iPhone (ADR 0022) — falta o contrato de apps pagos da Apple
+- [ ] Integrar plugins reais: AdMob, Google Play Billing (bloqueado: contas)
+- [x] Verificador Apple (JWS) + App Store Server Notifications V2 (estorno)
+- [ ] Verificador Google + RTDN
 - [x] Exclusão de conta no jogo e na API (LGPD, ADR 0009)
 - [x] Link web de exclusão de conta (landing) — informado na segurança dos dados do Play
 - [x] Apple: versão 1.0.0 enviada para revisão (fora da UE)
 - [x] Google Play: Produção 1.0.0 enviada para revisão (fora da UE)
+- [ ] Apple 1.0.1 (build 5, loja paga, capturas 6,3" e iPhone Duo) — enviar para revisão após o contrato
 - [ ] Vincular conta convidada a Google/Apple (`/auth/link`) para recuperar sem o Backup do Android
 - [ ] Consentimento (UMP/LGPD), ATT no iOS, app-ads.txt
 - [x] ADR do plugin AdMob/IAP para Godot com bloqueio explícito (ADR 0008)
@@ -82,7 +85,8 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
       evento de fim de semana, missões por fase (ADR 0014)
 - [x] Mapas 5–8 com 24 negócios novos (ADR 0016) · iPad habilitado
 - [x] Contas vinculadas no servidor + tela (ADR 0015)
-- [ ] Login nativo Google (Android) e Apple (iOS) — plugins; depende das contas das lojas
+- [x] Login com Apple (iOS) no Perfil (ADR 0022)
+- [ ] Login nativo Google (Android)
 - [ ] V1.2b Temporadas, passe de temporada e cosméticos
 - [ ] Fichas das lojas e políticas em inglês/espanhol (lançamento fora do Brasil)
 - [ ] V1.3 Amigos, visitas e compartilhamento (depende de vincular conta Google/Apple)

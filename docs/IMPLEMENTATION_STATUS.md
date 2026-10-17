@@ -12,8 +12,14 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 - Capturas novas: iPhone 6,3" (exigida — faltava, por isso a busca não mostrava imagens) e iPhone
   Duo (externa 1398×2034, interna 2007×2853); `tools/apple/capture.sh`.
 - Testes: backend **137** (inclui `apple-purchases.test.ts` com cadeia própria); jogo **151**.
-- **Pendente do titular:** contrato de apps pagos + dados bancários/fiscais na App Store Connect
-  (Negócios) — sem isso as compras não funcionam nem na revisão.
+- Versão **1.0.1** criada na App Store Connect com o **build 5** (perfil de distribuição recriado
+  com o Sign in with Apple), novidades e o bloco de compras/assinatura com links de Termos e
+  Privacidade nos 3 idiomas, e capturas 6,9", 6,3", iPhone Duo (tela aberta) e iPad aceitas.
+  VIP pronto para "Adicionar para revisão" (a 1ª assinatura vai junto com uma versão nova).
+  **Ainda não enviada para revisão.**
+- **Pendente do titular:** contrato de apps pagos (status "Novo") + atualizar a pessoa jurídica +
+  dados bancários/fiscais na App Store Connect (Negócios) — sem isso as compras não funcionam nem
+  na revisão. URL de notificações do servidor (App Store Server Notifications V2) a configurar.
 
 ## 2026-10-15 — Painel admin v2 (ADR 0021)
 
