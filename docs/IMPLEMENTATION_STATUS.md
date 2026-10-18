@@ -4,6 +4,9 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
 ## 2026-10-18 — Pacotes promocionais (ADR 0024) e VIP ativo na Loja
 
+- **1.0.2 enviada à Apple** (build 10) com os 20 pacotes: tudo "Aguardando revisão". Ajuste do
+  selo do Turbo (folga abaixo da renda/s; a coluna dos pacotes desce enquanto ele aparece).
+
 - Servidor: `economy/bundles.ts` (20 pacotes), `services/bundles.ts` (vitrine ≤ 5, limite por
   semana, entrega), catálogo com `offers`, `/purchases/verify` com `district`. Testes: **144**.
 - App Store Connect: 20 consumíveis criados (`tools/apple/bundles_setup.py`), preço base BRA,
