@@ -466,16 +466,22 @@ func open_store_menu() -> void:
 		_modal.refit()  # versão 1.0: sem itens em dinheiro real (ADR 0018)
 		return
 	_modal.add_section(tr("Passe VIP"))
+	# Já assinante: o botão vira "Ativo ✓" (desligado) e aparece "Gerenciar assinatura", que abre os
+	# Ajustes da conta Apple — cancelar/trocar é sempre pela Apple, nunca dentro do jogo.
 	_modal.add_store_card(func():
 		var vip := GameState.store_item("vip_monthly")
+		var active := GameState.vip_until() != null
 		return {
 			"title": vip.get("title", "Passe VIP"), "icon": Layout.texture("icon_helpers"),
 			"subtitle": " · ".join(Array(vip.get("benefits", [])).map(func(t): return tr(t))) + "\n" + _vip_status(),
-			"button": tr("%s/mês") % _price_label(vip), "color": Style.ORANGE,
-			"edge": Style.ORANGE_DARK, "enabled": true,
+			"button": tr("Ativo ✓") if active else tr("%s/mês") % _price_label(vip),
+			"color": Style.TEAL_LIGHT if active else Style.ORANGE,
+			"edge": Style.TEAL_DARK if active else Style.ORANGE_DARK, "enabled": not active,
 		}, func():
 			var vip := GameState.store_item("vip_monthly")
 			_buy_real_or_sandbox(vip))
+	if GameState.real_store() and GameState.vip_until() != null:
+		_modal.add_action(tr("Gerenciar assinatura"), func(): OS.shell_open("https://apps.apple.com/account/subscriptions"), Style.TEAL_LIGHT, Style.TEAL_DARK)
 	if GameState.real_store():
 		# Diretriz 3.1.2 da Apple: preço, período, renovação automática e links de termos/privacidade.
 		_modal.add_message(null, "", tr("Assinatura mensal de %s, renovada automaticamente até você cancelar nos Ajustes da sua conta Apple (pelo menos 24 h antes do fim do período). A cobrança é feita na sua conta Apple.") % _price_label(GameState.store_item("vip_monthly")))
