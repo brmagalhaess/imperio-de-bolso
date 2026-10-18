@@ -2,6 +2,14 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-18 — 1.0.2 aprovada; 1.0.3 (build 12) enviada
+
+- Apple aprovou a **1.0.2** (à venda). Os 20 pacotes e o Dobro de moedas seguem "Aguardando
+  revisão" (enviados à parte) — até aprovarem, a App Store não entrega esses produtos.
+- **1.0.3** enviada com o build 12: ranking v2 (prêmios maiores + bônus semanal, ligas por
+  vendas do império, coroa/medalhas, selo VIP), evoluções/compras rápidas sem perda, rolagem do
+  ranking corrigida.
+
 ## 2026-10-18 — Ranking: rolar não abre mais "denunciar"; validade do VIP conferida
 
 - Linha do ranking só abre denunciar/ocultar ao soltar o dedo sem arrastar (antes abria ao
