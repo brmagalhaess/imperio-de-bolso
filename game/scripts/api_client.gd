@@ -149,10 +149,13 @@ func forget_session() -> void:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(session_path))
 
 
-func store_buy(item_id: String, district := "") -> Dictionary:
+## `times`: toques rápidos no mesmo item viram um comando só (o servidor compra até N).
+func store_buy(item_id: String, district := "", times := 1) -> Dictionary:
 	var body := {"itemId": item_id}
 	if district != "":
 		body.district = district
+	if times > 1:
+		body.times = times
 	return await _command("/store/buy", body)
 
 

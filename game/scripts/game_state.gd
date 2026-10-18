@@ -374,7 +374,7 @@ func auto_collect_until() -> Variant:
 func buy_with_gems(item_id: String) -> Dictionary:
 	var item := store_item(item_id)
 	var result := {}
-	var ok := await _optimistic(Api.store_buy.bind(item_id, current_district), func() -> bool:
+	var predict := func() -> bool:
 		var cost := str(item.get("costGems", "")).to_int()
 		if item.is_empty() or cost <= 0 or gems().to_int() < cost:
 			return false
@@ -405,8 +405,22 @@ func buy_with_gems(item_id: String) -> Dictionary:
 					int(base) + int(item.get("hours", 24)) * 3600) + "Z"
 			result["autoCollect"] = true
 		_catalog_dirty = true
-		return true, "bonus")
-	return result if ok else {}
+		return true
+	# Como evoluir: responde na hora e toques seguidos no mesmo item vão juntos ao servidor.
+	_bank_live()
+	if not loaded or not predict.call():
+		flush_now()
+		await settled()
+		var ok := await _run(Api.store_buy.bind(item_id, current_district, 1), "bonus")
+		return result if ok else {}
+	Audio.play("bonus")
+	_predict_districts()
+	_local_rev += 1
+	state_changed.emit()
+	_pending_store[item_id] = int(_pending_store.get(item_id, 0)) + 1
+	_queued += 1
+	_schedule_flush()
+	return result
 
 
 ## Loja da Apple (StoreKit 2): nó filho criado no boot do iPhone (scripts/apple_store.gd).
@@ -660,6 +674,7 @@ func purchase(slug: String) -> bool:
 ## trocava de mapa ou saía do jogo antes de ela acabar perdia as últimas evoluções.
 const UPGRADE_BATCH_SECONDS := 0.35
 var _pending_upgrades := {}  # slug → níveis tocados ainda não enviados
+var _pending_store := {}  # item da Loja (diamantes) → compras tocadas ainda não enviadas
 var _upgrade_flush_scheduled := false
 
 
@@ -675,16 +690,29 @@ func upgrade(slug: String) -> bool:
 	state_changed.emit()
 	_pending_upgrades[slug] = int(_pending_upgrades.get(slug, 0)) + 1
 	_queued += 1  # conta como pendente: estados em segundo plano não sobrescrevem a previsão
+	_schedule_flush()
+	return true
+
+
+func _schedule_flush() -> void:
 	if not _upgrade_flush_scheduled:
 		_upgrade_flush_scheduled = true
 		get_tree().create_timer(UPGRADE_BATCH_SECONDS).timeout.connect(flush_now)
-	return true
 
 
 ## Envia já as evoluções juntadas (na ordem da fila). Chamado pelo temporizador, antes de
 ## qualquer outro comando, ao trocar de mapa e quando o jogo vai para o segundo plano.
 func flush_now() -> void:
 	_upgrade_flush_scheduled = false
+	var store := _pending_store
+	_pending_store = {}
+	for item_id in store:
+		var left: int = store[item_id]
+		_queued -= left
+		while left > 0:
+			var n: int = min(left, 50)
+			left -= n
+			_confirm(Api.store_buy.bind(item_id, current_district, n))
 	if _pending_upgrades.is_empty():
 		return
 	var batch := _pending_upgrades

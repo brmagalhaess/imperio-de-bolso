@@ -412,8 +412,13 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
   });
 
   app.post("/store/buy", { preHandler: authenticate }, async (request, reply) => {
-    const { itemId, district } = BuyBody.parse(request.body);
-    return command(request, reply, "store.buy", (at) => buyWithGems(itemId, district, at));
+    // `times`: toques rápidos no mesmo item viram um comando só (compra até N, parando no saldo).
+    const { itemId, district, times } = BuyBody.extend({
+      times: z.number().int().min(1).max(50).optional(),
+    }).parse(request.body);
+    return command(request, reply, "store.buy", (at) =>
+      buyWithGems(itemId, district, at, times ?? 1),
+    );
   });
 
   app.post(

@@ -66,4 +66,17 @@ describe("evolução em lote (toques rápidos viram um comando só)", () => {
     const r = await post(ctx.app, g, "/businesses/upgrade", { businessSlug: "agua", times: 3 });
     expect(r.json().error.code).toBe("INSUFFICIENT_FUNDS");
   });
+
+  it("loja: N compras do mesmo item num comando só, até onde os diamantes alcançam", async () => {
+    ctx = await createTestContext();
+    const g = await newGuest(ctx.app);
+    await post(ctx.app, g, "/businesses/purchase", { businessSlug: "agua" });
+    await ctx.db.playerWallet.update({ where: { playerId: g.playerId }, data: { gems: 25n } });
+    // Turbo 1h custa 10 diamantes: pediu 3, cabem 2 → 2 horas de Turbo e sobram 5 diamantes.
+    const r = await post(ctx.app, g, "/store/buy", { itemId: "turbo_1h", times: 3 });
+    expect(r.statusCode).toBe(200);
+    expect(r.json().times).toBe(2);
+    expect(r.json().state.wallet.gems).toBe("5");
+    expect(new Date(r.json().turboUntil).getTime()).toBe(ctx.clock.now.getTime() + 2 * 3_600_000);
+  });
 });

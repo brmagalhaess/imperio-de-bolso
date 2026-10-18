@@ -89,6 +89,16 @@ func _ready() -> void:
 		await GameState.enter_district("praia", false)  # "troca de mapa" logo depois
 		var res := await Api.get_state()
 		print("PASSO evolucao antes=%d tela=%d servidor=%d" % [before, shown, int(res.data.businesses.filter(func(b): return b.slug == "agua")[0].level)])
+		# Mesma coisa na Loja: 5 Turbos de 1h tocados seguidos (10 diamantes cada).
+		await GameState.refresh_catalog()
+		var gems_before := GameState.gems().to_int()
+		for i in 5:
+			GameState.buy_with_gems("turbo_1h")
+			await get_tree().create_timer(0.05).timeout
+		var gems_shown := GameState.gems().to_int()
+		await GameState.enter_district("praia", false)
+		var st := await Api.get_state()
+		print("PASSO loja diamantes antes=%d tela=%d servidor=%s turboAte=%s" % [gems_before, gems_shown, st.data.wallet.gems, st.data.player.turboUntil])
 		get_tree().quit()
 		return
 	if mode == "ofertas":

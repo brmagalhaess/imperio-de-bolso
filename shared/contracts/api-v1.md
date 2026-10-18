@@ -150,7 +150,8 @@ Corpo `{ events: [{ name, props? }] }` (1–20). Nomes permitidos: `tutorial_sta
   vipDailyGems, vipDailyClaimed }, serverTime }`.
 - `POST /vip/daily` — `Idempotency-Key`. `{}` → `200 { gems, state }`. `409 VIP_REQUIRED`,
   `409 VIP_DAILY_CLAIMED`.
-- `POST /store/buy` — `Idempotency-Key`. `{ itemId, district? }` (auto-coleta/turbo com
+- `POST /store/buy` — `Idempotency-Key`. `{ itemId, district?, times? }` (`times` 1–50: compra
+  até N do mesmo item numa transação, parando nos diamantes; resposta com `times`) (auto-coleta/turbo com
   diamantes) → `200 { bought, autoCollectUntil? | coins?, state }`. `409 INSUFFICIENT_FUNDS`,
   `409 NOTHING_TO_BOOST`, `404 STORE_ITEM_NOT_FOUND`.
 - `GET /store/catalog` também traz `offers` (ADR 0024): até 5 pacotes `{ id, productId, title,

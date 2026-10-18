@@ -148,20 +148,31 @@ export function claimVipDaily(now: Date) {
 }
 
 /** Compra com diamantes: auto-coleta (soma tempo à validade) ou turbo de produção do mapa. */
-export function buyWithGems(itemId: string, district: string | undefined, now: Date) {
+export function buyWithGems(itemId: string, district: string | undefined, now: Date, times = 1) {
   return async ({ tx, wallet, idempotencyKey }: CommandContext): Promise<CommandResult> => {
     const item = storeItem(itemId);
     if (!item || (item.kind !== "auto_collect" && item.kind !== "boost" && item.kind !== "turbo")) {
       throw Errors.storeItemNotFound(itemId);
     }
-    let w = await applyGems(tx, wallet, -item.costGems, `store:${item.id}`, idempotencyKey, now);
-    const body: Record<string, unknown> = { bought: item.id };
+    // Várias de uma vez (toques rápidos juntados): quantas couberem no saldo, ao menos 1.
+    const n =
+      item.costGems > 0n ? Math.max(1, Math.min(times, Number(wallet.gems / item.costGems))) : 1;
+    const hours = item.hours * n;
+    let w = await applyGems(
+      tx,
+      wallet,
+      -item.costGems * BigInt(n),
+      `store:${item.id}`,
+      idempotencyKey,
+      now,
+    );
+    const body: Record<string, unknown> = { bought: item.id, times: n };
 
     if (item.kind === "turbo") {
       const player = await tx.player.findUniqueOrThrow({ where: { id: wallet.playerId } });
       const active = player.turboUntil && player.turboUntil > now;
       const until = new Date(
-        (active ? player.turboUntil!.getTime() : now.getTime()) + item.hours * 3_600_000,
+        (active ? player.turboUntil!.getTime() : now.getTime()) + hours * 3_600_000,
       );
       await tx.player.update({
         where: { id: wallet.playerId },
@@ -172,19 +183,19 @@ export function buyWithGems(itemId: string, district: string | undefined, now: D
       const player = await tx.player.findUniqueOrThrow({ where: { id: wallet.playerId } });
       const from =
         player.autoCollectUntil && player.autoCollectUntil > now ? player.autoCollectUntil : now;
-      const until = new Date(from.getTime() + item.hours * 3_600_000);
+      const until = new Date(from.getTime() + hours * 3_600_000);
       await tx.player.update({ where: { id: wallet.playerId }, data: { autoCollectUntil: until } });
       body.autoCollectUntil = until.toISOString();
     } else {
       if (!district) throw new AppError(400, "DISTRICT_REQUIRED", "Informe o mapa do turbo");
-      const amount = await productionFor(tx, wallet.playerId, district, item.hours * 3600, now);
+      const amount = await productionFor(tx, wallet.playerId, district, hours * 3600, now);
       if (amount === 0n)
         throw new AppError(409, "NOTHING_TO_BOOST", "Construa um negócio neste mapa primeiro");
       w = await applyCoins(tx, w, amount, `boost:${item.id}`, `${idempotencyKey}:coins`, now);
       body.coins = amount.toString();
       body.district = district;
     }
-    await track(tx, wallet.playerId, "store_gems_spent", { item: item.id });
+    await track(tx, wallet.playerId, "store_gems_spent", { item: item.id, times: n });
     return {
       statusCode: 200,
       body: { ...body, state: await getPlayerState(tx, wallet.playerId, now) },

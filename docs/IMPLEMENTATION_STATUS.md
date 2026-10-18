@@ -11,8 +11,11 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
   `POST /businesses/upgrade { times: N }` (servidor sobe até N níveis numa transação, parando no
   saldo); a fila é enviada antes de trocar de mapa (`enter_district` espera `settled()`), antes
   de qualquer outro comando e quando o jogo vai para o segundo plano.
-- Validado com o servidor local: 15 toques + troca de mapa → tela 16 = servidor 16 (3 pedidos).
-  Testes: backend **153**; jogo **151** unitários e **191** com integração.
+- Loja (compras com diamantes): o mesmo — toques no mesmo item juntados em
+  `POST /store/buy { times: N }` (compra até N, parando nos diamantes).
+- Validado com o servidor local: 15 evoluções + troca de mapa → tela 31 = servidor 31; 5 Turbos
+  tocados seguidos → diamantes 100→50 na tela e no servidor, Turbo de 5 h.
+  Testes: backend **154**; jogo **151** unitários e **191** com integração.
 
 ## 2026-10-18 — Dobro corrigido (valor ×2) e site v2
 
