@@ -18,11 +18,21 @@ export interface SpeedContext {
   /** Turbo vale de turboFrom (inclusive) até turboUntil. */
   turboFrom?: Date | null;
   turboUntil: Date | null;
+  /** Dobro de moedas (ADR 0025): multiplica a velocidade TOTAL por 2 nesse intervalo. */
+  doubleFrom?: Date | null;
+  doubleUntil?: Date | null;
+}
+
+/** Dobro de moedas: ×2 sobre tudo (soma dos bônus), diferente do Turbo (+100 pontos). */
+export const DOUBLE_FACTOR = 2;
+
+function windowActive(from: Date | null | undefined, until: Date | null | undefined, t: number) {
+  if (!until || until.getTime() <= t) return false;
+  return !from || from.getTime() <= t;
 }
 
 function turboActive(ctx: SpeedContext, t: number): boolean {
-  if (!ctx.turboUntil || ctx.turboUntil.getTime() <= t) return false;
-  return !ctx.turboFrom || ctx.turboFrom.getTime() <= t;
+  return windowActive(ctx.turboFrom, ctx.turboUntil, t);
 }
 
 export interface SpeedSubject {
@@ -45,11 +55,11 @@ export function baseSpeedPercent(b: SpeedSubject): number {
 /** Velocidade total num instante (inclui VIP e Turbo ativos). */
 export function speedPercentAt(b: SpeedSubject, ctx: SpeedContext, at: Date): number {
   const t = at.getTime();
-  return (
+  const sum =
     baseSpeedPercent(b) +
     (ctx.vipUntil && ctx.vipUntil.getTime() > t ? VIP_SPEED : 0) +
-    (turboActive(ctx, t) ? TURBO_SPEED : 0)
-  );
+    (turboActive(ctx, t) ? TURBO_SPEED : 0);
+  return windowActive(ctx.doubleFrom, ctx.doubleUntil, t) ? sum * DOUBLE_FACTOR : sum;
 }
 
 /** Duração real (ms) de um ciclo com a velocidade dada. */
@@ -65,7 +75,7 @@ export function workBetween(
   toMs: number,
 ): number {
   if (toMs <= fromMs) return 0;
-  const cuts = [ctx.vipUntil, ctx.turboFrom, ctx.turboUntil]
+  const cuts = [ctx.vipUntil, ctx.turboFrom, ctx.turboUntil, ctx.doubleFrom, ctx.doubleUntil]
     .map((d) => d?.getTime())
     .filter((t): t is number => t !== undefined && t > fromMs && t < toMs)
     .sort((a, b) => a - b);

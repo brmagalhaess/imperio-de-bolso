@@ -82,6 +82,20 @@ func _ready() -> void:
 		await _wait(1.5)
 		get_viewport().get_texture().get_image().save_png(out.path_join("ofertas_turbo.png"))
 		print("PASSO ofertas com turbo")
+		GameState.state.player["doubleUntil"] = Time.get_datetime_string_from_unix_time(int(GameState.server_now()) + 3000) + "Z"
+		await _wait(1.5)
+		get_viewport().get_texture().get_image().save_png(out.path_join("ofertas_turbo_dobro.png"))
+		print("PASSO turbo + dobro")
+		GameState.state.player.erase("doubleUntil")
+		hud.open_store_menu()
+		await _wait(1.5)
+		for c in hud._modal._list.get_children():
+			if c is Label and c.text == tr("Dobro de moedas"):
+				hud._modal._scroll.scroll_vertical = int(c.position.y) - 20
+		await _wait(1.0)
+		get_viewport().get_texture().get_image().save_png(out.path_join("loja_dobro.png"))
+		print("PASSO loja dobro")
+		hud._modal.close()
 		var list := GameState.offers()
 		if not list.is_empty():
 			hud.open_offer_menu(list[min(1, list.size() - 1)])

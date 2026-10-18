@@ -561,6 +561,11 @@ func server_now() -> float:
 	return base + (Time.get_ticks_msec() - _received_at_ms) / 1000.0
 
 
+## Dobro de moedas (×2 em tudo, ADR 0025) ativo até (ISO) ou null.
+func double_until() -> Variant:
+	return state.get("player", {}).get("doubleUntil")
+
+
 ## Turbo 2× ativo até (ISO) ou null.
 func turbo_until() -> Variant:
 	return state.get("player", {}).get("turboUntil")

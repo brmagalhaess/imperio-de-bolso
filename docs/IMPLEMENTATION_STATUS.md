@@ -2,6 +2,18 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-18 — Dobro de moedas e auto-coleta em todas as cidades (ADR 0025)
+
+- **Bug corrigido (servidor):** auto-coleta só liquidava o mapa aberto (as outras cidades paravam
+  no teto de 4h) e o resumo ao abrir o jogo só pagava o mapa de entrada. Agora: com auto-coleta,
+  todas as cidades a cada sinal; ao abrir o jogo, os ajudantes de todos os mapas.
+- **Dobro de moedas** (R$ 129,90, 3/mês, ×2 na velocidade total): migração
+  `20261018120000_double_coins`, item na Loja, produto `double_1h` na App Store Connect ("Pronto
+  para envio").
+- Jogo: Turbo/Dobro como ícones na coluna direita (arte nova, US$ 0,18); selos de texto e a
+  sobreposição deles com janelas abertas removidos.
+- Testes: backend **148**, jogo **151**.
+
 ## 2026-10-18 — Pacotes promocionais (ADR 0024) e VIP ativo na Loja
 
 - **1.0.2 enviada à Apple** (build 10) com os 20 pacotes: tudo "Aguardando revisão". Ajuste do

@@ -261,8 +261,9 @@ func _growth_tests() -> bool:
 	add_child(hud)
 	await get_tree().process_frame
 	await get_tree().process_frame  # (o sinal vem antes do _process do quadro)
-	check(hud._turbo_pill.visible and hud._turbo_label.text.contains("Turbo 2×") and hud._turbo_label.text.contains("min"),
-			"Turbo ativo aparece no topo com o tempo que falta")
+	check(hud._status_turbo.get_parent().visible and hud._status_turbo.text.contains("min")
+			and not hud._status_double.get_parent().visible,
+			"Turbo ativo vira ícone na coluna direita com o tempo que falta (Dobro inativo some)")
 
 	GameState.daily = {"day": 2, "claimedToday": false, "rewards": [
 		{"day": 1, "coins": "200", "gems": 0, "turboMinutes": 0},

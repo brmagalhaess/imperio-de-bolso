@@ -39,6 +39,9 @@ model Player {
   // Turbo da Loja (ADR 0013): produção 2× de turboFrom até turboUntil.
   turboFrom           DateTime? @map("turbo_from") @db.Timestamptz(3)
   turboUntil          DateTime? @map("turbo_until") @db.Timestamptz(3)
+  // Dobro de moedas (ADR 0025): toda a produção ×2 de doubleFrom até doubleUntil.
+  doubleFrom          DateTime? @map("double_from") @db.Timestamptz(3)
+  doubleUntil         DateTime? @map("double_until") @db.Timestamptz(3)
   // Último AFK pago ao voltar a um mapa (para o anúncio "dobrar" — uma vez por resumo).
   lastAfkTotal        BigInt    @default(0) @map("last_afk_total")
   lastAfkAt           DateTime? @map("last_afk_at") @db.Timestamptz(3)

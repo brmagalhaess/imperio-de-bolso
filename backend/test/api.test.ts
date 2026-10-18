@@ -478,7 +478,7 @@ describe("ajudantes e produção AFK por mapa (ADR 0006)", () => {
     expect(await coinsOf(ctx.db, guest.playerId)).toBe(before + 18_000n);
   });
 
-  it("o limite de 4 horas é por mapa: só o mapa visitado é pago", async () => {
+  it("ao abrir o jogo, o resumo paga os ajudantes de TODOS os mapas (teto de 4h em cada)", async () => {
     const guest = await waterWithHelper();
     await setCoins(ctx.db, guest.playerId, 1_000_000n);
     for (const slug of ["pipoca", "sorveteria", "quiosque_coco", "mercadinho"]) {
@@ -487,10 +487,50 @@ describe("ajudantes e produção AFK por mapa (ADR 0006)", () => {
     await post(ctx.app, guest, "/managers/hire", { businessSlug: "mercadinho" });
     ctx.clock.advance(5 * 3_600);
     const praia = await presence(guest, "praia");
-    expect(praia.json().settled.map((i: { slug: string }) => i.slug)).toEqual(["agua"]);
+    expect(praia.json()).toMatchObject({ capped: true, elapsedSeconds: 14_400 });
+    expect(
+      praia
+        .json()
+        .settled.map((i: { slug: string }) => i.slug)
+        .sort(),
+    ).toEqual(["agua", "mercadinho"]);
+    // A cidade já foi paga no resumo: entrar nela logo depois não paga de novo.
     const cidade = await presence(guest, "cidade");
-    expect(cidade.json()).toMatchObject({ capped: true, elapsedSeconds: 14_400 });
-    expect(cidade.json().settled.map((i: { slug: string }) => i.slug)).toEqual(["mercadinho"]);
+    expect(cidade.json().total).toBe("0");
+  });
+
+  it("auto-coleta vale em todas as cidades: a cidade fechada não para no teto de 4h", async () => {
+    const guest = await waterWithHelper();
+    await setCoins(ctx.db, guest.playerId, 1_000_000n);
+    for (const slug of ["pipoca", "sorveteria", "quiosque_coco", "mercadinho"]) {
+      await post(ctx.app, guest, "/businesses/purchase", { businessSlug: slug });
+    }
+    await post(ctx.app, guest, "/managers/hire", { businessSlug: "mercadinho" });
+    await ctx.db.player.update({
+      where: { id: guest.playerId },
+      data: { autoCollectUntil: new Date(ctx.clock.now.getTime() + 24 * 3_600_000) },
+    });
+    // Joga 6h seguidas na praia (sinal a cada 10 min; presença vale por 45 s, então avança o
+    // relógio em passos curtos só para manter a sessão — o que importa é a cidade fechada).
+    let cycles = 0;
+    for (let i = 0; i < (6 * 3_600) / 30; i++) {
+      ctx.clock.advance(30);
+      if (i % 20 !== 19) {
+        await ctx.db.player.update({
+          where: { id: guest.playerId },
+          data: { lastSeenAt: ctx.clock.now },
+        });
+        continue;
+      }
+      const r = (await presence(guest, "praia")).json();
+      for (const it of r.settled) if (it.slug === "mercadinho") cycles += it.cycles;
+    }
+    const def = await ctx.db.businessDefinition.findUniqueOrThrow({
+      where: { slug: "mercadinho" },
+    });
+    // 6h de produção com o ajudante (+25%), não só as 4h do teto de quem está fora.
+    const sixHours = Math.floor((6 * 3_600 * 1.25) / def.cycleSeconds);
+    expect(cycles).toBeGreaterThanOrEqual(sixHours - 1);
   });
 
   it("sem ajudante não há AFK", async () => {

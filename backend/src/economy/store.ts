@@ -16,6 +16,16 @@ export type StoreItem =
   | { id: string; kind: "boost"; title: string; costGems: bigint; hours: number }
   | { id: string; kind: "turbo"; title: string; costGems: bigint; hours: number }
   | {
+      // Dobro de moedas (ADR 0025): dinheiro real, ×2 em toda a produção, limite por mês.
+      id: string;
+      kind: "double";
+      productId: string;
+      title: string;
+      priceBRL: string;
+      hours: number;
+      monthlyLimit: number;
+    }
+  | {
       id: string;
       kind: "ad";
       title: string;
@@ -86,6 +96,15 @@ export const STORE_ITEMS: readonly StoreItem[] = [
   { id: "turbo_1h", kind: "turbo", title: "Turbo 2× por 1 hora", costGems: 10n, hours: 1 },
   { id: "turbo_4h", kind: "turbo", title: "Turbo 2× por 4 horas", costGems: 30n, hours: 4 },
   { id: "turbo_24h", kind: "turbo", title: "Turbo 2× por 24 horas", costGems: 120n, hours: 24 },
+  {
+    id: "double_1h",
+    kind: "double",
+    productId: `${P}.double_1h`,
+    title: "Dobro de moedas por 1 hora",
+    priceBRL: "129,90",
+    hours: 1,
+    monthlyLimit: 3,
+  },
   {
     id: "ad_boost",
     kind: "ad",

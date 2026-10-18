@@ -59,9 +59,11 @@ var _daily_button: Control
 var _event_button: Control
 ## Coluna direita dos pacotes promocionais (ADR 0024): no máximo 5 ícones.
 var _offer_col: VBoxContainer
+var _offers_box: VBoxContainer
 const MAX_OFFERS := 5
-var _turbo_pill: PanelContainer
-var _turbo_label: Label
+## Turbo e Dobro de moedas ativos: ícones no topo da coluna direita (com o tempo restante).
+var _status_turbo: Label
+var _status_double: Label
 var _ranking_tab := 0
 var _gems_label: Label
 var _mock_ad: ColorRect
@@ -107,7 +109,6 @@ func _ready() -> void:
 			show_toast(_toast.text))
 	_build_toast()
 	_build_offline_pill()
-	_build_turbo_pill()
 	_build_fader()
 	_build_overlay()
 
@@ -260,17 +261,21 @@ func _process(_delta: float) -> void:
 
 ## "⚡ Turbo 2× · 43 min" enquanto o Turbo da Loja/prêmios estiver ativo (ADR 0013).
 func _update_turbo_pill() -> void:
-	var until: Variant = GameState.turbo_until() if GameState.loaded else null
+	if _status_turbo == null:
+		return
+	_set_status(_status_turbo, GameState.turbo_until() if GameState.loaded else null)
+	_set_status(_status_double, GameState.double_until() if GameState.loaded else null)
+
+
+## Mostra o ícone de status (Turbo/Dobro) só enquanto ativo, com o tempo restante embaixo.
+func _set_status(label: Label, until: Variant) -> void:
 	var left := 0.0
 	if until != null:
 		left = _iso_seconds(str(until)) - GameState.server_now()
-	_turbo_pill.visible = left > 0.0
-	# Coluna dos pacotes desce enquanto o selo do turbo está na tela (não ficar por cima).
-	if _offer_col:
-		_offer_col.offset_top = 300 if _turbo_pill.visible else 232
+	var row: Control = label.get_parent()
+	row.visible = left > 0.0
 	if left > 0.0:
-		_turbo_label.text = tr("⚡ Turbo 2× · %s") % Fmt.duration(left)
-
+		label.text = Fmt.duration(left)
 
 func _refresh() -> void:
 	if not GameState.loaded:
@@ -513,6 +518,24 @@ func open_store_menu() -> void:
 			if await GameState.claim_vip_daily():
 				show_toast(tr("+%d diamantes!") % int(GameState.catalog.get("entitlements", {}).get("vipDailyGems", 5)))
 			_modal.refresh_store_cards())
+
+	# Dobro de moedas (ADR 0025): ×2 em toda a produção por 1 hora, até 3 por mês.
+	var dbl := GameState.store_item("double_1h")
+	if not dbl.is_empty():
+		_modal.add_section(tr("Dobro de moedas"))
+		_modal.add_store_card(func():
+			var d := GameState.store_item("double_1h")
+			var used := int(d.get("usedThisMonth", 0))
+			var limit := int(d.get("monthlyLimit", 3))
+			var until: Variant = GameState.double_until()
+			return {
+				"title": tr("Dobro de moedas por 1 hora"), "icon": COIN_TEX,
+				"subtitle": tr("Toda a produção ×2 (soma com Turbo e VIP)") + "\n" + (
+						tr("Ativo até %s") % _date_text(until) if until != null else tr("Este mês: %d/%d") % [used, limit]),
+				"button": _price_label(d) if used < limit else "%d/%d" % [used, limit],
+				"color": Style.ORANGE, "edge": Style.ORANGE_DARK, "enabled": used < limit,
+			}, func():
+				_buy_real_or_sandbox(GameState.store_item("double_1h")))
 
 	_modal.add_section(tr("Diamantes"))
 	for id in ["gems_50", "gems_120", "gems_300"]:
@@ -1266,12 +1289,43 @@ func _build_offer_column() -> void:
 	_offer_col.add_theme_constant_override("separation", 4)
 	_offer_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_offer_col)
+	_status_turbo = _status_icon("status_turbo", tr("Turbo 2×"))
+	_status_double = _status_icon("status_double", tr("Dobro de moedas"))
+	_offers_box = VBoxContainer.new()
+	_offers_box.add_theme_constant_override("separation", 4)
+	_offers_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_offer_col.add_child(_offers_box)
+
+
+## Ícone redondo de status no topo da coluna (toque abre a Loja); devolve o rótulo do tempo.
+func _status_icon(texture: String, hint: String) -> Label:
+	var row := VBoxContainer.new()
+	row.add_theme_constant_override("separation", 0)
+	row.visible = false
+	row.tooltip_text = hint
+	_offer_col.add_child(row)
+	var button := TextureButton.new()
+	button.texture_normal = Layout.texture(texture)
+	button.ignore_texture_size = true
+	button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	button.custom_minimum_size = Vector2(94, 74)
+	button.pressed.connect(open_store_menu)
+	row.add_child(button)
+	var label := Label.new()
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.custom_minimum_size.x = 94
+	label.add_theme_font_size_override("font_size", 18)
+	label.add_theme_color_override("font_color", Color.WHITE)
+	label.add_theme_color_override("font_outline_color", Style.TEAL_DARK)
+	label.add_theme_constant_override("outline_size", 8)
+	row.add_child(label)
+	return label
 
 
 func _sync_offers() -> void:
 	if _offer_col == null:
 		return
-	for c in _offer_col.get_children():
+	for c in _offers_box.get_children():
 		c.queue_free()
 	var list := GameState.offers().slice(0, MAX_OFFERS)
 	for o in list:
@@ -1283,7 +1337,7 @@ func _sync_offers() -> void:
 		button.custom_minimum_size = Vector2(88, 88)
 		button.pivot_offset = Vector2(44, 44)
 		button.pressed.connect(func(): open_offer_menu(offer))
-		_offer_col.add_child(button)
+		_offers_box.add_child(button)
 		# Pulso discreto para chamar atenção sem poluir a tela.
 		var tw := button.create_tween().set_loops()
 		tw.tween_property(button, "scale", Vector2(1.06, 1.06), 0.7).set_trans(Tween.TRANS_SINE)
@@ -1296,7 +1350,7 @@ func _sync_offers() -> void:
 		label.add_theme_color_override("font_color", Color.WHITE)
 		label.add_theme_color_override("font_outline_color", Style.TEAL_DARK)
 		label.add_theme_constant_override("outline_size", 8)
-		_offer_col.add_child(label)
+		_offers_box.add_child(label)
 
 
 ## Texto curto embaixo do ícone: tempo que falta ou "Novo!" (Kit Iniciante, sem prazo).
@@ -1618,22 +1672,6 @@ func _build_offline_pill() -> void:
 	label.add_theme_font_size_override("font_size", 26)
 	_offline_pill.add_child(label)
 	add_child(_offline_pill)
-
-
-func _build_turbo_pill() -> void:
-	_turbo_pill = PanelContainer.new()
-	_turbo_pill.add_theme_stylebox_override("panel", Style.box(Color("fff3c4"), 26, Style.ORANGE, 3))
-	_turbo_pill.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	_turbo_pill.offset_top = 222  # folga abaixo do selo de renda por segundo
-	_turbo_pill.offset_right = -20
-	_turbo_pill.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	_turbo_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_turbo_pill.visible = false
-	_turbo_label = Label.new()
-	_turbo_label.add_theme_font_size_override("font_size", 22)
-	_turbo_label.add_theme_color_override("font_color", Color("8a4b00"))
-	_turbo_pill.add_child(_turbo_label)
-	add_child(_turbo_pill)
 
 
 func _build_fader() -> void:

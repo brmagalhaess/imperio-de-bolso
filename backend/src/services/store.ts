@@ -3,7 +3,7 @@ import { AppError, Errors } from "../errors.js";
 import { profitPerCycle } from "../economy/formulas.js";
 import { adsFor, purchasesFor } from "../lib/features.js";
 import { STORE_ITEMS, VIP_DAILY_GEMS, storeItem } from "../economy/store.js";
-import { dayBounds, gameDay } from "../lib/time.js";
+import { dayBounds, gameDay, monthBounds } from "../lib/time.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { track } from "./analytics.js";
 import { offersFor } from "./bundles.js";
@@ -73,7 +73,8 @@ export async function getCatalog(
   // Versão sem dinheiro real / sem anúncios (ADR 0018): esses itens nem aparecem.
   const visible = STORE_ITEMS.filter(
     (i) =>
-      (purchases || (i.kind !== "iap" && i.kind !== "subscription")) && (ads || i.kind !== "ad"),
+      (purchases || (i.kind !== "iap" && i.kind !== "subscription" && i.kind !== "double")) &&
+      (ads || i.kind !== "ad"),
   );
   const items = await Promise.all(
     visible.map(async (i) => {
@@ -88,6 +89,17 @@ export async function getCatalog(
             }
           : {}),
         ...(i.kind === "ad" ? { usedToday: adsToday } : {}),
+        ...(i.kind === "double"
+          ? {
+              usedThisMonth: await db.purchaseReceipt.count({
+                where: {
+                  playerId,
+                  productId: i.productId,
+                  createdAt: { gte: monthBounds(now).start },
+                },
+              }),
+            }
+          : {}),
       };
     }),
   );

@@ -82,6 +82,8 @@ export interface PlayerStateView {
     prestigeBonusPercent: number;
     /** Turbo 2× da Loja ativo até (ISO) ou null. */
     turboUntil: string | null;
+    /** Dobro de moedas (×2 em tudo, ADR 0025) ativo até (ISO) ou null. */
+    doubleUntil: string | null;
   };
   wallet: { coins: string; gems: string };
   businesses: BusinessView[];
@@ -99,7 +101,7 @@ export async function speedContext(db: Reader, playerId: string, now: Date): Pro
   const [player, vip] = await Promise.all([
     db.player.findUnique({
       where: { id: playerId },
-      select: { turboFrom: true, turboUntil: true },
+      select: { turboFrom: true, turboUntil: true, doubleFrom: true, doubleUntil: true },
     }),
     vipUntil(db, playerId, now),
   ]);
@@ -107,6 +109,8 @@ export async function speedContext(db: Reader, playerId: string, now: Date): Pro
     vipUntil: vip,
     turboFrom: player?.turboFrom ?? null,
     turboUntil: player?.turboUntil ?? null,
+    doubleFrom: player?.doubleFrom ?? null,
+    doubleUntil: player?.doubleUntil ?? null,
   };
 }
 
@@ -283,6 +287,8 @@ export async function getPlayerState(
       prestigeBonusPercent: bonusPercent(player.prestigeStars),
       turboUntil:
         player.turboUntil && player.turboUntil > now ? player.turboUntil.toISOString() : null,
+      doubleUntil:
+        player.doubleUntil && player.doubleUntil > now ? player.doubleUntil.toISOString() : null,
     },
     wallet: { coins: player.wallet.coins.toString(), gems: player.wallet.gems.toString() },
     businesses,
@@ -500,6 +506,10 @@ async function settleAutomatic(
     capped ||= s.capped;
     if (s.cycles > 0) {
       items.push({ slug: pb.business.slug, cycles: s.cycles, amount: amount.toString() });
+    } else if (!s.capped) {
+      // Nada fechou: manter lastSettlementAt/carry dá o mesmo resultado na próxima liquidação
+      // (com auto-coleta, todos os mapas são liquidados a cada ~15 s) e poupa escrita no banco.
+      continue;
     }
     await tx.playerBusiness.update({
       where: { playerId_businessId: { playerId: pb.playerId, businessId: pb.businessId } },
@@ -512,9 +522,9 @@ async function settleAutomatic(
 }
 
 /**
- * Auto-coleta no mapa aberto: o jogo mostra cada ciclo dos ajudantes na hora em que termina.
- * Antes de gastar moedas (comprar, melhorar, contratar), o servidor paga os ciclos já completos
- * desse mapa — assim o saldo que o jogador vê é o mesmo que o servidor usa.
+ * Auto-coleta: o jogo mostra cada ciclo dos ajudantes na hora em que termina. Antes de gastar
+ * moedas (comprar, melhorar, contratar), o servidor paga os ciclos já completos de TODOS os
+ * mapas (a auto-coleta vale em todas as cidades) — o saldo que o jogador vê é o que o servidor usa.
  */
 async function settleLive(
   tx: Tx,
@@ -525,8 +535,7 @@ async function settleLive(
   const player = await tx.player.findUniqueOrThrow({ where: { id: wallet.playerId } });
   if (!player.currentDistrict || !freshPresence(player, now)) return wallet;
   if (!(await autoCollectActive(tx, player, now))) return wallet;
-  return (await settleAutomatic(tx, wallet, now, ledgerKey, { district: player.currentDistrict }))
-    .wallet;
+  return (await settleAutomatic(tx, wallet, now, ledgerKey)).wallet;
 }
 
 /** Negócios com ajudante de um mapa saem do modo manual e passam a produzir AFK desde `at`. */
@@ -613,7 +622,19 @@ export function enterDistrict(district: string, now: Date) {
     };
     if (!stayed || autoCollect) {
       if (autoCollect) await startAfk(tx, player.id, district, now);
-      result = await settleAutomatic(tx, wallet, now, idempotencyKey, { district });
+      // Paga TODOS os mapas (não só o aberto) quando:
+      //  - há auto-coleta (Loja ou VIP): todas as cidades rendem enquanto o jogador joga, sem
+      //    bater no teto de 4h das cidades fechadas;
+      //  - é uma sessão nova (abriu o jogo): o resumo offline mostra os ajudantes de todas as
+      //    cidades, em vez de só a do mapa em que o jogo abriu.
+      const everywhere = autoCollect || !fresh;
+      result = await settleAutomatic(
+        tx,
+        wallet,
+        now,
+        idempotencyKey,
+        everywhere ? {} : { district },
+      );
       if (!autoCollect) await resumeManual(tx, player.id, district, now);
     }
     // Guarda o AFK pago ao voltar ao mapa: o anúncio "dobrar ganhos" pode pagá-lo de novo, uma vez.

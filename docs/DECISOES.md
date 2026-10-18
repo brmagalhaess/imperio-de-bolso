@@ -28,3 +28,4 @@
 | [0022](ADRs/0022-loja-paga-ios-e-login-apple.md) | Loja paga só no iPhone (StoreKit 2, recibo JWS verificado no servidor) e login com Apple; iOS 17+ | aceita |
 | [0023](ADRs/0023-anuncios-ios-admob.md) | Anúncios recompensados reais (AdMob) só no iPhone; ADS_PLATFORMS=ios; SSV com sessionId no custom_data | aceita |
 | [0024](ADRs/0024-pacotes-promocionais.md) | Pacotes promocionais: 3 por semana (faixas baixa/média/alta) + feriados, vitrine ≤ 5, 1 compra por vitrine, entrega no servidor | aceita |
+| [0025](ADRs/0025-dobro-de-moedas-e-auto-coleta-em-todas-as-cidades.md) | Dobro de moedas (×2 total, R$ 129,90, 3/mês) e auto-coleta/AFK pagos em todas as cidades | aceita |

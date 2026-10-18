@@ -20,6 +20,14 @@ export function dayBounds(now: Date): { start: Date; end: Date } {
   return { start, end: new Date(start.getTime() + DAY_MS) };
 }
 
+/** Mês civil de Brasília: dia 1º 00:00 até o dia 1º seguinte (limite mensal do Dobro). */
+export function monthBounds(now: Date): { start: Date; end: Date } {
+  const l = local(now);
+  const start = new Date(Date.UTC(l.getUTCFullYear(), l.getUTCMonth(), 1) - OFFSET_MS);
+  const end = new Date(Date.UTC(l.getUTCFullYear(), l.getUTCMonth() + 1, 1) - OFFSET_MS);
+  return { start, end };
+}
+
 /** Semana do ranking: segunda 00:00 até a segunda seguinte (horário de Brasília). */
 export function weekBounds(now: Date): { start: Date; end: Date } {
   const { start: today } = dayBounds(now);

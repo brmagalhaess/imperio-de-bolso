@@ -154,7 +154,7 @@ export function verifyPurchase(
     const found = bundle ? undefined : itemByProductId(productId);
     const item = bundle
       ? { kind: "bundle" as const, id: bundle.id }
-      : found && (found.kind === "iap" || found.kind === "subscription")
+      : found && (found.kind === "iap" || found.kind === "subscription" || found.kind === "double")
         ? found
         : undefined;
     if (!item) {
@@ -204,7 +204,21 @@ export function verifyPurchase(
 
     let gems = 0n;
     let coins = 0n;
-    if (item.kind === "bundle") {
+    if (item.kind === "double") {
+      // Dobro de moedas (ADR 0025): soma horas à validade; o limite de 3/mês é da vitrine — o
+      // pagamento já foi feito na loja, então a entrega nunca é recusada.
+      const p = await tx.player.findUniqueOrThrow({ where: { id: wallet.playerId } });
+      const active = p.doubleUntil && p.doubleUntil > now;
+      await tx.player.update({
+        where: { id: wallet.playerId },
+        data: {
+          doubleFrom: active ? p.doubleFrom : now,
+          doubleUntil: new Date(
+            (active ? p.doubleUntil!.getTime() : now.getTime()) + item.hours * 3_600_000,
+          ),
+        },
+      });
+    } else if (item.kind === "bundle") {
       gems = bundle!.gems;
       coins = (await grantBundle(tx, wallet, bundle!, district, idempotencyKey, now)).coins;
     } else if (item.kind === "iap") {
