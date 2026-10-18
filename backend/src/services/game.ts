@@ -375,7 +375,7 @@ export function purchaseBusiness(slug: string, now: Date) {
   };
 }
 
-export function upgradeBusiness(slug: string, now: Date) {
+export function upgradeBusiness(slug: string, now: Date, times = 1) {
   return async ({ tx, wallet, idempotencyKey }: CommandContext): Promise<CommandResult> => {
     const def = await findDefinition(tx, slug);
     const pb = await tx.playerBusiness.findUnique({
@@ -383,9 +383,7 @@ export function upgradeBusiness(slug: string, now: Date) {
     });
     if (!pb) throw Errors.businessNotOwned(slug);
 
-    const cost = nextUpgradeCost(def, pb.level);
-    if (cost === null) throw Errors.maxLevel(slug);
-    const newLevel = pb.level + 1;
+    if (nextUpgradeCost(def, pb.level) === null) throw Errors.maxLevel(slug);
 
     // Produzindo sozinho: o que já foi produzido é pago no nível antigo antes de subir.
     let current = await settleLive(tx, wallet, now, `${idempotencyKey}:live`);
@@ -397,26 +395,38 @@ export function upgradeBusiness(slug: string, now: Date) {
         await settleAutomatic(tx, current, now, `${idempotencyKey}:settle`, { businessId: def.id })
       ).wallet;
     }
-    await applyCoins(
-      tx,
-      current,
-      -cost,
-      `business_upgrade:${slug}:${newLevel}`,
-      idempotencyKey,
-      now,
-    );
+    // Sobe nível a nível enquanto houver saldo (o 1º precisa caber; os seguintes param no
+    // primeiro que não couber, sem erro — o jogador vê exatamente quantos entraram).
+    let level = pb.level;
+    let done = 0;
+    for (let i = 0; i < times; i++) {
+      const cost = nextUpgradeCost(def, level);
+      if (cost === null) break;
+      if (i > 0 && current.coins < cost) break;
+      current = await applyCoins(
+        tx,
+        current,
+        -cost,
+        `business_upgrade:${slug}:${level + 1}`,
+        i === 0 ? idempotencyKey : `${idempotencyKey}:${i}`,
+        now,
+      );
+      level += 1;
+      done += 1;
+    }
     await tx.playerBusiness.update({
       where: { playerId_businessId: { playerId: wallet.playerId, businessId: def.id } },
-      data: { level: newLevel },
+      data: { level },
     });
-    await trackMission(tx, wallet.playerId, "upgrade_count", 1n, now);
-    await track(tx, wallet.playerId, "business_upgraded", { business: slug, level: newLevel });
+    await trackMission(tx, wallet.playerId, "upgrade_count", BigInt(done), now);
+    await track(tx, wallet.playerId, "business_upgraded", { business: slug, level, levels: done });
 
     return {
       statusCode: 200,
       body: {
         upgraded: slug,
-        level: newLevel,
+        level,
+        levels: done,
         state: await getPlayerState(tx, wallet.playerId, now),
       },
     };

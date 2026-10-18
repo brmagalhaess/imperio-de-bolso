@@ -77,6 +77,8 @@ Corpo `{ businessSlug }`. Debita `cost`, cria o negócio no nível 1 e inicia o 
   anterior), `404 BUSINESS_NOT_FOUND`
 
 ### `POST /businesses/upgrade` — `Idempotency-Key`
+`{ businessSlug, times? }` — `times` (1–100) sobe até N níveis numa transação, parando quando o
+saldo acaba (o 1º precisa caber); resposta com `level` e `levels` (quantos entraram).
 Corpo `{ businessSlug }`. Custo para o nível n: `round(cost × 1,15^(n−1))`.
 - `200 { upgraded, level, state }`
 - `409 INSUFFICIENT_FUNDS`, `409 BUSINESS_NOT_OWNED`, `409 MAX_LEVEL_REACHED`, `404`

@@ -196,6 +196,9 @@ func _ping() -> void:
 ## `show_summary` mostra "Bem-vindo de volta" se ficou fora ≥ 1 min e houve ganho.
 func enter_district(district: String, show_summary: bool) -> void:
 	current_district = district
+	# Antes de trocar de mapa (ou ao voltar ao jogo), tudo que foi tocado chega ao servidor.
+	flush_now()
+	await settled()
 	var rev := _local_rev
 	var res := await Api.presence(district)
 	if not res.ok:
@@ -652,8 +655,47 @@ func purchase(slug: String) -> bool:
 	return await _optimistic(Api.purchase.bind(slug), _predict_purchase.bind(slug), "buy")
 
 
+## Evoluir responde na hora; toques seguidos no mesmo negócio se juntam por ~0,35 s e vão ao
+## servidor num comando só ("suba N níveis"). Antes: um pedido por toque numa fila longa — quem
+## trocava de mapa ou saía do jogo antes de ela acabar perdia as últimas evoluções.
+const UPGRADE_BATCH_SECONDS := 0.35
+var _pending_upgrades := {}  # slug → níveis tocados ainda não enviados
+var _upgrade_flush_scheduled := false
+
+
 func upgrade(slug: String) -> bool:
-	return await _optimistic(Api.upgrade.bind(slug), _predict_upgrade.bind(slug), "upgrade")
+	_bank_live()
+	if not loaded or not _predict_upgrade(slug):
+		flush_now()  # mantém a ordem: o que já foi tocado vai antes
+		await settled()
+		return await _run(Api.upgrade.bind(slug, 1), "upgrade")
+	Audio.play("upgrade")
+	_predict_districts()
+	_local_rev += 1
+	state_changed.emit()
+	_pending_upgrades[slug] = int(_pending_upgrades.get(slug, 0)) + 1
+	_queued += 1  # conta como pendente: estados em segundo plano não sobrescrevem a previsão
+	if not _upgrade_flush_scheduled:
+		_upgrade_flush_scheduled = true
+		get_tree().create_timer(UPGRADE_BATCH_SECONDS).timeout.connect(flush_now)
+	return true
+
+
+## Envia já as evoluções juntadas (na ordem da fila). Chamado pelo temporizador, antes de
+## qualquer outro comando, ao trocar de mapa e quando o jogo vai para o segundo plano.
+func flush_now() -> void:
+	_upgrade_flush_scheduled = false
+	if _pending_upgrades.is_empty():
+		return
+	var batch := _pending_upgrades
+	_pending_upgrades = {}
+	for slug in batch:
+		var left: int = batch[slug]
+		_queued -= left
+		while left > 0:
+			var n: int = min(left, 100)
+			left -= n
+			_confirm(Api.upgrade.bind(slug, n))  # sem await: entra na fila na ordem
 
 
 func collect(slug: String) -> bool:
@@ -678,6 +720,7 @@ func settled() -> void:
 
 
 func _optimistic(call: Callable, predict: Callable, sfx: String) -> bool:
+	flush_now()  # evoluções juntadas entram na fila antes deste comando
 	# O servidor paga os ciclos ao vivo antes de gastar (settleLive): a previsão faz o mesmo.
 	_bank_live()
 	if not loaded or not predict.call():

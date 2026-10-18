@@ -2,6 +2,18 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-18 — Evoluções rápidas se perdiam ao trocar de mapa/sair (corrigido)
+
+- Causa: cada toque de evoluir virava um pedido numa fila; com muitos toques a fila levava
+  segundos e, se o jogador trocava de mapa ou fechava o jogo antes, os últimos pedidos não
+  chegavam — a tela mostrava níveis/gastos que o servidor nunca recebeu.
+- Correção: toques seguidos no mesmo negócio se juntam (~0,35 s) num comando
+  `POST /businesses/upgrade { times: N }` (servidor sobe até N níveis numa transação, parando no
+  saldo); a fila é enviada antes de trocar de mapa (`enter_district` espera `settled()`), antes
+  de qualquer outro comando e quando o jogo vai para o segundo plano.
+- Validado com o servidor local: 15 toques + troca de mapa → tela 16 = servidor 16 (3 pedidos).
+  Testes: backend **153**; jogo **151** unitários e **191** com integração.
+
 ## 2026-10-18 — Dobro corrigido (valor ×2) e site v2
 
 - Dobro de moedas: cada coleta paga ×2 (manual, auto-coleta, AFK na janela); a velocidade não

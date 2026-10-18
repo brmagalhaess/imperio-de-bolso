@@ -88,6 +88,10 @@ func _tutorial_target(slug: String, bubble: bool) -> Variant:
 
 
 func _notification(what: int) -> void:
+	# Indo para o segundo plano / fechando: manda já o que foi tocado (nada fica só na tela).
+	if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT,
+			NOTIFICATION_WM_CLOSE_REQUEST, NOTIFICATION_WM_GO_BACK_REQUEST] and GameState.loaded:
+		GameState.flush_now()
 	# Ao voltar do segundo plano, o servidor reapura o estado.
 	if what == NOTIFICATION_APPLICATION_RESUMED and GameState.loaded:
 		GameState.resume()

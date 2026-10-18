@@ -256,8 +256,14 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
   });
 
   app.post("/businesses/upgrade", { preHandler: authenticate }, async (request, reply) => {
-    const { businessSlug } = BusinessBody.parse(request.body);
-    return command(request, reply, "businesses.upgrade", (at) => upgradeBusiness(businessSlug, at));
+    // `times`: toques rápidos no mesmo negócio viram um comando só (sobe até N níveis enquanto
+    // houver saldo, numa transação) — nada se perde se o jogador sair logo depois.
+    const { businessSlug, times } = BusinessBody.extend({
+      times: z.number().int().min(1).max(100).optional(),
+    }).parse(request.body);
+    return command(request, reply, "businesses.upgrade", (at) =>
+      upgradeBusiness(businessSlug, at, times ?? 1),
+    );
   });
 
   app.post("/production/collect", { preHandler: authenticate }, async (request, reply) => {

@@ -23,6 +23,8 @@ func _ready() -> void:
 	# DEMO_LANG=en|es: captura em outro idioma sem mudar a escolha salva.
 	if OS.get_environment("DEMO_LANG") != "":
 		TranslationServer.set_locale(OS.get_environment("DEMO_LANG"))
+	if mode == "evolucao":
+		Api.session_path = "user://demo_evolucao.cfg"
 	main = load("res://scenes/main.tscn").instantiate()
 	add_child(main)
 	while not GameState.loaded:
@@ -65,6 +67,28 @@ func _ready() -> void:
 			var img := get_viewport().get_texture().get_image()
 			img.save_png(out.path_join(shot[0] + ".png"))
 			print("PASSO %s %dx%d" % [shot[0], img.get_width(), img.get_height()])
+		get_tree().quit()
+		return
+	if mode == "evolucao":
+		# Bug relatado (2026-10-18): evoluir rápido e trocar de mapa perdia evoluções.
+		await _wait(2.0)
+		hud._modal.close()
+		if not GameState.business("agua").owned:
+			await GameState.purchase("agua")
+			await GameState.settled()
+		print("PLAYER %s" % str(GameState.state.player.get("id", "")))
+		if GameState.coins().to_int() < 10_000_000:
+			print("PASSO precisa de moedas")
+			get_tree().quit()
+			return
+		var before := int(GameState.business("agua").level)
+		for i in 15:
+			GameState.upgrade("agua")  # toques seguidos, sem esperar
+			await get_tree().create_timer(0.05).timeout
+		var shown := int(GameState.business("agua").level)
+		await GameState.enter_district("praia", false)  # "troca de mapa" logo depois
+		var res := await Api.get_state()
+		print("PASSO evolucao antes=%d tela=%d servidor=%d" % [before, shown, int(res.data.businesses.filter(func(b): return b.slug == "agua")[0].level)])
 		get_tree().quit()
 		return
 	if mode == "ofertas":

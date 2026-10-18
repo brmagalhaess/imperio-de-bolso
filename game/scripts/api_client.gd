@@ -56,8 +56,12 @@ func purchase(slug: String) -> Dictionary:
 	return await _command("/businesses/purchase", {"businessSlug": slug})
 
 
-func upgrade(slug: String) -> Dictionary:
-	return await _command("/businesses/upgrade", {"businessSlug": slug})
+## `times`: toques rápidos no mesmo negócio viram um comando só (o servidor sobe até N níveis).
+func upgrade(slug: String, times := 1) -> Dictionary:
+	var body := {"businessSlug": slug}
+	if times > 1:
+		body.times = times
+	return await _command("/businesses/upgrade", body)
 
 
 func collect(slug := "") -> Dictionary:
