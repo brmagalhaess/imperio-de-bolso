@@ -265,6 +265,9 @@ func _update_turbo_pill() -> void:
 	if until != null:
 		left = _iso_seconds(str(until)) - GameState.server_now()
 	_turbo_pill.visible = left > 0.0
+	# Coluna dos pacotes desce enquanto o selo do turbo está na tela (não ficar por cima).
+	if _offer_col:
+		_offer_col.offset_top = 300 if _turbo_pill.visible else 232
 	if left > 0.0:
 		_turbo_label.text = tr("⚡ Turbo 2× · %s") % Fmt.duration(left)
 
@@ -1621,7 +1624,7 @@ func _build_turbo_pill() -> void:
 	_turbo_pill = PanelContainer.new()
 	_turbo_pill.add_theme_stylebox_override("panel", Style.box(Color("fff3c4"), 26, Style.ORANGE, 3))
 	_turbo_pill.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	_turbo_pill.offset_top = 212
+	_turbo_pill.offset_top = 222  # folga abaixo do selo de renda por segundo
 	_turbo_pill.offset_right = -20
 	_turbo_pill.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	_turbo_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE

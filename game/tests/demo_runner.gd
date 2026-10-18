@@ -77,6 +77,11 @@ func _ready() -> void:
 		await _wait(1.5)
 		get_viewport().get_texture().get_image().save_png(out.path_join("ofertas_hud.png"))
 		print("PASSO ofertas hud (%d pacotes)" % GameState.offers().size())
+		# Turbo ativo (só na tela): o selo não pode ficar por cima da coluna dos pacotes.
+		GameState.state.player["turboUntil"] = Time.get_datetime_string_from_unix_time(int(GameState.server_now()) + 3 * 3600) + "Z"
+		await _wait(1.5)
+		get_viewport().get_texture().get_image().save_png(out.path_join("ofertas_turbo.png"))
+		print("PASSO ofertas com turbo")
 		var list := GameState.offers()
 		if not list.is_empty():
 			hud.open_offer_menu(list[min(1, list.size() - 1)])
