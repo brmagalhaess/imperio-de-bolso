@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { speedPercentAt, workBetween } from "../src/economy/speed.js";
-import { createTestContext, get, newGuest, post, type TestContext } from "./helpers.js";
+import { createTestContext, get, newGuest, post, setCoins, type TestContext } from "./helpers.js";
 
 let ctx: TestContext;
 afterEach(async () => ctx?.close());
@@ -10,14 +10,47 @@ describe("Dobro de moedas (ADR 0025)", () => {
   const t0 = new Date("2026-10-18T12:00:00Z");
   const t1 = new Date(t0.getTime() + 3_600_000);
 
-  it("multiplica a velocidade TOTAL por 2 (o Turbo só soma +100) e corta no fim da janela", () => {
+  it("não mexe na velocidade (isso é o Turbo): a coleta é que paga ×2", () => {
     const ctxOn = { vipUntil: null, turboUntil: null, doubleFrom: t0, doubleUntil: t1 };
-    expect(speedPercentAt(b, { vipUntil: null, turboUntil: null }, t0)).toBe(375);
-    expect(speedPercentAt(b, ctxOn, t0)).toBe(750);
-    expect(speedPercentAt(b, { ...ctxOn, turboFrom: t0, turboUntil: t1 }, t0)).toBe(950);
-    // 2h de trabalho: 1h dobrada + 1h normal = 3h a 375%.
-    const work = workBetween(b, ctxOn, t0.getTime(), t0.getTime() + 2 * 3_600_000);
-    expect(work).toBe(Math.floor((3 * 3_600_000 * 375) / 100));
+    expect(speedPercentAt(b, ctxOn, t0)).toBe(375);
+    expect(speedPercentAt(b, { ...ctxOn, turboFrom: t0, turboUntil: t1 }, t0)).toBe(475);
+    expect(workBetween(b, ctxOn, t0.getTime(), t1.getTime())).toBe((3_600_000 * 375) / 100);
+  });
+
+  it("coleta manual com o Dobro ativo paga ×2 no mesmo tempo de ciclo", async () => {
+    ctx = await createTestContext();
+    const g = await newGuest(ctx.app);
+    await post(ctx.app, g, "/businesses/purchase", { businessSlug: "agua" });
+    await ctx.db.player.update({
+      where: { id: g.playerId },
+      data: {
+        doubleFrom: ctx.clock.now,
+        doubleUntil: new Date(ctx.clock.now.getTime() + 3_600_000),
+      },
+    });
+    const state = (await get(ctx.app, g, "/player/state")).json();
+    expect(state.businesses[0]).toMatchObject({ cycleSeconds: 10, profitPerCycle: "20" });
+    ctx.clock.advance(10);
+    const res = await post(ctx.app, g, "/production/collect", { businessSlug: "agua" });
+    expect(res.json()).toMatchObject({ total: "20" });
+  });
+
+  it("ajudante fora do mapa: só os ciclos dentro da janela do Dobro pagam ×2", async () => {
+    ctx = await createTestContext();
+    const g = await newGuest(ctx.app);
+    await setCoins(ctx.db, g.playerId, 10_000n);
+    await post(ctx.app, g, "/presence", { district: "praia" });
+    await post(ctx.app, g, "/businesses/purchase", { businessSlug: "agua" });
+    await post(ctx.app, g, "/managers/hire", { businessSlug: "agua" });
+    await post(ctx.app, g, "/presence", { district: "cidade" });
+    await ctx.db.player.update({
+      where: { id: g.playerId },
+      data: { doubleFrom: ctx.clock.now, doubleUntil: new Date(ctx.clock.now.getTime() + 100_000) },
+    });
+    ctx.clock.advance(200);
+    const r = (await post(ctx.app, g, "/presence", { district: "praia" })).json();
+    // 200 s × 125% = 25 ciclos; nos 100 s do Dobro, 12 ciclos pagam em dobro → (25 + 12) × 10.
+    expect(r.total).toBe("370");
   });
 
   it("compra com recibo liga 1h (soma se já ativo) e a Loja conta as compras do mês", async () => {

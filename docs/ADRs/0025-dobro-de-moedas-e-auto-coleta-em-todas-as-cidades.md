@@ -8,10 +8,12 @@
 ## Decisões
 
 - **Dobro de moedas** (`double_1h`, consumível R$ 129,90 — faixa da Apple; R$ 129,99 não existe
-  em BRL): multiplica a velocidade **total** por 2 (`speedPercentAt`: soma dos bônus × 2) de
-  `doubleFrom` até `doubleUntil` (colunas novas em `players`), em toda a produção (manual, AFK,
-  auto-coleta) e em todos os mapas. Soma com Turbo e VIP. O Turbo continua +100 pontos (não é
-  2× de verdade para negócios de nível alto — por isso o Dobro vale o preço). Compra repetida
+  em BRL): **cada coleta paga ×2** (o valor, não a velocidade) de `doubleFrom` até `doubleUntil`
+  (colunas novas em `players`): coleta manual, auto-coleta e ajudantes AFK (só os ciclos que
+  fecharam dentro da janela), em todos os mapas; `profitPerCycle` já vem ×2 enquanto ativo.
+  **Turbo = mais rápido** (+100 pontos de velocidade); **Dobro = vale o dobro** — somam.
+  (Revisado em 2026-10-18: a 1ª versão aplicava o Dobro na velocidade, igual ao Turbo; o titular
+  testou e pediu o valor ×2.) Compra repetida
   soma horas. Limite: 3 por mês civil de Brasília (`usedThisMonth` no catálogo; a entrega nunca
   é recusada porque o pagamento já aconteceu).
 - **Auto-coleta em todas as cidades:** com auto-coleta (Loja ou VIP), a cada sinal de presença o

@@ -7,7 +7,9 @@ import { nextUpgradeCost, profitPerCycle } from "../economy/formulas.js";
 import { EVENT_PROFIT_PERCENT, weekendEvent } from "../economy/events.js";
 import { OFFLINE_CAP_MS, settle } from "../economy/offline.js";
 import {
+  DOUBLE_FACTOR,
   type SpeedContext,
+  doubleActive,
   effectiveCycleMs,
   speedPercentAt,
   workBetween,
@@ -141,6 +143,33 @@ export function profitNow(
   return evDistrict === def.district ? (p * BigInt(100 + EVENT_PROFIT_PERCENT)) / 100n : p;
 }
 
+/** Multiplicador do Dobro de moedas (ADR 0025) para uma coleta no instante `at`. */
+function doubleMult(ctx: SpeedContext, at: Date): bigint {
+  return doubleActive(ctx, at.getTime()) ? DOUBLE_FACTOR : 1n;
+}
+
+/**
+ * Dos ciclos AFK liquidados agora, quantos fecharam dentro da janela do Dobro (pelo trabalho
+ * feito na janela). Esses pagam em dobro; o resto paga normal.
+ */
+function doubledCycles(
+  pb: PlayerBusiness & { business: BusinessDefinition },
+  ctx: SpeedContext,
+  now: Date,
+  cycles: number,
+): number {
+  if (!ctx.doubleUntil || cycles === 0) return 0;
+  const from = Math.max(
+    pb.lastSettlementAt?.getTime() ?? now.getTime(),
+    now.getTime() - OFFLINE_CAP_MS,
+    ctx.doubleFrom?.getTime() ?? 0,
+  );
+  const to = Math.min(now.getTime(), ctx.doubleUntil.getTime());
+  if (to <= from) return 0;
+  const work = workBetween(pb, ctx, from, to);
+  return Math.min(cycles, Math.floor(work / (pb.business.cycleSeconds * 1000)));
+}
+
 /** Trabalho do ajudante entre dois instantes (função para settle). */
 function workOf(pb: PlayerBusiness, ctx: SpeedContext) {
   return (fromMs: number, toMs: number) => workBetween(pb, ctx, fromMs, toMs);
@@ -222,7 +251,8 @@ function toBusinessView(
     owned: Boolean(pb),
     level: pb ? level : 0,
     maxLevel: def.maxLevel,
-    profitPerCycle: profitNow(def, level, stars, evDistrict).toString(),
+    // Com o Dobro ativo o jogo já mostra o valor ×2 de cada coleta.
+    profitPerCycle: (profitNow(def, level, stars, evDistrict) * doubleMult(ctx, now)).toString(),
     nextUpgradeCost: upgrade === null ? null : upgrade.toString(),
     cycleStartedAt: status.startedAt?.toISOString() ?? null,
     cycleEndsAt: status.endsAt?.toISOString() ?? null,
@@ -232,7 +262,9 @@ function toBusinessView(
     automatic: isAutomatic(pb),
     managerCost: def.managerCost.toString(),
     pendingAmount: (
-      profitNow(def, level, stars, evDistrict) * BigInt(status.pendingCycles)
+      profitNow(def, level, stars, evDistrict) *
+      doubleMult(ctx, now) *
+      BigInt(status.pendingCycles)
     ).toString(),
   };
 }
@@ -420,7 +452,7 @@ export function collectProduction(slug: string | undefined, now: Date) {
     const ev = await eventDistrict(tx, wallet.playerId, now);
     const collected = ready.map((pb) => ({
       slug: pb.business.slug,
-      amount: profitNow(pb.business, pb.level, stars, ev),
+      amount: profitNow(pb.business, pb.level, stars, ev) * doubleMult(ctx, now),
     }));
     const total = collected.reduce((sum, c) => sum + c.amount, 0n);
 
@@ -500,7 +532,8 @@ async function settleAutomatic(
       cycleSeconds: pb.business.cycleSeconds,
       work: workOf(pb, ctx),
     });
-    const amount = profitNow(pb.business, pb.level, stars, ev) * BigInt(s.cycles);
+    const doubled = doubledCycles(pb, ctx, now, s.cycles);
+    const amount = profitNow(pb.business, pb.level, stars, ev) * BigInt(s.cycles + doubled);
     total += amount;
     elapsedMs = Math.max(elapsedMs, s.elapsedMs);
     capped ||= s.capped;

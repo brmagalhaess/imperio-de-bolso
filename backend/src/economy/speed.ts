@@ -18,13 +18,20 @@ export interface SpeedContext {
   /** Turbo vale de turboFrom (inclusive) até turboUntil. */
   turboFrom?: Date | null;
   turboUntil: Date | null;
-  /** Dobro de moedas (ADR 0025): multiplica a velocidade TOTAL por 2 nesse intervalo. */
+  /**
+   * Dobro de moedas (ADR 0025): NÃO mexe na velocidade — cada coleta nesse intervalo paga ×2
+   * (ver `doubleActive`/`doubledCycles` em services/game.ts). O Turbo é que acelera.
+   */
   doubleFrom?: Date | null;
   doubleUntil?: Date | null;
 }
 
-/** Dobro de moedas: ×2 sobre tudo (soma dos bônus), diferente do Turbo (+100 pontos). */
-export const DOUBLE_FACTOR = 2;
+/** Dobro de moedas: cada coleta paga ×2 (a velocidade continua a mesma). */
+export const DOUBLE_FACTOR = 2n;
+
+export function doubleActive(ctx: SpeedContext, t: number): boolean {
+  return windowActive(ctx.doubleFrom, ctx.doubleUntil, t);
+}
 
 function windowActive(from: Date | null | undefined, until: Date | null | undefined, t: number) {
   if (!until || until.getTime() <= t) return false;
@@ -55,11 +62,11 @@ export function baseSpeedPercent(b: SpeedSubject): number {
 /** Velocidade total num instante (inclui VIP e Turbo ativos). */
 export function speedPercentAt(b: SpeedSubject, ctx: SpeedContext, at: Date): number {
   const t = at.getTime();
-  const sum =
+  return (
     baseSpeedPercent(b) +
     (ctx.vipUntil && ctx.vipUntil.getTime() > t ? VIP_SPEED : 0) +
-    (turboActive(ctx, t) ? TURBO_SPEED : 0);
-  return windowActive(ctx.doubleFrom, ctx.doubleUntil, t) ? sum * DOUBLE_FACTOR : sum;
+    (turboActive(ctx, t) ? TURBO_SPEED : 0)
+  );
 }
 
 /** Duração real (ms) de um ciclo com a velocidade dada. */
@@ -75,7 +82,7 @@ export function workBetween(
   toMs: number,
 ): number {
   if (toMs <= fromMs) return 0;
-  const cuts = [ctx.vipUntil, ctx.turboFrom, ctx.turboUntil, ctx.doubleFrom, ctx.doubleUntil]
+  const cuts = [ctx.vipUntil, ctx.turboFrom, ctx.turboUntil]
     .map((d) => d?.getTime())
     .filter((t): t is number => t !== undefined && t > fromMs && t < toMs)
     .sort((a, b) => a - b);
