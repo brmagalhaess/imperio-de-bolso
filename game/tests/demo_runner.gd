@@ -101,6 +101,21 @@ func _ready() -> void:
 		print("PASSO loja diamantes antes=%d tela=%d servidor=%s turboAte=%s" % [gems_before, gems_shown, st.data.wallet.gems, st.data.player.turboUntil])
 		get_tree().quit()
 		return
+	if mode == "ranking":
+		var out := OS.get_environment("CAPTURE_DIR")
+		await _wait(2.5)
+		hud._modal.close()
+		GameState.daily["claimedToday"] = true
+		for t in [0, 1]:
+			hud.open_ranking_menu(t)
+			await _wait(2.5)
+			get_viewport().get_texture().get_image().save_png(out.path_join("ranking_%d.png" % t))
+		hud.open_profile_menu()
+		await _wait(2.0)
+		get_viewport().get_texture().get_image().save_png(out.path_join("perfil.png"))
+		print("PASSO ranking")
+		get_tree().quit()
+		return
 	if mode == "ofertas":
 		# Pacotes promocionais (ADR 0024): coluna direita na cidade e a tela de um pacote.
 		var out := OS.get_environment("CAPTURE_DIR")

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { leagueMoves } from "../src/services/leaderboard.js";
+import { leagueMoves, podiumPrizes } from "../src/services/leaderboard.js";
 import {
   coinsOf,
   createTestContext,
@@ -234,14 +234,34 @@ describe("pódio semanal e prestígio no ranking", () => {
       await earn(p.playerId, BigInt((i + 1) * 1_000));
     }
     const lb = (await get(ctx.app, players[0]!, "/leaderboard")).json();
-    expect(lb.prizes).toEqual({ semana: [100, 60, 30], liga: [30, 20, 10] });
+    const week = podiumPrizes(0, ctx.clock.now);
+    expect(lb.prizes).toEqual(week);
+    // 2025-12-29 cai na rotação "diamantes em dobro": 1º 600 na semana, 1º 200 na liga Bronze.
+    expect(week.bonus).toBe("double_gems");
+    expect(week.semana[0]).toEqual({ gems: 600, bonusKind: null, bonusHours: 0 });
     expect((await get(ctx.app, players[3]!, "/rewards/weekly")).json().pending).toEqual([]);
 
     ctx.clock.advance(7 * 24 * HOUR);
     const first = (await get(ctx.app, players[3]!, "/rewards/weekly")).json();
     expect(first.pending).toEqual([
-      { week: "2025-12-29", kind: "liga", rank: 1, league: "Bronze", gems: 30 },
-      { week: "2025-12-29", kind: "semana", rank: 1, gems: 100, league: null },
+      {
+        week: "2025-12-29",
+        kind: "liga",
+        rank: 1,
+        league: "Bronze",
+        gems: 200,
+        bonusKind: null,
+        bonusHours: 0,
+      },
+      {
+        week: "2025-12-29",
+        kind: "semana",
+        rank: 1,
+        gems: 600,
+        league: null,
+        bonusKind: null,
+        bonusHours: 0,
+      },
     ]);
     const third = (await get(ctx.app, players[1]!, "/rewards/weekly")).json();
     expect(third.pending.map((r: { rank: number }) => r.rank)).toEqual([3, 3]);
@@ -252,12 +272,63 @@ describe("pódio semanal e prestígio no ranking", () => {
       kind: "semana",
     });
     expect(claim.statusCode).toBe(200);
-    expect(await gemsOf(players[3]!.playerId)).toBe(100n);
+    expect(await gemsOf(players[3]!.playerId)).toBe(600n);
     const again = await post(ctx.app, players[3]!, "/rewards/weekly/claim", {
       week: "2025-12-29",
       kind: "semana",
     });
     expect(again.json().error.code).toBe("WEEKLY_REWARD_CLAIMED");
     expect((await get(ctx.app, players[3]!, "/rewards/weekly")).json().pending).toHaveLength(1);
+  });
+
+  it("o bônus muda a cada semana e é entregue no resgate (ex.: Turbo de 6 h para o 1º)", async () => {
+    const turboWeek = [0, 1, 2, 3]
+      .map((w) => new Date(Date.UTC(2026, 0, 5 + 7 * w, 15)))
+      .find((d) => podiumPrizes(0, d).bonus === "turbo")!;
+    expect(podiumPrizes(4, turboWeek).liga[0]).toEqual({
+      gems: 300,
+      bonusKind: "turbo",
+      bonusHours: 6,
+    });
+    const kinds = [0, 1, 2, 3].map(
+      (w) => podiumPrizes(0, new Date(Date.UTC(2026, 0, 5 + 7 * w, 15))).bonus,
+    );
+    expect(new Set(kinds).size).toBe(4);
+
+    ctx = await createTestContext();
+    ctx.clock.now = turboWeek;
+    const a = await newGuest(ctx.app);
+    await get(ctx.app, a, "/leaderboard");
+    await earn(a.playerId, 5_000n);
+    ctx.clock.advance(7 * 24 * HOUR);
+    await get(ctx.app, a, "/rewards/weekly");
+    const claim = await post(ctx.app, a, "/rewards/weekly/claim", {
+      week: "2026-01-05",
+      kind: "semana",
+    });
+    expect(claim.json().claimed).toMatchObject({ gems: 300, bonusKind: "turbo", bonusHours: 6 });
+    expect(new Date(claim.json().state.player.turboUntil).getTime()).toBe(
+      ctx.clock.now.getTime() + 6 * 3_600_000,
+    );
+  });
+
+  it("ligas por vendas do império: quem vendeu não disputa com quem nunca vendeu", async () => {
+    ctx = await createTestContext();
+    const novato = await newGuest(ctx.app);
+    const veterano = await newGuest(ctx.app);
+    await ctx.db.player.update({ where: { id: veterano.playerId }, data: { prestigeCount: 2 } });
+    const n = (await get(ctx.app, novato, "/leaderboard")).json().league;
+    const v = (await get(ctx.app, veterano, "/leaderboard")).json().league;
+    expect(n).toMatchObject({ bracket: 0, size: 1 });
+    expect(v).toMatchObject({ bracket: 2, size: 1, name: "Bronze" });
+
+    // Vender no meio da semana não muda o grupo até a semana acabar.
+    await ctx.db.player.update({ where: { id: novato.playerId }, data: { prestigeCount: 1 } });
+    expect((await get(ctx.app, novato, "/leaderboard")).json().league.bracket).toBe(0);
+    ctx.clock.advance(7 * 24 * HOUR);
+    expect((await get(ctx.app, novato, "/leaderboard")).json().league).toMatchObject({
+      bracket: 1,
+      tier: 0,
+    });
   });
 });

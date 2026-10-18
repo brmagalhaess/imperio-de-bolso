@@ -403,6 +403,7 @@ SHEETS = {
         {"height": 132},
     ),
     # Pacotes promocionais (ADR 0024): ícones da coluna direita e da tela do pacote.
+    "g_rank_icons/g_rank_icons_v01.png": (["rank_1", "rank_2", "rank_3", "badge_vip"], {"width": 120}),
     "g_status_icons/g_status_icons_v02.png": (["status_turbo", "status_double"], {"width": 160}),
     "g_offers_a/g_offers_a_v02.png": (
         ["offer_iniciante", "offer_combo_turbo", "offer_empreendedor", "offer_fim_de_semana",

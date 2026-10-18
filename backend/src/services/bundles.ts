@@ -1,7 +1,13 @@
 // Vitrine dos pacotes promocionais e entrega do conteúdo (ADR 0024).
 
 import type { Db, Tx } from "../db/prisma.js";
-import { BUNDLES, type Bundle, holidayBundleFor, weeklyBundles } from "../economy/bundles.js";
+import {
+  BUNDLES,
+  type Bundle,
+  type BundleContents,
+  holidayBundleFor,
+  weeklyBundles,
+} from "../economy/bundles.js";
 import type { LockedWallet } from "./wallet.js";
 import { weekBounds } from "../lib/time.js";
 import { productionFor } from "./store.js";
@@ -76,14 +82,16 @@ export async function offersFor(db: Reader, playerId: string, now: Date): Promis
 export async function grantBundle(
   tx: Tx,
   wallet: LockedWallet,
-  bundle: Bundle,
+  bundle: BundleContents & { id: string },
   district: string | undefined,
   idempotencyKey: string,
   now: Date,
+  /** Motivo no extrato (padrão: compra do pacote; o pódio do ranking usa "podium:…"). */
+  reason = `purchase:${bundle.id}`,
 ): Promise<{ wallet: LockedWallet; coins: bigint }> {
   let w = wallet;
   if (bundle.gems > 0n) {
-    w = await applyGems(tx, w, bundle.gems, `purchase:${bundle.id}`, idempotencyKey, now);
+    w = await applyGems(tx, w, bundle.gems, reason, idempotencyKey, now);
   }
   const player = await tx.player.findUniqueOrThrow({ where: { id: w.playerId } });
   const data: { autoCollectUntil?: Date; turboUntil?: Date; turboFrom?: Date | null } = {};
@@ -120,7 +128,7 @@ export async function grantBundle(
       if (amount > coins) coins = amount;
     }
     if (coins > 0n) {
-      w = await applyCoins(tx, w, coins, `purchase:${bundle.id}`, `${idempotencyKey}:coins`, now);
+      w = await applyCoins(tx, w, coins, reason, `${idempotencyKey}:coins`, now);
     }
   }
   return { wallet: w, coins };

@@ -291,11 +291,13 @@ model PlayerLeagueWeek {
   playerId String @map("player_id") @db.Uuid
   week     String // segunda-feira da semana, AAAA-MM-DD (Brasília)
   league   Int
+  // Grupo por vendas do império (0 = nunca vendeu … 5 = 5 ou mais), fixo durante a semana.
+  bracket  Int    @default(0)
 
   player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
   @@id([playerId, week])
-  @@index([week, league])
+  @@index([week, bracket, league])
   @@map("player_league_weeks")
 }
 
@@ -338,6 +340,9 @@ model PlayerWeeklyReward {
   rank      Int
   league    Int?
   gems      Int
+  // Bônus da semana (ADR 0026): "turbo" | "auto" | "boost" (horas) ou nulo.
+  bonusKind  String? @map("bonus_kind")
+  bonusHours Int     @default(0) @map("bonus_hours")
   claimedAt DateTime? @map("claimed_at") @db.Timestamptz(3)
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
 

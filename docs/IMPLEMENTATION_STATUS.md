@@ -2,6 +2,15 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-18 — Ranking v2, ligas por vendas e selo VIP (ADR 0026)
+
+- Servidor: grupos de liga por vendas do império (migração `20261018180000_league_brackets_prize_bonus`),
+  prêmios 300/180/100 (semana) e 100/60/30 × liga, bônus semanal girando (Turbo, auto-coleta,
+  coleta antecipada, diamantes em dobro) entregue no resgate, `vip` no ranking. Testes: **156**.
+- Jogo: faixa de prêmios com coroa/prata/bronze, medalhas no pódio, selo VIP no ranking e no
+  Perfil, textos da liga claros; aviso do "mês de 5 min" do Sandbox no build de desenvolvimento.
+  Jogo: **151** verificações.
+
 ## 2026-10-18 — Evoluções rápidas se perdiam ao trocar de mapa/sair (corrigido)
 
 - Causa: cada toque de evoluir virava um pedido numa fila; com muitos toques a fila levava

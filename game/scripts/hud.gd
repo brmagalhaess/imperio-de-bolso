@@ -693,7 +693,12 @@ func _auto_collect_status() -> String:
 
 func _vip_status() -> String:
 	var until: Variant = GameState.vip_until()
-	return tr("Ativo até %s") % _date_text(until) if until != null else tr("Assinatura mensal")
+	if until == null:
+		return tr("Assinatura mensal")
+	# Versão de desenvolvimento compra no ambiente de teste da Apple: o "mês" dura 5 minutos.
+	if OS.is_debug_build() and GameState.real_store():
+		return tr("Ativo até %s (teste da Apple: o mês dura 5 min)") % _date_text(until)
+	return tr("Ativo até %s · renova todo mês") % _date_text(until)
 
 
 ## "dd/mm às hh:mm" no fuso do aparelho.
@@ -740,9 +745,10 @@ func open_profile_menu() -> void:
 	var player: Dictionary = GameState.state.get("player", {})
 	var owned := GameState.businesses().filter(func(b): return b.owned).size()
 	var helpers := GameState.businesses().filter(func(b): return b.get("managed", false)).size()
-	var vip_tag := tr(" · VIP") if GameState.vip_until() != null else ""
 	_modal.add_message(Layout.texture("icon_profile"), str(player.get("displayName", "")),
-			tr("%d negócios · %d ajudantes · %s diamantes%s") % [owned, helpers, Fmt.coins(GameState.gems()), vip_tag])
+			tr("%d negócios · %d ajudantes · %s diamantes") % [owned, helpers, Fmt.coins(GameState.gems())])
+	if GameState.vip_until() != null:
+		_modal.add_vip_badge(tr("Jogador VIP"), tr("Passe VIP ativo até %s") % _date_text(GameState.vip_until()))
 	# Código usado no suporte e para pedir exclusão pelo site (sem o jogo instalado).
 	_modal.add_copy_row(tr("Código do jogador (suporte)"), player_code(), func():
 		show_toast(tr("Código copiado!")))
@@ -981,23 +987,25 @@ func open_ranking_menu(tab := -1) -> void:
 	if shown_tab == 0:
 		var lg: Dictionary = data.get("league", {})
 		var ends := _iso_seconds(data.week.end) - _iso_seconds(data.serverTime)
-		var rules := []
+		var lines := [_bracket_text(int(lg.get("bracket", 0)))]
+		var size := int(lg.get("size", 0))
+		lines.append(tr("1 jogador nesta liga") if size == 1 else tr("%d jogadores nesta liga") % size)
 		if int(lg.get("promote", 0)) > 0:
-			rules.append(tr("Sobem de liga: %d") % int(lg.promote))
+			lines.append(tr("O 1º sobe para a próxima liga") if int(lg.promote) == 1 else tr("Os %d primeiros sobem para a próxima liga") % int(lg.promote))
 		else:
-			rules.append(tr("Liga mais alta: mantenha o topo!"))
+			lines.append(tr("Liga mais alta: mantenha o topo!"))
 		if int(lg.get("demote", 0)) > 0:
-			rules.append(tr("Descem: %d") % int(lg.demote))
-		_modal.add_message(null, tr("Liga %s") % tr(str(lg.get("name", "Bronze"))),
-				tr("Jogadores na sua liga: %d · %s\nTermina em %s.") % [int(lg.get("size", 0)), " · ".join(rules), Fmt.duration(ends)]
-				+ "\n" + _prizes_text(data.get("prizes", {}).get("liga", [])))
+			lines.append(tr("Os %d últimos descem") % int(lg.demote))
+		lines.append(tr("Termina em %s.") % Fmt.duration(ends))
+		_modal.add_message(null, tr("Liga %s") % tr(str(lg.get("name", "Bronze"))), "\n".join(lines))
+		_modal.add_prize_strip(tr("Prêmios desta semana"), _prize_items(data.get("prizes", {}).get("liga", [])))
 		entries = lg.get("entries", [])
 		me = lg.get("me")
 	elif shown_tab == 1:
 		var ends := _iso_seconds(data.week.end) - _iso_seconds(data.serverTime)
 		_modal.add_message(null, tr("Desafio dos 7 dias"),
-				tr("Quem faturar mais com seus negócios até domingo vence.\nTermina em %s.") % Fmt.duration(ends)
-				+ "\n" + _prizes_text(data.get("prizes", {}).get("semana", [])))
+				tr("Quem faturar mais com seus negócios até domingo vence.\nTermina em %s.") % Fmt.duration(ends))
+		_modal.add_prize_strip(tr("Prêmios desta semana"), _prize_items(data.get("prizes", {}).get("semana", [])))
 	else:
 		_modal.add_message(null, tr("Estrelas de investidor"),
 				tr("Quem acumulou mais estrelas vendendo o império (Perfil → Prestígio)."))
@@ -1005,15 +1013,18 @@ func open_ranking_menu(tab := -1) -> void:
 		_modal.add_message(null, "", tr("Ninguém faturou nesta semana ainda. Colete moedas e saia na frente!")
 				if shown_tab < 2 else tr("Ninguém vendeu o império ainda. Seja o primeiro!"))
 	var hidden := GameState.hidden_players()
+	var vips: Array = data.get("vip", [])
 	for e in entries:
 		if not e.isMe and hidden.has(str(e.get("playerId", ""))):
 			continue
 		var entry: Dictionary = e
 		_modal.add_rank_row(int(e.rank), e.displayName, ("⭐ " + str(e.score)) if shown_tab == 2 else e.score, e.isMe,
-				Callable() if e.isMe or not e.has("playerId") else func(): open_player_options(entry))
+				Callable() if e.isMe or not e.has("playerId") else func(): open_player_options(entry),
+				vips.has(str(e.get("playerId", ""))))
 	if me != null and not entries.any(func(e): return e.isMe):
 		_modal.add_section(tr("Sua posição"))
-		_modal.add_rank_row(int(me.rank), me.displayName, ("⭐ " + str(me.score)) if shown_tab == 2 else me.score, true)
+		_modal.add_rank_row(int(me.rank), me.displayName, ("⭐ " + str(me.score)) if shown_tab == 2 else me.score, true,
+				Callable(), GameState.vip_until() != null)
 	_modal.refit()
 
 
@@ -1060,8 +1071,12 @@ func open_podium_reward(r: Dictionary) -> void:
 	_reward_kind = "podium"
 	_modal.open(tr("Parabéns!"))
 	var where := tr("no ranking da semana") if r.kind == "semana" else tr("na Liga %s") % tr(str(r.get("league", "Bronze")))
-	_modal.add_message(_gem_tex, tr("%dº lugar") % int(r.rank),
-			tr("Você ficou em %dº lugar %s. Seu prêmio:") % [int(r.rank), where] + "\n" + tr("+%d diamantes") % int(r.gems))
+	var rank := int(r.rank)
+	var medal: Texture2D = load("res://assets/optimized/rank_%d.png" % rank) if rank >= 1 and rank <= 3 else _gem_tex
+	var bonus := _bonus_text(str(r.get("bonusKind", "")), int(r.get("bonusHours", 0)))
+	_modal.add_message(medal, tr("%dº lugar") % rank,
+			tr("Você ficou em %dº lugar %s. Seu prêmio:") % [rank, where] + "\n" + tr("+%d diamantes") % int(r.gems)
+			+ ("\n" + bonus if bonus != "" else ""))
 	_modal.add_action(tr("Resgatar +%d diamantes") % int(r.gems), func():
 		var gems := int(r.gems)
 		if await GameState.claim_podium(str(r.week), str(r.kind)):
@@ -1069,11 +1084,35 @@ func open_podium_reward(r: Dictionary) -> void:
 		_modal.close(), Style.ORANGE, Style.ORANGE_DARK)
 
 
-## Linha "Prêmios: 1º 100 · 2º 60 · 3º 30 diamantes" do Ranking.
-func _prizes_text(values: Array) -> String:
-	if values.size() < 3:
+## Prêmios do pódio para a faixa do Ranking: [{gems, extra}] (o bônus muda toda semana).
+func _prize_items(values: Array) -> Array:
+	return values.map(func(p): return {
+		"gems": int(p.get("gems", 0)) if p is Dictionary else int(p),
+		"extra": _bonus_text(str(p.get("bonusKind", "")), int(p.get("bonusHours", 0))) if p is Dictionary else "",
+	})
+
+
+## "+ Turbo 6 h", "+ Auto-coleta 3 dias", "+ 12 h de produção" (bônus do pódio da semana).
+func _bonus_text(kind: String, hours: int) -> String:
+	if hours <= 0:
 		return ""
-	return tr("Prêmios: 1º %d · 2º %d · 3º %d diamantes") % [int(values[0]), int(values[1]), int(values[2])]
+	match kind:
+		"turbo":
+			return tr("+ Turbo %d h") % hours
+		"auto":
+			return tr("+ Auto-coleta %d dias") % (hours / 24) if hours >= 48 else tr("+ Auto-coleta %d h") % hours
+		"boost":
+			return tr("+ %d h de produção") % hours
+	return ""
+
+
+## Grupo de vendas do império da liga (ADR 0026).
+func _bracket_text(bracket: int) -> String:
+	if bracket <= 0:
+		return tr("Grupo: quem ainda não vendeu o império")
+	if bracket >= 5:
+		return tr("Grupo: quem vendeu o império 5 vezes ou mais")
+	return tr("Grupo: quem vendeu o império 1 vez") if bracket == 1 else tr("Grupo: quem vendeu o império %d vezes") % bracket
 
 
 ## Abre o calendário sozinho quando o prêmio do dia está esperando (depois do tutorial e de

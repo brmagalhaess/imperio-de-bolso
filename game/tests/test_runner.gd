@@ -281,7 +281,10 @@ func _growth_tests() -> bool:
 			"pódio: aviso de 1º lugar com o prêmio")
 	GameState.claim_podium("2025-12-29", "semana")
 	check(GameState.podium.is_empty() and GameState.gems() == "105", "pódio: diamantes entram no toque")
-	check(hud._prizes_text([100, 60, 30]) == "Prêmios: 1º 100 · 2º 60 · 3º 30 diamantes", "ranking mostra os prêmios do pódio")
+	var items: Array = hud._prize_items([{"gems": 300, "bonusKind": "turbo", "bonusHours": 6},
+		{"gems": 180, "bonusKind": "auto", "bonusHours": 48}, {"gems": 100, "bonusKind": null, "bonusHours": 0}])
+	check(items[0].gems == 300 and items[0].extra == "+ Turbo 6 h" and items[1].extra == "+ Auto-coleta 2 dias"
+			and items[2].extra == "", "ranking mostra os prêmios do pódio com o bônus da semana")
 	GameState.weekend = {"active": true, "completed": true, "claimed": false, "prizeGems": 20}
 	GameState.event_changed.emit()
 	check(hud._event_button.visible and hud._event_button.badge == 1, "evento ativo: botão aparece com selo da meta batida")

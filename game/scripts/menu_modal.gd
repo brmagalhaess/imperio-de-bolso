@@ -10,6 +10,9 @@ const TouchScroll := preload("res://scripts/touch_scroll.gd")
 
 const COIN := preload("res://assets/optimized/icon_coin.png")
 const LOCK := preload("res://assets/optimized/lot_lock.png")
+const MEDALS := [preload("res://assets/optimized/rank_1.png"), preload("res://assets/optimized/rank_2.png"),
+		preload("res://assets/optimized/rank_3.png")]
+const VIP_BADGE := preload("res://assets/optimized/badge_vip.png")
 const GlyphButton := preload("res://scripts/glyph_button.gd")
 var GEM: Texture2D = GlyphButton.gem_texture()
 
@@ -549,7 +552,8 @@ func refresh_store_cards() -> void:
 
 ## Linha do ranking (posição, nome, faturamento); `me` destaca o jogador.
 ## `on_press` (opcional): tocar na linha de outro jogador abre denunciar/ocultar.
-func add_rank_row(rank: int, name_text: String, score: String, me: bool, on_press := Callable()) -> void:
+func add_rank_row(rank: int, name_text: String, score: String, me: bool, on_press := Callable(),
+		vip := false) -> void:
 	var panel := PanelContainer.new()
 	if on_press.is_valid():
 		panel.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -565,16 +569,23 @@ func add_rank_row(rank: int, name_text: String, score: String, me: bool, on_pres
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 12)
 	panel.add_child(row)
-	var pos := _text("#%d" % rank, 28, [Color("c99a00"), Color("8f9aa6"), Color("b0703a")][rank - 1]
-			if rank <= 3 else Style.TEAL_DARK)
-	pos.custom_minimum_size.x = 76
-	pos.autowrap_mode = TextServer.AUTOWRAP_OFF
-	row.add_child(pos)
+	# 1º coroa de ouro, 2º medalha de prata, 3º de bronze; do 4º em diante, o número.
+	if rank >= 1 and rank <= 3:
+		var medal := _icon(MEDALS[rank - 1], 52)
+		medal.custom_minimum_size.x = 76
+		row.add_child(medal)
+	else:
+		var pos := _text("#%d" % rank, 28, Style.TEAL_DARK)
+		pos.custom_minimum_size.x = 76
+		pos.autowrap_mode = TextServer.AUTOWRAP_OFF
+		row.add_child(pos)
 	var who := _text(name_text + (tr(" (você)") if me else ""), 26, Style.INK)
 	who.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	who.autowrap_mode = TextServer.AUTOWRAP_OFF
 	who.clip_text = true
 	row.add_child(who)
+	if vip:
+		row.add_child(_icon(VIP_BADGE, 34))
 	var coin := TextureRect.new()
 	coin.texture = COIN
 	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -584,6 +595,61 @@ func add_rank_row(rank: int, name_text: String, score: String, me: bool, on_pres
 	var score_label := _text(Fmt.coins(score), 26, Color("8a4b00"))
 	score_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	row.add_child(score_label)
+
+
+## Selo VIP no Perfil (benefício do Passe VIP): escudo dourado + texto.
+func add_vip_badge(title: String, subtitle: String) -> void:
+	var row := _card_row()
+	row.add_child(_icon(VIP_BADGE, 72))
+	var texts := VBoxContainer.new()
+	texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	texts.add_child(_text(title, 30, Color("7a3db8")))
+	texts.add_child(_text(subtitle, 22, Style.INK_SOFT))
+	row.add_child(texts)
+
+
+## Faixa compacta com os prêmios do pódio: coroa/prata/bronze, diamantes e o bônus da semana.
+## `items`: [{gems: int, extra: String}] (1º, 2º, 3º).
+func add_prize_strip(title: String, items: Array) -> void:
+	if title != "":
+		var t := _text(title, 22, Style.INK_SOFT)
+		t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_list.add_child(t)
+	var strip := HBoxContainer.new()
+	strip.add_theme_constant_override("separation", 8)
+	strip.alignment = BoxContainer.ALIGNMENT_CENTER
+	_list.add_child(strip)
+	for i in min(items.size(), 3):
+		var it: Dictionary = items[i]
+		var card := PanelContainer.new()
+		var b := Style.box(Style.CREAM_CARD, 18, [Color("e8b400"), Color("a7b1bb"), Color("c4824a")][i], 3, false)
+		b.content_margin_left = 8
+		b.content_margin_right = 8
+		b.content_margin_top = 6
+		b.content_margin_bottom = 6
+		card.add_theme_stylebox_override("panel", b)
+		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		strip.add_child(card)
+		var col := VBoxContainer.new()
+		col.alignment = BoxContainer.ALIGNMENT_CENTER
+		col.add_theme_constant_override("separation", 2)
+		card.add_child(col)
+		var medal := _icon(MEDALS[i], 48)
+		medal.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		col.add_child(medal)
+		var gems := HBoxContainer.new()
+		gems.alignment = BoxContainer.ALIGNMENT_CENTER
+		gems.add_theme_constant_override("separation", 4)
+		gems.add_child(_icon(GlyphButton.gem_texture(), 26))
+		var g := _text(str(it.get("gems", 0)), 26, Style.TEAL_DARK)
+		g.autowrap_mode = TextServer.AUTOWRAP_OFF
+		gems.add_child(g)
+		col.add_child(gems)
+		var extra := str(it.get("extra", ""))
+		if extra != "":
+			var e := _text(extra, 18, Style.ORANGE_DARK)
+			e.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			col.add_child(e)
 
 
 ## Cartão grande de distrito com miniatura do cenário.
