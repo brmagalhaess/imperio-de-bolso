@@ -6,6 +6,7 @@ import { STORE_ITEMS, VIP_DAILY_GEMS, storeItem } from "../economy/store.js";
 import { dayBounds, gameDay } from "../lib/time.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { track } from "./analytics.js";
+import { offersFor } from "./bundles.js";
 import { vipUntil } from "./entitlements.js";
 import { effectiveCycleMs, speedPercentAt } from "../economy/speed.js";
 import { eventDistrict, getPlayerState, profitNow, speedContext, starsOf } from "./game.js";
@@ -93,6 +94,8 @@ export async function getCatalog(
   return {
     sandbox: storeMode === "mock" && (purchases || ads),
     purchasesEnabled: purchases,
+    // Pacotes promocionais da semana/feriado (ADR 0024): só com compras ligadas na plataforma.
+    offers: purchases ? await offersFor(db, playerId, now) : [],
     adsEnabled: ads,
     district,
     items,

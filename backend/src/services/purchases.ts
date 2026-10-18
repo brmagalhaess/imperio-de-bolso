@@ -1,10 +1,12 @@
 import type { Db, Tx } from "../db/prisma.js";
 import { AppError } from "../errors.js";
 import { AppleJwsError, verifyAppleJws } from "../lib/apple-jws.js";
+import { bundleByProductId } from "../economy/bundles.js";
 import { itemByProductId } from "../economy/store.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { track } from "./analytics.js";
 import { getPlayerState } from "./game.js";
+import { grantBundle } from "./bundles.js";
 import { applyGems } from "./wallet.js";
 
 // Compras com dinheiro real (doc §12, plano §23, ADR 0008). O servidor é a autoridade:
@@ -144,10 +146,18 @@ export function verifyPurchase(
   purchaseToken: string,
   verifier: StoreVerifier,
   now: Date,
+  district?: string,
 ) {
   return async ({ tx, wallet, idempotencyKey }: CommandContext): Promise<CommandResult> => {
-    const item = itemByProductId(productId);
-    if (!item || (item.kind !== "iap" && item.kind !== "subscription")) {
+    // Pacote promocional (ADR 0024) ou item avulso da Loja (diamantes / Passe VIP).
+    const bundle = bundleByProductId(productId);
+    const found = bundle ? undefined : itemByProductId(productId);
+    const item = bundle
+      ? { kind: "bundle" as const, id: bundle.id }
+      : found && (found.kind === "iap" || found.kind === "subscription")
+        ? found
+        : undefined;
+    if (!item) {
       throw new AppError(404, "PRODUCT_NOT_FOUND", "Produto não encontrado", { productId });
     }
     const tr = await verifier.verify(productId, purchaseToken);
@@ -193,7 +203,11 @@ export function verifyPurchase(
     }
 
     let gems = 0n;
-    if (item.kind === "iap") {
+    let coins = 0n;
+    if (item.kind === "bundle") {
+      gems = bundle!.gems;
+      coins = (await grantBundle(tx, wallet, bundle!, district, idempotencyKey, now)).coins;
+    } else if (item.kind === "iap") {
       gems = item.gems;
       await applyGems(tx, wallet, gems, `purchase:${item.id}`, idempotencyKey, now);
     } else {
@@ -223,6 +237,7 @@ export function verifyPurchase(
         productId,
         status: "VERIFIED",
         gemsGranted: gems,
+        createdAt: now, // relógio do servidor (vitrine semanal dos pacotes compara com ele)
       },
     });
     await track(tx, wallet.playerId, "purchase_verified", { product: item.id, store });
@@ -232,6 +247,7 @@ export function verifyPurchase(
         receipt: receipt.id,
         product: item.id,
         gems: gems.toString(),
+        ...(coins > 0n ? { coins: coins.toString() } : {}),
         state: await getPlayerState(tx, wallet.playerId, now),
       },
     };

@@ -91,6 +91,8 @@ const VerifyBody = z.object({
   productId: z.string().min(3).max(120),
   // O JWS da App Store traz a cadeia x5c (3 certificados) e passa de 6 KB; o token do Google é curto.
   purchaseToken: z.string().min(3).max(32_768),
+  // Mapa atual: a coleta antecipada dos pacotes (ADR 0024) é entregue nele.
+  district: Slug.optional(),
 });
 const AdStartBody = z.object({
   placement: z.enum(["ad_boost", "offline_double"]),
@@ -412,7 +414,7 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
     "/purchases/verify",
     { preHandler: [authenticate, purchasesOn], bodyLimit: 64 * 1024 },
     async (request, reply) => {
-      const { store, productId, purchaseToken } = VerifyBody.parse(request.body);
+      const { store, productId, purchaseToken, district } = VerifyBody.parse(request.body);
       const verifier = verifierFor(store, {
         storeMode: config.STORE_MODE,
         appleBundleId: config.APPLE_BUNDLE_ID,
@@ -420,7 +422,7 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
         appleRootFingerprint: deps.appleRootFingerprint,
       });
       return command(request, reply, "purchases.verify", (at) =>
-        verifyPurchase(store, productId, purchaseToken, verifier, at),
+        verifyPurchase(store, productId, purchaseToken, verifier, at, district),
       );
     },
   );
