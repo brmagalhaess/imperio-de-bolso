@@ -89,7 +89,8 @@ const BuyBody = z.object({ itemId: Slug, district: Slug.optional() });
 const VerifyBody = z.object({
   store: z.enum(["mock", "google", "apple"]),
   productId: z.string().min(3).max(120),
-  purchaseToken: z.string().min(3).max(4096),
+  // O JWS da App Store traz a cadeia x5c (3 certificados) e passa de 6 KB; o token do Google é curto.
+  purchaseToken: z.string().min(3).max(32_768),
 });
 const AdStartBody = z.object({
   placement: z.enum(["ad_boost", "offline_double"]),
@@ -409,7 +410,7 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
 
   app.post(
     "/purchases/verify",
-    { preHandler: [authenticate, purchasesOn] },
+    { preHandler: [authenticate, purchasesOn], bodyLimit: 64 * 1024 },
     async (request, reply) => {
       const { store, productId, purchaseToken } = VerifyBody.parse(request.body);
       const verifier = verifierFor(store, {
@@ -431,7 +432,8 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
   // App Store Server Notifications V2 (URL cadastrada na App Store Connect): estornos revogam.
   app.post(
     "/purchases/apple/notifications",
-    { config: { rateLimit: { max: 120, timeWindow: "1 minute" } } },
+    // signedPayload traz um JWS com outros JWS dentro (transação e renovação): passa de 16 KB.
+    { config: { rateLimit: { max: 120, timeWindow: "1 minute" } }, bodyLimit: 64 * 1024 },
     async (request) => {
       const { signedPayload } = z.object({ signedPayload: z.string().min(10) }).parse(request.body);
       return handleAppleNotification(db, signedPayload, now(), deps.appleRootFingerprint);

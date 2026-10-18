@@ -157,10 +157,14 @@ describe("compras no iPhone (PURCHASES_PLATFORMS=ios)", () => {
     expect(android.purchasesEnabled).toBe(false);
     expect(android.items.some((i: { kind: string }) => i.kind === "iap")).toBe(false);
 
+    // Tamanho real: o JWS da App Store (x5c com 3 certificados RSA/EC) passa de 6 KB — o limite
+    // antigo de 4096 caracteres recusava toda compra de verdade com 400 (2026-10-18).
+    const realSize = jws(tx({ appAccountToken: "x".repeat(5000) }));
+    expect(realSize.length).toBeGreaterThan(6000);
     const body = {
       store: "apple",
       productId: "br.com.imperiodebolso.gems_50",
-      purchaseToken: jws(tx()),
+      purchaseToken: realSize,
     };
     const first = await post(ctx.app, g, "/purchases/verify", body);
     expect(first.statusCode).toBe(201);
