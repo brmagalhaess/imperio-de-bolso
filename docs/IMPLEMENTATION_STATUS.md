@@ -2,6 +2,14 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-18 — Situação das lojas
+
+- **Apple:** 1.0.1 **à venda** (READY_FOR_SALE); 3 pacotes de diamantes e Passe VIP **aprovados**.
+- **Google Play:** produção 2 (1.0.0) ainda **em revisão** (desde 15/10, primeira publicação).
+- **AdMob:** perfil de pagamentos completo; conta aguardando aprovação; app com "veiculação
+  limitada" — a verificação do `app-ads.txt` falha porque o Google procura no domínio raiz
+  `crowntech.com.br` (outro servidor, 2.24.94.160), não em `imperio.crowntech.com.br`.
+
 ## 2026-10-17 — 1.0.1 ENVIADA para revisão da Apple (build 8 + 4 compras)
 
 - Acordo de apps pagos **Ativo** (banco e formulários fiscais aprovados).
