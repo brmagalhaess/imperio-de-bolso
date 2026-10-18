@@ -2,6 +2,17 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-18 — Compra real na Apple falhava (corrigido no servidor)
+
+- Todo `POST /purchases/verify` da App Store voltava **400**: o `purchaseToken` era limitado a
+  4096 caracteres e o JWS real (cadeia x5c com 3 certificados) tem ~6–7 KB. Nos testes passava
+  porque a cadeia de teste é menor. Agora: token até 32 KB e corpo de 64 KB em
+  `/purchases/verify` e nas notificações da App Store; teste com recibo do tamanho real.
+- As transações que falharam ficaram **sem finalizar** na Apple (o jogo só finaliza depois do
+  servidor aceitar): voltam pelo `Transaction.updates` ao abrir o app e são creditadas.
+- Site da empresa no ar no nosso servidor (DNS trocado no Cloudflare; Let's Encrypt ok) com
+  `app-ads.txt` em `www.crowntech.com.br`; aguardando o rastreador do AdMob.
+
 ## 2026-10-18 — Situação das lojas
 
 - **Apple:** 1.0.1 **à venda** (READY_FOR_SALE); 3 pacotes de diamantes e Passe VIP **aprovados**.
@@ -11,8 +22,8 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
   `crowntech.com.br` (outro servidor, 2.24.94.160), não em `imperio.crowntech.com.br`.
 - Site da empresa (repo `brmagalhaess/crowntech-site`) migrado para o nosso Dokploy: projeto
   Crowntech → "Site CrownTech" (`docker-compose.vps-imperio.yml`, domínios www e raiz no Traefik
-  com Let's Encrypt) já com `app-ads.txt`. Testado direto no IP (200). Falta o titular apontar o
-  DNS (Cloudflare) de `crowntech.com.br` e `www` para 169.58.235.246 e desligar a VPS antiga.
+  com Let's Encrypt) já com `app-ads.txt`. DNS apontado (Cloudflare) e HTTPS ok. Falta desligar o site
+  na VPS antiga (2.24.94.160).
 
 ## 2026-10-17 — 1.0.1 ENVIADA para revisão da Apple (build 8 + 4 compras)
 
