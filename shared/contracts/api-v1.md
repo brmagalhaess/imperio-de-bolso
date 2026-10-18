@@ -151,8 +151,12 @@ Corpo `{ events: [{ name, props? }] }` (1–20). Nomes permitidos: `tutorial_sta
 - `POST /store/buy` — `Idempotency-Key`. `{ itemId, district? }` (auto-coleta/turbo com
   diamantes) → `200 { bought, autoCollectUntil? | coins?, state }`. `409 INSUFFICIENT_FUNDS`,
   `409 NOTHING_TO_BOOST`, `404 STORE_ITEM_NOT_FOUND`.
+- `GET /store/catalog` também traz `offers` (ADR 0024): até 5 pacotes `{ id, productId, title,
+  priceBRL, icon, kind: starter|weekly|holiday, gems, autoCollectHours, turboHours, boostHours,
+  endsAt|null }` (vazio sem compras na plataforma; some o que já foi comprado nesta vitrine).
 - `POST /purchases/verify` — `Idempotency-Key`. `{ store: mock|google|apple, productId,
-  purchaseToken }` → `201 { receipt, product, gems, state }` (recibo repetido: `200 { duplicate }`).
+  purchaseToken, district? }` (pacote: entrega diamantes + auto-coleta + turbo + produção no mapa;
+  resposta com `coins` quando há produção na hora) → `201 { receipt, product, gems, state }` (recibo repetido: `200 { duplicate }`).
   `409 PURCHASE_OWNED_BY_OTHER`, `422 PURCHASE_INVALID`, `404 PRODUCT_NOT_FOUND`,
   `403 MOCK_DISABLED`, `501 STORE_NOT_CONFIGURED` (google/apple até as contas existirem).
 - `POST /purchases/restore` → `{ purchases, activeSubscriptions }`.

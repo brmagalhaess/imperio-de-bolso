@@ -2,6 +2,18 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-18 — Pacotes promocionais (ADR 0024) e VIP ativo na Loja
+
+- Servidor: `economy/bundles.ts` (20 pacotes), `services/bundles.ts` (vitrine ≤ 5, limite por
+  semana, entrega), catálogo com `offers`, `/purchases/verify` com `district`. Testes: **144**.
+- App Store Connect: 20 consumíveis criados (`tools/apple/bundles_setup.py`), preço base BRA,
+  3 idiomas e imagem de revisão — todos "Pronto para envio".
+- Jogo: coluna direita com até 5 ícones (pulso + tempo restante) e tela do pacote; Passe VIP
+  ativo mostra "Ativo ✓" e "Gerenciar assinatura". Arte: 20 ícones (US$ 0,54). Capturas:
+  `docs/lojas/capturas/compras/ofertas_*.jpg`. Jogo: **151** verificações.
+- Também: marcadores de conflito de merge antigos removidos de `tools/art/generations.jsonl` e
+  `tools/art/jobs/v6-expansao-teste.json` (quebravam o gerador de arte).
+
 ## 2026-10-18 — Compra real na Apple falhava (corrigido no servidor)
 
 - Todo `POST /purchases/verify` da App Store voltava **400**: o `purchaseToken` era limitado a

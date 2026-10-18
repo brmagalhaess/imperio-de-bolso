@@ -67,6 +67,24 @@ func _ready() -> void:
 			print("PASSO %s %dx%d" % [shot[0], img.get_width(), img.get_height()])
 		get_tree().quit()
 		return
+	if mode == "ofertas":
+		# Pacotes promocionais (ADR 0024): coluna direita na cidade e a tela de um pacote.
+		var out := OS.get_environment("CAPTURE_DIR")
+		await _wait(2.5)
+		hud._modal.close()
+		GameState.daily["claimedToday"] = true
+		await GameState.refresh_catalog()
+		await _wait(1.5)
+		get_viewport().get_texture().get_image().save_png(out.path_join("ofertas_hud.png"))
+		print("PASSO ofertas hud (%d pacotes)" % GameState.offers().size())
+		var list := GameState.offers()
+		if not list.is_empty():
+			hud.open_offer_menu(list[min(1, list.size() - 1)])
+			await _wait(1.5)
+			get_viewport().get_texture().get_image().save_png(out.path_join("ofertas_pacote.png"))
+			print("PASSO ofertas pacote")
+		get_tree().quit()
+		return
 	if mode == "loja_paga":
 		# Imagens da revisão das compras (App Store): Loja com diamantes e Passe VIP à venda.
 		var out := OS.get_environment("CAPTURE_DIR")

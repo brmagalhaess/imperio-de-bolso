@@ -152,8 +152,12 @@ func store_buy(item_id: String, district := "") -> Dictionary:
 	return await _command("/store/buy", body)
 
 
-func verify_purchase(store: String, product_id: String, token: String) -> Dictionary:
-	return await _command("/purchases/verify", {"store": store, "productId": product_id, "purchaseToken": token})
+## `district`: mapa atual (a coleta antecipada dos pacotes promocionais é entregue nele).
+func verify_purchase(store: String, product_id: String, token: String, district := "") -> Dictionary:
+	var body := {"store": store, "productId": product_id, "purchaseToken": token}
+	if district != "":
+		body.district = district
+	return await _command("/purchases/verify", body)
 
 
 func restore_purchases() -> Dictionary:

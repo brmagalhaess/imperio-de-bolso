@@ -402,6 +402,21 @@ SHEETS = {
         ["char_vendor", "char_woman", "char_boy", "char_grandma", "char_tourist", "char_kid"],
         {"height": 132},
     ),
+    # Pacotes promocionais (ADR 0024): ícones da coluna direita e da tela do pacote.
+    "g_offers_a/g_offers_a_v02.png": (
+        ["offer_iniciante", "offer_combo_turbo", "offer_empreendedor", "offer_fim_de_semana",
+         "offer_investidor", "offer_express", "offer_mala_de_ouro", "offer_magnata"],
+        {"width": 200},
+    ),
+    "g_offers_b/g_offers_b_v01.png": (
+        ["offer_tesouro_real", "offer_lenda", "offer_carnaval", "offer_pascoa",
+         "offer_dia_das_maes", "offer_festa_junina", "offer_dia_dos_pais", "offer_independencia"],
+        {"width": 200},
+    ),
+    "g_offers_c/g_offers_c_v01.png": (
+        ["offer_dia_das_criancas", "offer_black_friday", "offer_natal", "offer_ano_novo"],
+        {"width": 200},
+    ),
     "g_ui_icons/g_ui_icons_v01.png": (
         ["icon_build", "icon_shop", "icon_map", "icon_profile",
          "icon_coin", None, "icon_settings", "icon_help"],  # None = bolha (desenhada no código)

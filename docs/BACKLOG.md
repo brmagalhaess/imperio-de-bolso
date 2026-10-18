@@ -68,6 +68,8 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Apple: versão 1.0.0 enviada para revisão (fora da UE)
 - [x] Google Play: Produção 1.0.0 enviada para revisão (fora da UE)
 - [x] Apple 1.0.1 enviada (build 8, loja paga, login Apple, capturas 6,3" e iPhone Duo, SDK AdMob)
+- [x] Pacotes promocionais (ADR 0024) — servidor, 20 produtos na Apple, coluna no jogo
+- [ ] Enviar 1.0.2 (pacotes + VIP ativo) para revisão
 - [ ] Ligar anúncios no iPhone (`ADS_PLATFORMS=ios`) quando o AdMob aprovar o app
 - [ ] Vincular conta convidada a Google/Apple (`/auth/link`) para recuperar sem o Backup do Android
 - [ ] Consentimento (UMP/LGPD), ATT no iOS, app-ads.txt

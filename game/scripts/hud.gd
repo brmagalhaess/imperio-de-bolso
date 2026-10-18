@@ -57,6 +57,9 @@ var _missions_button: Control
 var _ranking_button: Control
 var _daily_button: Control
 var _event_button: Control
+## Coluna direita dos pacotes promocionais (ADR 0024): no máximo 5 ícones.
+var _offer_col: VBoxContainer
+const MAX_OFFERS := 5
 var _turbo_pill: PanelContainer
 var _turbo_label: Label
 var _ranking_tab := 0
@@ -78,6 +81,7 @@ func _ready() -> void:
 	theme = _build_theme()
 	_build_top()
 	_build_side_buttons()
+	_build_offer_column()
 	_build_bottom_bar()
 	_build_sheet()
 	tutorial = Tutorial.new()
@@ -113,7 +117,9 @@ func _ready() -> void:
 	GameState.offline_summary.connect(show_offline_summary)
 	GameState.state_changed.connect(_sync_helper_cards)
 	GameState.state_changed.connect(func(): _modal.refresh_store_cards())
-	GameState.catalog_changed.connect(func(): _modal.refresh_store_cards())
+	GameState.catalog_changed.connect(func():
+		_modal.refresh_store_cards()
+		_sync_offers())
 	GameState.busy_changed.connect(func(_b): _modal.refresh_store_cards())
 	GameState.missions_changed.connect(_sync_rewards)
 	GameState.achievements_changed.connect(_sync_rewards)
@@ -562,10 +568,10 @@ func _price_label(item: Dictionary) -> String:
 
 
 ## Loja real (iPhone): a própria Apple mostra a confirmação. Teste: nossa confirmação "sem cobrança".
-func _buy_real_or_sandbox(item: Dictionary) -> void:
+func _buy_real_or_sandbox(item: Dictionary, reopen_store := true) -> void:
 	var product_id := str(item.get("productId", ""))
 	if not GameState.real_store():
-		_confirm_sandbox(item, product_id)
+		_confirm_sandbox(item, product_id, reopen_store)
 		return
 	var r: Dictionary = await GameState.buy_apple(product_id)
 	if r.ok:
@@ -574,11 +580,14 @@ func _buy_real_or_sandbox(item: Dictionary) -> void:
 		show_toast(tr("Compra aguardando aprovação. O item chega assim que for aprovada."))
 	elif r.message != "":
 		show_toast(GameState.message_for(str(r.message)) if GameState.MESSAGES.has(str(r.message)) else tr("Não foi possível concluir a compra."))
-	open_store_menu()
+	if reopen_store:
+		open_store_menu()
+	else:
+		_modal.close()
 
 
 ## Confirmação da compra em dinheiro. No modo de teste deixa claro que nada é cobrado.
-func _confirm_sandbox(item: Dictionary, product_id: String) -> void:
+func _confirm_sandbox(item: Dictionary, product_id: String, reopen_store := true) -> void:
 	_reward_kind = "store_confirm"
 	_modal.open(tr("Confirmar compra"))
 	var price := "R$ " + str(item.get("priceBRL", ""))
@@ -587,12 +596,18 @@ func _confirm_sandbox(item: Dictionary, product_id: String) -> void:
 				tr("%s\n\nCOMPRA DE TESTE: nenhum valor será cobrado.") % price)
 	else:
 		_modal.add_message(null, str(item.get("title", "")), price)
-	_modal.add_action(tr("Confirmar"), func():
-		if await GameState.buy_sandbox(product_id):
-			show_toast(tr("Compra confirmada: %s") % item.get("title", ""))
-		open_store_menu(), Style.GREEN, Style.GREEN_DARK)
-	_modal.add_action(tr("Voltar"), open_store_menu, Style.GREY, Style.GREY_DARK)
+	_modal.add_action(tr("Confirmar"), func(): _sandbox_buy(item, product_id, reopen_store),
+			Style.GREEN, Style.GREEN_DARK)
+	var back := open_store_menu if reopen_store else Callable(_modal, "close")
+	_modal.add_action(tr("Voltar"), back, Style.GREY, Style.GREY_DARK)
 	_modal.refit()
+
+
+func _sandbox_buy(item: Dictionary, product_id: String, reopen_store: bool) -> void:
+	if await GameState.buy_sandbox(product_id):
+		show_toast(tr("Compra confirmada: %s") % item.get("title", ""))
+	if reopen_store:
+		open_store_menu()
 
 
 func _restore_purchases() -> void:
@@ -1230,6 +1245,95 @@ func _side_button(parent: Control, glyph: int, color: Color, edge: Color, text_v
 func _set_side_visible(b: Control, show: bool) -> void:
 	b.visible = show
 	(b.get_meta("label") as Control).visible = show
+
+
+# --- Pacotes promocionais (ADR 0024) -----------------------------------------
+
+## Coluna à direita, espelhando a da esquerda (missões/ranking): ícones chamativos dos pacotes
+## da semana/feriado com o tempo restante. Some quando a loja paga está desligada.
+func _build_offer_column() -> void:
+	_offer_col = VBoxContainer.new()
+	_offer_col.anchor_left = 1.0
+	_offer_col.anchor_right = 1.0
+	_offer_col.offset_left = -108
+	_offer_col.offset_right = -14
+	_offer_col.offset_top = 232
+	_offer_col.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_offer_col.alignment = BoxContainer.ALIGNMENT_BEGIN
+	_offer_col.add_theme_constant_override("separation", 4)
+	_offer_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_offer_col)
+
+
+func _sync_offers() -> void:
+	if _offer_col == null:
+		return
+	for c in _offer_col.get_children():
+		c.queue_free()
+	var list := GameState.offers().slice(0, MAX_OFFERS)
+	for o in list:
+		var offer: Dictionary = o
+		var button := TextureButton.new()
+		button.texture_normal = Layout.texture(str(offer.icon)) if ResourceLoader.exists("res://assets/optimized/%s.png" % offer.icon) else _gem_tex
+		button.ignore_texture_size = true
+		button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+		button.custom_minimum_size = Vector2(88, 88)
+		button.pivot_offset = Vector2(44, 44)
+		button.pressed.connect(func(): open_offer_menu(offer))
+		_offer_col.add_child(button)
+		# Pulso discreto para chamar atenção sem poluir a tela.
+		var tw := button.create_tween().set_loops()
+		tw.tween_property(button, "scale", Vector2(1.06, 1.06), 0.7).set_trans(Tween.TRANS_SINE)
+		tw.tween_property(button, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_SINE)
+		var label := Label.new()
+		label.text = _offer_badge(offer)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.custom_minimum_size.x = 94
+		label.add_theme_font_size_override("font_size", 18)
+		label.add_theme_color_override("font_color", Color.WHITE)
+		label.add_theme_color_override("font_outline_color", Style.TEAL_DARK)
+		label.add_theme_constant_override("outline_size", 8)
+		_offer_col.add_child(label)
+
+
+## Texto curto embaixo do ícone: tempo que falta ou "Novo!" (Kit Iniciante, sem prazo).
+func _offer_badge(o: Dictionary) -> String:
+	if o.get("endsAt") == null:
+		return tr("Novo!")
+	var left := _iso_seconds(str(o.endsAt)) - _iso_seconds(str(GameState.catalog.get("serverTime", o.endsAt)))
+	return Fmt.duration(left) if left < 86400 else tr("%d dias") % int(ceil(left / 86400.0))
+
+
+## Lista do que vem no pacote, uma linha por item.
+func _offer_contents(o: Dictionary) -> String:
+	var lines: Array[String] = [tr("+%s diamantes") % Fmt.coins(str(o.get("gems", "0")))]
+	var ac := int(o.get("autoCollectHours", 0))
+	if ac > 0:
+		lines.append(tr("Auto-coleta por %s") % (tr("%d dias") % (ac / 24) if ac >= 48 else tr("%d horas") % ac))
+	var tb := int(o.get("turboHours", 0))
+	if tb > 0:
+		lines.append(tr("Turbo 2× por %s") % (tr("%d dias") % (tb / 24) if tb >= 48 else tr("%d horas") % tb))
+	var bh := int(o.get("boostHours", 0))
+	if bh > 0:
+		lines.append(tr("%d horas de produção na hora") % bh)
+	return "\n".join(lines)
+
+
+func open_offer_menu(o: Dictionary) -> void:
+	close_sheet()
+	_reward_kind = "offer"
+	GameState.track("screen_view", {"screen": "oferta", "offer": str(o.get("id", ""))})
+	_modal.open(tr(str(o.title)))
+	var ends := tr("Compra única por conta.") if o.get("endsAt") == null else \
+			tr("Disponível por mais %s · 1 compra nesta vitrine.") % _offer_badge(o)
+	_modal.add_message(Layout.texture(str(o.icon)) if ResourceLoader.exists("res://assets/optimized/%s.png" % o.icon) else _gem_tex,
+			"", _offer_contents(o) + "\n\n" + ends)
+	_modal.add_store_card(func():
+		return {
+			"title": tr(str(o.title)), "icon": _gem_tex, "subtitle": tr("Pagamento pela sua conta Apple") if GameState.real_store() else tr("Pacote promocional"),
+			"button": _price_label(o), "color": Style.GREEN, "edge": Style.GREEN_DARK, "enabled": true,
+		}, func(): _buy_real_or_sandbox(o, false))
+	_modal.refit()
 
 
 ## Selos: prêmio do dia esperando; evento ativo (com selo se a meta foi batida).

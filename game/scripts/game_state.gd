@@ -311,13 +311,19 @@ func refresh_catalog() -> void:
 			_ensure_apple_store()
 			if apple_store != null:
 				apple_store.load_products(Array(catalog.get("items", [])).filter(
-					func(i): return i.has("productId")).map(func(i): return str(i.productId)))
+					func(i): return i.has("productId")).map(func(i): return str(i.productId))
+					+ offers().map(func(o): return str(o.productId)))
 		catalog_changed.emit()
 
 
 ## Compras em dinheiro real / anúncios ligados no servidor (versão 1.0 sai sem — ADR 0018).
 func purchases_enabled() -> bool:
 	return bool(catalog.get("purchasesEnabled", false))
+
+
+## Pacotes promocionais na vitrine (ADR 0024): no máximo 5, já sem os comprados nesta semana.
+func offers() -> Array:
+	return Array(catalog.get("offers", []))
 
 
 func ads_enabled() -> bool:
@@ -412,7 +418,7 @@ func _ensure_apple_store() -> void:
 
 ## Recibo de uma loja real → servidor (chamado pela loja da Apple). Atualiza o estado.
 func verify_store_purchase(store: String, product_id: String, token: String) -> Dictionary:
-	var res := await Api.verify_purchase(store, product_id, token)
+	var res := await Api.verify_purchase(store, product_id, token, current_district)
 	if res.ok:
 		_apply_state(res.data.state)
 		_catalog_dirty = true
@@ -440,7 +446,7 @@ func buy_sandbox(product_id: String) -> bool:
 		return false
 	_set_busy(true)
 	var token := "mock-" + Api.new_idempotency_key()
-	var res := await Api.verify_purchase("mock", product_id, token)
+	var res := await Api.verify_purchase("mock", product_id, token, current_district)
 	_set_busy(false)
 	if not res.ok:
 		_fail(res.error_code)

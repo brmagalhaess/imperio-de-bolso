@@ -27,3 +27,4 @@
 | [0021](ADRs/0021-painel-admin-v2.md) | Painel admin v2: economia, ranking, moderação; únicas escritas = trocar nome denunciado / arquivar denúncia | aceita |
 | [0022](ADRs/0022-loja-paga-ios-e-login-apple.md) | Loja paga só no iPhone (StoreKit 2, recibo JWS verificado no servidor) e login com Apple; iOS 17+ | aceita |
 | [0023](ADRs/0023-anuncios-ios-admob.md) | Anúncios recompensados reais (AdMob) só no iPhone; ADS_PLATFORMS=ios; SSV com sessionId no custom_data | aceita |
+| [0024](ADRs/0024-pacotes-promocionais.md) | Pacotes promocionais: 3 por semana (faixas baixa/média/alta) + feriados, vitrine ≤ 5, 1 compra por vitrine, entrega no servidor | aceita |
