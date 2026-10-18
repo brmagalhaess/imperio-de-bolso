@@ -2,6 +2,16 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-18 — Dobro corrigido (valor ×2) e site v2
+
+- Dobro de moedas: cada coleta paga ×2 (manual, auto-coleta, AFK na janela); a velocidade não
+  muda — Turbo acelera, Dobro dobra. Correção só no servidor (vale para o build 11). Testes: 150.
+- Apple: 25 produtos cadastrados — diamantes (3) e VIP aprovados; 20 pacotes + Dobro aguardando a
+  revisão da 1.0.2.
+- Site (`landing/`) v2: herói com o mar do jogo, aparelho com tela real, galeria de telas,
+  recursos com ícones do jogo, FAQ atualizado e botão "Baixar grátis na App Store"
+  (`apps.apple.com/br/app/id6822892071`). Google Play segue "Em breve".
+
 ## 2026-10-18 — Dobro de moedas e auto-coleta em todas as cidades (ADR 0025)
 
 - **Bug corrigido (servidor):** auto-coleta só liquidava o mapa aberto (as outras cidades paravam
