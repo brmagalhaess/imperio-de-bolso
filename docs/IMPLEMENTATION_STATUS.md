@@ -2,6 +2,14 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-18 — Ranking: rolar não abre mais "denunciar"; validade do VIP conferida
+
+- Linha do ranking só abre denunciar/ocultar ao soltar o dedo sem arrastar (antes abria ao
+  encostar e quem rolava caía nessa tela). Teste novo no `test_runner` (153 verificações).
+- Validade do VIP conferida no banco de produção: compra real (App Store) 17/10 → 17/11; a do
+  aparelho de desenvolvimento é do Sandbox da Apple, que renova a cada 1 dia nessa conta — o
+  servidor grava a data que a Apple manda. Aviso da Loja (só no build de desenvolvimento) ajustado.
+
 ## 2026-10-18 — Ranking v2, ligas por vendas e selo VIP (ADR 0026)
 
 - Servidor: grupos de liga por vendas do império (migração `20261018180000_league_brackets_prize_bonus`),

@@ -13,6 +13,8 @@ const LOCK := preload("res://assets/optimized/lot_lock.png")
 const MEDALS := [preload("res://assets/optimized/rank_1.png"), preload("res://assets/optimized/rank_2.png"),
 		preload("res://assets/optimized/rank_3.png")]
 const VIP_BADGE := preload("res://assets/optimized/badge_vip.png")
+## Quanto o dedo pode andar e ainda contar como toque (px na resolução base).
+const TAP_SLOP := 14.0
 const GlyphButton := preload("res://scripts/glyph_button.gd")
 var GEM: Texture2D = GlyphButton.gem_texture()
 
@@ -556,10 +558,24 @@ func add_rank_row(rank: int, name_text: String, score: String, me: bool, on_pres
 		vip := false) -> void:
 	var panel := PanelContainer.new()
 	if on_press.is_valid():
-		panel.mouse_filter = Control.MOUSE_FILTER_STOP
+		# Toque de verdade = soltar o dedo sem ter arrastado. Antes abria ao encostar, e quem só
+		# queria rolar o ranking caía na tela de denunciar/ocultar o jogador.
+		panel.mouse_filter = Control.MOUSE_FILTER_PASS
+		var press := {"at": Vector2.INF, "moved": false}
 		panel.gui_input.connect(func(ev: InputEvent):
-			if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-				on_press.call())
+			if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
+				if ev.pressed:
+					press.at = ev.global_position
+					press.moved = false
+				elif press.at != Vector2.INF:
+					var scrolled: bool = touch_scroll != null and touch_scroll.muted
+					var tap: bool = not press.moved and not scrolled and ev.global_position.distance_to(press.at) < TAP_SLOP
+					press.at = Vector2.INF
+					if tap:
+						on_press.call()
+			elif ev is InputEventMouseMotion and press.at != Vector2.INF:
+				if ev.global_position.distance_to(press.at) >= TAP_SLOP:
+					press.moved = true)
 	var b := Style.box(Color("ffe9b8") if me else Style.CREAM_CARD, 20,
 			Style.ORANGE if me else Style.CREAM_LINE, 3, false)
 	b.content_margin_top = 8

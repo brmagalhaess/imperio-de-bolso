@@ -695,9 +695,10 @@ func _vip_status() -> String:
 	var until: Variant = GameState.vip_until()
 	if until == null:
 		return tr("Assinatura mensal")
-	# Versão de desenvolvimento compra no ambiente de teste da Apple: o "mês" dura 5 minutos.
+	# Versão de desenvolvimento compra no ambiente de teste da Apple, onde o "mês" é encurtado
+	# (renova a cada poucos minutos ou 1 dia, conforme a conta de teste). Na App Store é 1 mês.
 	if OS.is_debug_build() and GameState.real_store():
-		return tr("Ativo até %s (teste da Apple: o mês dura 5 min)") % _date_text(until)
+		return tr("Ativo até %s (assinatura de teste da Apple: renova mais rápido)") % _date_text(until)
 	return tr("Ativo até %s · renova todo mês") % _date_text(until)
 
 

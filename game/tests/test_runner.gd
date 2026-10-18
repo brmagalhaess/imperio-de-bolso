@@ -281,6 +281,28 @@ func _growth_tests() -> bool:
 			"pódio: aviso de 1º lugar com o prêmio")
 	GameState.claim_podium("2025-12-29", "semana")
 	check(GameState.podium.is_empty() and GameState.gems() == "105", "pódio: diamantes entram no toque")
+	# Ranking: arrastar a partir de um jogador rola a lista; só soltar sem mover abre as opções.
+	var opened := [0]
+	hud._modal.open("teste")
+	hud._modal.add_rank_row(4, "Outro", "10", false, func(): opened[0] += 1)
+	var row: Control = hud._modal._list.get_child(hud._modal._list.get_child_count() - 1)
+	var ev := func(pressed: bool, pos: Vector2):
+		var e := InputEventMouseButton.new()
+		e.button_index = MOUSE_BUTTON_LEFT
+		e.pressed = pressed
+		e.global_position = pos
+		row.gui_input.emit(e)
+	var move := InputEventMouseMotion.new()
+	move.global_position = Vector2(100, 160)
+	ev.call(true, Vector2(100, 100))
+	row.gui_input.emit(move)
+	ev.call(false, Vector2(100, 160))
+	check(opened[0] == 0, "ranking: arrastar sobre um jogador não abre denunciar/ocultar")
+	ev.call(true, Vector2(100, 100))
+	ev.call(false, Vector2(102, 101))
+	check(opened[0] == 1, "ranking: tocar e soltar no jogador abre as opções")
+	hud._modal.close()
+
 	var items: Array = hud._prize_items([{"gems": 300, "bonusKind": "turbo", "bonusHours": 6},
 		{"gems": 180, "bonusKind": "auto", "bonusHours": 48}, {"gems": 100, "bonusKind": null, "bonusHours": 0}])
 	check(items[0].gems == 300 and items[0].extra == "+ Turbo 6 h" and items[1].extra == "+ Auto-coleta 2 dias"
