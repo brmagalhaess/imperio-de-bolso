@@ -7,7 +7,8 @@ const PENDING = "PENDENTE";
 export const SITE = {
   name: "Império de Bolso",
   url: "https://imperio.crowntech.com.br",
-  tagline: "Comece com um carrinho de água na praia e construa o seu império.",
+  tagline:
+    "Comece com um carrinho de água na praia, contrate ajudantes e construa um império em 8 mapas — da praia ao espaço.",
   description:
     "Jogo de construir negócios para celular: comece com um carrinho de água na praia, " +
     "contrate ajudantes e transforme a ilha em uma cidade inteira. Grátis para Android e iPhone.",
@@ -36,7 +37,7 @@ if (process.env.SITE_STRICT === "1" && pendingFields().length > 0) {
 }
 
 export const STORES = {
-  // Links reais entram quando o app estiver publicado (antes disso: "Em breve").
+  // Google Play: "Em breve" até a aprovação. App Store: no ar desde a 1.0.0 (2026-10).
   googlePlay: process.env.SITE_GOOGLE_PLAY_URL ?? "",
-  appStore: process.env.SITE_APP_STORE_URL ?? "",
+  appStore: process.env.SITE_APP_STORE_URL || "https://apps.apple.com/br/app/id6822892071",
 };

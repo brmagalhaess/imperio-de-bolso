@@ -97,7 +97,7 @@ services:
         SITE_CITY: ${SITE_CITY:-Maricá/RJ}
         SITE_EMAIL: ${SITE_EMAIL:-suporte-imperio@crowntech.com.br}
         SITE_GOOGLE_PLAY_URL: ${SITE_GOOGLE_PLAY_URL:-}
-        SITE_APP_STORE_URL: ${SITE_APP_STORE_URL:-}
+        SITE_APP_STORE_URL: ${SITE_APP_STORE_URL:-https://apps.apple.com/br/app/id6822892071}
     restart: unless-stopped
     environment:
       VIRTUAL_HOST: ${LANDING_DOMAIN:-imperio.crowntech.com.br}
