@@ -9,6 +9,10 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 - **AdMob:** perfil de pagamentos completo; conta aguardando aprovação; app com "veiculação
   limitada" — a verificação do `app-ads.txt` falha porque o Google procura no domínio raiz
   `crowntech.com.br` (outro servidor, 2.24.94.160), não em `imperio.crowntech.com.br`.
+- Site da empresa (repo `brmagalhaess/crowntech-site`) migrado para o nosso Dokploy: projeto
+  Crowntech → "Site CrownTech" (`docker-compose.vps-imperio.yml`, domínios www e raiz no Traefik
+  com Let's Encrypt) já com `app-ads.txt`. Testado direto no IP (200). Falta o titular apontar o
+  DNS (Cloudflare) de `crowntech.com.br` e `www` para 169.58.235.246 e desligar a VPS antiga.
 
 ## 2026-10-17 — 1.0.1 ENVIADA para revisão da Apple (build 8 + 4 compras)
 
