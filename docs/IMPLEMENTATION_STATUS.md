@@ -12,7 +12,7 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 - Painel admin: botão "Conta da equipe (tirar do ranking)" no detalhe do jogador; selo "equipe"
   na lista.
 - Jogo: aviso "Conta da equipe" no ranking (pt/en/es). Jogo: **153** verificações.
-- Pendente: marcar a conta do iPhone de desenvolvimento como equipe no painel admin de produção.
+- Conta do iPhone de desenvolvimento marcada como equipe no painel admin de produção (titular).
 
 ## 2026-10-18 — 1.0.2 aprovada; 1.0.3 (build 12) enviada
 

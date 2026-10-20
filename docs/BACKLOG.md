@@ -53,7 +53,7 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Editar nome do jogador uma vez, com validação e palavras bloqueadas (moderação no admin: futuro)
 - [x] Vender o império zera a pontuação da semana e renova as missões não resgatadas (ADR 0027)
 - [x] Conta da equipe fora do ranking, ligada no painel admin (ADR 0027)
-- [ ] Marcar a conta do iPhone de desenvolvimento como equipe no admin de produção
+- [x] Marcar a conta do iPhone de desenvolvimento como equipe no admin de produção (titular, 2026-10-19)
 
 ## Etapa 4 — Monetização sandbox
 - [x] Loja: **auto-coleta no mapa aberto** (diamantes 24h/7d e Passe VIP — ADR 0008)
