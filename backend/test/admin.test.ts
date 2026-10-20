@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   ADMIN_TOKEN,
   createTestContext,
+  get,
   key,
   newGuest,
   post,
@@ -96,5 +97,21 @@ describe("painel admin", () => {
     const detail = (await admin("GET", `/players/${target.playerId}`)).json();
     expect(detail).toMatchObject({ nameChanged: true, openReports: 0, prestige: { stars: 0 } });
     expect(detail.code).toBe(target.playerId.slice(0, 8).toUpperCase());
+  });
+
+  it("marca e desmarca conta da equipe (fora do ranking)", async () => {
+    ctx = await createTestContext();
+    const g = await newGuest(ctx.app);
+    expect((await admin("GET", `/players/${g.playerId}`)).json().staff).toBe(false);
+    expect((await admin("POST", `/players/${g.playerId}/staff`)).json()).toEqual({
+      playerId: g.playerId,
+      staff: true,
+    });
+    expect((await admin("GET", `/players/${g.playerId}`)).json().staff).toBe(true);
+    expect((await get(ctx.app, g, "/leaderboard")).json().staff).toBe(true);
+    await admin("POST", `/players/${g.playerId}/unstaff`);
+    expect((await admin("GET", "/players")).json().players[0].staff).toBe(false);
+    const missing = await admin("POST", "/players/00000000-0000-4000-8000-000000000000/staff");
+    expect(missing.statusCode).toBe(404);
   });
 });

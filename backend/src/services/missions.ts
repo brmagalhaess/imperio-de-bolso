@@ -99,6 +99,33 @@ export async function ensureDailyMissions(db: Reader, playerId: string, now: Dat
   return db.playerMission.findMany({ where: { playerId, day } });
 }
 
+/**
+ * Depois de vender o império: as missões de hoje ainda não resgatadas foram sorteadas com a renda
+ * do império antigo (ex.: prêmio de 2 tri para quem recomeça com 100 moedas). Elas saem e entram
+ * outras, com alvo e prêmio do império novo; as já resgatadas ficam (o baú segue contando).
+ */
+export async function refreshMissionsAfterPrestige(tx: Tx, playerId: string, now: Date) {
+  const day = gameDay(now);
+  const today = await tx.playerMission.findMany({ where: { playerId, day } });
+  if (today.length === 0) return;
+  const kept = today.filter((m) => m.claimedAt !== null);
+  await tx.playerMission.deleteMany({ where: { playerId, day, claimedAt: null } });
+  const ctx = await missionContext(tx, playerId, now);
+  const reward = missionRewardCoins(ctx);
+  const keep = kept.flatMap((m) => templateById(m.template) ?? []);
+  await tx.playerMission.createMany({
+    data: pickDailyMissions(playerId, day, ctx, keep).map((t) => ({
+      playerId,
+      day,
+      template: t.id,
+      target: t.target(ctx),
+      rewardCoins: reward,
+      rewardGems: MISSION_REWARD_GEMS,
+    })),
+    skipDuplicates: true,
+  });
+}
+
 /** Soma progresso nas missões de hoje que medem `metric` (chamado pelos comandos). */
 export async function trackMission(
   tx: Tx,

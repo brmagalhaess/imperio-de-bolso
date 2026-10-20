@@ -262,3 +262,13 @@ em `POST /store/buy` → `200 { bought, turboUntil, state }` (soma tempo se já 
   está desligada.
 - `POST /purchases/apple/notifications` `{ signedPayload }` — App Store Server Notifications V2
   (sem token). REFUND/REVOKE revogam → `{ type, revoked }`.
+
+### 2026-10-19 — Venda do império e conta da equipe (ADR 0027)
+
+- `GET /leaderboard` (semana e `league`) e o pódio contam só o faturamento depois da última venda
+  do império dentro da semana. Novo campo `staff: boolean` (conta da equipe: fica fora de
+  `entries`/`me`, da liga e de `GET /leaderboard/stars`; o jogo mostra o aviso).
+- `POST /prestige` também troca as missões de hoje não resgatadas (novo `GET /missions`).
+- Admin: `POST /api/admin/players/:id/staff` e `/unstaff` → `{ playerId, staff }`;
+  `GET /api/admin/players` e `/players/:id` trazem `staff`.
+

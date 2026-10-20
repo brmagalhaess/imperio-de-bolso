@@ -152,8 +152,15 @@ export function missionRewardCoins(ctx: MissionContext): bigint {
  * demais, um sorteio estável (mesmo jogador e mesmo dia → mesmas missões) entre as elegíveis,
  * no máximo uma por grupo.
  */
-export function pickDailyMissions(playerId: string, day: string, ctx: MissionContext) {
-  const eligible = MISSION_TEMPLATES.filter((t) => t.eligible(ctx));
+export function pickDailyMissions(
+  playerId: string,
+  day: string,
+  ctx: MissionContext,
+  /** Missões de hoje que ficam (já resgatadas): não repete o modelo nem o grupo delas. */
+  keep: readonly MissionTemplate[] = [],
+) {
+  const kept = new Set(keep.map((t) => t.id));
+  const eligible = MISSION_TEMPLATES.filter((t) => t.eligible(ctx) && !kept.has(t.id));
   const fixedId = missionTier(ctx) === 0 ? "collect_times" : null;
   const fixed = eligible.filter((t) => t.id === fixedId);
   const rest = eligible
@@ -165,9 +172,9 @@ export function pickDailyMissions(playerId: string, day: string, ctx: MissionCon
     .sort((a, b) => (a.h < b.h ? -1 : 1))
     .map((x) => x.t);
   const picked: MissionTemplate[] = [];
-  const groups = new Set<string>();
+  const groups = new Set<string>(keep.flatMap((t) => (t.group ? [t.group] : [])));
   for (const t of [...fixed, ...rest]) {
-    if (picked.length >= MISSIONS_PER_DAY) break;
+    if (picked.length + keep.length >= MISSIONS_PER_DAY) break;
     if (t.group && groups.has(t.group)) continue;
     if (t.group) groups.add(t.group);
     picked.push(t);

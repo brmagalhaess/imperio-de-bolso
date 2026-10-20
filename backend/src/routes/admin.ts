@@ -338,6 +338,20 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
     return { playerId: id, dismissed: r.count };
   });
 
+  // Conta da equipe: fora de todos os rankings e pódios (aparelho de desenvolvimento).
+  for (const [action, staff] of [
+    ["staff", true],
+    ["unstaff", false],
+  ] as const) {
+    app.post(`/players/:id/${action}`, async (request) => {
+      const { id } = z.object({ id: z.uuid() }).parse(request.params);
+      const r = await db.player.updateMany({ where: { id }, data: { staff } });
+      if (r.count === 0) throw new AppError(404, "PLAYER_NOT_FOUND", "Jogador não encontrado");
+      await track(db, id, staff ? "admin_staff_on" : "admin_staff_off", {});
+      return { playerId: id, staff };
+    });
+  }
+
   const PlayersQuery = z.object({
     search: z.string().max(60).optional(),
     limit: z.coerce.number().int().min(1).max(200).default(50),
@@ -383,6 +397,7 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
         businesses: p._count.businesses,
         prestigeStars: p.prestigeStars,
         linked: p._count.identities > 0,
+        staff: p.staff,
       })),
     };
   });
@@ -422,6 +437,7 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
       currentDistrict: player.currentDistrict,
       tutorialCompleted: player.tutorialCompletedAt !== null,
       nameChanged: player.nameChangedAt !== null,
+      staff: player.staff,
       coins: (player.wallet?.coins ?? 0n).toString(),
       gems: (player.wallet?.gems ?? 0n).toString(),
       prestige: { stars: player.prestigeStars, count: player.prestigeCount },

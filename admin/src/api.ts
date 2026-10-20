@@ -139,6 +139,7 @@ export interface PlayerRow {
   businesses: number;
   prestigeStars: number;
   linked: boolean;
+  staff: boolean;
 }
 
 export interface PlayerDetail {
@@ -150,6 +151,7 @@ export interface PlayerDetail {
   currentDistrict: string | null;
   tutorialCompleted: boolean;
   nameChanged: boolean;
+  staff: boolean;
   coins: string;
   gems: string;
   prestige: { stars: number; count: number };

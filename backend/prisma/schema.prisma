@@ -29,6 +29,9 @@ model Player {
   prestigeStars       Int       @default(0) @map("prestige_stars")
   prestigeCount       Int       @default(0) @map("prestige_count")
   lastPrestigeAt      DateTime? @map("last_prestige_at") @db.Timestamptz(3)
+  // Conta da equipe (testes no aparelho de desenvolvimento): fica fora de todos os rankings e
+  // pódios para não concorrer com os jogadores. Ligada pelo painel admin.
+  staff               Boolean   @default(false) @map("is_staff")
   tutorialCompletedAt DateTime? @map("tutorial_completed_at") @db.Timestamptz(3)
   // Presença por mapa (ADR 0006): mapa aberto agora e último sinal do jogo.
   currentDistrict     String?   @map("current_district")

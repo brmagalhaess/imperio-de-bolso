@@ -154,4 +154,41 @@ describe("vender o império", () => {
     // 10 de lucro × 2 (+100% com 50 estrelas) × 12 ciclos (100 s × 1,25 do ajudante).
     expect(res.json().total).toBe("240");
   });
+
+  it("missões de hoje não resgatadas são sorteadas de novo com prêmio do império novo", async () => {
+    ctx = await createTestContext();
+    const g = await newGuest(ctx.app);
+    await buildEmpire(g, ALL, true);
+    await earn(g, 50_000_000n);
+    // Missões sorteadas com o império grande (ex.: prêmio de 2 tri).
+    await get(ctx.app, g, "/missions");
+    await ctx.db.playerMission.updateMany({
+      where: { playerId: g.playerId },
+      data: { rewardCoins: 2_000_000_000_000n },
+    });
+    const before = (await get(ctx.app, g, "/missions")).json().missions;
+    expect(before[0].rewardCoins).toBe("2000000000000");
+    // Resgata uma (fica), as outras duas são trocadas.
+    const done = before[0];
+    await ctx.db.playerMission.update({
+      where: { id: done.id },
+      data: { progress: BigInt(done.target) },
+    });
+    expect((await post(ctx.app, g, "/missions/claim", { missionId: done.id })).statusCode).toBe(
+      200,
+    );
+
+    expect((await post(ctx.app, g, "/prestige", {})).statusCode).toBe(200);
+    const after = (await get(ctx.app, g, "/missions")).json();
+    expect(after.missions).toHaveLength(3);
+    const kept = after.missions.find((m: { id: string }) => m.id === done.id);
+    expect(kept).toMatchObject({ claimed: true });
+    const fresh = after.missions.filter((m: { id: string }) => m.id !== done.id);
+    expect(fresh).toHaveLength(2);
+    for (const m of fresh) {
+      expect(m).toMatchObject({ claimed: false, progress: "0", rewardCoins: "50" });
+      expect(m.template).not.toBe(done.template);
+    }
+    expect(after.chest).toMatchObject({ progress: 1, target: 3 });
+  });
 });

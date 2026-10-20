@@ -200,16 +200,12 @@ describe("pódio semanal e prestígio no ranking", () => {
       },
     });
 
-  it("vender o império não tira o jogador do ranking da semana nem da liga", async () => {
-    ctx = await createTestContext();
-    const g = await newGuest(ctx.app);
-    await get(ctx.app, g, "/leaderboard"); // entra na liga
-    await earn(g.playerId, 50_000_000n);
-    // Império completo (requisito da venda): todos os negócios com ajudante.
+  /** Império completo (requisito da venda): todos os negócios com ajudante. */
+  const completeEmpire = async (playerId: string) => {
     for (const def of await ctx.db.businessDefinition.findMany()) {
       await ctx.db.playerBusiness.create({
         data: {
-          playerId: g.playerId,
+          playerId,
           businessId: def.id,
           level: 1,
           managerUnlocked: true,
@@ -218,10 +214,80 @@ describe("pódio semanal e prestígio no ranking", () => {
         },
       });
     }
+  };
+
+  it("vender o império zera a pontuação da semana e da liga; o que fatura depois conta", async () => {
+    ctx = await createTestContext();
+    const g = await newGuest(ctx.app);
+    const rival = await newGuest(ctx.app);
+    await get(ctx.app, g, "/leaderboard"); // entra na liga
+    await get(ctx.app, rival, "/leaderboard");
+    await earn(g.playerId, 50_000_000n);
+    await earn(rival.playerId, 1_000n);
+    await completeEmpire(g.playerId);
+    ctx.clock.advance(60);
     expect((await post(ctx.app, g, "/prestige", {})).statusCode).toBe(200);
-    const lb = (await get(ctx.app, g, "/leaderboard")).json();
-    expect(lb.me).toMatchObject({ rank: 1, score: "50000000" });
-    expect(lb.league.me).toMatchObject({ rank: 1, score: "50000000" });
+
+    let lb = (await get(ctx.app, g, "/leaderboard")).json();
+    expect(lb.entries.map((e: { playerId: string }) => e.playerId)).toEqual([rival.playerId]);
+    expect(lb.me).toBeNull();
+    expect(lb.league.me).toMatchObject({ rank: 2, score: "0" });
+
+    ctx.clock.advance(60);
+    await earn(g.playerId, 300n);
+    lb = (await get(ctx.app, g, "/leaderboard")).json();
+    expect(lb.me).toMatchObject({ rank: 2, score: "300" });
+    expect(lb.league.me).toMatchObject({ rank: 2, score: "300" });
+  });
+
+  it("vender o império na semana nova não tira o pódio da semana anterior", async () => {
+    ctx = await createTestContext();
+    const g = await newGuest(ctx.app);
+    await get(ctx.app, g, "/leaderboard");
+    await earn(g.playerId, 50_000_000n);
+    ctx.clock.advance(7 * 24 * HOUR);
+    await completeEmpire(g.playerId);
+    expect((await post(ctx.app, g, "/prestige", {})).statusCode).toBe(200);
+    const pending = (await get(ctx.app, g, "/rewards/weekly")).json().pending;
+    expect(pending.map((r: { kind: string; rank: number }) => `${r.kind}:${r.rank}`)).toEqual([
+      "liga:1",
+      "semana:1",
+    ]);
+  });
+
+  it("conta da equipe fica fora do ranking, da liga, das estrelas e do pódio", async () => {
+    ctx = await createTestContext();
+    const staff = await newGuest(ctx.app);
+    const player = await newGuest(ctx.app);
+    await ctx.db.player.update({
+      where: { id: staff.playerId },
+      data: { staff: true, prestigeStars: 99 },
+    });
+    await ctx.db.player.update({ where: { id: player.playerId }, data: { prestigeStars: 1 } });
+    await get(ctx.app, staff, "/leaderboard");
+    await get(ctx.app, player, "/leaderboard");
+    await earn(staff.playerId, 50_000_000n);
+    await earn(player.playerId, 1_000n);
+
+    const mine = (await get(ctx.app, staff, "/leaderboard")).json();
+    expect(mine.staff).toBe(true);
+    expect(mine.me).toBeNull();
+    expect(mine.league.me).toBeNull();
+    const theirs = (await get(ctx.app, player, "/leaderboard")).json();
+    expect(theirs.staff).toBe(false);
+    expect(theirs.entries).toHaveLength(1);
+    expect(theirs.me).toMatchObject({ rank: 1, score: "1000" });
+    expect(theirs.league).toMatchObject({ size: 1, me: { rank: 1 } });
+    const stars = (await get(ctx.app, player, "/leaderboard/stars")).json();
+    expect(stars.entries.map((e: { score: string }) => e.score)).toEqual(["1"]);
+
+    ctx.clock.advance(7 * 24 * HOUR);
+    expect((await get(ctx.app, staff, "/rewards/weekly")).json().pending).toEqual([]);
+    const won = (await get(ctx.app, player, "/rewards/weekly")).json().pending;
+    expect(won.map((r: { kind: string; rank: number }) => `${r.kind}:${r.rank}`)).toEqual([
+      "liga:1",
+      "semana:1",
+    ]);
   });
 
   it("1º, 2º e 3º lugar ganham diamantes na semana seguinte; resgate uma vez", async () => {

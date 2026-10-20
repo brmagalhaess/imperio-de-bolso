@@ -689,7 +689,10 @@ function PlayersView(props: ViewProps) {
                 className="clickable"
                 onClick={() => props.openPlayer(p.id)}
               >
-                <td>{p.displayName}</td>
+                <td>
+                  {p.displayName}
+                  {p.staff ? <span className="muted"> · equipe</span> : null}
+                </td>
                 <td className="mono">{p.id.slice(0, 8).toUpperCase()}</td>
                 <td>{when(p.createdAt)}</td>
                 <td>{when(p.lastSeenAt)}</td>
@@ -714,7 +717,24 @@ function PlayerView({
   onBack,
   ...props
 }: ViewProps & { id: string; onBack: () => void }) {
-  const { data } = useAdmin<PlayerDetail>(`/players/${id}`, props);
+  const { data, reload } = useAdmin<PlayerDetail>(`/players/${id}`, props);
+  const [busy, setBusy] = useState(false);
+  const toggleStaff = async () => {
+    if (!data) return;
+    const question = data.staff
+      ? `Colocar "${data.displayName}" de volta no ranking?`
+      : `Marcar "${data.displayName}" como conta da equipe? Ela sai de todos os rankings e pódios.`;
+    if (!window.confirm(question)) return;
+    setBusy(true);
+    try {
+      await adminPost(`/players/${id}/${data.staff ? "unstaff" : "staff"}`);
+      await reload();
+    } catch (err) {
+      props.onError(String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
   if (!data)
     return (
       <>
@@ -731,9 +751,18 @@ function PlayerView({
     <>
       <div className="toolbar">
         <button onClick={onBack}>← Jogadores</button>
+        <button disabled={busy} onClick={() => void toggleStaff()}>
+          {data.staff
+            ? "Voltar ao ranking"
+            : "Conta da equipe (tirar do ranking)"}
+        </button>
       </div>
       <h2>
-        {data.displayName} <span className="mono muted">#{data.code}</span>
+        {data.displayName}
+        {data.staff ? (
+          <span className="chip">equipe · fora do ranking</span>
+        ) : null}{" "}
+        <span className="mono muted">#{data.code}</span>
       </h2>
       <p className="muted">
         Criado {when(data.createdAt)} · último sinal {when(data.lastSeenAt)} ·

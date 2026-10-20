@@ -2,9 +2,10 @@ import type { Db, Tx } from "../db/prisma.js";
 import { AppError } from "../errors.js";
 import { bonusPercent, PRESTIGE_REQUIRES, starsFor } from "../economy/prestige.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
-import { PRODUCTION_REASONS } from "./achievements.js";
+import { PRESTIGE_REASON, PRODUCTION_REASONS } from "./achievements.js";
 import { track } from "./analytics.js";
 import { getPlayerState } from "./game.js";
+import { refreshMissionsAfterPrestige } from "./missions.js";
 import { applyCoins } from "./wallet.js";
 
 type Reader = Db | Tx;
@@ -65,7 +66,9 @@ export async function getPrestige(db: Reader, playerId: string): Promise<Prestig
 
 /**
  * "Vender o império": zera negócios, níveis, ajudantes, moedas (volta ao saldo inicial) e mapas;
- * soma as estrelas. Mantém diamantes, conquistas, VIP, auto-coleta comprada e ranking.
+ * soma as estrelas. Mantém diamantes, conquistas, VIP e auto-coleta comprada. A pontuação da
+ * semana no ranking recomeça do zero e as missões de hoje ainda não resgatadas são sorteadas de
+ * novo com alvos e prêmios do império novo.
  */
 export function sellEmpire(startingCoins: bigint, now: Date) {
   return async ({ tx, wallet, idempotencyKey }: CommandContext): Promise<CommandResult> => {
@@ -82,7 +85,7 @@ export function sellEmpire(startingCoins: bigint, now: Date) {
       tx,
       wallet,
       startingCoins - wallet.coins,
-      "prestige_reset",
+      PRESTIGE_REASON,
       idempotencyKey,
       now,
     );
@@ -98,6 +101,7 @@ export function sellEmpire(startingCoins: bigint, now: Date) {
         lastAfkDoubled: false,
       },
     });
+    await refreshMissionsAfterPrestige(tx, wallet.playerId, now);
     await track(tx, wallet.playerId, "prestige", {
       gained: p.starsToGain,
       stars: p.stars + p.starsToGain,

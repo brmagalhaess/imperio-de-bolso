@@ -30,3 +30,4 @@
 | [0024](ADRs/0024-pacotes-promocionais.md) | Pacotes promocionais: 3 por semana (faixas baixa/média/alta) + feriados, vitrine ≤ 5, 1 compra por vitrine, entrega no servidor | aceita |
 | [0025](ADRs/0025-dobro-de-moedas-e-auto-coleta-em-todas-as-cidades.md) | Dobro de moedas (×2 total, R$ 129,90, 3/mês) e auto-coleta/AFK pagos em todas as cidades | aceita |
 | [0026](ADRs/0026-ranking-ligas-por-vendas-e-premios.md) | Ligas por vendas do império (grupo fixo na semana), prêmios maiores com bônus semanal, coroa/medalhas e selo VIP | aceita |
+| [0027](ADRs/0027-venda-zera-ranking-missoes-e-conta-da-equipe.md) | Vender o império zera a pontuação da semana e renova as missões não resgatadas; conta da equipe fora do ranking | aceita |

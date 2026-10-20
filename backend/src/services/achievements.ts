@@ -10,6 +10,8 @@ type Reader = Db | Tx;
 
 /** Motivos do ledger que contam como faturamento de produção (conquistas e ranking). */
 export const PRODUCTION_REASONS = ["production_collect", "production_auto"];
+/** Lançamento gravado ao vender o império (marco de recomeço do ranking da semana). */
+export const PRESTIGE_REASON = "prestige_reset";
 
 async function stats(db: Reader, playerId: string): Promise<AchievementStats> {
   const [owned, defs, earned] = await Promise.all([

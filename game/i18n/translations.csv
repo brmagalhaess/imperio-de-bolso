@@ -505,3 +505,5 @@ Passe VIP ativo até %s,Passe VIP ativo até %s,VIP Pass active until %s,Pase VI
 Ativo até %s (assinatura de teste da Apple: renova mais rápido),Ativo até %s (assinatura de teste da Apple: renova mais rápido),Active until %s (Apple test subscription: renews faster),Activo hasta %s (suscripción de prueba de Apple: se renueva más rápido)
 Ativo até %s · renova todo mês,Ativo até %s · renova todo mês,Active until %s · renews monthly,Activo hasta %s · se renueva cada mes
 Termina em %s.,Termina em %s.,Ends in %s.,Termina en %s.
+Conta da equipe,Conta da equipe,Team account,Cuenta del equipo
+"Esta conta é de testes da equipe e fica fora do ranking, para não concorrer com os jogadores.","Esta conta é de testes da equipe e fica fora do ranking, para não concorrer com os jogadores.","This is a team test account and is kept out of the rankings so it does not compete with players.","Esta es una cuenta de pruebas del equipo y queda fuera del ranking para no competir con los jugadores."

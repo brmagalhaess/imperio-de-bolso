@@ -4,12 +4,13 @@ import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { track } from "./analytics.js";
 import { getPlayerState } from "./game.js";
 import { gameDay, weekBounds } from "../lib/time.js";
-import { PRODUCTION_REASONS } from "./achievements.js";
+import { PRESTIGE_REASON, PRODUCTION_REASONS } from "./achievements.js";
 import { weekIndex } from "../economy/bundles.js";
 import { grantBundle } from "./bundles.js";
 
 // Ranking semanal — "Desafio dos 7 dias" da conversa original: quem faturou mais com
-// produção na semana (segunda 00:00 → domingo 23:59, horário de Brasília).
+// produção na semana (segunda 00:00 → domingo 23:59, horário de Brasília). Quem vende o império
+// recomeça do zero: conta só o faturamento depois da última venda dentro da semana.
 
 export const LEADERBOARD_SIZE = 50;
 
@@ -23,16 +24,22 @@ interface Row {
 export async function getLeaderboard(db: Db, playerId: string, now: Date) {
   const { start, end } = weekBounds(now);
   const rows = await db.$queryRaw<Row[]>`
-    WITH scores AS (
-      SELECT player_id, SUM(delta) AS score
+    WITH resets AS (
+      SELECT player_id, MAX(created_at) AS at
       FROM wallet_ledger
-      WHERE currency = 'COINS' AND reason = ANY(${PRODUCTION_REASONS})
-        AND created_at >= ${start} AND created_at < ${end}
+      WHERE reason = ${PRESTIGE_REASON} AND created_at >= ${start} AND created_at < ${end}
       GROUP BY player_id
+    ), scores AS (
+      SELECT l.player_id, SUM(l.delta) AS score
+      FROM wallet_ledger l LEFT JOIN resets r ON r.player_id = l.player_id
+      WHERE l.currency = 'COINS' AND l.reason = ANY(${PRODUCTION_REASONS})
+        AND l.created_at >= ${start} AND (r.at IS NULL OR l.created_at > r.at) AND l.created_at < ${end}
+      GROUP BY l.player_id
     ), ranked AS (
       SELECT s.player_id AS "playerId", p.display_name AS "displayName", s.score,
              RANK() OVER (ORDER BY s.score DESC) AS rank
       FROM scores s JOIN players p ON p.id = s.player_id
+      WHERE NOT p.is_staff
     )
     SELECT * FROM ranked
     WHERE rank <= ${LEADERBOARD_SIZE} OR "playerId" = ${playerId}::uuid
@@ -56,8 +63,15 @@ export async function getLeaderboard(db: Db, playerId: string, now: Date) {
       rows.map((r) => r.playerId),
       now,
     ),
+    /** Conta da equipe: aparece para ela mesma como "fora do ranking". */
+    staff: await isStaff(db, playerId),
     serverTime: now.toISOString(),
   };
+}
+
+async function isStaff(db: Db, playerId: string): Promise<boolean> {
+  const p = await db.player.findUnique({ where: { id: playerId }, select: { staff: true } });
+  return p?.staff ?? false;
 }
 
 /** Quem tem Passe VIP ativo entre os jogadores listados (selo VIP no ranking). */
@@ -103,13 +117,22 @@ async function leagueScores(
 ): Promise<ScoreRow[]> {
   const { start, end } = weekBounds(week);
   return db.$queryRaw<ScoreRow[]>`
+    WITH resets AS (
+      SELECT player_id, MAX(created_at) AS at
+      FROM wallet_ledger
+      WHERE reason = ${PRESTIGE_REASON} AND created_at >= ${start} AND created_at < ${end}
+      GROUP BY player_id
+    )
     SELECT lw.player_id AS "playerId", p.display_name AS "displayName",
            COALESCE(SUM(l.delta), 0)::bigint AS score
     FROM player_league_weeks lw
     JOIN players p ON p.id = lw.player_id
+    LEFT JOIN resets r ON r.player_id = lw.player_id
     LEFT JOIN wallet_ledger l ON l.player_id = lw.player_id AND l.currency = 'COINS'
-      AND l.reason = ANY(${PRODUCTION_REASONS}) AND l.created_at >= ${start} AND l.created_at < ${end}
+      AND l.reason = ANY(${PRODUCTION_REASONS})
+      AND l.created_at >= ${start} AND (r.at IS NULL OR l.created_at > r.at) AND l.created_at < ${end}
     WHERE lw.week = ${weekId(week)} AND lw.league = ${league} AND lw.bracket = ${bracket}
+      AND NOT p.is_staff
     GROUP BY lw.player_id, p.display_name
     ORDER BY score DESC, p.display_name`;
 }
@@ -199,7 +222,7 @@ export async function getStarsRanking(db: Db, playerId: string, now: Date) {
     WITH ranked AS (
       SELECT id AS "playerId", display_name AS "displayName", prestige_stars AS stars,
              RANK() OVER (ORDER BY prestige_stars DESC) AS rank
-      FROM players WHERE prestige_stars > 0
+      FROM players WHERE prestige_stars > 0 AND NOT is_staff
     )
     SELECT * FROM ranked
     WHERE rank <= ${LEADERBOARD_SIZE} OR "playerId" = ${playerId}::uuid
@@ -215,6 +238,7 @@ export async function getStarsRanking(db: Db, playerId: string, now: Date) {
   return {
     entries: rows.filter((r) => Number(r.rank) <= LEADERBOARD_SIZE).map(view),
     me: me ? view(me) : null,
+    staff: await isStaff(db, playerId),
     serverTime: now.toISOString(),
   };
 }
@@ -222,7 +246,7 @@ export async function getStarsRanking(db: Db, playerId: string, now: Date) {
 // --- Pódio semanal (ADR 0017) ---------------------------------------------------
 // Fechada a semana, 1º, 2º e 3º lugar do ranking geral e de cada liga ganham diamantes.
 // Conferido na primeira visita da semana seguinte; o jogador resgata pelo aviso no jogo.
-// Vender o império não tira ninguém do ranking: a pontuação é o faturamento já registrado.
+// Vender o império zera a pontuação da semana (conta só o faturamento depois da venda).
 
 export const WEEK_PRIZES = [300, 180, 100] as const;
 export const LEAGUE_PRIZES = [100, 60, 30] as const;
@@ -271,14 +295,21 @@ async function weekRank(
 ): Promise<{ rank: number; score: bigint } | null> {
   const { start, end } = weekBounds(week);
   const rows = await db.$queryRaw<{ playerId: string; score: bigint; rank: bigint }[]>`
-    WITH scores AS (
-      SELECT player_id, SUM(delta) AS score
+    WITH resets AS (
+      SELECT player_id, MAX(created_at) AS at
       FROM wallet_ledger
-      WHERE currency = 'COINS' AND reason = ANY(${PRODUCTION_REASONS})
-        AND created_at >= ${start} AND created_at < ${end}
+      WHERE reason = ${PRESTIGE_REASON} AND created_at >= ${start} AND created_at < ${end}
       GROUP BY player_id
+    ), scores AS (
+      SELECT l.player_id, SUM(l.delta) AS score
+      FROM wallet_ledger l LEFT JOIN resets r ON r.player_id = l.player_id
+      WHERE l.currency = 'COINS' AND l.reason = ANY(${PRODUCTION_REASONS})
+        AND l.created_at >= ${start} AND (r.at IS NULL OR l.created_at > r.at) AND l.created_at < ${end}
+      GROUP BY l.player_id
     ), ranked AS (
-      SELECT player_id AS "playerId", score, RANK() OVER (ORDER BY score DESC) AS rank FROM scores
+      SELECT s.player_id AS "playerId", s.score, RANK() OVER (ORDER BY s.score DESC) AS rank
+      FROM scores s JOIN players p ON p.id = s.player_id
+      WHERE NOT p.is_staff
     )
     SELECT * FROM ranked WHERE "playerId" = ${playerId}::uuid`;
   const r = rows[0];

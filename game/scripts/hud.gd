@@ -1010,6 +1010,8 @@ func open_ranking_menu(tab := -1) -> void:
 	else:
 		_modal.add_message(null, tr("Estrelas de investidor"),
 				tr("Quem acumulou mais estrelas vendendo o império (Perfil → Prestígio)."))
+	if data.get("staff", false):
+		_modal.add_message(null, tr("Conta da equipe"), tr("Esta conta é de testes da equipe e fica fora do ranking, para não concorrer com os jogadores."))
 	if entries.is_empty():
 		_modal.add_message(null, "", tr("Ninguém faturou nesta semana ainda. Colete moedas e saia na frente!")
 				if shown_tab < 2 else tr("Ninguém vendeu o império ainda. Seja o primeiro!"))

@@ -2,6 +2,18 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-19 — Vender o império zera o ranking e renova as missões; conta da equipe (ADR 0027)
+
+- Servidor: ranking da semana, liga e pódio contam só o faturamento depois da última venda do
+  império na semana (marco `prestige_reset` do ledger). Ao vender, as missões de hoje não
+  resgatadas são sorteadas de novo com alvo/prêmio do império novo (antes: prêmio de trilhões com
+  100 moedas). Conta da equipe (`is_staff`, migração `20261019120000_staff_accounts`) fora de todos
+  os rankings e pódios; `GET /leaderboard` traz `staff`. Testes: **160**.
+- Painel admin: botão "Conta da equipe (tirar do ranking)" no detalhe do jogador; selo "equipe"
+  na lista.
+- Jogo: aviso "Conta da equipe" no ranking (pt/en/es). Jogo: **153** verificações.
+- Pendente: marcar a conta do iPhone de desenvolvimento como equipe no painel admin de produção.
+
 ## 2026-10-18 — 1.0.2 aprovada; 1.0.3 (build 12) enviada
 
 - Apple aprovou a **1.0.2** (à venda). Os 20 pacotes e o Dobro de moedas seguem "Aguardando
