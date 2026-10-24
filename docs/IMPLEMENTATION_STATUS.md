@@ -2,6 +2,13 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-24 — iPhone 1.0.5 (build 13) enviada; card de versões no painel
+
+- iOS **1.0.5 (build 13)** com o botão "Compartilhar no Facebook", prêmios com teto e aviso de
+  ranking semanal; enviada para revisão da Apple. Android já está na 1.0.5 na produção.
+- Painel: card "Versão nas lojas" (App Store pela consulta pública; Google pela conta de
+  serviço) com as versões em uso pelos jogadores. Testes: servidor **175**.
+
 ## 2026-10-24 — Compras de teste e equipe fora do painel (ADR 0031); Google 1.0.5 publicada
 
 - Recibos e assinaturas marcam `test` (Sandbox, testador, mock); migração
