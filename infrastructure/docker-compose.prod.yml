@@ -47,6 +47,9 @@ services:
       # Loja paga só no iPhone (ADR 0022); a versão 1.0.0 não manda a plataforma e segue sem loja paga.
       PURCHASES_PLATFORMS: ${PURCHASES_PLATFORMS:-ios}
       APPLE_BUNDLE_ID: ${APPLE_BUNDLE_ID:-br.com.imperiodebolso.game}
+      # Google Play Billing (ADR 0028): conta de serviço (base64 do JSON) para verificar compras.
+      GOOGLE_PLAY_PACKAGE: ${GOOGLE_PLAY_PACKAGE:-br.com.imperiodebolso.game}
+      GOOGLE_PLAY_SERVICE_ACCOUNT: ${GOOGLE_PLAY_SERVICE_ACCOUNT:-}
       ADS_ENABLED: ${ADS_ENABLED:-false}
       # Anúncios só no iPhone: ADS_PLATFORMS=ios com ADS_MODE=admob (mock é recusado em produção).
       ADS_PLATFORMS: ${ADS_PLATFORMS:-}
