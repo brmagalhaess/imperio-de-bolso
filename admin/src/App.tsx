@@ -13,8 +13,15 @@ import {
   type Reports,
   setToken,
 } from "./api";
+import {
+  exportPlayersCsv,
+  PlayerSupport,
+  RevenueView,
+  TrendsSection,
+} from "./insights";
 
-// Painel administrativo (docs/README.md §3; ADR 0021): leitura de tudo + moderação de nomes.
+// Painel administrativo (docs/README.md §3; ADR 0021/0030): visão geral com tendências, receita,
+// economia, ranking, moderação, jogadores (com ações de suporte) e eventos.
 
 const fmt = (v: string | number) => {
   try {
@@ -84,6 +91,7 @@ const REASONS: Record<string, string> = {
   store: "Loja (diamantes)",
   purchase: "Compra com dinheiro",
   refund: "Reembolso",
+  admin_grant: "Diamantes do suporte",
 };
 const reasonName = (r: string) => {
   const [base, detail] = r.split(":");
@@ -92,14 +100,21 @@ const reasonName = (r: string) => {
 };
 
 type Tab =
-  "overview" | "economy" | "ranking" | "moderation" | "players" | "events";
-const TABS: [Tab, string][] = [
-  ["overview", "Visão geral"],
-  ["economy", "Economia"],
-  ["ranking", "Ranking"],
-  ["moderation", "Moderação"],
-  ["players", "Jogadores"],
-  ["events", "Eventos"],
+  | "overview"
+  | "revenue"
+  | "economy"
+  | "ranking"
+  | "moderation"
+  | "players"
+  | "events";
+const TABS: [Tab, string, string][] = [
+  ["overview", "📊", "Visão geral"],
+  ["revenue", "💰", "Receita"],
+  ["players", "👥", "Jogadores"],
+  ["economy", "🪙", "Economia"],
+  ["ranking", "🏆", "Ranking"],
+  ["moderation", "🛡️", "Moderação"],
+  ["events", "📜", "Eventos"],
 ];
 
 export function App() {
@@ -126,10 +141,16 @@ export function App() {
   };
   return (
     <div className="shell">
-      <header>
-        <h1>Império de Bolso · Admin</h1>
+      <aside>
+        <div className="brand">
+          <img src="/icone.png" alt="" width={40} height={40} />
+          <div>
+            <strong>Império de Bolso</strong>
+            <small>Painel admin</small>
+          </div>
+        </div>
         <nav>
-          {TABS.map(([t, label]) => (
+          {TABS.map(([t, icon, label]) => (
             <button
               key={t}
               className={tab === t ? "active" : ""}
@@ -138,17 +159,21 @@ export function App() {
                 setPlayer(null);
               }}
             >
-              {label}
+              <span aria-hidden>{icon}</span> {label}
             </button>
           ))}
-          <button className="ghost" onClick={logout}>
-            Sair
-          </button>
         </nav>
-      </header>
-      {error && <p className="error">{error}</p>}
+        <button className="ghost logout" onClick={logout}>
+          Sair
+        </button>
+      </aside>
       <main>
+        <header>
+          <h1>{TABS.find(([t]) => t === tab)?.[2]}</h1>
+        </header>
+        {error && <p className="error">{error}</p>}
         {tab === "overview" && <OverviewView {...props} />}
+        {tab === "revenue" && <RevenueView {...props} />}
         {tab === "economy" && <EconomyView {...props} />}
         {tab === "ranking" && <RankingView {...props} />}
         {tab === "moderation" && <ModerationView {...props} />}
@@ -201,13 +226,13 @@ function Login({ onLogin }: { onLogin: (token: string) => void }) {
   );
 }
 
-interface ViewProps {
+export interface ViewProps {
   onError: (msg: string) => void;
   onAuthFail: () => void;
   openPlayer: (id: string) => void;
 }
 
-function useAdmin<T>(path: string, { onError, onAuthFail }: ViewProps) {
+export function useAdmin<T>(path: string, { onError, onAuthFail }: ViewProps) {
   const [data, setData] = useState<T | null>(null);
   const load = useCallback(async () => {
     try {
@@ -250,6 +275,12 @@ function Bar({ value, max }: { value: number; max: number }) {
 
 function OverviewView(props: ViewProps) {
   const { data, reload } = useAdmin<Overview>("/overview", props);
+  const [auto, setAuto] = useState(false);
+  useEffect(() => {
+    if (!auto) return;
+    const t = setInterval(() => void reload(), 60_000);
+    return () => clearInterval(t);
+  }, [auto, reload]);
   if (!data) return <p className="muted">Carregando…</p>;
   const events = Object.entries(data.eventsLast24h).sort((a, b) => b[1] - a[1]);
   const funnelMax = Math.max(1, ...data.mapFunnel.map((m) => m.players));
@@ -266,8 +297,17 @@ function OverviewView(props: ViewProps) {
         <span className="badge">
           {data.features.ads ? "Anúncios ligados" : "Sem anúncios (v1.0)"}
         </span>
+        <label className="check">
+          <input
+            type="checkbox"
+            checked={auto}
+            onChange={(e) => setAuto(e.target.checked)}
+          />
+          Atualizar a cada minuto
+        </label>
         <button onClick={() => void reload()}>Atualizar</button>
       </div>
+      <TrendsSection {...props} />
       <h2>Jogadores</h2>
       <Cards
         items={[
@@ -636,10 +676,24 @@ function PlayersView(props: ViewProps) {
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("recent");
-  const { data } = useAdmin<{ players: PlayerRow[] }>(
-    `/players?limit=100&sort=${sort}${query ? `&search=${encodeURIComponent(query)}` : ""}`,
+  const [filter, setFilter] = useState("all");
+  const { data: raw } = useAdmin<{ players: PlayerRow[] }>(
+    `/players?limit=200&sort=${sort}${query ? `&search=${encodeURIComponent(query)}` : ""}`,
     props,
   );
+  const FILTERS: Record<string, (p: PlayerRow) => boolean> = {
+    all: () => true,
+    active: (p) =>
+      !!p.lastSeenAt &&
+      Date.now() - new Date(p.lastSeenAt).getTime() < 86_400_000,
+    linked: (p) => p.linked,
+    prestige: (p) => p.prestigeStars > 0,
+    staff: (p) => p.staff,
+    new: (p) => Date.now() - new Date(p.createdAt).getTime() < 86_400_000,
+  };
+  const data = raw && {
+    players: raw.players.filter(FILTERS[filter] ?? (() => true)),
+  };
   return (
     <>
       <form
@@ -659,7 +713,24 @@ function PlayersView(props: ViewProps) {
           <option value="seen">Jogaram por último</option>
           <option value="stars">Mais estrelas</option>
         </select>
+        <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+          <option value="all">Todos</option>
+          <option value="active">Ativos nas últimas 24 h</option>
+          <option value="new">Novos (24 h)</option>
+          <option value="linked">Conta vinculada</option>
+          <option value="prestige">Já venderam o império</option>
+          <option value="staff">Equipe</option>
+        </select>
         <button type="submit">Buscar</button>
+        {data && data.players.length > 0 && (
+          <button
+            type="button"
+            className="ghost"
+            onClick={() => exportPlayersCsv(data.players)}
+          >
+            ⬇ Exportar CSV ({data.players.length})
+          </button>
+        )}
       </form>
       {!data ? (
         <p className="muted">Carregando…</p>
@@ -719,6 +790,24 @@ function PlayerView({
 }: ViewProps & { id: string; onBack: () => void }) {
   const { data, reload } = useAdmin<PlayerDetail>(`/players/${id}`, props);
   const [busy, setBusy] = useState(false);
+  const resetName = async () => {
+    if (
+      !data ||
+      !window.confirm(
+        `Trocar o nome "${data.displayName}" pelo padrão (Empreendedor NNNN)?`,
+      )
+    )
+      return;
+    setBusy(true);
+    try {
+      await adminPost(`/reports/${id}/reset-name`);
+      await reload();
+    } catch (err) {
+      props.onError(String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
   const toggleStaff = async () => {
     if (!data) return;
     const question = data.staff
@@ -751,6 +840,13 @@ function PlayerView({
     <>
       <div className="toolbar">
         <button onClick={onBack}>← Jogadores</button>
+        <button
+          disabled={busy}
+          className="ghost"
+          onClick={() => void resetName()}
+        >
+          Trocar nome pelo padrão
+        </button>
         <button disabled={busy} onClick={() => void toggleStaff()}>
           {data.staff
             ? "Voltar ao ranking"
@@ -797,6 +893,12 @@ function PlayerView({
           ],
           ["Denúncias abertas", fmt(data.openReports)],
         ]}
+      />
+      <PlayerSupport
+        id={id}
+        name={data.displayName}
+        onChanged={() => void reload()}
+        {...props}
       />
       <h2>Missões de hoje</h2>
       {data.missionsToday.length === 0 ? (

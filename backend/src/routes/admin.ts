@@ -13,10 +13,11 @@ import { dayBounds, gameDay, weekBounds } from "../lib/time.js";
 import { PRODUCTION_REASONS } from "../services/achievements.js";
 import { track } from "../services/analytics.js";
 import { LEAGUES, weekId } from "../services/leaderboard.js";
+import { insightsRoutes } from "./admin-insights.js";
 
-// Painel administrativo (docs/README.md §3; ADR 0021). Leitura de tudo; as únicas escritas são
-// de moderação de nomes denunciados (trocar pelo padrão / arquivar a denúncia), registradas em
-// analytics como "admin_*".
+// Painel administrativo (docs/README.md §3; ADR 0021/0030). Leitura de tudo; as escritas são de
+// moderação (nomes denunciados, conta da equipe) e de suporte (diamantes de compensação e
+// reembolso manual — routes/admin-insights.ts), registradas em analytics como "admin_*".
 // Autenticação: Authorization: Bearer <ADMIN_TOKEN>. Sem token configurado → rotas desligadas.
 
 export interface AdminDeps {
@@ -501,4 +502,6 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
       })),
     };
   });
+
+  await insightsRoutes(app, { db, now });
 }

@@ -2,6 +2,14 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-24 — Painel admin v3 (ADR 0030) e Google Cloud preparado
+
+- Painel: menu lateral, gráficos de 30 dias, aba Receita, diamantes de suporte, reembolso manual,
+  filtros e CSV. Servidor: **171** testes.
+- Google Cloud: projeto `imperio-de-bolso-pagamentos` criado e a Google Play Android Developer API
+  ativada. Falta (titular): criar a conta de serviço + chave JSON, convidar no Play Console e a
+  conta de comerciante.
+
 ## 2026-10-24 — Prêmios com teto, virada da semana, evento após a venda e compartilhar (ADR 0029)
 
 - Servidor: missões e calendário pagam no máximo o preço do próximo negócio; produção do domingo

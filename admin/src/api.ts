@@ -1,4 +1,4 @@
-// Cliente da API admin (leitura + moderação de nomes, ADR 0021). Token só na aba (sessionStorage).
+// Cliente da API admin (leitura, moderação e suporte, ADR 0021/0030). Token só na aba (sessionStorage).
 const TOKEN_KEY = "imperio_admin_token";
 
 export function getToken(): string {
@@ -34,26 +34,37 @@ export async function adminGet<T>(
   return adminRequest<T>("GET", path, token);
 }
 
-export async function adminPost<T>(path: string): Promise<T> {
-  return adminRequest<T>("POST", path, getToken());
+export async function adminPost<T>(
+  path: string,
+  body?: unknown,
+  headers: Record<string, string> = {},
+): Promise<T> {
+  return adminRequest<T>("POST", path, getToken(), body, headers);
 }
 
 async function adminRequest<T>(
   method: string,
   path: string,
   token: string,
+  body?: unknown,
+  extra: Record<string, string> = {},
 ): Promise<T> {
   const res = await fetch(`/api/admin${path}`, {
     method,
-    headers: { authorization: `Bearer ${token}` },
+    headers: {
+      authorization: `Bearer ${token}`,
+      ...(body === undefined ? {} : { "content-type": "application/json" }),
+      ...extra,
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
-  const body = await res.json().catch(() => ({}));
+  const data = await res.json().catch(() => ({}));
   if (!res.ok)
     throw new ApiError(
       res.status,
-      body?.error?.message ?? `Erro ${res.status}`,
+      data?.error?.message ?? `Erro ${res.status}`,
     );
-  return body as T;
+  return data as T;
 }
 
 export interface Overview {
@@ -193,4 +204,54 @@ export interface EventRow {
   name: string;
   props: Record<string, unknown>;
   at: string;
+}
+
+export interface TrendDay {
+  day: string;
+  newPlayers: number;
+  activePlayers: number;
+  purchases: number;
+  revenueBRL: number;
+  adViews: number;
+  prestiges: number;
+}
+
+export interface Trends {
+  days: TrendDay[];
+  serverTime: string;
+}
+
+export interface PurchaseRow {
+  at: string;
+  playerId?: string | null;
+  displayName?: string;
+  productId: string;
+  title: string;
+  priceBRL: number;
+  store: string;
+  transactionId: string;
+  status: string;
+}
+
+export interface Revenue {
+  totals: {
+    revenueBRL: number;
+    revenue30dBRL: number;
+    purchases: number;
+    purchases30d: number;
+    refunds: number;
+    buyers: number;
+    activeSubscriptions: Record<string, number>;
+  };
+  byStore: { store: string; purchases: number; revenueBRL: number }[];
+  byProduct: {
+    productId: string;
+    title: string;
+    priceBRL: number;
+    count: number;
+    revenueBRL: number;
+    refunds: number;
+  }[];
+  recent: PurchaseRow[];
+  serverTime: string;
 }

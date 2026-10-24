@@ -287,3 +287,12 @@ em `POST /store/buy` → `200 { bought, turboUntil, state }` (soma tempo se já 
   for UUID. Conta da equipe: título genérico.
 - Prêmios em moedas de `/missions` e `/daily-reward` têm teto no preço do próximo negócio.
 
+### 2026-10-24 — Admin v3 (ADR 0030)
+
+- `GET /api/admin/trends?days=7..90` → `{ days: [{ day, newPlayers, activePlayers, purchases,
+  revenueBRL, adViews, prestiges }] }`.
+- `GET /api/admin/revenue` → `{ totals, byStore, byProduct, recent }`.
+- `POST /api/admin/players/:id/gems` `{ amount, note }` + header `Idempotency-Key` → `{ playerId, gems }`.
+- `POST /api/admin/purchases/revoke` `{ store, transactionId }` → `{ alreadyRevoked, shortfall }`.
+- `GET /api/admin/players/:id/purchases` → `{ purchases: [...] }`.
+
