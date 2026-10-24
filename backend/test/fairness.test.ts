@@ -106,6 +106,19 @@ describe("compartilhar a posição", () => {
       'og:image" content="https://imperio.crowntech.com.br/img/compartilhar.jpg"',
     );
 
+    // Aberta pelo jogo (s=1): folha de compartilhar com a imagem montada e o link do post.
+    const sheet = await ctx.app.inject({
+      method: "GET",
+      url: `/api/v1/share/rank/${g.playerId}?t=semana&s=1`,
+    });
+    expect(sheet.body).toContain("navigator.share");
+    expect(sheet.body).toContain("Compartilhar");
+    expect(sheet.body).toContain("wa.me");
+    const card = await ctx.app.inject({ method: "GET", url: "/api/v1/share/rank/card.jpg" });
+    expect(card.statusCode).toBe(200);
+    expect(card.headers["content-type"]).toBe("image/jpeg");
+    expect(card.rawPayload.length).toBeGreaterThan(10_000);
+
     await ctx.db.player.update({ where: { id: g.playerId }, data: { staff: true } });
     const staff = await ctx.app.inject({ method: "GET", url: `/api/v1/share/rank/${g.playerId}` });
     expect(staff.body).not.toContain("lugar");

@@ -143,7 +143,13 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   );
 
   await app.register(
-    (instance) => shareRoutes(instance, { db: deps.db, now, siteUrl: deps.config.SITE_URL }),
+    (instance) =>
+      shareRoutes(instance, {
+        db: deps.db,
+        now,
+        siteUrl: deps.config.SITE_URL,
+        apiUrl: deps.config.PUBLIC_API_URL,
+      }),
     { prefix: "/api/v1" },
   );
 

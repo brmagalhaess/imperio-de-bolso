@@ -1041,17 +1041,18 @@ func open_ranking_menu(tab := -1) -> void:
 	if me != null and not data.get("staff", false) and str(me.get("playerId", "")) != "":
 		var tab_key: String = ["liga", "semana", "estrelas"][shown_tab]
 		var player_id := str(me.playerId)
-		_modal.add_action(tr("Compartilhar no Facebook"), func(): share_rank(player_id, tab_key),
+		_modal.add_action(tr("Compartilhar minha posição"), func(): share_rank(player_id, tab_key),
 				Color("1877f2"), Color("0d5bbf"))
 	_modal.refit()
 
 
-## Compartilhar a posição: o servidor monta a página do post (título com a posição e imagem do
-## jogo) e o Facebook abre no app ou no navegador para o jogador publicar.
+## Compartilhar a posição: abre a página do servidor que monta a imagem com o nome e a posição e
+## chama a folha de compartilhar do celular (Facebook, WhatsApp, Instagram…) com a imagem e o
+## link. Abrir o facebook.com/sharer direto não serve: o app do Facebook só abre o feed.
 func share_rank(player_id: String, tab_key: String) -> void:
-	var page := "%s/share/rank/%s?t=%s" % [Api.base_url, player_id, tab_key]
-	GameState.track("rank_shared", {"tab": tab_key, "network": "facebook"})
-	OS.shell_open("https://www.facebook.com/sharer/sharer.php?u=" + page.uri_encode())
+	var page := "%s/share/rank/%s?t=%s&s=1" % [Api.base_url, player_id, tab_key]
+	GameState.track("rank_shared", {"tab": tab_key, "network": "sheet"})
+	OS.shell_open(page)
 
 
 ## Tocar em outro jogador no ranking: denunciar o nome ou ocultar (diretriz 1.2 da App Store).

@@ -14,6 +14,7 @@ RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=build /app/dist ./dist
 COPY prisma ./prisma
 COPY prisma.config.ts ./
+COPY assets ./assets
 USER node
 EXPOSE 3000
 # Migrações e catálogo antes de subir a API (ambos idempotentes).

@@ -32,6 +32,8 @@ const ConfigSchema = z.object({
   GOOGLE_PLAY_SERVICE_ACCOUNT: z.string().default(""),
   // Site do jogo: destino e imagem do compartilhamento da posição no ranking.
   SITE_URL: z.url().default("https://imperio.crowntech.com.br"),
+  // Endereço público da API (link que vai no post compartilhado).
+  PUBLIC_API_URL: z.url().default("https://api-imperio.crowntech.com.br/api/v1"),
   ADS_ENABLED: z.enum(["true", "false"]).optional(),
   // Anúncios só em algumas plataformas (ex.: ADS_PLATFORMS=ios), como PURCHASES_PLATFORMS.
   ADS_PLATFORMS: z.string().default(""),
