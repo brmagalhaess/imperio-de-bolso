@@ -245,6 +245,8 @@ export interface PurchaseRow {
   store: string;
   transactionId: string;
   status: string;
+  /** Sandbox da Apple, testador do Google ou conta da equipe: fora da receita. */
+  test?: boolean;
 }
 
 export interface Revenue {
@@ -254,6 +256,7 @@ export interface Revenue {
     purchases: number;
     purchases30d: number;
     refunds: number;
+    testPurchases: number;
     buyers: number;
     activeSubscriptions: Record<string, number>;
   };

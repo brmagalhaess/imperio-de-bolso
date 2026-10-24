@@ -1,3 +1,4 @@
+import type { Prisma } from "../generated/prisma/client.js";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import type { Db } from "../db/prisma.js";
@@ -27,6 +28,16 @@ for (const b of BUNDLES) {
   PRODUCTS.set(b.productId, { title: b.title, priceBRL: Number(b.priceBRL.replace(",", ".")) });
 }
 const priceOf = (productId: string) => PRODUCTS.get(productId)?.priceBRL ?? 0;
+
+/**
+ * Compra real (entra na receita e nas estatísticas): sem a loja "mock", fora do Sandbox da Apple
+ * e dos testadores do Google, e de quem não é da equipe. As de teste ficam só no registro.
+ */
+const REAL: Prisma.PurchaseReceiptWhereInput = {
+  test: false,
+  store: { not: "mock" },
+  OR: [{ playerId: null }, { player: { staff: false } }],
+};
 const round2 = (v: number) => Math.round(v * 100) / 100;
 
 export interface InsightsDeps {
@@ -47,19 +58,23 @@ export async function insightsRoutes(app: FastifyInstance, deps: InsightsDeps): 
     const start = new Date(end.getTime() - days * DAY_MS);
     const dayOf = (d: Date) => gameDay(d);
     const [players, active, receipts, ads, prestiges] = await Promise.all([
-      db.player.findMany({ where: { createdAt: { gte: start } }, select: { createdAt: true } }),
+      db.player.findMany({
+        where: { createdAt: { gte: start }, staff: false },
+        select: { createdAt: true },
+      }),
       // Ativos = jogadores com qualquer lançamento no ledger no dia (coleta, compra, prêmio…).
       db.$queryRaw<{ day: string; players: bigint }[]>`
         SELECT to_char(created_at AT TIME ZONE 'America/Sao_Paulo', 'YYYY-MM-DD') AS day,
                COUNT(DISTINCT player_id) AS players
-        FROM wallet_ledger WHERE created_at >= ${start}
+        FROM wallet_ledger
+        WHERE created_at >= ${start} AND player_id NOT IN (SELECT id FROM players WHERE is_staff)
         GROUP BY 1`,
       db.purchaseReceipt.findMany({
-        where: { createdAt: { gte: start }, store: { not: "mock" } },
+        where: { ...REAL, createdAt: { gte: start } },
         select: { createdAt: true, productId: true, status: true },
       }),
       db.adReward.findMany({
-        where: { createdAt: { gte: start }, status: "CLAIMED" },
+        where: { createdAt: { gte: start }, status: "CLAIMED", player: { staff: false } },
         select: { createdAt: true },
       }),
       db.analyticsEvent.findMany({
@@ -155,21 +170,31 @@ export async function insightsRoutes(app: FastifyInstance, deps: InsightsDeps): 
   app.get("/revenue", async () => {
     const at = now();
     const since30 = new Date(at.getTime() - 30 * DAY_MS);
-    const [receipts, subs, recent] = await Promise.all([
+    const [receipts, subs, recent, tests] = await Promise.all([
       db.purchaseReceipt.findMany({
-        where: { store: { not: "mock" } },
+        where: REAL,
         select: { productId: true, store: true, status: true, createdAt: true, playerId: true },
       }),
       db.subscription.groupBy({
         by: ["store"],
-        where: { status: "ACTIVE", expiresAt: { gt: at }, store: { not: "mock" } },
+        where: {
+          status: "ACTIVE",
+          expiresAt: { gt: at },
+          test: false,
+          store: { not: "mock" },
+          OR: [{ playerId: null }, { player: { staff: false } }],
+        },
         _count: { _all: true },
       }),
+      // A lista mostra também as de teste (marcadas), para conferência.
       db.purchaseReceipt.findMany({
-        where: { store: { not: "mock" } },
+        where: { OR: [{ playerId: null }, { player: { staff: false } }] },
         orderBy: { createdAt: "desc" },
         take: 50,
-        include: { player: { select: { displayName: true } } },
+        include: { player: { select: { displayName: true, staff: true } } },
+      }),
+      db.purchaseReceipt.count({
+        where: { NOT: REAL, OR: [{ playerId: null }, { player: { staff: false } }] },
       }),
     ]);
     const ok = receipts.filter((r) => r.status === "VERIFIED");
@@ -192,6 +217,8 @@ export async function insightsRoutes(app: FastifyInstance, deps: InsightsDeps): 
         purchases: ok.length,
         purchases30d: ok.filter((r) => r.createdAt >= since30).length,
         refunds: receipts.length - ok.length,
+        /** Compras de teste (Sandbox, testadores, equipe): registradas, fora da receita. */
+        testPurchases: tests,
         buyers: new Set(ok.map((r) => r.playerId).filter(Boolean)).size,
         activeSubscriptions: Object.fromEntries(subs.map((s) => [s.store, s._count._all])),
       },
@@ -218,6 +245,7 @@ export async function insightsRoutes(app: FastifyInstance, deps: InsightsDeps): 
         store: r.store,
         transactionId: r.transactionId,
         status: r.status,
+        test: r.test || r.store === "mock" || (r.player?.staff ?? false),
       })),
       serverTime: at.toISOString(),
     };
@@ -273,6 +301,7 @@ export async function insightsRoutes(app: FastifyInstance, deps: InsightsDeps): 
     const { id } = z.object({ id: z.uuid() }).parse(request.params);
     const rows = await db.purchaseReceipt.findMany({
       where: { playerId: id },
+      include: { player: { select: { staff: true } } },
       orderBy: { createdAt: "desc" },
       take: 100,
     });
@@ -285,6 +314,7 @@ export async function insightsRoutes(app: FastifyInstance, deps: InsightsDeps): 
         store: r.store,
         transactionId: r.transactionId,
         status: r.status,
+        test: r.test || r.store === "mock" || (r.player?.staff ?? false),
       })),
     };
   });

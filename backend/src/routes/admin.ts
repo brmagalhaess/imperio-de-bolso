@@ -27,6 +27,14 @@ export interface AdminDeps {
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+/**
+ * Contas da equipe (testes) não aparecem em nenhuma tela nem número do painel — só no filtro
+ * "Equipe" da lista de jogadores, para poder gerenciá-las.
+ */
+const REAL_PLAYER = { staff: false } satisfies Prisma.PlayerWhereInput;
+const REAL_EVENT: Prisma.AnalyticsEventWhereInput = {
+  OR: [{ playerId: null }, { player: { staff: false } }],
+};
 const sha = (v: string) => createHash("sha256").update(v).digest();
 
 export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promise<void> {
@@ -74,60 +82,89 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
       gemsSpent,
       funnel,
     ] = await Promise.all([
-      db.player.count(),
-      db.player.count({ where: { createdAt: { gte: today } } }),
-      db.player.count({ where: { lastSeenAt: { gte: today } } }),
-      db.player.count({ where: { lastSeenAt: { gte: weekAgo } } }),
-      db.player.count({ where: { tutorialCompletedAt: { not: null } } }),
-      db.playerWallet.aggregate({ _sum: { coins: true, gems: true } }),
+      db.player.count({ where: REAL_PLAYER }),
+      db.player.count({ where: { ...REAL_PLAYER, createdAt: { gte: today } } }),
+      db.player.count({ where: { ...REAL_PLAYER, lastSeenAt: { gte: today } } }),
+      db.player.count({ where: { ...REAL_PLAYER, lastSeenAt: { gte: weekAgo } } }),
+      db.player.count({ where: { ...REAL_PLAYER, tutorialCompletedAt: { not: null } } }),
+      db.playerWallet.aggregate({
+        where: { player: REAL_PLAYER },
+        _sum: { coins: true, gems: true },
+      }),
       db.analyticsEvent.groupBy({
         by: ["name"],
-        where: { createdAt: { gte: new Date(at.getTime() - DAY_MS) } },
+        where: { ...REAL_EVENT, createdAt: { gte: new Date(at.getTime() - DAY_MS) } },
         _count: { _all: true },
       }),
-      db.player.count({ where: { createdAt: { gte: yesterday, lt: today } } }),
+      db.player.count({ where: { ...REAL_PLAYER, createdAt: { gte: yesterday, lt: today } } }),
       // Retenção D1 aproximada: criados ontem que abriram o jogo hoje.
       db.player.count({
-        where: { createdAt: { gte: yesterday, lt: today }, lastSeenAt: { gte: today } },
+        where: {
+          ...REAL_PLAYER,
+          createdAt: { gte: yesterday, lt: today },
+          lastSeenAt: { gte: today },
+        },
       }),
       db.player.count({
-        where: { createdAt: { gte: d7Start, lt: new Date(d7Start.getTime() + DAY_MS) } },
+        where: {
+          ...REAL_PLAYER,
+          createdAt: { gte: d7Start, lt: new Date(d7Start.getTime() + DAY_MS) },
+        },
       }),
       // Retenção D7 aproximada: criados há 7 dias que abriram o jogo hoje.
       db.player.count({
         where: {
+          ...REAL_PLAYER,
           createdAt: { gte: d7Start, lt: new Date(d7Start.getTime() + DAY_MS) },
           lastSeenAt: { gte: today },
         },
       }),
       db.player.aggregate({
-        where: { prestigeCount: { gt: 0 } },
+        where: { ...REAL_PLAYER, prestigeCount: { gt: 0 } },
         _count: { _all: true },
         _sum: { prestigeCount: true, prestigeStars: true },
       }),
-      db.player.count({ where: { autoCollectUntil: { gt: at } } }),
-      db.player.count({ where: { turboUntil: { gt: at } } }),
-      db.subscription.count({ where: { status: "ACTIVE", expiresAt: { gt: at } } }),
-      db.playerIdentity.groupBy({ by: ["provider"], _count: { _all: true } }),
-      db.playerMission.count({ where: { day, claimedAt: { not: null } } }),
-      db.player.count({ where: { missionChestDay: day } }),
-      db.player.count({ where: { lastLoginRewardDay: day } }),
+      db.player.count({ where: { ...REAL_PLAYER, autoCollectUntil: { gt: at } } }),
+      db.player.count({ where: { ...REAL_PLAYER, turboUntil: { gt: at } } }),
+      db.subscription.count({
+        where: {
+          status: "ACTIVE",
+          expiresAt: { gt: at },
+          test: false,
+          store: { not: "mock" },
+          OR: [{ playerId: null }, { player: { staff: false } }],
+        },
+      }),
+      db.playerIdentity.groupBy({
+        by: ["provider"],
+        where: { player: REAL_PLAYER },
+        _count: { _all: true },
+      }),
+      db.playerMission.count({ where: { player: REAL_PLAYER, day, claimedAt: { not: null } } }),
+      db.player.count({ where: { ...REAL_PLAYER, missionChestDay: day } }),
+      db.player.count({ where: { ...REAL_PLAYER, lastLoginRewardDay: day } }),
       ev
         ? db.playerEvent.groupBy({
             by: ["eventId"],
-            where: { eventId: ev.id },
+            where: { eventId: ev.id, player: REAL_PLAYER },
             _count: { _all: true, claimedAt: true },
           })
         : Promise.resolve([]),
       db.playerReport.groupBy({ by: ["reportedId"], where: { resolvedAt: null } }),
       db.walletLedger.aggregate({
-        where: { currency: "GEMS", delta: { lt: 0n }, createdAt: { gte: today } },
+        where: {
+          player: REAL_PLAYER,
+          currency: "GEMS",
+          delta: { lt: 0n },
+          createdAt: { gte: today },
+        },
         _sum: { delta: true },
       }),
       // Funil por mapa: jogadores com ao menos um negócio em cada distrito.
       db.$queryRaw<{ district: string; players: bigint }[]>`
           SELECT b.district, COUNT(DISTINCT pb.player_id) AS players
           FROM player_businesses pb JOIN business_definitions b ON b.id = pb.business_id
+          JOIN players p ON p.id = pb.player_id AND NOT p.is_staff
           GROUP BY b.district`,
     ]);
     const evRow = eventRows[0];
@@ -203,12 +240,14 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
                COUNT(*) FILTER (WHERE pb.level >= 100) AS t5
         FROM business_definitions b
         LEFT JOIN player_businesses pb ON pb.business_id = b.id
+          AND pb.player_id NOT IN (SELECT id FROM players WHERE is_staff)
         GROUP BY b.slug`,
       // Agrupado pelo tipo (parte antes de ":"; ex.: business_upgrade:agua:12 → business_upgrade).
       db.$queryRaw<{ currency: string; reason: string; total: bigint; count: bigint }[]>`
         SELECT currency, split_part(reason, ':', 1) AS reason,
                SUM(delta) AS total, COUNT(*) AS count
-        FROM wallet_ledger WHERE created_at >= ${since}
+        FROM wallet_ledger
+        WHERE created_at >= ${since} AND player_id NOT IN (SELECT id FROM players WHERE is_staff)
         GROUP BY currency, split_part(reason, ':', 1)`,
     ]);
     const bySlug = new Map(rows.map((r) => [r.slug, r]));
@@ -249,12 +288,16 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
         SELECT l.player_id AS "playerId", p.display_name AS "displayName", SUM(l.delta) AS score
         FROM wallet_ledger l JOIN players p ON p.id = l.player_id
         WHERE l.currency = 'COINS' AND l.reason = ANY(${PRODUCTION_REASONS})
-          AND l.created_at >= ${start} AND l.created_at < ${end}
+          AND l.created_at >= ${start} AND l.created_at < ${end} AND NOT p.is_staff
         GROUP BY l.player_id, p.display_name
         ORDER BY score DESC LIMIT 20`,
-      db.playerLeagueWeek.groupBy({ by: ["league"], where: { week }, _count: { _all: true } }),
+      db.playerLeagueWeek.groupBy({
+        by: ["league"],
+        where: { week, player: REAL_PLAYER },
+        _count: { _all: true },
+      }),
       db.playerWeeklyReward.findMany({
-        where: { week: prevWeek },
+        where: { week: prevWeek, player: REAL_PLAYER },
         include: { player: { select: { displayName: true } } },
         orderBy: [{ kind: "asc" }, { league: "asc" }, { rank: "asc" }],
       }),
@@ -288,7 +331,7 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
       by: ["reportedId"],
       _count: { _all: true },
       _max: { createdAt: true },
-      where: { resolvedAt: null },
+      where: { resolvedAt: null, reported: REAL_PLAYER },
     });
     const players = await db.player.findMany({
       where: { id: { in: groups.map((g) => g.reportedId) } },
@@ -357,19 +400,24 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
     search: z.string().max(60).optional(),
     limit: z.coerce.number().int().min(1).max(200).default(50),
     sort: z.enum(["recent", "seen", "stars"]).default("recent"),
+    /** "1" = só as contas da equipe (o único lugar onde elas aparecem). */
+    staff: z.enum(["0", "1"]).default("0"),
   });
 
   app.get("/players", async (request) => {
-    const { search, limit, sort } = PlayersQuery.parse(request.query);
+    const { search, limit, sort, staff } = PlayersQuery.parse(request.query);
     let where: Prisma.PlayerWhereInput = search
       ? { displayName: { contains: search, mode: "insensitive" } }
       : {};
+    where = { AND: [where, { staff: staff === "1" }] };
     // "Código do jogador" (Perfil do jogo / pedidos de suporte e exclusão) = 8 primeiros hex do id.
     const code = search?.trim().toLowerCase() ?? "";
     if (/^[0-9a-f]{8}$/.test(code)) {
       const rows = await db.$queryRaw<{ id: string }[]>`
         SELECT id FROM players WHERE id::text LIKE ${code + "%"}`;
-      where = { OR: [where, { id: { in: rows.map((r) => r.id) } }] };
+      where = {
+        AND: [{ OR: [where, { id: { in: rows.map((r) => r.id) } }] }, { staff: staff === "1" }],
+      };
     }
     const players = await db.player.findMany({
       where,
@@ -492,7 +540,7 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
       })
       .parse(request.query);
     const events = await db.analyticsEvent.findMany({
-      where: name ? { name } : {},
+      where: { ...(name ? { name } : {}), ...REAL_EVENT },
       orderBy: { id: "desc" },
       take: limit,
     });

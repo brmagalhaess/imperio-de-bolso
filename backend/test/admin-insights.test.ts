@@ -138,4 +138,48 @@ describe("painel admin v3", () => {
       null,
     ]);
   });
+
+  it("compras de teste (Sandbox, testadores, equipe) ficam no registro mas fora da receita", async () => {
+    ctx = await createTestContext();
+    const real = await newGuest(ctx.app);
+    const staff = await newGuest(ctx.app);
+    await ctx.db.player.update({ where: { id: staff.playerId }, data: { staff: true } });
+    await receipt(real.playerId, `${P}.gems_50`, "apple", "real-1");
+    await ctx.db.purchaseReceipt.create({
+      data: {
+        playerId: real.playerId,
+        store: "apple",
+        transactionId: "sandbox-1",
+        productId: `${P}.gems_300`,
+        status: "VERIFIED",
+        test: true,
+        createdAt: ctx.clock.now,
+      },
+    });
+    await receipt(staff.playerId, `${P}.bundle_lenda`, "apple", "equipe-1");
+    const r = (
+      await ctx.app.inject({ method: "GET", url: "/api/admin/revenue", headers: auth })
+    ).json();
+    expect(r.totals).toMatchObject({ revenueBRL: 4.9, purchases: 1, testPurchases: 1, buyers: 1 });
+    expect(r.byProduct.map((p: { productId: string }) => p.productId)).toEqual([`${P}.gems_50`]);
+    // Conta da equipe não aparece nem na lista; o Sandbox de quem não é da equipe aparece marcado.
+    expect(r.recent).toHaveLength(2);
+    expect(r.recent.filter((x: { test: boolean }) => x.test)).toHaveLength(1);
+    const players = (
+      await ctx.app.inject({ method: "GET", url: "/api/admin/players", headers: auth })
+    ).json().players;
+    expect(players.map((p: { id: string }) => p.id)).toEqual([real.playerId]);
+    const team = (
+      await ctx.app.inject({ method: "GET", url: "/api/admin/players?staff=1", headers: auth })
+    ).json().players;
+    expect(team.map((p: { id: string }) => p.id)).toEqual([staff.playerId]);
+    const overview = (
+      await ctx.app.inject({ method: "GET", url: "/api/admin/overview", headers: auth })
+    ).json();
+    expect(overview.players).toBe(1);
+    const trends = (
+      await ctx.app.inject({ method: "GET", url: "/api/admin/trends?days=7", headers: auth })
+    ).json();
+    expect(trends.days.at(-1)).toMatchObject({ purchases: 1, revenueBRL: 4.9 });
+  });
 });

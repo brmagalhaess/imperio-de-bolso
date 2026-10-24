@@ -226,6 +226,9 @@ model PurchaseReceipt {
   transactionId   String    @map("transaction_id")
   productId       String    @map("product_id")
   status          String // VERIFIED | REVOKED
+  // Compra sem cobrança: Sandbox da Apple, testador licenciado do Google ou loja "mock". Fica
+  // registrada (entrega igual), mas não entra na receita nem nas estatísticas do painel.
+  test            Boolean   @default(false)
   gemsGranted     BigInt    @default(0) @map("gems_granted")
   // Diamantes que não puderam ser retirados no reembolso (já gastos).
   revokeShortfall BigInt    @default(0) @map("revoke_shortfall")
@@ -246,6 +249,8 @@ model Subscription {
   store         String
   transactionId String    @map("transaction_id")
   status        String // ACTIVE | REVOKED
+  // Assinatura de teste (mesma regra do recibo): não conta em "assinantes ativos" do painel.
+  test          Boolean   @default(false)
   startsAt      DateTime  @map("starts_at") @db.Timestamptz(3)
   expiresAt     DateTime  @map("expires_at") @db.Timestamptz(3)
   revokedAt     DateTime? @map("revoked_at") @db.Timestamptz(3)

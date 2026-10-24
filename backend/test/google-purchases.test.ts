@@ -46,6 +46,7 @@ describe("compras do Google Play", () => {
     ctx = await createTestContext({}, undefined, undefined, undefined, play.api);
     const g = await newGuest(ctx.app);
     play.products.set("tok-ok", { purchaseState: 0, orderId: "GPA.1111-2222-3333-44444" });
+    play.products.set("tok-testador", { purchaseState: 0, purchaseType: 0 });
     play.products.set("tok-pend", { purchaseState: 2 });
     play.products.set("tok-cancel", { purchaseState: 1, orderId: "GPA.9" });
 
@@ -57,6 +58,10 @@ describe("compras do Google Play", () => {
     expect(again.json()).toMatchObject({ duplicate: true });
     expect(await gemsOf(g.playerId)).toBe(50n);
 
+    // Testador licenciado (sem cobrança): entrega, mas o recibo fica marcado como teste.
+    expect((await verify(g, `${P}.gems_50`, "tok-testador")).statusCode).toBe(201);
+    const recs = await ctx.db.purchaseReceipt.findMany({ orderBy: { createdAt: "asc" } });
+    expect(recs.map((r) => r.test).sort()).toEqual([false, true]);
     expect((await verify(g, `${P}.gems_50`, "tok-pend")).json().error.code).toBe(
       "PURCHASE_PENDING",
     );

@@ -272,14 +272,23 @@ function PurchaseTable({
             <td>{STORE_NAMES[r.store] ?? r.store}</td>
             <td className="num">{brl(r.priceBRL)}</td>
             <td>
-              <span
-                className={`badge ${r.status === "VERIFIED" ? "ok" : "bad"}`}
-              >
-                {r.status === "VERIFIED" ? "Paga" : "Reembolsada"}
-              </span>
+              {r.test ? (
+                <span
+                  className="badge"
+                  title="Sandbox da Apple, testador do Google ou conta da equipe: não entra na receita"
+                >
+                  Teste
+                </span>
+              ) : (
+                <span
+                  className={`badge ${r.status === "VERIFIED" ? "ok" : "bad"}`}
+                >
+                  {r.status === "VERIFIED" ? "Paga" : "Reembolsada"}
+                </span>
+              )}
             </td>
             <td>
-              {r.status === "VERIFIED" && r.store !== "mock" && (
+              {r.status === "VERIFIED" && !r.test && (
                 <button className="small ghost" onClick={() => onRevoke(r)}>
                   Registrar reembolso
                 </button>
@@ -326,9 +335,10 @@ export function RevenueView(props: ViewProps) {
   return (
     <>
       <p className="muted">
-        Valores brutos estimados pelo preço de tabela (R$). A loja fica com a
-        comissão (Apple/Google: 15% a 30%) e o repasse sai pelos relatórios
-        financeiros delas.
+        Só compras reais: as de teste (Sandbox da Apple, testadores do Google e
+        contas da equipe) ficam no registro, marcadas como "Teste", e não entram
+        nos números. Valores brutos pelo preço de tabela (R$); a loja fica com a
+        comissão (15% a 30%).
       </p>
       <div className="kpis">
         <Kpi
@@ -352,6 +362,11 @@ export function RevenueView(props: ViewProps) {
           label="Reembolsos"
           value={num(t.refunds)}
           tone={t.refunds ? "red" : ""}
+        />
+        <Kpi
+          label="Compras de teste"
+          value={num(t.testPurchases)}
+          hint="Sandbox, testadores e equipe — não contam"
         />
       </div>
       <h2>Por loja</h2>

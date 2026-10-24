@@ -22,6 +22,8 @@ export interface VerifiedTransaction {
   productId: string;
   /** Fim do período pago da assinatura informado pela loja (senão, conta pelos dias do item). */
   expiresAt?: Date;
+  /** Sem cobrança (Sandbox da Apple, testador do Google, mock): fora das estatísticas. */
+  test?: boolean;
 }
 
 export interface StoreVerifier {
@@ -34,7 +36,7 @@ export const mockVerifier: StoreVerifier = {
     if (!purchaseToken.startsWith("mock-")) {
       throw new AppError(422, "PURCHASE_INVALID", "Recibo de teste inválido");
     }
-    return { transactionId: purchaseToken, productId };
+    return { transactionId: purchaseToken, productId, test: true };
   },
 };
 
@@ -65,7 +67,12 @@ export function appleVerifier(
       if (t.expiresAt && t.expiresAt <= at) {
         throw new AppError(422, "PURCHASE_EXPIRED", "Assinatura vencida");
       }
-      return { transactionId: t.transactionId, productId: t.productId, expiresAt: t.expiresAt };
+      return {
+        transactionId: t.transactionId,
+        productId: t.productId,
+        expiresAt: t.expiresAt,
+        test: t.environment !== "Production",
+      };
     },
   };
 }
@@ -164,7 +171,12 @@ export function googleVerifier(api: GooglePlayApi, now: () => Date): StoreVerifi
         ) {
           throw new AppError(422, "PURCHASE_EXPIRED", "Assinatura vencida");
         }
-        return { transactionId: s.latestOrderId ?? tokenId(purchaseToken), productId, expiresAt };
+        return {
+          transactionId: s.latestOrderId ?? tokenId(purchaseToken),
+          productId,
+          expiresAt,
+          test: s.testPurchase !== undefined,
+        };
       }
       const p = await call(() => api.product(productId, purchaseToken));
       if (!p || (p.productId && p.productId !== productId)) {
@@ -172,7 +184,11 @@ export function googleVerifier(api: GooglePlayApi, now: () => Date): StoreVerifi
       }
       if (p.purchaseState === 1) throw new AppError(422, "PURCHASE_REVOKED", "Compra cancelada");
       if (p.purchaseState === 2) throw new AppError(422, "PURCHASE_PENDING", "Pagamento pendente");
-      return { transactionId: p.orderId || tokenId(purchaseToken), productId };
+      return {
+        transactionId: p.orderId || tokenId(purchaseToken),
+        productId,
+        test: p.purchaseType === 0,
+      };
     },
   };
 }
@@ -299,6 +315,7 @@ export function verifyPurchase(
           store,
           transactionId: tr.transactionId,
           status: "ACTIVE",
+          test: tr.test ?? false,
           startsAt,
           // A loja informa o fim do período (renovação mensal da Apple); o mock soma os dias.
           expiresAt: tr.expiresAt ?? new Date(startsAt.getTime() + item.periodDays * DAY_MS),
@@ -312,6 +329,7 @@ export function verifyPurchase(
         transactionId: tr.transactionId,
         productId,
         status: "VERIFIED",
+        test: tr.test ?? false,
         gemsGranted: gems,
         createdAt: now, // relógio do servidor (vitrine semanal dos pacotes compara com ele)
       },

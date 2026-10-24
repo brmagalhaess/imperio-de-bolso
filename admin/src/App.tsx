@@ -681,7 +681,7 @@ function PlayersView(props: ViewProps) {
   const [sort, setSort] = useState("recent");
   const [filter, setFilter] = useState("all");
   const { data: raw } = useAdmin<{ players: PlayerRow[] }>(
-    `/players?limit=200&sort=${sort}${query ? `&search=${encodeURIComponent(query)}` : ""}`,
+    `/players?limit=200&sort=${sort}${filter === "staff" ? "&staff=1" : ""}${query ? `&search=${encodeURIComponent(query)}` : ""}`,
     props,
   );
   const FILTERS: Record<string, (p: PlayerRow) => boolean> = {
@@ -724,7 +724,7 @@ function PlayersView(props: ViewProps) {
           <option value="new">Novos (24 h)</option>
           <option value="linked">Conta vinculada</option>
           <option value="prestige">Já venderam o império</option>
-          <option value="staff">Equipe</option>
+          <option value="staff">Equipe (escondidas do resto do painel)</option>
           <option value="ios">iPhone</option>
           <option value="android">Android</option>
         </select>

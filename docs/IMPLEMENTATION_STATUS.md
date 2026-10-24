@@ -2,6 +2,16 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-24 — Compras de teste e equipe fora do painel (ADR 0031); Google 1.0.5 publicada
+
+- Recibos e assinaturas marcam `test` (Sandbox, testador, mock); migração
+  `20261024170000_test_purchases`. Painel só conta compras reais e esconde as contas da equipe
+  em todas as telas (exceto o filtro "Equipe"). Testes: servidor **174**.
+- Google Play publicou a **1.0.5** (loja e anúncios no Android). Apple segue na 1.0.3.
+- Downloads oficiais (30 dias): Apple 15 primeiros downloads; Google 7 aquisições de aparelhos.
+  Relatórios automáticos: a chave da API da Apple não tem permissão de Vendas; o Google ainda não
+  gerou o relatório mensal.
+
 ## 2026-10-24 — Painel: de onde vêm os jogadores (iPhone x Android)
 
 - Servidor guarda `players.platform` e `app_version` (migração `20261024150000_player_platform`)

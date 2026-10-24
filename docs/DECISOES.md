@@ -34,3 +34,4 @@
 | [0028](ADRs/0028-compras-e-anuncios-no-android.md) | Compras no Android pelo Google Play Billing (verificação no servidor) e anúncios AdMob no Android | aceita |
 | [0029](ADRs/0029-premios-com-teto-virada-da-semana-e-compartilhar.md) | Prêmios em moedas com teto no próximo negócio, virada da semana sem produção do domingo, evento recomeça na venda, compartilhar posição no Facebook | aceita |
 | [0030](ADRs/0030-painel-admin-v3.md) | Painel admin v3: tendências por dia, receita das lojas, diamantes de suporte, reembolso manual, filtros e CSV | aceita |
+| [0031](ADRs/0031-compras-de-teste-e-equipe-fora-do-painel.md) | Compras de teste (Sandbox/testadores/mock) e contas da equipe fora das estatísticas e telas do painel | aceita |
