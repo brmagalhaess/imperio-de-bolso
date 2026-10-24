@@ -7,7 +7,7 @@
 ## Decisões
 
 - **Compras:** plugin oficial `GodotGooglePlayBilling` 3.3.0 (Billing Library 9.1), instalado por
-  `tools/android/fetch_billing.sh` (fora do Git, SHA-256 fixado). O jogo usa o singleton direto em
+  `tools/android/fetch_billing.sh` (SHA-256 fixado; ~40 KB, MIT, versionado no Git). O jogo usa o singleton direto em
   `scripts/google_store.gd`, com a mesma interface da loja da Apple (`load_products`, `price`,
   `buy`, `restore`, `manage`); `GameState.store_node` escolhe a loja do aparelho.
 - **Mesmos IDs de produto da Apple** (`br.com.imperiodebolso.*`) e o Passe VIP como assinatura com
