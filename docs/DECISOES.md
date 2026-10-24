@@ -35,3 +35,4 @@
 | [0029](ADRs/0029-premios-com-teto-virada-da-semana-e-compartilhar.md) | Prêmios em moedas com teto no próximo negócio, virada da semana sem produção do domingo, evento recomeça na venda, compartilhar posição no Facebook | aceita |
 | [0030](ADRs/0030-painel-admin-v3.md) | Painel admin v3: tendências por dia, receita das lojas, diamantes de suporte, reembolso manual, filtros e CSV | aceita |
 | [0031](ADRs/0031-compras-de-teste-e-equipe-fora-do-painel.md) | Compras de teste (Sandbox/testadores/mock) e contas da equipe fora das estatísticas e telas do painel | aceita |
+| [0032](ADRs/0032-login-google-android-e-compartilhar-nativo.md) | Login com Google no Android (plugin próprio, Credential Manager) e compartilhar pela folha nativa do celular | aceita |

@@ -2,6 +2,14 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-24 — 1.0.6: login Google no Android e compartilhar com imagem (ADR 0032)
+
+- Plugin `ImperioAndroid` (login Google), clientes OAuth (web + 2 Android) e tela de login
+  publicada no Google Cloud. Página de compartilhar com folha nativa e imagem montada.
+- Android **1.0.6 (código 6)** e iOS **1.0.6 (build 14)**. Jogo: **153** verificações; servidor **175**.
+- Não testado em aparelho Android real (não há um conectado); conferir pelo relatório de
+  pré-lançamento e no celular do titular.
+
 ## 2026-10-24 — iPhone 1.0.5 (build 13) enviada; card de versões no painel
 
 - iOS **1.0.5 (build 13)** com o botão "Compartilhar no Facebook", prêmios com teto e aviso de

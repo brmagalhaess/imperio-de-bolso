@@ -7,7 +7,7 @@ config_version=5
 
 config/name="Império de Bolso"
 config/description="Idle tycoon isométrico 2D"
-config/version="1.0.5"
+config/version="1.0.6"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://assets/app_icon/icon_512.png"
@@ -70,7 +70,7 @@ window/handheld/orientation=1
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/admob/plugin.cfg", "res://addons/GodotGooglePlayBilling/plugin.cfg")
+enabled=PackedStringArray("res://addons/admob/plugin.cfg", "res://addons/GodotGooglePlayBilling/plugin.cfg", "res://addons/ImperioAndroid/plugin.cfg")
 
 [imperio]
 
@@ -78,6 +78,9 @@ api/base_url="http://127.0.0.1:3000/api/v1"
 api/base_url_mobile="https://api-imperio.crowntech.com.br/api/v1"
 ads/ios_rewarded_unit="ca-app-pub-9538653038510274/3843187791"
 ads/android_rewarded_unit="ca-app-pub-9538653038510274/8046651528"
+; Login com Google no Android (ADR 0032): cliente "web" do projeto imperio-de-bolso-pagamentos —
+; o ID token sai com este público, que o servidor aceita em GOOGLE_CLIENT_IDS.
+auth/google_web_client_id="373550280191-u2o0tvukq24t6ptib8ndfvnpk7i82vqp.apps.googleusercontent.com"
 
 [input_devices]
 

@@ -41,6 +41,7 @@ const MESSAGES := {
 	"ALREADY_LINKED": "Este progresso já tem uma conta ligada.",
 	"LINK_NOT_CONFIGURED": "Vincular conta ainda não está disponível.",
 	"APPLE_SIGNIN_FAILED": "Não foi possível entrar com a Apple. Tente de novo.",
+	"GOOGLE_SIGNIN_FAILED": "Não foi possível entrar com o Google. Tente de novo.",
 	"INVALID_ID_TOKEN": "Não foi possível confirmar a conta. Tente de novo.",
 	"IDENTITY_NOT_FOUND": "Nenhum progresso ligado a essa conta.",
 	"INSUFFICIENT_FUNDS": "Moedas insuficientes.",
@@ -1002,28 +1003,40 @@ func report_player(player_id: String) -> bool:
 var linked_providers: Array = []
 
 
-func link_apple() -> Dictionary:
-	var auth := await AppleAuth.request_token()
+## Vincula a conta convidada à Apple (iPhone) ou ao Google (Android). Devolve {ok, code, token};
+## code "IDENTITY_IN_USE" traz o token para oferecer carregar o progresso daquela conta.
+func link_account(provider: String) -> Dictionary:
+	var auth: Dictionary = await (preload("res://scripts/apple_auth.gd") if provider == "apple" \
+			else preload("res://scripts/google_auth.gd")).request_token()
 	if auth.token == "":
-		# Cancelar na folha da Apple não é erro; qualquer outra falha precisa aparecer.
-		var cancelled: bool = str(auth.error).to_lower().contains("cancel") or str(auth.error).contains("1001")
-		print("AppleAuth: sem token (", auth.error, ")")
-		return {"ok": false, "code": "CANCELLED" if cancelled else "APPLE_SIGNIN_FAILED", "token": ""}
-	var res := await Api.link_identity("apple", auth.token)
-	print("AppleAuth: vínculo ", "ok" if res.ok else res.error_code)
+		# Fechar a folha não é erro; qualquer outra falha precisa aparecer.
+		var err := str(auth.error).to_lower()
+		var cancelled: bool = err.contains("cancel") or err.contains("1001")
+		print("Login ", provider, ": sem token (", auth.error, ")")
+		return {"ok": false, "code": "CANCELLED" if cancelled else ("APPLE_SIGNIN_FAILED" if provider == "apple" else "GOOGLE_SIGNIN_FAILED"), "token": ""}
+	var res := await Api.link_identity(provider, auth.token)
+	print("Login ", provider, ": vínculo ", "ok" if res.ok else res.error_code)
 	if res.ok or res.error_code == "ALREADY_LINKED":
-		if not linked_providers.has("apple"):
-			linked_providers.append("apple")
+		if not linked_providers.has(provider):
+			linked_providers.append(provider)
 		if res.ok:
-			track("account_linked", {"provider": "apple"})
+			track("account_linked", {"provider": provider})
 		return {"ok": true, "code": "", "token": ""}
 	return {"ok": false, "code": res.error_code, "token": auth.token}
 
 
-## Troca este aparelho para o progresso ligado à conta Apple (token de `link_apple`).
-func sign_in_apple(id_token: String) -> bool:
-	var res := await Api.social_sign_in("apple", id_token)
+func link_apple() -> Dictionary:
+	return await link_account("apple")
+
+
+## Troca este aparelho para o progresso ligado à conta Apple/Google (token de `link_account`).
+func sign_in_with(provider: String, id_token: String) -> bool:
+	var res := await Api.social_sign_in(provider, id_token)
 	return res.ok
+
+
+func sign_in_apple(id_token: String) -> bool:
+	return await sign_in_with("apple", id_token)
 
 
 func businesses() -> Array:

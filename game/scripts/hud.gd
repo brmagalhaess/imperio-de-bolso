@@ -13,6 +13,7 @@ const Fmt := preload("res://scripts/fmt.gd")
 const Layout := preload("res://scripts/layout.gd")
 const UiFont := preload("res://scripts/ui_font.gd")
 const AppleAuth := preload("res://scripts/apple_auth.gd")
+const GoogleAuth := preload("res://scripts/google_auth.gd")
 const Style := preload("res://scripts/ui_style.gd")
 const MenuModal := preload("res://scripts/menu_modal.gd")
 const MapTrail := preload("res://scripts/map_trail.gd")
@@ -805,30 +806,33 @@ func _show_linked(button: Button, provider: String) -> void:
 
 
 func _on_link_pressed(button: Button, provider: String) -> void:
-	if provider != "apple" or not AppleAuth.available():
-		show_toast(tr("Em breve: disponível quando o jogo estiver na loja."))
+	var ready_ := AppleAuth.available() if provider == "apple" else GoogleAuth.available()
+	if not ready_:
+		show_toast(tr("Atualize o jogo na loja para vincular sua conta."))
 		return
 	button.disabled = true
-	var r: Dictionary = await GameState.link_apple()
+	var r: Dictionary = await GameState.link_account(provider)
 	if not is_instance_valid(button):
 		return
 	button.disabled = false
 	if r.ok:
 		_show_linked(button, provider)
-		show_toast(tr("Progresso salvo na sua conta Apple!"))
+		show_toast(tr("Progresso salvo na sua conta Apple!") if provider == "apple" else tr("Progresso salvo na sua conta Google!"))
 	elif r.code == "IDENTITY_IN_USE":
-		_offer_load_linked_progress(str(r.token))
+		_offer_load_linked_progress(provider, str(r.token))
 	elif r.code != "CANCELLED":
 		show_toast(GameState.message_for(str(r.code)))
 
 
-## A conta Apple já guarda outro progresso (ex.: de outro iPhone): pergunta se carrega aquele.
-func _offer_load_linked_progress(id_token: String) -> void:
+## A conta Apple/Google já guarda outro progresso (ex.: de outro aparelho): pergunta se carrega.
+func _offer_load_linked_progress(provider: String, id_token: String) -> void:
 	_reward_kind = "link"
-	_modal.open(tr("Conta Apple já usada"))
-	_modal.add_message(null, "", tr("Essa conta Apple já tem um progresso salvo. Quer carregar aquele progresso neste aparelho? O progresso atual deste aparelho deixa de ser usado."))
+	var apple := provider == "apple"
+	_modal.open(tr("Conta Apple já usada") if apple else tr("Conta Google já usada"))
+	_modal.add_message(null, "", tr("Essa conta Apple já tem um progresso salvo. Quer carregar aquele progresso neste aparelho? O progresso atual deste aparelho deixa de ser usado.") if apple \
+			else tr("Essa conta Google já tem um progresso salvo. Quer carregar aquele progresso neste aparelho? O progresso atual deste aparelho deixa de ser usado."))
 	_modal.add_action(tr("Carregar o progresso salvo"), func():
-		if await GameState.sign_in_apple(id_token):
+		if await GameState.sign_in_with(provider, id_token):
 			get_tree().reload_current_scene()
 		else:
 			show_toast(tr("Não foi possível carregar. Tente de novo."))
