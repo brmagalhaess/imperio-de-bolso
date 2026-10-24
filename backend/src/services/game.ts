@@ -18,6 +18,7 @@ import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { track } from "./analytics.js";
 import { autoCollectActive, vipUntil } from "./entitlements.js";
 import { trackMission } from "./missions.js";
+import { weekBounds } from "../lib/time.js";
 import { applyCoins, type LockedWallet } from "./wallet.js";
 
 // Ciclo manual: ao terminar, o negócio fica parado com 1 ciclo pronto até o jogador
@@ -532,6 +533,10 @@ async function settleAutomatic(
   const ev = automatic.length > 0 ? await eventDistrict(tx, wallet.playerId, now) : null;
   const items: SettledItem[] = [];
   let total = 0n;
+  // Produção de antes da virada da semana (ajudantes no domingo, recebida na segunda): fica na
+  // semana anterior — o ranking da semana nova começa do zero para todos.
+  const weekStart = weekBounds(now).start;
+  let beforeWeek = 0n;
   let elapsedMs = 0;
   let capped = false;
   for (const pb of automatic) {
@@ -545,6 +550,11 @@ async function settleAutomatic(
     const doubled = doubledCycles(pb, ctx, now, s.cycles);
     const amount = profitNow(pb.business, pb.level, stars, ev) * BigInt(s.cycles + doubled);
     total += amount;
+    if (amount > 0n && pb.lastSettlementAt < weekStart) {
+      const span = now.getTime() - pb.lastSettlementAt.getTime();
+      const share = Math.min(1, (weekStart.getTime() - pb.lastSettlementAt.getTime()) / span);
+      beforeWeek += (amount * BigInt(Math.round(share * 1_000_000))) / 1_000_000n;
+    }
     elapsedMs = Math.max(elapsedMs, s.elapsedMs);
     capped ||= s.capped;
     if (s.cycles > 0) {
@@ -559,8 +569,21 @@ async function settleAutomatic(
       data: { lastSettlementAt: now, carryMs: s.carryMs },
     });
   }
-  const updated =
-    total > 0n ? await applyCoins(tx, wallet, total, "production_auto", ledgerKey, now) : wallet;
+  let updated = wallet;
+  if (beforeWeek > 0n) {
+    const lastWeek = new Date(weekStart.getTime() - 1);
+    updated = await applyCoins(
+      tx,
+      updated,
+      beforeWeek,
+      "production_auto",
+      `${ledgerKey}:prev`,
+      lastWeek,
+    );
+  }
+  if (total - beforeWeek > 0n) {
+    updated = await applyCoins(tx, updated, total - beforeWeek, "production_auto", ledgerKey, now);
+  }
   return { wallet: updated, items, total, elapsedMs, capped };
 }
 

@@ -4,13 +4,14 @@ import { DAILY_REWARDS, MISSION_CHEST } from "../economy/daily.js";
 import { previousDistrict } from "../economy/districts.js";
 import { EVENT_PRIZE_GEMS, EVENT_TARGET_SECONDS, weekendEvent } from "../economy/events.js";
 import { profitPerCycle } from "../economy/formulas.js";
-import { niceRound } from "../economy/missions.js";
+import { niceRound, rewardCap } from "../economy/missions.js";
 import { effectiveCycleMs, speedPercentAt } from "../economy/speed.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { gameDay } from "../lib/time.js";
 import { PRODUCTION_REASONS } from "./achievements.js";
 import { track } from "./analytics.js";
 import { getPlayerState, speedContext, starsOf } from "./game.js";
+import { missionContext } from "./missions.js";
 import { applyCoins, applyGems } from "./wallet.js";
 
 // Retenção (ADR 0014): calendário de 7 dias, baú das missões e evento de fim de semana.
@@ -55,13 +56,19 @@ function nextDay(player: { loginStreak: number; lastLoginRewardDay: string | nul
 }
 
 async function rewardViews(db: Reader, playerId: string, now: Date) {
-  const income = await incomePerSecond(db, playerId, now);
+  const [income, ctx] = await Promise.all([
+    incomePerSecond(db, playerId, now),
+    missionContext(db, playerId, now),
+  ]);
+  // Mesmo teto das missões: no máximo o preço do próximo negócio (ver rewardCap).
+  const cap = rewardCap(ctx.cheapestBuy);
   return DAILY_REWARDS.map((r) => ({
     day: r.day,
     coins: r.coinsMinutes
       ? (() => {
-          const v = niceRound(income * r.coinsMinutes * 60);
-          return (v > (r.minCoins ?? 0n) ? v : (r.minCoins ?? 0n)).toString();
+          const min = r.minCoins ?? 0n;
+          const v = niceRound(Math.min(income * r.coinsMinutes * 60, cap));
+          return (v > min ? v : min).toString();
         })()
       : null,
     gems: r.gems ?? 0,
@@ -190,6 +197,19 @@ async function earnedBetween(db: Reader, playerId: string, start: Date, end: Dat
   return agg._sum.delta ?? 0n;
 }
 
+/**
+ * Início da contagem do evento para o jogador: o começo do evento ou, se ele vendeu o império
+ * durante o evento, a hora da venda (recomeça do zero, como no ranking).
+ */
+async function eventCountFrom(db: Reader, playerId: string, start: Date, end: Date) {
+  const p = await db.player.findUnique({
+    where: { id: playerId },
+    select: { lastPrestigeAt: true },
+  });
+  const sold = p?.lastPrestigeAt;
+  return sold && sold > start && sold < end ? sold : start;
+}
+
 /** Evento do fim de semana: entra no evento na primeira consulta (mapa e meta ficam fixos). */
 export async function getEvent(db: Db, playerId: string, now: Date) {
   const ev = weekendEvent(now);
@@ -208,7 +228,8 @@ export async function getEvent(db: Db, playerId: string, now: Date) {
       where: { playerId_eventId: { playerId, eventId: ev.id } },
     });
   }
-  const progress = await earnedBetween(db, playerId, ev.start, ev.end);
+  const from = await eventCountFrom(db, playerId, ev.start, ev.end);
+  const progress = await earnedBetween(db, playerId, from, ev.end);
   return {
     active: true,
     id: ev.id,
@@ -234,7 +255,8 @@ export function claimEvent(now: Date) {
       : null;
     if (!ev || !row) throw new AppError(409, "EVENT_NOT_ACTIVE", "Nenhum evento agora");
     if (row.claimedAt) throw new AppError(409, "EVENT_ALREADY_CLAIMED", "Prêmio já resgatado");
-    const progress = await earnedBetween(tx, wallet.playerId, ev.start, ev.end);
+    const from = await eventCountFrom(tx, wallet.playerId, ev.start, ev.end);
+    const progress = await earnedBetween(tx, wallet.playerId, from, ev.end);
     if (progress < row.target) {
       throw new AppError(409, "EVENT_GOAL_NOT_REACHED", "Meta do evento ainda não alcançada");
     }

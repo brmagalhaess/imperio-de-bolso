@@ -8,6 +8,7 @@ import type { AppConfig } from "./config.js";
 import type { Db } from "./db/prisma.js";
 import { AppError } from "./errors.js";
 import { adminRoutes } from "./routes/admin.js";
+import { shareRoutes } from "./routes/share.js";
 import { v1Routes } from "./routes/v1.js";
 
 declare module "@fastify/jwt" {
@@ -130,6 +131,11 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     {
       prefix: "/api/v1",
     },
+  );
+
+  await app.register(
+    (instance) => shareRoutes(instance, { db: deps.db, now, siteUrl: deps.config.SITE_URL }),
+    { prefix: "/api/v1" },
   );
 
   const adminToken = deps.config.ADMIN_TOKEN;

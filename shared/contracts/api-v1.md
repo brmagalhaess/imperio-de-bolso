@@ -280,3 +280,10 @@ em `POST /store/buy` → `200 { bought, turboUntil, state }` (soma tempo se já 
   `PURCHASE_INVALID`, `STORE_UNAVAILABLE` (503, Google fora — tentar de novo),
   `STORE_NOT_CONFIGURED` (501, sem conta de serviço no servidor).
 
+### 2026-10-24 — Compartilhar posição (ADR 0029)
+
+- `GET /api/v1/share/rank/:playerId?t=semana|liga|estrelas` (sem login): HTML com Open Graph
+  (`og:title` com a posição, `og:image` do site) e redirecionamento para o site. 400 se o id não
+  for UUID. Conta da equipe: título genérico.
+- Prêmios em moedas de `/missions` e `/daily-reward` têm teto no preço do próximo negócio.
+

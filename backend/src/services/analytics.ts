@@ -9,6 +9,7 @@ export const CLIENT_EVENTS = [
   "tutorial_step",
   "tutorial_skipped",
   "screen_view",
+  "rank_shared",
   "crash",
 ] as const;
 

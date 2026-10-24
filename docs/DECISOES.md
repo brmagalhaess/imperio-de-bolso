@@ -32,3 +32,4 @@
 | [0026](ADRs/0026-ranking-ligas-por-vendas-e-premios.md) | Ligas por vendas do império (grupo fixo na semana), prêmios maiores com bônus semanal, coroa/medalhas e selo VIP | aceita |
 | [0027](ADRs/0027-venda-zera-ranking-missoes-e-conta-da-equipe.md) | Vender o império zera a pontuação da semana e renova as missões não resgatadas; conta da equipe fora do ranking | aceita |
 | [0028](ADRs/0028-compras-e-anuncios-no-android.md) | Compras no Android pelo Google Play Billing (verificação no servidor) e anúncios AdMob no Android | aceita |
+| [0029](ADRs/0029-premios-com-teto-virada-da-semana-e-compartilhar.md) | Prêmios em moedas com teto no próximo negócio, virada da semana sem produção do domingo, evento recomeça na venda, compartilhar posição no Facebook | aceita |

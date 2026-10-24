@@ -37,7 +37,9 @@ if (process.env.SITE_STRICT === "1" && pendingFields().length > 0) {
 }
 
 export const STORES = {
-  // Google Play: "Em breve" até a aprovação. App Store: no ar desde a 1.0.0 (2026-10).
-  googlePlay: process.env.SITE_GOOGLE_PLAY_URL ?? "",
+  // Lojas: App Store desde a 1.0.0 e Google Play desde 2026-10-21.
+  googlePlay:
+    process.env.SITE_GOOGLE_PLAY_URL ||
+    "https://play.google.com/store/apps/details?id=br.com.imperiodebolso.game",
   appStore: process.env.SITE_APP_STORE_URL || "https://apps.apple.com/br/app/id6822892071",
 };

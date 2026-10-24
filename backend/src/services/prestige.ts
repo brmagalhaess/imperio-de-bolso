@@ -102,6 +102,9 @@ export function sellEmpire(startingCoins: bigint, now: Date) {
       },
     });
     await refreshMissionsAfterPrestige(tx, wallet.playerId, now);
+    // Evento em andamento ainda não resgatado: sai, e a meta é calculada de novo com a renda do
+    // império novo na próxima consulta (a contagem recomeça da venda).
+    await tx.playerEvent.deleteMany({ where: { playerId: wallet.playerId, claimedAt: null } });
     await track(tx, wallet.playerId, "prestige", {
       gained: p.starsToGain,
       stars: p.stars + p.starsToGain,

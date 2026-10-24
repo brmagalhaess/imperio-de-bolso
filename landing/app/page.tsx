@@ -129,7 +129,7 @@ export default function Home() {
         <div className="hero-bg" aria-hidden />
         <div className="wrap hero-grid">
           <div className="hero-text">
-            <span className="pill">Novo · Grátis para iPhone</span>
+            <span className="pill">Novo · Grátis para iPhone e Android</span>
             <h1>
               Do carrinho de água ao <em>império</em>.
             </h1>

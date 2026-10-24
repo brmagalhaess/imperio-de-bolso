@@ -1006,6 +1006,7 @@ func open_ranking_menu(tab := -1) -> void:
 		if int(lg.get("demote", 0)) > 0:
 			lines.append(tr("Os %d últimos descem") % int(lg.demote))
 		lines.append(tr("Termina em %s.") % Fmt.duration(ends))
+		lines.append(tr("A pontuação zera toda segunda: todos começam do zero."))
 		_modal.add_message(null, tr("Liga %s") % tr(str(lg.get("name", "Bronze"))), "\n".join(lines))
 		_modal.add_prize_strip(tr("Prêmios desta semana"), _prize_items(data.get("prizes", {}).get("liga", [])))
 		entries = lg.get("entries", [])
@@ -1013,7 +1014,8 @@ func open_ranking_menu(tab := -1) -> void:
 	elif shown_tab == 1:
 		var ends := _iso_seconds(data.week.end) - _iso_seconds(data.serverTime)
 		_modal.add_message(null, tr("Desafio dos 7 dias"),
-				tr("Quem faturar mais com seus negócios até domingo vence.\nTermina em %s.") % Fmt.duration(ends))
+				tr("Quem faturar mais com seus negócios até domingo vence.\nTermina em %s.") % Fmt.duration(ends)
+				+ "\n" + tr("A pontuação zera toda segunda: todos começam do zero."))
 		_modal.add_prize_strip(tr("Prêmios desta semana"), _prize_items(data.get("prizes", {}).get("semana", [])))
 	else:
 		_modal.add_message(null, tr("Estrelas de investidor"),
@@ -1036,7 +1038,20 @@ func open_ranking_menu(tab := -1) -> void:
 		_modal.add_section(tr("Sua posição"))
 		_modal.add_rank_row(int(me.rank), me.displayName, ("⭐ " + str(me.score)) if shown_tab == 2 else me.score, true,
 				Callable(), GameState.vip_until() != null)
+	if me != null and not data.get("staff", false) and str(me.get("playerId", "")) != "":
+		var tab_key: String = ["liga", "semana", "estrelas"][shown_tab]
+		var player_id := str(me.playerId)
+		_modal.add_action(tr("Compartilhar no Facebook"), func(): share_rank(player_id, tab_key),
+				Color("1877f2"), Color("0d5bbf"))
 	_modal.refit()
+
+
+## Compartilhar a posição: o servidor monta a página do post (título com a posição e imagem do
+## jogo) e o Facebook abre no app ou no navegador para o jogador publicar.
+func share_rank(player_id: String, tab_key: String) -> void:
+	var page := "%s/share/rank/%s?t=%s" % [Api.base_url, player_id, tab_key]
+	GameState.track("rank_shared", {"tab": tab_key, "network": "facebook"})
+	OS.shell_open("https://www.facebook.com/sharer/sharer.php?u=" + page.uri_encode())
 
 
 ## Tocar em outro jogador no ranking: denunciar o nome ou ocultar (diretriz 1.2 da App Store).

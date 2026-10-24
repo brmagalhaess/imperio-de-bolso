@@ -142,9 +142,19 @@ export const MISSION_TEMPLATES: readonly MissionTemplate[] = [
 export const MISSIONS_PER_DAY = 3;
 export const MISSION_REWARD_GEMS = 1;
 
-/** Prêmio em moedas: ~15 min da renda atual, no mínimo 50. */
+/**
+ * Teto dos prêmios em moedas (missões e calendário): o preço do próximo negócio a construir.
+ * Quem vendeu o império volta ao 1º mapa com a renda multiplicada pelas estrelas; sem o teto,
+ * 15 min dessa renda pagavam vários negócios de uma vez e o recomeço perdia a graça.
+ * Império completo (nada para construir): sem teto.
+ */
+export function rewardCap(cheapestBuy: number | null | undefined): number {
+  return cheapestBuy === null || cheapestBuy === undefined ? Infinity : Math.max(50, cheapestBuy);
+}
+
+/** Prêmio em moedas: ~15 min da renda atual (mín. 50), até o preço do próximo negócio. */
 export function missionRewardCoins(ctx: MissionContext): bigint {
-  return niceRound(Math.max(50, ctx.incomePerSecond * 900));
+  return niceRound(Math.min(Math.max(50, ctx.incomePerSecond * 900), rewardCap(ctx.cheapestBuy)));
 }
 
 /**

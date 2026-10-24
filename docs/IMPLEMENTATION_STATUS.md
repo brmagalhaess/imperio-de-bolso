@@ -2,6 +2,15 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-24 — Prêmios com teto, virada da semana, evento após a venda e compartilhar (ADR 0029)
+
+- Servidor: missões e calendário pagam no máximo o preço do próximo negócio; produção do domingo
+  recebida na segunda fica na semana anterior; evento recomeça na venda do império; página de
+  compartilhamento `/api/v1/share/rank/:id`. Testes: **168**.
+- Jogo: botão "Compartilhar no Facebook" no ranking (3 abas); aviso "a pontuação zera toda
+  segunda". Jogo: **153** verificações. Site: link do Google Play e imagem do post.
+- Admin: conta de testes "Magalhães" marcada como equipe (saiu do ranking de Estrelas).
+
 ## 2026-10-24 — Android 1.0.3 enviado; compras e anúncios no Android prontos no código (ADR 0028)
 
 - Apple: as 24 compras (diamantes, VIP, 20 pacotes, Dobro) estão **aprovadas**. AdMob: conta e

@@ -36,7 +36,11 @@ export interface MissionView {
   rewardGems: number;
 }
 
-async function missionContext(db: Reader, playerId: string, now: Date): Promise<MissionContext> {
+export async function missionContext(
+  db: Reader,
+  playerId: string,
+  now: Date,
+): Promise<MissionContext> {
   const [defs, owned, stars] = await Promise.all([
     db.businessDefinition.findMany(),
     db.playerBusiness.findMany({ where: { playerId }, include: { business: true } }),

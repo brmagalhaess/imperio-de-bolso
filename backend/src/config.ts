@@ -30,6 +30,8 @@ const ConfigSchema = z.object({
   // JSON) com permissão de ver pedidos. Vazio = compras do Google não são verificadas (501).
   GOOGLE_PLAY_PACKAGE: z.string().default("br.com.imperiodebolso.game"),
   GOOGLE_PLAY_SERVICE_ACCOUNT: z.string().default(""),
+  // Site do jogo: destino e imagem do compartilhamento da posição no ranking.
+  SITE_URL: z.url().default("https://imperio.crowntech.com.br"),
   ADS_ENABLED: z.enum(["true", "false"]).optional(),
   // Anúncios só em algumas plataformas (ex.: ADS_PLATFORMS=ios), como PURCHASES_PLATFORMS.
   ADS_PLATFORMS: z.string().default(""),
