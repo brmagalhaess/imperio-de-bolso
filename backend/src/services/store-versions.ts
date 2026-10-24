@@ -22,24 +22,50 @@ export interface LiveVersions {
 export function storeVersions(fetchFn: typeof fetch = fetch) {
   let cache: { at: number; value: LiveVersions } | null = null;
 
-  async function apple(): Promise<LiveVersions["ios"]> {
+  /** "1.0.10" > "1.0.9". */
+  const newer = (a: string, b: string) => {
+    const x = a.split(".").map(Number);
+    const y = b.split(".").map(Number);
+    for (let i = 0; i < Math.max(x.length, y.length); i++) {
+      if ((x[i] ?? 0) !== (y[i] ?? 0)) return (x[i] ?? 0) > (y[i] ?? 0);
+    }
+    return false;
+  };
+
+  async function lookup(country: string) {
     try {
       const r = (await (
-        await fetchFn(`https://itunes.apple.com/lookup?id=${APPLE_APP_ID}&country=br`)
+        await fetchFn(`https://itunes.apple.com/lookup?id=${APPLE_APP_ID}&country=${country}`)
       ).json()) as { results?: { version?: string; currentVersionReleaseDate?: string }[] };
       const a = r.results?.[0];
-      const version = a?.version && VERSION.test(a.version) ? a.version : null;
-      return { version, releasedAt: a?.currentVersionReleaseDate ?? null };
+      return a?.version && VERSION.test(a.version)
+        ? { version: a.version, releasedAt: a.currentVersionReleaseDate ?? null }
+        : null;
     } catch {
-      return { version: null, releasedAt: null };
+      return null;
     }
+  }
+
+  // O cache de cada país da App Store atualiza em horários diferentes: vale a mais nova.
+  async function apple(): Promise<LiveVersions["ios"]> {
+    const found = (await Promise.all(["br", "us"].map(lookup))).filter((x) => x !== null);
+    const best = found.reduce<(typeof found)[number] | null>(
+      (acc, x) => (acc === null || newer(x.version, acc.version) ? x : acc),
+      null,
+    );
+    return best ?? { version: null, releasedAt: null };
   }
 
   async function google(): Promise<LiveVersions["android"]> {
     try {
       const html = await (
         await fetchFn(`${STORE_URLS.android}&hl=pt_BR&gl=BR`, {
-          headers: { "user-agent": "Mozilla/5.0 (Linux; Android 14) Chrome/120 Mobile" },
+          // Identificação de navegador completa: a curta recebe 403 da Play Store.
+          headers: {
+            "user-agent":
+              "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36",
+            "accept-language": "pt-BR",
+          },
         })
       ).text();
       // A página traz a versão atual nos dados embutidos como [[["1.0.5"]]].
