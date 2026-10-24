@@ -1,3 +1,4 @@
+import type { Prisma } from "../generated/prisma/client.js";
 import { googlePlayApi, parseServiceAccount, type GooglePlayApi } from "../lib/google-play.js";
 import { reportPlayer } from "../services/reports.js";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
@@ -379,6 +380,20 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
         platform: z.enum(["ios", "android", "other"]).optional(),
       })
       .parse(request.query);
+    // O jogo pede o catálogo ao abrir: guarda aparelho e versão (painel admin por plataforma).
+    // Só escreve quando muda (o NULL do banco não entra em "diferente de", daí as duas condições).
+    const version = appVersion(request);
+    if (platform === "ios" || platform === "android") {
+      const changed: Prisma.PlayerWhereInput[] = [
+        { platform: null },
+        { platform: { not: platform } },
+      ];
+      if (version) changed.push({ appVersion: null }, { appVersion: { not: version } });
+      await db.player.updateMany({
+        where: { id: playerIdOf(request), OR: changed },
+        data: { platform, ...(version ? { appVersion: version } : {}) },
+      });
+    }
     const catalog = await getCatalog(
       db,
       playerIdOf(request),

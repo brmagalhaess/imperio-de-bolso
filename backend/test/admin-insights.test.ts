@@ -104,4 +104,38 @@ describe("painel admin v3", () => {
     });
     expect(bad.statusCode).toBe(400);
   });
+
+  it("jogadores por plataforma: registra o aparelho e a versão ao abrir o jogo", async () => {
+    ctx = await createTestContext();
+    const a = await newGuest(ctx.app);
+    const b = await newGuest(ctx.app);
+    await newGuest(ctx.app); // nunca abriu a loja: plataforma desconhecida
+    const open = (g: typeof a, platform: string, version?: string) =>
+      ctx.app.inject({
+        method: "GET",
+        url: `/api/v1/store/catalog?platform=${platform}`,
+        headers: {
+          authorization: `Bearer ${g.token}`,
+          ...(version ? { "x-app-version": version } : {}),
+        },
+      });
+    await open(a, "ios", "1.0.5");
+    await open(b, "android");
+    await open(b, "android", "1.0.5"); // atualizou o app
+    const r = (
+      await ctx.app.inject({ method: "GET", url: "/api/admin/platforms", headers: auth })
+    ).json();
+    const by = Object.fromEntries(r.platforms.map((p: { platform: string }) => [p.platform, p]));
+    expect(by.ios).toMatchObject({ players: 1, versions: [{ version: "1.0.5", players: 1 }] });
+    expect(by.android).toMatchObject({ players: 1, versions: [{ version: "1.0.5", players: 1 }] });
+    expect(by.desconhecida.players).toBe(1);
+    const list = (
+      await ctx.app.inject({ method: "GET", url: "/api/admin/players", headers: auth })
+    ).json();
+    expect(list.players.map((p: { platform: string | null }) => p.platform).sort()).toEqual([
+      "android",
+      "ios",
+      null,
+    ]);
+  });
 });

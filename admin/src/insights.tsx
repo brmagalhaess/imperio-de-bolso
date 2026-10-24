@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   adminPost,
+  type PlatformRow,
   type PlayerRow,
   type PurchaseRow,
   type Revenue,
@@ -82,6 +83,62 @@ export function MiniChart({
         </span>
       </div>
     </figure>
+  );
+}
+
+export const PLATFORM_NAMES: Record<string, string> = {
+  ios: "🍎 iPhone (App Store)",
+  android: "🤖 Android (Google Play)",
+  desconhecida: "❔ Ainda não identificados",
+};
+
+/** De onde vêm os jogadores: aparelho da última abertura do jogo (sem a conta da equipe). */
+export function PlatformsSection(props: ViewProps) {
+  const { data } = useAdmin<{ platforms: PlatformRow[] }>("/platforms", props);
+  if (!data) return null;
+  const total = Math.max(
+    1,
+    data.platforms.reduce((s, p) => s + p.players, 0),
+  );
+  return (
+    <section>
+      <h2>De onde vêm os jogadores</h2>
+      <div className="kpis">
+        {data.platforms.map((p) => (
+          <div
+            key={p.platform}
+            className={`kpi ${p.platform === "ios" ? "" : p.platform === "android" ? "green" : "orange"}`}
+          >
+            <span>{PLATFORM_NAMES[p.platform] ?? p.platform}</span>
+            <strong>
+              {num(p.players)}{" "}
+              <small className="muted">
+                ({Math.round((p.players / total) * 100)}%)
+              </small>
+            </strong>
+            <small className="muted">
+              novos: {num(p.newToday)} hoje · {num(p.new7d)} em 7 dias
+            </small>
+            <small className="muted">
+              ativos: {num(p.activeToday)} hoje · {num(p.active7d)} em 7 dias
+            </small>
+            {p.versions.length > 0 && (
+              <small className="muted">
+                versões:{" "}
+                {p.versions
+                  .map((v) => `${v.version} (${num(v.players)})`)
+                  .join(" · ")}
+              </small>
+            )}
+          </div>
+        ))}
+      </div>
+      <p className="muted">
+        Quem abriu o jogo antes da 1.0.5 é identificado na próxima vez que abrir
+        o app. Os contados como iPhone/Android já entraram pelo vínculo de conta
+        ou por compra.
+      </p>
+    </section>
   );
 }
 
@@ -424,6 +481,8 @@ export function exportPlayersCsv(rows: PlayerRow[]) {
     "tutorial",
     "vinculada",
     "equipe",
+    "aparelho",
+    "versao",
   ];
   const cell = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
   const lines = rows.map((p) =>
@@ -440,6 +499,8 @@ export function exportPlayersCsv(rows: PlayerRow[]) {
       p.tutorialCompleted ? "sim" : "não",
       p.linked ? "sim" : "não",
       p.staff ? "sim" : "não",
+      p.platform ?? "",
+      p.appVersion ?? "",
     ]
       .map(cell)
       .join(";"),

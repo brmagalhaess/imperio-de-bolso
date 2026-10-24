@@ -2,6 +2,14 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-24 — Painel: de onde vêm os jogadores (iPhone x Android)
+
+- Servidor guarda `players.platform` e `app_version` (migração `20261024150000_player_platform`)
+  quando o jogo pede o catálogo ao abrir; quem já tinha vínculo Apple/Google ou compra foi
+  preenchido na migração. `GET /api/admin/platforms`: total, novos e ativos por plataforma e
+  versões. Painel: seção "De onde vêm os jogadores", coluna Aparelho, filtros e CSV.
+  Testes: servidor **173**.
+
 ## 2026-10-24 — Google Play: conta de serviço, 25 produtos ativos, 1.0.5 com loja e anúncios
 
 - Conta de serviço `crowntech-games-monitor@imperio-de-bolso-pagamentos` com chave

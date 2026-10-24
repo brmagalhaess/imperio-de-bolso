@@ -151,6 +151,8 @@ export interface PlayerRow {
   prestigeStars: number;
   linked: boolean;
   staff: boolean;
+  platform: string | null;
+  appVersion: string | null;
 }
 
 export interface PlayerDetail {
@@ -163,6 +165,8 @@ export interface PlayerDetail {
   tutorialCompleted: boolean;
   nameChanged: boolean;
   staff: boolean;
+  platform: string | null;
+  appVersion: string | null;
   coins: string;
   gems: string;
   prestige: { stars: number; count: number };
@@ -204,6 +208,16 @@ export interface EventRow {
   name: string;
   props: Record<string, unknown>;
   at: string;
+}
+
+export interface PlatformRow {
+  platform: string;
+  players: number;
+  newToday: number;
+  new7d: number;
+  activeToday: number;
+  active7d: number;
+  versions: { version: string; players: number }[];
 }
 
 export interface TrendDay {

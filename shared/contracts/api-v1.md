@@ -296,3 +296,10 @@ em `POST /store/buy` → `200 { bought, turboUntil, state }` (soma tempo se já 
 - `POST /api/admin/purchases/revoke` `{ store, transactionId }` → `{ alreadyRevoked, shortfall }`.
 - `GET /api/admin/players/:id/purchases` → `{ purchases: [...] }`.
 
+### 2026-10-24 — Plataforma do jogador
+
+- O jogo manda `X-App-Version` em todas as requisições. `GET /store/catalog?platform=ios|android`
+  grava a plataforma e a versão no jogador. Admin: `GET /api/admin/platforms` →
+  `{ platforms: [{ platform, players, newToday, new7d, activeToday, active7d, versions }] }`;
+  `/players` e `/players/:id` trazem `platform` e `appVersion`.
+

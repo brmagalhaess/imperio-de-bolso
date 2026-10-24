@@ -15,6 +15,8 @@ import {
 } from "./api";
 import {
   exportPlayersCsv,
+  PLATFORM_NAMES,
+  PlatformsSection,
   PlayerSupport,
   RevenueView,
   TrendsSection,
@@ -307,6 +309,7 @@ function OverviewView(props: ViewProps) {
         </label>
         <button onClick={() => void reload()}>Atualizar</button>
       </div>
+      <PlatformsSection {...props} />
       <TrendsSection {...props} />
       <h2>Jogadores</h2>
       <Cards
@@ -689,6 +692,8 @@ function PlayersView(props: ViewProps) {
     linked: (p) => p.linked,
     prestige: (p) => p.prestigeStars > 0,
     staff: (p) => p.staff,
+    ios: (p) => p.platform === "ios",
+    android: (p) => p.platform === "android",
     new: (p) => Date.now() - new Date(p.createdAt).getTime() < 86_400_000,
   };
   const data = raw && {
@@ -720,6 +725,8 @@ function PlayersView(props: ViewProps) {
           <option value="linked">Conta vinculada</option>
           <option value="prestige">Já venderam o império</option>
           <option value="staff">Equipe</option>
+          <option value="ios">iPhone</option>
+          <option value="android">Android</option>
         </select>
         <button type="submit">Buscar</button>
         {data && data.players.length > 0 && (
@@ -744,6 +751,7 @@ function PlayersView(props: ViewProps) {
               <th>Código</th>
               <th>Criado</th>
               <th>Último sinal</th>
+              <th>Aparelho</th>
               <th>Mapa</th>
               <th className="num">Moedas</th>
               <th className="num">Diamantes</th>
@@ -767,6 +775,16 @@ function PlayersView(props: ViewProps) {
                 <td className="mono">{p.id.slice(0, 8).toUpperCase()}</td>
                 <td>{when(p.createdAt)}</td>
                 <td>{when(p.lastSeenAt)}</td>
+                <td>
+                  {p.platform === "ios"
+                    ? "🍎 iPhone"
+                    : p.platform === "android"
+                      ? "🤖 Android"
+                      : "—"}
+                  {p.appVersion ? (
+                    <span className="muted"> {p.appVersion}</span>
+                  ) : null}
+                </td>
                 <td>{districtName(p.currentDistrict)}</td>
                 <td className="num">{short(p.coins)}</td>
                 <td className="num">{fmt(p.gems)}</td>
@@ -865,6 +883,9 @@ function PlayerView({
         mapa {districtName(data.currentDistrict)} · tutorial{" "}
         {data.tutorialCompleted ? "concluído" : "pendente"}
         {data.nameChanged ? " · nome escolhido" : ""}
+        {data.platform
+          ? ` · ${(PLATFORM_NAMES[data.platform] ?? data.platform).replace(/^\S+ /, "")}${data.appVersion ? ` ${data.appVersion}` : ""}`
+          : ""}
         {data.identities.length
           ? ` · vinculada: ${data.identities.join(", ")}`
           : ""}

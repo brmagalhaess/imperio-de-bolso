@@ -399,6 +399,8 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
         prestigeStars: p.prestigeStars,
         linked: p._count.identities > 0,
         staff: p.staff,
+        platform: p.platform,
+        appVersion: p.appVersion,
       })),
     };
   });
@@ -439,6 +441,8 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
       tutorialCompleted: player.tutorialCompletedAt !== null,
       nameChanged: player.nameChangedAt !== null,
       staff: player.staff,
+      platform: player.platform,
+      appVersion: player.appVersion,
       coins: (player.wallet?.coins ?? 0n).toString(),
       gems: (player.wallet?.gems ?? 0n).toString(),
       prestige: { stars: player.prestigeStars, count: player.prestigeCount },

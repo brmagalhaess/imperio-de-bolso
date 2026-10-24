@@ -32,6 +32,9 @@ model Player {
   // Conta da equipe (testes no aparelho de desenvolvimento): fica fora de todos os rankings e
   // pódios para não concorrer com os jogadores. Ligada pelo painel admin.
   staff               Boolean   @default(false) @map("is_staff")
+  // Aparelho e versão do jogo da última abertura (painel: de qual loja vêm os jogadores).
+  platform            String? // ios | android
+  appVersion          String?   @map("app_version")
   tutorialCompletedAt DateTime? @map("tutorial_completed_at") @db.Timestamptz(3)
   // Presença por mapa (ADR 0006): mapa aberto agora e último sinal do jogo.
   currentDistrict     String?   @map("current_district")

@@ -117,6 +117,40 @@ export async function insightsRoutes(app: FastifyInstance, deps: InsightsDeps): 
     return { days: [...rows.values()], serverTime: at.toISOString() };
   });
 
+  // --- De onde vêm os jogadores: iPhone x Android (aparelho da última abertura do jogo) -------
+  app.get("/platforms", async () => {
+    const at = now();
+    const today = dayBounds(at).start;
+    const week = new Date(at.getTime() - 7 * DAY_MS);
+    const [players, versions] = await Promise.all([
+      db.player.findMany({
+        where: { staff: false },
+        select: { platform: true, createdAt: true, lastSeenAt: true },
+      }),
+      db.player.groupBy({
+        by: ["platform", "appVersion"],
+        where: { staff: false, platform: { not: null } },
+        _count: { _all: true },
+      }),
+    ]);
+    const rows = ["ios", "android", "desconhecida"].map((platform) => {
+      const list = players.filter((p) => (p.platform ?? "desconhecida") === platform);
+      return {
+        platform,
+        players: list.length,
+        newToday: list.filter((p) => p.createdAt >= today).length,
+        new7d: list.filter((p) => p.createdAt >= week).length,
+        activeToday: list.filter((p) => p.lastSeenAt && p.lastSeenAt >= today).length,
+        active7d: list.filter((p) => p.lastSeenAt && p.lastSeenAt >= week).length,
+        versions: versions
+          .filter((v) => v.platform === platform)
+          .map((v) => ({ version: v.appVersion ?? "antiga (sem versão)", players: v._count._all }))
+          .sort((a, b) => b.players - a.players),
+      };
+    });
+    return { platforms: rows, serverTime: at.toISOString() };
+  });
+
   // --- Receita: compras reais (Apple/Google; o "mock" de teste fica de fora) -----------------
   app.get("/revenue", async () => {
     const at = now();
