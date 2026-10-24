@@ -20,6 +20,7 @@ export async function createTestContext(
   admobKeys?: import("../src/lib/admob-ssv.js").KeyResolver,
   idKeys?: import("../src/lib/id-token.js").JwkResolver,
   appleRootFingerprint?: string,
+  googlePlay?: import("../src/lib/google-play.js").GooglePlayApi,
 ): Promise<TestContext> {
   const url = process.env.TEST_DATABASE_URL;
   if (!url) throw new Error("TEST_DATABASE_URL não definido");
@@ -53,6 +54,7 @@ export async function createTestContext(
     admobKeys,
     idKeys,
     appleRootFingerprint,
+    googlePlay,
   });
   return {
     app,

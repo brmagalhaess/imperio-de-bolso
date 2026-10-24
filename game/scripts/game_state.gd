@@ -311,9 +311,9 @@ func refresh_catalog() -> void:
 		if ads_enabled():
 			_ensure_admob()  # consentimento e primeiro anúncio já carregando
 		if bool(catalog.get("purchasesEnabled", false)) and not catalog.get("sandbox", false):
-			_ensure_apple_store()
-			if apple_store != null:
-				apple_store.load_products(Array(catalog.get("items", [])).filter(
+			_ensure_store()
+			if store_node != null:
+				store_node.load_products(Array(catalog.get("items", [])).filter(
 					func(i): return i.has("productId")).map(func(i): return str(i.productId))
 					+ offers().map(func(o): return str(o.productId)))
 		catalog_changed.emit()
@@ -423,14 +423,24 @@ func buy_with_gems(item_id: String) -> Dictionary:
 	return result
 
 
-## Loja da Apple (StoreKit 2): nó filho criado no boot do iPhone (scripts/apple_store.gd).
-var apple_store: Node
+## Loja real do aparelho: App Store no iPhone (scripts/apple_store.gd) ou Google Play no
+## Android (scripts/google_store.gd). Mesma interface: load_products, price, buy, restore.
+var store_node: Node
 
 
-func _ensure_apple_store() -> void:
-	if apple_store == null and preload("res://scripts/apple_store.gd").available():
-		apple_store = preload("res://scripts/apple_store.gd").new()
-		add_child(apple_store)
+func _ensure_store() -> void:
+	if store_node != null:
+		return
+	for script in [preload("res://scripts/apple_store.gd"), preload("res://scripts/google_store.gd")]:
+		if script.available():
+			store_node = script.new()
+			add_child(store_node)
+			return
+
+
+## "apple" no iPhone, "google" no Android (textos da Loja e do Passe VIP).
+func store_brand() -> String:
+	return "google" if OS.get_name() == "Android" else "apple"
 
 
 ## Recibo de uma loja real → servidor (chamado pela loja da Apple). Atualiza o estado.
@@ -444,17 +454,17 @@ func verify_store_purchase(store: String, product_id: String, token: String) -> 
 	return res
 
 
-## Compra pela App Store. Devolve {ok, message} (message "" = cancelado pelo jogador).
-func buy_apple(product_id: String) -> Dictionary:
-	_ensure_apple_store()
-	if apple_store == null:
+## Compra pela loja do aparelho. Devolve {ok, message} (message "" = cancelado pelo jogador).
+func buy_real(product_id: String) -> Dictionary:
+	_ensure_store()
+	if store_node == null:
 		return {"ok": false, "message": "unavailable"}
-	return await apple_store.buy(product_id)
+	return await store_node.buy(product_id)
 
 
-## Loja paga real neste aparelho (iPhone com compras ligadas no servidor).
+## Loja paga real neste aparelho (iPhone/Android com compras ligadas no servidor).
 func real_store() -> bool:
-	return purchases_enabled() and not catalog.get("sandbox", false) and apple_store != null
+	return purchases_enabled() and not catalog.get("sandbox", false) and store_node != null
 
 
 ## Compra de TESTE (modo sandbox): nada é cobrado; o servidor registra como loja "mock".

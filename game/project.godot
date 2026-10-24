@@ -18,11 +18,11 @@ boot_splash/use_filter=true
 
 [admob]
 
-; Anúncios só no iPhone (ADR 0023). Todas as chaves do plugin ficam aqui de propósito: se faltar
-; alguma, o plugin regrava o project.godot sozinho (e perde configurações). App ID da conta da
-; empresa (pub-9538653038510274); o Android segue desligado com o ID de teste do Google.
-general/android/enabled=false
-general/android/app_id="ca-app-pub-3940256099942544~3347511713"
+; Anúncios no iPhone e no Android (ADR 0023/0028). Todas as chaves do plugin ficam aqui de
+; propósito: se faltar alguma, o plugin regrava o project.godot sozinho (e perde configurações).
+; App IDs da conta da empresa (pub-9538653038510274).
+general/android/enabled=true
+general/android/app_id="ca-app-pub-9538653038510274~1940408178"
 general/android/enable_r8_optimization=false
 general/android/disable_initialization_optimization=false
 general/android/disable_ad_loading_optimization=false
@@ -70,13 +70,14 @@ window/handheld/orientation=1
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/admob/plugin.cfg")
+enabled=PackedStringArray("res://addons/admob/plugin.cfg", "res://addons/GodotGooglePlayBilling/plugin.cfg")
 
 [imperio]
 
 api/base_url="http://127.0.0.1:3000/api/v1"
 api/base_url_mobile="https://api-imperio.crowntech.com.br/api/v1"
 ads/ios_rewarded_unit="ca-app-pub-9538653038510274/3843187791"
+ads/android_rewarded_unit="ca-app-pub-9538653038510274/8046651528"
 
 [input_devices]
 

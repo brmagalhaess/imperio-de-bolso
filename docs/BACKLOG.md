@@ -84,6 +84,14 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [ ] Deploy staging no Dockploy, backups e restauração testada
 - [ ] QA, segurança, teste fechado
 
+- [x] Android 1.0.3 na produção (enviada para revisão em 2026-10-24)
+- [x] Loja do Google Play no jogo + verificação no servidor (ADR 0028)
+- [x] AdMob no Android (app + bloco premiado com SSV)
+- [ ] Conta de comerciante (titular) e produtos no Play Console
+- [ ] Conta de serviço do Google Cloud → `GOOGLE_PLAY_SERVICE_ACCOUNT` no Dokploy
+- [ ] Testar o build 1.0.4 no teste interno (relatório de pré-lançamento) e publicar
+- [ ] Reembolsos do Google (RTDN / voided purchases)
+
 ## Etapa 6 — Versão completa (após validação)
 - [x] V1.1 Prestígio "Vender o império" (ADR 0011) e bairros novos (porto, centro — ADR 0010)
 - [x] V1.2a Idiomas inglês e espanhol no jogo (ADR 0012)

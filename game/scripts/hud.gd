@@ -495,10 +495,17 @@ func open_store_menu() -> void:
 			var vip := GameState.store_item("vip_monthly")
 			_buy_real_or_sandbox(vip))
 	if GameState.real_store() and GameState.vip_until() != null:
-		_modal.add_action(tr("Gerenciar assinatura"), func(): OS.shell_open("https://apps.apple.com/account/subscriptions"), Style.TEAL_LIGHT, Style.TEAL_DARK)
+		_modal.add_action(tr("Gerenciar assinatura"), func():
+			if GameState.store_brand() == "google":
+				GameState.store_node.manage(str(GameState.store_item("vip_monthly").get("productId", "")))
+			else:
+				OS.shell_open("https://apps.apple.com/account/subscriptions"), Style.TEAL_LIGHT, Style.TEAL_DARK)
 	if GameState.real_store():
 		# Diretriz 3.1.2 da Apple: preço, período, renovação automática e links de termos/privacidade.
-		_modal.add_message(null, "", tr("Assinatura mensal de %s, renovada automaticamente até você cancelar nos Ajustes da sua conta Apple (pelo menos 24 h antes do fim do período). A cobrança é feita na sua conta Apple.") % _price_label(GameState.store_item("vip_monthly")))
+		var terms := tr("Assinatura mensal de %s, renovada automaticamente até você cancelar em Google Play → Pagamentos e assinaturas. A cobrança é feita na sua conta Google.") \
+				if GameState.store_brand() == "google" else \
+				tr("Assinatura mensal de %s, renovada automaticamente até você cancelar nos Ajustes da sua conta Apple (pelo menos 24 h antes do fim do período). A cobrança é feita na sua conta Apple.")
+		_modal.add_message(null, "", terms % _price_label(GameState.store_item("vip_monthly")))
 		_modal.add_action(tr("Termos de uso"), func(): OS.shell_open("https://imperio.crowntech.com.br/termos/"), Style.TEAL_LIGHT, Style.TEAL_DARK)
 		_modal.add_action(tr("Política de privacidade"), func(): OS.shell_open("https://imperio.crowntech.com.br/privacidade/"), Style.TEAL_LIGHT, Style.TEAL_DARK)
 	# Recompensa diária de diamantes do VIP (pedido do titular).
@@ -587,7 +594,7 @@ func _buy_with_gems(item_id: String) -> void:
 ## Preço do item: o da App Store (localizado) quando a loja real está ligada; senão o do catálogo.
 func _price_label(item: Dictionary) -> String:
 	if GameState.real_store():
-		var p: String = GameState.apple_store.price(str(item.get("productId", "")))
+		var p: String = GameState.store_node.price(str(item.get("productId", "")))
 		if p != "":
 			return p
 	return "R$ " + str(item.get("priceBRL", ""))
@@ -599,7 +606,7 @@ func _buy_real_or_sandbox(item: Dictionary, reopen_store := true) -> void:
 	if not GameState.real_store():
 		_confirm_sandbox(item, product_id, reopen_store)
 		return
-	var r: Dictionary = await GameState.buy_apple(product_id)
+	var r: Dictionary = await GameState.buy_real(product_id)
 	if r.ok:
 		show_toast(tr("Compra confirmada: %s") % item.get("title", ""))
 	elif r.message == "PURCHASE_PENDING":
@@ -638,7 +645,7 @@ func _sandbox_buy(item: Dictionary, product_id: String, reopen_store: bool) -> v
 
 func _restore_purchases() -> void:
 	if GameState.real_store():
-		await GameState.apple_store.restore()
+		await GameState.store_node.restore()
 	var res := await Api.restore_purchases()
 	if res.ok:
 		show_toast(tr("%d compra(s) encontrada(s) nesta conta.") % res.data.purchases.size())
@@ -698,7 +705,8 @@ func _vip_status() -> String:
 	# Versão de desenvolvimento compra no ambiente de teste da Apple, onde o "mês" é encurtado
 	# (renova a cada poucos minutos ou 1 dia, conforme a conta de teste). Na App Store é 1 mês.
 	if OS.is_debug_build() and GameState.real_store():
-		return tr("Ativo até %s (assinatura de teste da Apple: renova mais rápido)") % _date_text(until)
+		return (tr("Ativo até %s (assinatura de teste do Google: renova mais rápido)") if GameState.store_brand() == "google" \
+				else tr("Ativo até %s (assinatura de teste da Apple: renova mais rápido)")) % _date_text(until)
 	return tr("Ativo até %s · renova todo mês") % _date_text(until)
 
 
@@ -1429,7 +1437,7 @@ func open_offer_menu(o: Dictionary) -> void:
 			"", _offer_contents(o) + "\n\n" + ends)
 	_modal.add_store_card(func():
 		return {
-			"title": tr(str(o.title)), "icon": _gem_tex, "subtitle": tr("Pagamento pela sua conta Apple") if GameState.real_store() else tr("Pacote promocional"),
+			"title": tr(str(o.title)), "icon": _gem_tex, "subtitle": (tr("Pagamento pela sua conta Google") if GameState.store_brand() == "google" else tr("Pagamento pela sua conta Apple")) if GameState.real_store() else tr("Pacote promocional"),
 			"button": _price_label(o), "color": Style.GREEN, "edge": Style.GREEN_DARK, "enabled": true,
 		}, func(): _buy_real_or_sandbox(o, false))
 	_modal.refit()

@@ -272,3 +272,11 @@ em `POST /store/buy` → `200 { bought, turboUntil, state }` (soma tempo se já 
 - Admin: `POST /api/admin/players/:id/staff` e `/unstaff` → `{ playerId, staff }`;
   `GET /api/admin/players` e `/players/:id` trazem `staff`.
 
+### 2026-10-24 — Compras do Google Play (ADR 0028)
+
+- `POST /purchases/verify` com `store: "google"`: `purchaseToken` = token da compra do Google
+  Play. O servidor consulta a Google Play Developer API (conta de serviço). Erros: `PURCHASE_PENDING`
+  (pagamento pendente), `PURCHASE_REVOKED` (cancelada), `PURCHASE_EXPIRED` (assinatura vencida),
+  `PURCHASE_INVALID`, `STORE_UNAVAILABLE` (503, Google fora — tentar de novo),
+  `STORE_NOT_CONFIGURED` (501, sem conta de serviço no servidor).
+

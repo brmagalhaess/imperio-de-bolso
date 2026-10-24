@@ -1,6 +1,8 @@
 import type { Db, Tx } from "../db/prisma.js";
 import { AppError } from "../errors.js";
+import { createHash } from "node:crypto";
 import { AppleJwsError, verifyAppleJws } from "../lib/apple-jws.js";
+import { GooglePlayError, type GooglePlayApi } from "../lib/google-play.js";
 import { bundleByProductId } from "../economy/bundles.js";
 import { itemByProductId } from "../economy/store.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
@@ -107,7 +109,7 @@ export function decodeAppleTransaction(
   };
 }
 
-/** Google Play Billing: depende da conta de serviço da Play Console (ainda não criada). */
+/** Loja sem verificação configurada (ex.: Google sem a conta de serviço no servidor). */
 const notConfigured = (store: string): StoreVerifier => ({
   async verify() {
     throw new AppError(
@@ -118,12 +120,71 @@ const notConfigured = (store: string): StoreVerifier => ({
   },
 });
 
+/** Assinatura do Google com direito ativo (cancelada = só não renova; vale até o fim). */
+const GOOGLE_ACTIVE_STATES = new Set([
+  "SUBSCRIPTION_STATE_ACTIVE",
+  "SUBSCRIPTION_STATE_IN_GRACE_PERIOD",
+  "SUBSCRIPTION_STATE_CANCELED",
+]);
+
+/**
+ * Google Play Billing: o jogo manda o purchaseToken; o servidor consulta a compra na API do
+ * Google Play (conta de serviço) e confere produto, estado e validade. A transação é o número
+ * do pedido (orderId; cada renovação da assinatura gera um novo). Compras de testadores
+ * licenciados (sem cobrança) também são aceitas, como o Sandbox da Apple.
+ */
+export function googleVerifier(api: GooglePlayApi, now: () => Date): StoreVerifier {
+  const call = async <T>(fn: () => Promise<T>) => {
+    try {
+      return await fn();
+    } catch (e) {
+      if (e instanceof GooglePlayError) {
+        throw new AppError(503, "STORE_UNAVAILABLE", "Google Play indisponível, tente de novo");
+      }
+      throw e;
+    }
+  };
+  const tokenId = (token: string) =>
+    `token:${createHash("sha256").update(token).digest("hex").slice(0, 40)}`;
+  return {
+    async verify(productId, purchaseToken) {
+      if (itemByProductId(productId)?.kind === "subscription") {
+        const s = await call(() => api.subscription(purchaseToken));
+        const line = s?.lineItems?.find((l) => l.productId === productId);
+        if (!s || !line)
+          throw new AppError(422, "PURCHASE_INVALID", "Recibo não corresponde ao produto");
+        const expiresAt = line.expiryTime ? new Date(line.expiryTime) : undefined;
+        if (s.subscriptionState === "SUBSCRIPTION_STATE_PENDING") {
+          throw new AppError(422, "PURCHASE_PENDING", "Pagamento pendente");
+        }
+        if (
+          !GOOGLE_ACTIVE_STATES.has(s.subscriptionState ?? "") ||
+          !expiresAt ||
+          expiresAt <= now()
+        ) {
+          throw new AppError(422, "PURCHASE_EXPIRED", "Assinatura vencida");
+        }
+        return { transactionId: s.latestOrderId ?? tokenId(purchaseToken), productId, expiresAt };
+      }
+      const p = await call(() => api.product(productId, purchaseToken));
+      if (!p || (p.productId && p.productId !== productId)) {
+        throw new AppError(422, "PURCHASE_INVALID", "Recibo inválido");
+      }
+      if (p.purchaseState === 1) throw new AppError(422, "PURCHASE_REVOKED", "Compra cancelada");
+      if (p.purchaseState === 2) throw new AppError(422, "PURCHASE_PENDING", "Pagamento pendente");
+      return { transactionId: p.orderId || tokenId(purchaseToken), productId };
+    },
+  };
+}
+
 export interface VerifierDeps {
   storeMode: string;
   appleBundleId: string;
   now: () => Date;
   /** Testes: raiz própria no lugar da Apple Root CA - G3. */
   appleRootFingerprint?: string;
+  /** API do Google Play (conta de serviço); ausente = verificação do Google desligada. */
+  googlePlay?: GooglePlayApi;
 }
 
 export function verifierFor(store: StoreName, deps: VerifierDeps): StoreVerifier {
@@ -134,6 +195,7 @@ export function verifierFor(store: StoreName, deps: VerifierDeps): StoreVerifier
   }
   if (store === "apple")
     return appleVerifier(deps.appleBundleId, deps.now, deps.appleRootFingerprint);
+  if (store === "google" && deps.googlePlay) return googleVerifier(deps.googlePlay, deps.now);
   return notConfigured(store);
 }
 

@@ -27,6 +27,8 @@ export interface AppDeps {
   admobKeys?: import("./lib/admob-ssv.js").KeyResolver;
   idKeys?: import("./lib/id-token.js").JwkResolver;
   appleRootFingerprint?: string;
+  /** API do Google Play (testes injetam uma falsa; produção usa a conta de serviço). */
+  googlePlay?: import("./lib/google-play.js").GooglePlayApi;
 }
 
 export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
@@ -123,6 +125,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
         admobKeys: deps.admobKeys,
         idKeys: deps.idKeys,
         appleRootFingerprint: deps.appleRootFingerprint,
+        googlePlay: deps.googlePlay,
       }),
     {
       prefix: "/api/v1",

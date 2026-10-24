@@ -1,14 +1,15 @@
-## Anúncios recompensados reais (AdMob) só no iPhone — ADR 0023. Plugin da Poing Studios
-## (instalado por tools/apple/fetch_admob.sh, fora do Git): os scripts dele são carregados aqui
-## por caminho, então sem o plugin (Android, CI) `available()` é falso e o jogo usa o anúncio de
-## teste. O prêmio é decidido pelo servidor: o sessionId vai no custom_data do SSV e o Google
+## Anúncios recompensados reais (AdMob) no iPhone e no Android — ADR 0023/0028. Plugin da
+## Poing Studios (instalado por tools/apple/fetch_admob.sh, fora do Git): os scripts dele são
+## carregados aqui por caminho, então sem o plugin (CI, computador) `available()` é falso e o jogo
+## usa o anúncio de teste. O servidor ainda decide por plataforma (ADS_PLATFORMS). O prêmio é decidido pelo servidor: o sessionId vai no custom_data do SSV e o Google
 ## confirma direto na API (/ads/ssv) antes do resgate.
 extends Node
 
 const API := "res://addons/admob/gdscript/src/"
-## Bloco de anúncio de teste do Google (iOS). O real (imperio/ads/ios_rewarded_unit) só vale no
-## build de release: no de desenvolvimento ver o próprio anúncio real conta como tráfego inválido.
+## Blocos de anúncio de teste do Google. O real (imperio/ads/<ios|android>_rewarded_unit) só vale
+## no build de release: no de desenvolvimento ver o próprio anúncio real conta como tráfego inválido.
 const TEST_UNIT_IOS := "ca-app-pub-3940256099942544/1712485313"
+const TEST_UNIT_ANDROID := "ca-app-pub-3940256099942544/5224354917"
 
 var _started := false
 var _initialized := false
@@ -18,12 +19,16 @@ var _show := {"done": true, "earned": false}
 
 
 static func available() -> bool:
-	return OS.get_name() == "iOS" and ResourceLoader.exists(API + "api/MobileAds.gd")
+	return OS.get_name() in ["iOS", "Android"] and ResourceLoader.exists(API + "api/MobileAds.gd")
 
 
 func unit_id() -> String:
-	var configured := str(ProjectSettings.get_setting("imperio/ads/ios_rewarded_unit", ""))
-	return configured if configured != "" and not OS.is_debug_build() else TEST_UNIT_IOS
+	var android := OS.get_name() == "Android"
+	var configured := str(ProjectSettings.get_setting(
+			"imperio/ads/android_rewarded_unit" if android else "imperio/ads/ios_rewarded_unit", ""))
+	if configured != "" and not OS.is_debug_build():
+		return configured
+	return TEST_UNIT_ANDROID if android else TEST_UNIT_IOS
 
 
 ## Consentimento (UMP: LGPD/GDPR e, se configurado no AdMob, a pergunta de rastreamento da

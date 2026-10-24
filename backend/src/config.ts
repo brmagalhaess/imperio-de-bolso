@@ -26,6 +26,10 @@ const ConfigSchema = z.object({
   PURCHASES_PLATFORMS: z.string().default(""),
   // Bundle id esperado nos recibos da App Store (StoreKit 2).
   APPLE_BUNDLE_ID: z.string().default("br.com.imperiodebolso.game"),
+  // Google Play Billing: pacote do app e conta de serviço da Play Console (JSON ou base64 do
+  // JSON) com permissão de ver pedidos. Vazio = compras do Google não são verificadas (501).
+  GOOGLE_PLAY_PACKAGE: z.string().default("br.com.imperiodebolso.game"),
+  GOOGLE_PLAY_SERVICE_ACCOUNT: z.string().default(""),
   ADS_ENABLED: z.enum(["true", "false"]).optional(),
   // Anúncios só em algumas plataformas (ex.: ADS_PLATFORMS=ios), como PURCHASES_PLATFORMS.
   ADS_PLATFORMS: z.string().default(""),

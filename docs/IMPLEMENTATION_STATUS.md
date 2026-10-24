@@ -2,6 +2,19 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-24 — Android 1.0.3 enviado; compras e anúncios no Android prontos no código (ADR 0028)
+
+- Apple: as 24 compras (diamantes, VIP, 20 pacotes, Dobro) estão **aprovadas**. AdMob: conta e
+  apps ainda em análise (anúncios seguem desligados).
+- Google Play: **1.0.3 (código 3)** enviada para revisão na produção (igual à da App Store, sem
+  loja paga). App Android cadastrado no AdMob com bloco premiado e SSV verificado.
+- Código: loja do Google (`google_store.gd`, plugin oficial 3.3.0) com a mesma interface da Apple;
+  verificação no servidor pela Google Play Developer API (`lib/google-play.ts`); AdMob no Android.
+  Build **1.0.4 (código 4)** gerado com os dois plugins (falta testar num aparelho/teste interno).
+  Testes: servidor **164**, jogo **153** verificações.
+- Pendente do titular: conta de comerciante no Play Console; conta de serviço do Google Cloud
+  com acesso ao Play Console (para o servidor verificar compras).
+
 ## 2026-10-19 — Vender o império zera o ranking e renova as missões; conta da equipe (ADR 0027)
 
 - Servidor: ranking da semana, liga e pódio contam só o faturamento depois da última venda do

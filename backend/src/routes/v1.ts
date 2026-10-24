@@ -1,3 +1,4 @@
+import { googlePlayApi, parseServiceAccount, type GooglePlayApi } from "../lib/google-play.js";
 import { reportPlayer } from "../services/reports.js";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
@@ -68,6 +69,8 @@ export interface V1Deps {
   idKeys?: JwkResolver;
   /** Testes: raiz própria no lugar da Apple Root CA - G3 (recibos da App Store). */
   appleRootFingerprint?: string;
+  /** API do Google Play; sem ela usa a conta de serviço do env (GOOGLE_PLAY_SERVICE_ACCOUNT). */
+  googlePlay?: GooglePlayApi;
 }
 
 const Slug = z.string().regex(/^[a-z0-9_-]{1,64}$/);
@@ -125,6 +128,10 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
   const { db, now, config } = deps;
   const links = linkConfig(config.GOOGLE_CLIENT_IDS, config.APPLE_AUDIENCES);
   const idKeys = deps.idKeys ?? remoteJwkResolver();
+  const googleAccount = parseServiceAccount(config.GOOGLE_PLAY_SERVICE_ACCOUNT);
+  const googlePlay =
+    deps.googlePlay ??
+    (googleAccount ? googlePlayApi(config.GOOGLE_PLAY_PACKAGE, googleAccount) : undefined);
 
   const authenticate = async (request: FastifyRequest) => {
     try {
@@ -431,6 +438,7 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
         appleBundleId: config.APPLE_BUNDLE_ID,
         now,
         appleRootFingerprint: deps.appleRootFingerprint,
+        googlePlay,
       });
       return command(request, reply, "purchases.verify", (at) =>
         verifyPurchase(store, productId, purchaseToken, verifier, at, district),
