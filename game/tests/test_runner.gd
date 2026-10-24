@@ -369,6 +369,9 @@ func _i18n_tests() -> bool:
 			"idiomas: números no padrão inglês")
 	var mission := {"title": "Fature 1.000 moedas", "titleTemplate": "Fature {n} moedas", "target": "1000"}
 	check(Hud.mission_title(mission) == "Earn 1,000 coins", "idiomas: missão traduzida com o alvo formatado")
+	check(Hud.version_less("1.0.5", "1.0.6") and Hud.version_less("1.0.9", "1.0.10")
+			and not Hud.version_less("1.0.6", "1.0.6") and not Hud.version_less("1.1", "1.0.9"),
+			"atualização: compara versões por partes")
 	check(Hud.mission_title({"title": "Fature 1.000 moedas", "target": "1000"}) == "Fature 1.000 moedas",
 			"idiomas: servidor antigo sem modelo mostra o título pronto")
 

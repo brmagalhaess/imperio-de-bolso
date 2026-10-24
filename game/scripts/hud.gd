@@ -1080,8 +1080,66 @@ func open_player_options(entry: Dictionary) -> void:
 
 ## Avisos ao entrar: primeiro o pódio da semana (se ganhou), depois o prêmio do dia.
 func maybe_show_popups() -> void:
+	await maybe_show_update()
 	await maybe_show_podium()
 	await maybe_show_daily()
+
+
+## Ao abrir: se a loja já tem uma versão mais nova, oferece atualizar (abre a página do jogo na
+## App Store / Play Store). Abaixo da versão mínima do servidor, a atualização é obrigatória.
+func maybe_show_update() -> void:
+	if OS.get_name() not in ["iOS", "Android"]:
+		return
+	var res := await Api.app_version()
+	if not res.ok:
+		return
+	var mine := str(ProjectSettings.get_setting("application/config/version", ""))
+	var latest := str(res.data.get("latest", "")) if res.data.get("latest") != null else ""
+	var minimum := str(res.data.get("minimum", "")) if res.data.get("minimum") != null else ""
+	var required := minimum != "" and version_less(mine, minimum)
+	if not required and (latest == "" or not version_less(mine, latest)):
+		return
+	while _modal.visible or map_trail.visible:
+		await get_tree().create_timer(0.4).timeout
+	open_update_prompt(latest if latest != "" else minimum, required)
+	while _modal.visible and _reward_kind == "update":
+		await get_tree().create_timer(0.3).timeout
+
+
+func open_update_prompt(version: String, required: bool) -> void:
+	_reward_kind = "update"
+	_modal.open(tr("Atualização disponível"))
+	_modal.add_message(null, tr("Versão %s") % version,
+			tr("Esta versão do jogo não é mais aceita. Atualize para continuar jogando.") if required
+			else tr("Tem uma versão nova do Império de Bolso na loja, com novidades e correções. Atualize para não perder nada."))
+	_modal.add_action(tr("Atualizar agora"), func():
+		OS.shell_open(store_link())
+		if required:
+			open_update_prompt(version, required)  # continua aberto até atualizar
+		else:
+			_modal.close(), Style.GREEN, Style.GREEN_DARK)
+	if not required:
+		_modal.add_action(tr("Depois"), func(): _modal.close(), Style.GREY, Style.GREY_DARK)
+	_modal.refit()
+
+
+## Abre direto o app da loja (App Store / Play Store), não o navegador.
+static func store_link() -> String:
+	if OS.get_name() == "iOS":
+		return "itms-apps://apps.apple.com/app/id6822892071"
+	return "market://details?id=br.com.imperiodebolso.game"
+
+
+## "1.0.5" < "1.0.10": compara versões por partes numéricas.
+static func version_less(a: String, b: String) -> bool:
+	var x := a.split(".")
+	var y := b.split(".")
+	for i in max(x.size(), y.size()):
+		var p := int(x[i]) if i < x.size() else 0
+		var q := int(y[i]) if i < y.size() else 0
+		if p != q:
+			return p < q
+	return false
 
 
 ## "Parabéns! Você ficou em 1º lugar…" com o botão de resgatar (ADR 0017).

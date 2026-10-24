@@ -25,7 +25,7 @@ export interface AdminDeps {
   token: string;
   now: () => Date;
   googlePlay?: import("../lib/google-play.js").GooglePlayApi;
-  storeFetch?: typeof fetch;
+  storeVersions: import("../services/store-versions.js").StoreVersions;
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -561,6 +561,6 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
     db,
     now,
     googlePlay: deps.googlePlay,
-    fetchFn: deps.storeFetch,
+    storeVersions: deps.storeVersions,
   });
 }

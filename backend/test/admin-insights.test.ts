@@ -184,12 +184,15 @@ describe("painel admin v3", () => {
   });
 
   it("versão publicada em cada loja e versões em uso pelos jogadores", async () => {
-    const appleFetch = (async () =>
-      new Response(
-        JSON.stringify({
-          results: [{ version: "1.0.3", currentVersionReleaseDate: "2026-10-19T16:33:51Z" }],
-        }),
-      )) as typeof fetch;
+    // Páginas públicas das lojas: App Store (lookup) e Google Play (versão nos dados da página).
+    const appleFetch = (async (url: string | URL) =>
+      String(url).includes("itunes")
+        ? new Response(
+            JSON.stringify({
+              results: [{ version: "1.0.3", currentVersionReleaseDate: "2026-10-19T16:33:51Z" }],
+            }),
+          )
+        : new Response('<html>…[[["1.0.5"]]…</html>')) as typeof fetch;
     const play = {
       product: async () => null,
       subscription: async () => null,
@@ -213,8 +216,20 @@ describe("painel admin v3", () => {
       code: "5",
       status: "completed",
       rollout: 1,
+      submitted: null,
       testing: { version: "1.0.6" },
       inUse: [{ version: "1.0.5", players: 1 }],
     });
+    // Aviso de atualização do jogo (sem login): versão no ar e link da loja.
+    const ios = (
+      await ctx.app.inject({ method: "GET", url: "/api/v1/app/version?platform=ios" })
+    ).json();
+    expect(ios).toMatchObject({ platform: "ios", latest: "1.0.3", minimum: null });
+    expect(ios.storeUrl).toContain("apps.apple.com");
+    const android = (
+      await ctx.app.inject({ method: "GET", url: "/api/v1/app/version?platform=android" })
+    ).json();
+    expect(android).toMatchObject({ latest: "1.0.5" });
+    expect(android.storeUrl).toContain("play.google.com");
   });
 });

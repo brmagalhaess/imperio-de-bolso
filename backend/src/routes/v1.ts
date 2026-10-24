@@ -1,5 +1,6 @@
 import type { Prisma } from "../generated/prisma/client.js";
 import type { GooglePlayApi } from "../lib/google-play.js";
+import { STORE_URLS, type StoreVersions } from "../services/store-versions.js";
 import { reportPlayer } from "../services/reports.js";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
@@ -72,6 +73,8 @@ export interface V1Deps {
   appleRootFingerprint?: string;
   /** API do Google Play; sem ela usa a conta de serviço do env (GOOGLE_PLAY_SERVICE_ACCOUNT). */
   googlePlay?: GooglePlayApi;
+  /** Versão no ar em cada loja (aviso de atualização). */
+  storeVersions?: StoreVersions;
 }
 
 const Slug = z.string().regex(/^[a-z0-9_-]{1,64}$/);
@@ -173,6 +176,21 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
       : adsFor(storePlatform(body.platform, appVersion(request)));
     if (!ok) throw new AppError(409, "ADS_DISABLED", "Anúncios ainda não disponíveis");
   };
+
+  // Aviso de atualização (sem login): versão no ar na loja do aparelho e a mínima aceita. O jogo
+  // compara com a sua e mostra "Atualizar" (ou obriga, abaixo da mínima).
+  app.get("/app/version", async (request) => {
+    const { platform } = z.object({ platform: z.enum(["ios", "android"]) }).parse(request.query);
+    const live = deps.storeVersions ? await deps.storeVersions() : null;
+    const minimum =
+      (platform === "ios" ? config.MIN_APP_VERSION_IOS : config.MIN_APP_VERSION_ANDROID) || null;
+    return {
+      platform,
+      latest: live ? live[platform].version : null,
+      minimum,
+      storeUrl: STORE_URLS[platform],
+    };
+  });
 
   // Criar/retomar conta convidada: limite mais rígido por IP (evita criação em massa).
   app.post(

@@ -303,3 +303,9 @@ em `POST /store/buy` → `200 { bought, turboUntil, state }` (soma tempo se já 
   `{ platforms: [{ platform, players, newToday, new7d, activeToday, active7d, versions }] }`;
   `/players` e `/players/:id` trazem `platform` e `appVersion`.
 
+### 2026-10-24 — Aviso de atualização
+
+- `GET /api/v1/app/version?platform=ios|android` (sem login) → `{ platform, latest, minimum,
+  storeUrl }`. `latest` = versão no ar na loja (null se a loja não respondeu); `minimum` = versão
+  mínima aceita (null = sem obrigatoriedade).
+

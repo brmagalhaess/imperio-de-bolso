@@ -2,6 +2,13 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-24 — Aviso de atualização automático ao abrir o jogo
+
+- `GET /api/v1/app/version?platform=ios|android`: versão no ar (páginas públicas das lojas, cache
+  10 min) e mínima aceita (`MIN_APP_VERSION_IOS/ANDROID`, vazio = só sugere). Ao abrir, o jogo
+  compara e mostra "Atualização disponível" → abre o app da loja; abaixo da mínima, obrigatório.
+- Builds: Android **1.0.6 (código 7)**, iOS **1.0.6 (build 15)**. Testes: servidor **175**, jogo **154**.
+
 ## 2026-10-24 — 1.0.6: login Google no Android e compartilhar com imagem (ADR 0032)
 
 - Plugin `ImperioAndroid` (login Google), clientes OAuth (web + 2 Android) e tela de login

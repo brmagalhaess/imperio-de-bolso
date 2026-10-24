@@ -99,6 +99,7 @@ interface StoreInfo {
   status?: string | null;
   rollout?: number | null;
   testing?: { version: string | null; code?: string | null } | null;
+  submitted?: { version: string | null } | null;
   url?: string | null;
   error?: string;
   inUse: { version: string; players: number }[];
@@ -137,6 +138,11 @@ export function StoresSection(props: ViewProps) {
             ? ` (${Math.round(s.rollout * 100)}%)`
             : ""}
           {s.code ? ` · código ${s.code}` : ""}
+        </small>
+      )}
+      {s.submitted?.version && (
+        <small className="muted">
+          enviada: {s.submitted.version} (em revisão ou chegando na loja)
         </small>
       )}
       {s.testing?.version && s.testing.version !== s.version && (

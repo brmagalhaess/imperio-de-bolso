@@ -94,6 +94,12 @@ func claim_achievement(achievement_id: String) -> Dictionary:
 	return await _command("/achievements/claim", {"achievementId": achievement_id})
 
 
+## Versão no ar na loja deste aparelho e a mínima aceita (aviso de atualização).
+func app_version() -> Dictionary:
+	var platform := "ios" if OS.get_name() == "iOS" else "android"
+	return await _authed(HTTPClient.METHOD_GET, "/app/version?platform=" + platform, null, "")
+
+
 func leaderboard() -> Dictionary:
 	return await _authed(HTTPClient.METHOD_GET, "/leaderboard", null, "")
 

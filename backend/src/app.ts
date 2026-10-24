@@ -9,6 +9,7 @@ import type { Db } from "./db/prisma.js";
 import { AppError } from "./errors.js";
 import { adminRoutes } from "./routes/admin.js";
 import { googlePlayApi, parseServiceAccount } from "./lib/google-play.js";
+import { storeVersions } from "./services/store-versions.js";
 import { shareRoutes } from "./routes/share.js";
 import { v1Routes } from "./routes/v1.js";
 
@@ -120,6 +121,9 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return { status: "ok", serverTime: now().toISOString() };
   });
 
+  // Versão no ar em cada loja (aviso de atualização do jogo e card do painel), cache de 10 min.
+  const versions = storeVersions(deps.storeFetch);
+
   // API do Google Play: testes injetam uma falsa; produção usa a conta de serviço do env.
   const googleAccount = parseServiceAccount(deps.config.GOOGLE_PLAY_SERVICE_ACCOUNT);
   const googlePlay =
@@ -136,6 +140,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
         idKeys: deps.idKeys,
         appleRootFingerprint: deps.appleRootFingerprint,
         googlePlay,
+        storeVersions: versions,
       }),
     {
       prefix: "/api/v1",
@@ -162,7 +167,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
           token: adminToken,
           now,
           googlePlay,
-          storeFetch: deps.storeFetch,
+          storeVersions: versions,
         }),
       {
         prefix: "/api/admin",
