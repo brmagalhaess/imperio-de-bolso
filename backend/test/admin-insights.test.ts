@@ -182,4 +182,39 @@ describe("painel admin v3", () => {
     ).json();
     expect(trends.days.at(-1)).toMatchObject({ purchases: 1, revenueBRL: 4.9 });
   });
+
+  it("versão publicada em cada loja e versões em uso pelos jogadores", async () => {
+    const appleFetch = (async () =>
+      new Response(
+        JSON.stringify({
+          results: [{ version: "1.0.3", currentVersionReleaseDate: "2026-10-19T16:33:51Z" }],
+        }),
+      )) as typeof fetch;
+    const play = {
+      product: async () => null,
+      subscription: async () => null,
+      tracks: async () => [
+        { track: "production", name: "1.0.5 (5)", status: "completed", versionCodes: ["5"] },
+        { track: "internal", name: "1.0.6 (6)", status: "completed", versionCodes: ["6"] },
+      ],
+    };
+    ctx = await createTestContext({}, undefined, undefined, undefined, play, appleFetch);
+    const g = await newGuest(ctx.app);
+    await ctx.db.player.update({
+      where: { id: g.playerId },
+      data: { platform: "android", appVersion: "1.0.5", lastSeenAt: ctx.clock.now },
+    });
+    const r = (
+      await ctx.app.inject({ method: "GET", url: "/api/admin/stores", headers: auth })
+    ).json();
+    expect(r.apple).toMatchObject({ version: "1.0.3", releasedAt: "2026-10-19T16:33:51Z" });
+    expect(r.google).toMatchObject({
+      version: "1.0.5",
+      code: "5",
+      status: "completed",
+      rollout: 1,
+      testing: { version: "1.0.6" },
+      inUse: [{ version: "1.0.5", players: 1 }],
+    });
+  });
 });

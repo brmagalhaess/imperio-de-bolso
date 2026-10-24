@@ -32,10 +32,21 @@ export interface GoogleSubscriptionPurchase {
   testPurchase?: object;
 }
 
+/** Lançamento de uma faixa (produção, teste interno…) como o Play Console mostra. */
+export interface GoogleTrackRelease {
+  track: string;
+  name?: string;
+  status?: string;
+  versionCodes?: string[];
+  userFraction?: number;
+}
+
 export interface GooglePlayApi {
   /** null = token desconhecido para este app/produto (404/410). */
   product(productId: string, token: string): Promise<GoogleProductPurchase | null>;
   subscription(token: string): Promise<GoogleSubscriptionPurchase | null>;
+  /** Lançamentos de todas as faixas (abre e descarta uma edição só de leitura). */
+  tracks?(): Promise<GoogleTrackRelease[]>;
 }
 
 export class GooglePlayError extends Error {}
@@ -101,7 +112,32 @@ export function googlePlayApi(
     return (await res.json()) as T;
   }
 
+  async function call<T>(method: string, path: string): Promise<T> {
+    const res = await fetchFn(`${API}/${encodeURIComponent(packageName)}${path}`, {
+      method,
+      headers: { authorization: `Bearer ${await accessToken()}` },
+    });
+    if (!res.ok) throw new GooglePlayError(`Google Play respondeu ${res.status}`);
+    const text = await res.text();
+    return (text ? JSON.parse(text) : {}) as T;
+  }
+
+  async function tracks(): Promise<GoogleTrackRelease[]> {
+    const edit = await call<{ id: string }>("POST", "/edits");
+    try {
+      const r = await call<{
+        tracks?: { track: string; releases?: Omit<GoogleTrackRelease, "track">[] }[];
+      }>("GET", `/edits/${edit.id}/tracks`);
+      return (r.tracks ?? []).flatMap((t) =>
+        (t.releases ?? []).map((rel) => ({ track: t.track, ...rel })),
+      );
+    } finally {
+      await call("DELETE", `/edits/${edit.id}`).catch(() => undefined);
+    }
+  }
+
   return {
+    tracks,
     product: (productId, token) =>
       get(
         `/purchases/products/${encodeURIComponent(productId)}/tokens/${encodeURIComponent(token)}`,

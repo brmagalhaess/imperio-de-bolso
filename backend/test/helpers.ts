@@ -21,6 +21,7 @@ export async function createTestContext(
   idKeys?: import("../src/lib/id-token.js").JwkResolver,
   appleRootFingerprint?: string,
   googlePlay?: import("../src/lib/google-play.js").GooglePlayApi,
+  storeFetch?: typeof fetch,
 ): Promise<TestContext> {
   const url = process.env.TEST_DATABASE_URL;
   if (!url) throw new Error("TEST_DATABASE_URL não definido");
@@ -55,6 +56,7 @@ export async function createTestContext(
     idKeys,
     appleRootFingerprint,
     googlePlay,
+    storeFetch,
   });
   return {
     app,

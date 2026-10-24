@@ -92,6 +92,93 @@ export const PLATFORM_NAMES: Record<string, string> = {
   desconhecida: "❔ Ainda não identificados",
 };
 
+interface StoreInfo {
+  version: string | null;
+  releasedAt?: string | null;
+  code?: string | null;
+  status?: string | null;
+  rollout?: number | null;
+  testing?: { version: string | null; code?: string | null } | null;
+  url?: string | null;
+  error?: string;
+  inUse: { version: string; players: number }[];
+}
+
+const RELEASE_STATUS: Record<string, string> = {
+  completed: "publicada para todos",
+  inProgress: "lançamento gradual",
+  halted: "lançamento pausado",
+};
+
+/** Versão publicada em cada loja (App Store pela consulta pública; Google pela conta de serviço). */
+export function StoresSection(props: ViewProps) {
+  // "Atualizar" pede uma consulta nova às lojas (senão o servidor guarda por 10 min).
+  const [fresh, setFresh] = useState(0);
+  const { data } = useAdmin<{
+    apple: StoreInfo;
+    google: StoreInfo;
+    checkedAt: string;
+  }>(fresh ? `/stores?fresh=1&n=${fresh}` : "/stores", props);
+  if (!data) return null;
+  const card = (title: string, s: StoreInfo, tone: string) => (
+    <div className={`kpi ${tone}`}>
+      <span>{title}</span>
+      <strong>{s.version ? `Versão ${s.version}` : "—"}</strong>
+      {s.error && <small className="muted">{s.error}</small>}
+      {s.releasedAt && (
+        <small className="muted">
+          no ar desde {new Date(s.releasedAt).toLocaleDateString("pt-BR")}
+        </small>
+      )}
+      {s.status && (
+        <small className="muted">
+          {RELEASE_STATUS[s.status] ?? s.status}
+          {s.rollout && s.rollout < 1
+            ? ` (${Math.round(s.rollout * 100)}%)`
+            : ""}
+          {s.code ? ` · código ${s.code}` : ""}
+        </small>
+      )}
+      {s.testing?.version && s.testing.version !== s.version && (
+        <small className="muted">em teste interno: {s.testing.version}</small>
+      )}
+      <small className="muted">
+        jogadores (7 dias):{" "}
+        {s.inUse.length
+          ? s.inUse.map((v) => `${v.version} (${num(v.players)})`).join(" · ")
+          : "—"}
+      </small>
+      {s.url && (
+        <small>
+          <a href={s.url} target="_blank" rel="noreferrer">
+            abrir na loja ↗
+          </a>
+        </small>
+      )}
+    </div>
+  );
+  return (
+    <section>
+      <div className="section-head">
+        <h2>Versão nas lojas</h2>
+        <span className="muted">
+          conferido {new Date(data.checkedAt).toLocaleTimeString("pt-BR")}{" "}
+          <button
+            className="small ghost"
+            onClick={() => setFresh((n) => n + 1)}
+          >
+            Atualizar
+          </button>
+        </span>
+      </div>
+      <div className="kpis">
+        {card("🍎 App Store", data.apple, "")}
+        {card("🤖 Google Play", data.google, "green")}
+      </div>
+    </section>
+  );
+}
+
 /** De onde vêm os jogadores: aparelho da última abertura do jogo (sem a conta da equipe). */
 export function PlatformsSection(props: ViewProps) {
   const { data } = useAdmin<{ platforms: PlatformRow[] }>("/platforms", props);

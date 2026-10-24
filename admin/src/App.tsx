@@ -18,6 +18,7 @@ import {
   PLATFORM_NAMES,
   PlatformsSection,
   PlayerSupport,
+  StoresSection,
   RevenueView,
   TrendsSection,
 } from "./insights";
@@ -309,6 +310,7 @@ function OverviewView(props: ViewProps) {
         </label>
         <button onClick={() => void reload()}>Atualizar</button>
       </div>
+      <StoresSection {...props} />
       <PlatformsSection {...props} />
       <TrendsSection {...props} />
       <h2>Jogadores</h2>

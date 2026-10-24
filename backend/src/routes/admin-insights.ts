@@ -10,6 +10,7 @@ import { dayBounds, gameDay } from "../lib/time.js";
 import { track } from "../services/analytics.js";
 import { revokePurchase, type StoreName } from "../services/purchases.js";
 import { applyGems } from "../services/wallet.js";
+import type { GooglePlayApi } from "../lib/google-play.js";
 
 // Painel admin v3 (ADR 0030): tendências por dia, receita das lojas e ações de suporte
 // (diamantes de compensação e reembolso manual). Registrado dentro de adminRoutes, atrás do
@@ -43,10 +44,96 @@ const round2 = (v: number) => Math.round(v * 100) / 100;
 export interface InsightsDeps {
   db: Db;
   now: () => Date;
+  /** API do Google Play (faixas de lançamento); ausente = versão do Google desconhecida. */
+  googlePlay?: GooglePlayApi;
+  /** Testes trocam a consulta pública da App Store. */
+  fetchFn?: typeof fetch;
 }
+
+const APPLE_APP_ID = "6822892071";
+const STORES_CACHE_MS = 10 * 60 * 1000;
 
 export async function insightsRoutes(app: FastifyInstance, deps: InsightsDeps): Promise<void> {
   const { db, now } = deps;
+  const fetchFn = deps.fetchFn ?? fetch;
+  let storesCache: { at: number; body: unknown } | null = null;
+
+  // --- Versão publicada em cada loja (card da visão geral; guardada por 10 min) -------------
+  app.get("/stores", async (request) => {
+    const fresh = (request.query as { fresh?: string }).fresh === "1";
+    if (!fresh && storesCache && Date.now() - storesCache.at < STORES_CACHE_MS) {
+      return storesCache.body;
+    }
+    // App Store: consulta pública (a mesma que a loja usa), sem chave.
+    const apple = await fetchFn(`https://itunes.apple.com/lookup?id=${APPLE_APP_ID}&country=br`)
+      .then(
+        (r) =>
+          r.json() as Promise<{
+            results?: {
+              version?: string;
+              currentVersionReleaseDate?: string;
+              trackViewUrl?: string;
+            }[];
+          }>,
+      )
+      .then((r) => {
+        const a = r.results?.[0];
+        return a
+          ? {
+              version: a.version ?? null,
+              releasedAt: a.currentVersionReleaseDate ?? null,
+              url: a.trackViewUrl ?? null,
+            }
+          : { version: null, error: "App não encontrado na App Store" };
+      })
+      .catch(() => ({ version: null, error: "App Store não respondeu" }));
+    // Google Play: faixas do Play Console pela conta de serviço.
+    let google: Record<string, unknown> = {
+      version: null,
+      error: "Conta de serviço do Google não configurada",
+    };
+    if (deps.googlePlay?.tracks) {
+      try {
+        const releases = await deps.googlePlay.tracks();
+        const prod = releases.find((r) => r.track === "production" && r.status !== "draft");
+        const pick = (r?: (typeof releases)[number]) =>
+          r && {
+            version: r.name?.split(" ")[0] ?? null,
+            code: r.versionCodes?.[0] ?? null,
+            status: r.status ?? null,
+            rollout: r.userFraction ?? (r.status === "completed" ? 1 : null),
+          };
+        google = {
+          ...(pick(prod) ?? { version: null }),
+          testing: pick(releases.find((r) => r.track === "internal")) ?? null,
+          url: "https://play.google.com/store/apps/details?id=br.com.imperiodebolso.game",
+        };
+      } catch {
+        google = { version: null, error: "Google Play não respondeu" };
+      }
+    }
+    const versions = await db.player.groupBy({
+      by: ["platform", "appVersion"],
+      where: {
+        staff: false,
+        platform: { not: null },
+        lastSeenAt: { gte: new Date(now().getTime() - 7 * DAY_MS) },
+      },
+      _count: { _all: true },
+    });
+    const inUse = (platform: string) =>
+      versions
+        .filter((v) => v.platform === platform)
+        .map((v) => ({ version: v.appVersion ?? "antiga", players: v._count._all }))
+        .sort((a, b) => b.players - a.players);
+    const body = {
+      apple: { ...apple, inUse: inUse("ios") },
+      google: { ...google, inUse: inUse("android") },
+      checkedAt: now().toISOString(),
+    };
+    storesCache = { at: Date.now(), body };
+    return body;
+  });
 
   // --- Tendências: uma linha por dia (Brasília) nos últimos N dias ---------------------------
   app.get("/trends", async (request) => {

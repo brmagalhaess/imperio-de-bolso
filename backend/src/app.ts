@@ -8,6 +8,7 @@ import type { AppConfig } from "./config.js";
 import type { Db } from "./db/prisma.js";
 import { AppError } from "./errors.js";
 import { adminRoutes } from "./routes/admin.js";
+import { googlePlayApi, parseServiceAccount } from "./lib/google-play.js";
 import { shareRoutes } from "./routes/share.js";
 import { v1Routes } from "./routes/v1.js";
 
@@ -30,6 +31,8 @@ export interface AppDeps {
   appleRootFingerprint?: string;
   /** API do Google Play (testes injetam uma falsa; produção usa a conta de serviço). */
   googlePlay?: import("./lib/google-play.js").GooglePlayApi;
+  /** Testes trocam a consulta pública da App Store (versão publicada no painel). */
+  storeFetch?: typeof fetch;
 }
 
 export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
@@ -117,6 +120,12 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return { status: "ok", serverTime: now().toISOString() };
   });
 
+  // API do Google Play: testes injetam uma falsa; produção usa a conta de serviço do env.
+  const googleAccount = parseServiceAccount(deps.config.GOOGLE_PLAY_SERVICE_ACCOUNT);
+  const googlePlay =
+    deps.googlePlay ??
+    (googleAccount ? googlePlayApi(deps.config.GOOGLE_PLAY_PACKAGE, googleAccount) : undefined);
+
   await app.register(
     (instance) =>
       v1Routes(instance, {
@@ -126,7 +135,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
         admobKeys: deps.admobKeys,
         idKeys: deps.idKeys,
         appleRootFingerprint: deps.appleRootFingerprint,
-        googlePlay: deps.googlePlay,
+        googlePlay,
       }),
     {
       prefix: "/api/v1",
@@ -141,7 +150,14 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   const adminToken = deps.config.ADMIN_TOKEN;
   if (adminToken) {
     await app.register(
-      (instance) => adminRoutes(instance, { db: deps.db, token: adminToken, now }),
+      (instance) =>
+        adminRoutes(instance, {
+          db: deps.db,
+          token: adminToken,
+          now,
+          googlePlay,
+          storeFetch: deps.storeFetch,
+        }),
       {
         prefix: "/api/admin",
       },
