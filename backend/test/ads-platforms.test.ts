@@ -54,3 +54,30 @@ describe("anúncios só no iPhone (ADS_PLATFORMS=ios)", () => {
     ).toThrow(/mock/);
   });
 });
+
+describe("Android: loja e anúncios só na versão com os plugins (1.0.5+)", () => {
+  it("versão antiga (sem X-App-Version) não vê itens pagos nem anúncios", async () => {
+    ctx = await createTestContext({
+      PURCHASES_ENABLED: "false",
+      PURCHASES_PLATFORMS: "ios,android",
+      ADS_ENABLED: "false",
+      ADS_PLATFORMS: "ios,android",
+    });
+    const g = await newGuest(ctx.app);
+    const catalog = (version?: string) =>
+      ctx.app
+        .inject({
+          method: "GET",
+          url: "/api/v1/store/catalog?platform=android",
+          headers: {
+            authorization: `Bearer ${g.token}`,
+            ...(version ? { "x-app-version": version } : {}),
+          },
+        })
+        .then((r) => r.json());
+    expect(await catalog()).toMatchObject({ purchasesEnabled: false, adsEnabled: false });
+    expect(await catalog("1.0.4")).toMatchObject({ purchasesEnabled: false, adsEnabled: false });
+    expect(await catalog("1.0.5")).toMatchObject({ purchasesEnabled: true, adsEnabled: true });
+    expect(await catalog("1.0.10")).toMatchObject({ purchasesEnabled: true });
+  });
+});

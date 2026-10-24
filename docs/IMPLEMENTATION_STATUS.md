@@ -2,6 +2,19 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-24 — Google Play: conta de serviço, 25 produtos ativos, 1.0.5 com loja e anúncios
+
+- Conta de serviço `crowntech-games-monitor@imperio-de-bolso-pagamentos` com chave
+  (`~/.imperio/keys/google-play.json`, fora do Git) e convidada no Play Console; acesso testado.
+- `tools/android/play.mjs` (API do Google Play) e `tools/android/products_setup.mjs`: **25 produtos
+  ativos** no Google (24 avulsos + Passe VIP com plano "mensal"), preços em BRL iguais aos da Apple.
+- Declarações atualizadas: ID de publicidade (análise, publicidade, fraudes), "contém anúncios",
+  Segurança dos dados (localização aproximada, histórico de compras, falhas/diagnóstico, IDs).
+- Jogo manda `X-App-Version`; o servidor só abre loja e anúncios no Android a partir da 1.0.5
+  (`ANDROID_STORE_MIN_VERSION`). Build **1.0.5 (código 5)**. Testes: servidor **172**, jogo **153**.
+- Falta (titular): validar a conta bancária no Play Console (depósito de teste) e, no Dokploy,
+  `GOOGLE_PLAY_SERVICE_ACCOUNT` + `PURCHASES_PLATFORMS=ios,android` (e `ADS_PLATFORMS` após o AdMob).
+
 ## 2026-10-24 — Painel admin v3 (ADR 0030) e Google Cloud preparado
 
 - Painel: menu lateral, gráficos de 30 dias, aba Receita, diamantes de suporte, reembolso manual,

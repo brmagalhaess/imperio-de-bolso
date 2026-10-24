@@ -283,7 +283,10 @@ func _authed(method: int, path: String, body: Variant, idempotency_key: String) 
 ## Envia uma requisição e normaliza a resposta:
 ## { ok, status, data, error_code, network_error }.
 func _send(method: int, path: String, body: Variant, idempotency_key := "") -> Dictionary:
-	var headers := PackedStringArray(["Accept: application/json"])
+	# Versão do jogo: o servidor só abre a loja do Google e os anúncios no Android a partir da
+	# versão com os plugins (ADR 0028).
+	var headers := PackedStringArray(["Accept: application/json",
+			"X-App-Version: " + str(ProjectSettings.get_setting("application/config/version", ""))])
 	var payload := ""
 	if body != null:
 		headers.append("Content-Type: application/json")

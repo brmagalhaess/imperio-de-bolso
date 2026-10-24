@@ -27,7 +27,7 @@ import {
   verifierFor,
   verifyPurchase,
 } from "../services/purchases.js";
-import { adsFor, features, purchasesFor, STORE_PLATFORM } from "../lib/features.js";
+import { STORE_PLATFORM, adsFor, features, purchasesFor, storePlatform } from "../lib/features.js";
 import { deleteAccount } from "../services/account.js";
 import { getPrestige, sellEmpire } from "../services/prestige.js";
 import { changeName } from "../services/profile.js";
@@ -120,6 +120,12 @@ const EventsBody = z.object({
     .max(20),
 });
 
+/** Versão do jogo (header X-App-Version; versões antigas não mandam). */
+function appVersion(request: FastifyRequest): string | undefined {
+  const v = request.headers["x-app-version"];
+  return typeof v === "string" && /^\d+(\.\d+){0,3}$/.test(v) ? v : undefined;
+}
+
 function playerIdOf(request: FastifyRequest): string {
   return request.user.sub;
 }
@@ -166,7 +172,7 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
     const body = (request.body ?? {}) as { platform?: string; sessionId?: string };
     const ok = body.sessionId
       ? features.ads || features.adPlatforms.length > 0
-      : adsFor(body.platform);
+      : adsFor(storePlatform(body.platform, appVersion(request)));
     if (!ok) throw new AppError(409, "ADS_DISABLED", "Anúncios ainda não disponíveis");
   };
 
@@ -379,7 +385,7 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
       now(),
       config.STORE_MODE,
       district,
-      platform,
+      storePlatform(platform, appVersion(request)),
     );
     // "admob" = anúncio real com confirmação SSV do Google; "mock" = anúncio de teste.
     return { ...catalog, adsMode: config.ADS_MODE };

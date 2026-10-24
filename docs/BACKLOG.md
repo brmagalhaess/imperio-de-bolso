@@ -87,9 +87,11 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Android 1.0.3 na produção (enviada para revisão em 2026-10-24)
 - [x] Loja do Google Play no jogo + verificação no servidor (ADR 0028)
 - [x] AdMob no Android (app + bloco premiado com SSV)
-- [ ] Conta de comerciante (titular) e produtos no Play Console
-- [ ] Conta de serviço do Google Cloud → `GOOGLE_PLAY_SERVICE_ACCOUNT` no Dokploy
-- [ ] Testar o build 1.0.4 no teste interno (relatório de pré-lançamento) e publicar
+- [x] Conta de comerciante (titular) e produtos no Play Console (25 ativos, 2026-10-24)
+- [ ] Validar a conta bancária do Play Console (depósito de teste)
+- [x] Conta de serviço do Google Cloud (chave + convite no Play Console)
+- [ ] `GOOGLE_PLAY_SERVICE_ACCOUNT` + `PURCHASES_PLATFORMS=ios,android` no Dokploy (titular)
+- [ ] 1.0.5 no teste interno e na produção (revisão do Google; conferir relatório de pré-lançamento)
 - [ ] Reembolsos do Google (RTDN / voided purchases)
 
 ## Etapa 6 — Versão completa (após validação)

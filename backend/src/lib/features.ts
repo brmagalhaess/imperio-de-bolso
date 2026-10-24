@@ -34,5 +34,32 @@ export function adsFor(platform: string | undefined): boolean {
   return features.ads || (!!platform && features.adPlatforms.includes(platform));
 }
 
+/**
+ * Versão mínima do jogo no Android com a loja do Google e os anúncios (plugins da 1.0.5,
+ * ADR 0028). Quem ainda está numa versão anterior não vê itens pagos nem anúncios — eles
+ * apareceriam sem como comprar/assistir.
+ */
+export const ANDROID_STORE_MIN_VERSION = "1.0.5";
+
+/** "1.0.10" > "1.0.9": compara versões numéricas por partes. */
+export function versionAtLeast(version: string | undefined, min: string): boolean {
+  if (!version) return false;
+  const a = version.split(".").map((n) => Number.parseInt(n, 10) || 0);
+  const b = min.split(".").map((n) => Number.parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    if ((a[i] ?? 0) !== (b[i] ?? 0)) return (a[i] ?? 0) > (b[i] ?? 0);
+  }
+  return true;
+}
+
+/**
+ * Plataforma que vale para loja/anúncios: Android só a partir da versão com os plugins (o jogo
+ * manda X-App-Version). Versões antigas contam como plataforma desconhecida.
+ */
+export function storePlatform(platform: string | undefined, version: string | undefined) {
+  if (platform === "android" && !versionAtLeast(version, ANDROID_STORE_MIN_VERSION)) return "other";
+  return platform;
+}
+
 /** Loja → plataforma (para a verificação de recibos). */
 export const STORE_PLATFORM: Record<string, string> = { apple: "ios", google: "android" };
