@@ -29,6 +29,7 @@ class ImperioExport extends EditorExportPlugin:
 			"androidx.credentials:credentials:1.5.0",
 			"androidx.credentials:credentials-play-services-auth:1.5.0",
 			"com.google.android.libraries.identity.googleid:googleid:1.1.1",
+			"com.google.android.play:app-update:2.1.0",
 			"org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0",
 		])
 

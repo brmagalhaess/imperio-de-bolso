@@ -1099,6 +1099,9 @@ func maybe_show_update() -> void:
 	var required := minimum != "" and version_less(mine, minimum)
 	if not required and (latest == "" or not version_less(mine, latest)):
 		return
+	# Android: a própria Play Store atualiza por cima do jogo (baixa, instala e reinicia).
+	if OS.get_name() == "Android" and await GoogleAuth.start_store_update():
+		return
 	while _modal.visible or map_trail.visible:
 		await get_tree().create_timer(0.4).timeout
 	open_update_prompt(latest if latest != "" else minimum, required)

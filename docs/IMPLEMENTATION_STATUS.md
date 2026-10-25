@@ -2,6 +2,15 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-25 — Android 1.0.7: atualização dentro do app (Google Play)
+
+- Plugin `ImperioAndroid` ganha `checkForUpdate()` (Play In-App Updates, tela cheia: baixa,
+  instala e reinicia; retoma se o jogador sair no meio). O aviso do jogo tenta isso primeiro no
+  Android e só mostra a janela "Atualização disponível" se a Play Store não assumir.
+- iPhone não tem atualização dentro do app (regra da Apple): o aviso abre a App Store.
+- A atualização automática começa a valer a partir de quem já está na 1.0.6/1.0.7.
+  Android **1.0.7 (código 8)**. Jogo: **154** verificações.
+
 ## 2026-10-24 — Aviso de atualização automático ao abrir o jogo
 
 - `GET /api/v1/app/version?platform=ios|android`: versão no ar (páginas públicas das lojas, cache
