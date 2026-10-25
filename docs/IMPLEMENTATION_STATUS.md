@@ -17,7 +17,7 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 - Testes: servidor **177**, jogo **162** unitários e **202** com a API local, 0 falhas. Capturas
   reais dos 20 mapas conferidas (topo e ilhas).
 - Builds: Android **1.1.0 (código 9)** enviado à revisão (interno + produção); iOS **1.1.0
-  (build 16)** enviado ao TestFlight — a 1.0.6 ainda aguarda revisão da Apple.
+  (build 16)** em revisão na Apple (substituiu a 1.0.6, que estava na fila — pedido do titular).
 - **Bloqueio de publicação:** servidor (deploy/servidor) e site com os 20 mapas só depois da
   1.1.0 aprovada nas duas lojas, com `MIN_APP_VERSION_IOS/ANDROID=1.1.0`.
 
