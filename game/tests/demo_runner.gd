@@ -69,6 +69,49 @@ func _ready() -> void:
 			print("PASSO %s %dx%d" % [shot[0], img.get_width(), img.get_height()])
 		get_tree().quit()
 		return
+	if mode == "mapas20":
+		# Conferência dos 20 mapas (ADR 0034): cada mapa todo construído (só na tela), no topo e
+		# rolado até as ilhas; níveis variados para ver as 5 evoluções.
+		var out := OS.get_environment("CAPTURE_DIR")
+		await _wait(2.0)
+		hud._modal.close()
+		GameState._presence_timer.stop()
+		GameState.daily["claimedToday"] = true
+		var all := []
+		for id in Layout.DISTRICT_ORDER:
+			all.append({"id": id, "unlocked": true, "requires": null})
+		GameState.state.districts = all
+		var levels := [1, 10, 25, 50, 100]
+		var build := func():
+			GameState.state.districts = all
+			var i := 0
+			for b in GameState.businesses():
+				b["owned"] = true
+				b["level"] = levels[i % 5]
+				b["managed"] = true
+				i += 1
+			GameState.state_changed.emit()
+		await _wait(3.0)  # deixa os avisos da abertura (pódio, prêmio) chegarem antes
+		hud._modal.close()
+		var only := OS.get_environment("MAPS").split(",", false)
+		for id in Layout.DISTRICT_ORDER:
+			if not only.is_empty() and not only.has(id):
+				continue
+			main._show_district(id)
+			await _wait(1.0)
+			hud._modal.close()
+			build.call()
+			await _wait(0.4)
+			get_viewport().get_texture().get_image().save_png(out.path_join("%s_a.png" % id))
+			var cfg: Dictionary = Layout.DISTRICTS[id]
+			for k in ["expansion", "expansion2"]:
+				if cfg.has(k):
+					main.camera.position.y = float(cfg[k].y) + 420.0
+					await _wait(0.8)
+					get_viewport().get_texture().get_image().save_png(out.path_join("%s_%s.png" % [id, k]))
+			print("PASSO ", id)
+		get_tree().quit()
+		return
 	if mode == "evolucao":
 		# Bug relatado (2026-10-18): evoluir rápido e trocar de mapa perdia evoluções.
 		await _wait(2.0)

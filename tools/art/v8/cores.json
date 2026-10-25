@@ -1,0 +1,86 @@
+{
+ "piratas": {
+  "top": "00679d",
+  "bottom": "04709d",
+  "sea": "0076b2"
+ },
+ "atlantida": {
+  "top": "56bfe2",
+  "bottom": "436673",
+  "sea": "005490"
+ },
+ "dinos": {
+  "top": "4ea2d6",
+  "bottom": "435321",
+  "sea": "0494c9"
+ },
+ "pinguins": {
+  "top": "7ec6ef",
+  "bottom": "178ac2",
+  "sea": "5094cb"
+ },
+ "doces": {
+  "top": "2e96d7",
+  "bottom": "ee9bb5",
+  "sea": "f4adc4"
+ },
+ "brinquedos": {
+  "top": "0185bf",
+  "bottom": "515b36",
+  "sea": "056f9c"
+ },
+ "lua": {
+  "top": "02020d",
+  "bottom": "010411",
+  "sea": "010515"
+ },
+ "marte": {
+  "top": "d5795e",
+  "bottom": "9b3c23",
+  "sea": "bd5838"
+ },
+ "gatos": {
+  "top": "03093d",
+  "bottom": "030b48",
+  "sea": "020420"
+ },
+ "saturno": {
+  "top": "030514",
+  "bottom": "02071d",
+  "sea": "01051a"
+ },
+ "gelatina": {
+  "top": "030418",
+  "bottom": "030622",
+  "sea": "010012"
+ },
+ "galaxia": {
+  "top": "03020f",
+  "bottom": "020316",
+  "sea": "010415"
+ },
+ "praia": {
+  "sea": "017272"
+ },
+ "cidade": {
+  "sea": "0273a2"
+ },
+ "porto": {
+  "sea": "016697"
+ },
+ "centro": {
+  "sea": "01537e"
+ },
+ "industrial": {
+  "sea": "025087"
+ },
+ "serra": {
+  "sea": "0778b6"
+ },
+ "ilha": {
+  "sea": "005897"
+ },
+ "espaco": {
+  "sea": "0071a5"
+ }
+}

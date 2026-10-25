@@ -95,8 +95,8 @@ func _unit_tests() -> void:
 		var points: Array = lots.values()
 		for i in points.size():
 			for j in range(i + 1, points.size()):
-				lots_apart = lots_apart and points[i].distance_to(points[j]) > 150
-	check(lots_apart, "lotes afastados entre si")
+				lots_apart = lots_apart and points[i].distance_to(points[j]) > 120
+	check(lots_apart, "lotes afastados entre si (ilhas novas como a do Espaço)")
 	var ui_ok := true
 	for name in ["icon_build", "icon_shop", "icon_map", "icon_profile", "icon_coin",
 			"icon_settings", "icon_help", "lot_lock", "char_vendor"] + Layout.DISTRICTS.praia.walkers:
@@ -332,7 +332,8 @@ func _trail_tests() -> bool:
 			{"id": "porto", "unlocked": false}, {"id": "centro", "unlocked": false}]})
 	await trail.open("praia")
 	var ids: Array = trail._cards.map(func(c): return c.get_meta("district"))
-	check(ids == Layout.DISTRICT_ORDER + ["em_breve"] and ids.size() == 9, "trilha: 8 mapas em ordem + Em breve no fim")
+	check(ids == ["praia", "cidade", "porto", "centro", "em_breve"],
+			"trilha: só os mapas que o servidor conhece, em ordem, + Em breve no fim")
 	check(trail._nodes[0].y > trail._nodes[4].y, "trilha: primeiro mapa embaixo, Em breve em cima")
 	var texts := func(card: Control) -> String:
 		return " ".join(card.find_children("*", "Label", true, false).map(func(l): return l.text))
@@ -344,6 +345,13 @@ func _trail_tests() -> bool:
 	var go: Array = trail._cards[1].find_children("*", "Button", true, false).filter(func(b): return b.text == "Ir")
 	go[0].pressed.emit()
 	check(chosen == ["cidade"] and not trail.visible, "trilha: Ir leva ao mapa e fecha")
+	var all := []
+	for id in Layout.DISTRICT_ORDER:
+		all.append({"id": id, "unlocked": id == "praia"})
+	GameState.state.districts = all
+	await trail.open("praia")
+	ids = trail._cards.map(func(c): return c.get_meta("district"))
+	check(ids == Layout.DISTRICT_ORDER + ["em_breve"] and ids.size() == 21, "trilha: 20 mapas + Em breve")
 	trail.queue_free()
 	GameState.state = {}
 	return true

@@ -5,6 +5,8 @@ novos são edições do Centro Espacial (mesmos lotes); as ilhas, edições da i
 
     python3 tools/art/v8/layout_v8.py   (depois de processar.py)
 """
+from __future__ import annotations
+
 import json, re, subprocess, sys
 from pathlib import Path
 from PIL import Image
@@ -37,22 +39,48 @@ def v(x, y):
     return f"Vector2({x}, {y})"
 
 
-def praia_lots():
-    """A ilha da praia tem 2 lotes (gerada à parte): acha-os na faixa da ilha."""
-    p = ROOT / "game/assets/optimized/praia_expansao.png"
-    im = Image.open(p).convert("RGB").resize((720, 870))
-    tmp = Path("/tmp/praia_exp.png")
+def detect(img: Image.Image) -> list[tuple[float, float]]:
+    """Lotes achados pelo find_lots numa imagem já em coordenadas 720 de largura."""
     canvas = Image.new("RGB", (720, 1280), (0, 0, 0))
-    canvas.paste(im, (0, 0))
+    canvas.paste(img.convert("RGB"), (0, 0))
+    tmp = Path("/tmp/v8_lots.png")
     canvas.save(tmp)
     out = subprocess.run([sys.executable, str(ROOT / "tools/art/find_lots.py"), str(tmp)],
                          capture_output=True, text=True).stdout
-    pts = [tuple(int(float(n)) for n in re.findall(r"Vector2\(([\d.]+), ([\d.]+)\)", l)[0]) for l in out.splitlines() if "Vector2" in l]
-    pts.sort(key=lambda p: p[1])
-    if len(pts) != 2:
-        print("! praia: lotes achados", pts, "— usando os da ilha do Espaço")
+    return [tuple(map(float, m)) for m in re.findall(r"Vector2\(([\d.]+), ([\d.]+)\)", out)]
+
+
+def snap(ref: list[tuple[int, int]], found: list[tuple[float, float]]) -> list[tuple[int, int]]:
+    """Cada lote de referência vai para o achado mais próximo (até 80 px); os não achados levam o
+    deslocamento médio dos achados (a imagem gerada às vezes sai um pouco deslocada)."""
+    got, shifts = [], []
+    for x, y in ref:
+        best = min(found, key=lambda p: (p[0] - x) ** 2 + (p[1] - y) ** 2, default=None)
+        if best and ((best[0] - x) ** 2 + (best[1] - y) ** 2) ** 0.5 <= 80:
+            got.append(best)
+            shifts.append((best[0] - x, best[1] - y))
+        else:
+            got.append(None)
+    dx = sum(s[0] for s in shifts) / len(shifts) if shifts else 0
+    dy = sum(s[1] for s in shifts) / len(shifts) if shifts else 0
+    return [(round(g[0]), round(g[1])) if g else (round(x + dx), round(y + dy)) for g, (x, y) in zip(got, ref)]
+
+
+def base_lots(d: str) -> list[tuple[int, int]]:
+    return snap(BASE_LOTS, detect(Image.open(ROOT / f"game/assets/optimized/{d}_base.jpg").resize((720, 1280))))
+
+
+def island_lots(png: str, n: int = 3) -> list[tuple[int, int]]:
+    im = Image.open(ROOT / "game/assets/optimized" / png)
+    im = im.resize((720, round(im.height * 720 / im.width)))
+    found = detect(im)
+    if n == 2:
+        found.sort(key=lambda p: p[1])
+        if len(found) == 2:
+            return [(round(x), round(y)) for x, y in found]
+        print("! praia: lotes achados", found, "— usando os da ilha do Espaço")
         return ISLAND_LOTS[:2]
-    return pts
+    return snap(ISLAND_LOTS, found)
 
 
 def main():
@@ -71,10 +99,10 @@ def main():
         m = re.search(rf'\n\t"{d}": {{\n(.*?)\n\t}},', s, re.S)
         block = m.group(1)
         if d == "praia":
-            lots = [(x, Y1 + y) for x, y in praia_lots()]
+            lots = [(x, Y1 + y) for x, y in island_lots("praia_expansao.png", 2)]
             extra = f'\t\t"expansion": {{"base": "praia_expansao.png", "y": {Y1}, "sea_color": Color("{colors[d]["sea"]}")}},\n\t\t"pan": true,\n\t\t"world_height": {H1},\n'
         else:
-            lots = [(x, Y2 + y) for x, y in ISLAND_LOTS]
+            lots = [(x, Y2 + y) for x, y in island_lots(f"{d}_expansao2.png")]
             extra = f'\t\t"expansion2": {{"base": "{d}_expansao2.png", "y": {Y2}}},\n'
             block = block.replace(f'"world_height": {H1}', f'"world_height": {H2}')
         add = "\t\t\t# Ilha nova (12 negócios por mapa, ADR 0034).\n" + "".join(
@@ -88,8 +116,10 @@ def main():
     for d in NEW:
         slugs = by[d]
         c = colors[d]
-        lots = list(zip(slugs[:6], BASE_LOTS)) + [(x, (px, Y1 + py)) for x, (px, py) in zip(slugs[6:9], ISLAND_LOTS)] \
-            + [(x, (px, Y2 + py)) for x, (px, py) in zip(slugs[9:12], ISLAND_LOTS)]
+        lots = list(zip(slugs[:6], base_lots(d))) \
+            + [(x, (px, Y1 + py)) for x, (px, py) in zip(slugs[6:9], island_lots(f"{d}_expansao.png"))] \
+            + [(x, (px, Y2 + py)) for x, (px, py) in zip(slugs[9:12], island_lots(f"{d}_expansao2.png"))]
+        print(d, lots)
         lot_txt = "".join(f'\t\t\t"{x}": {v(*p)},\n' for x, p in lots)
         blocks.append(f'''	"{d}": {{
 		"title": "{TITLES[d]}",

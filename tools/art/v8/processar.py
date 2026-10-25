@@ -6,6 +6,8 @@ folhas de evolução → <slug>_lv1..5.png; folhas de ajudantes → helper_<slug
 
     python3 tools/art/v8/processar.py
 """
+from __future__ import annotations
+
 import json, sys
 from pathlib import Path
 import numpy as np
@@ -37,12 +39,23 @@ def hexc(rgb) -> str:
     return "%02x%02x%02x" % tuple(int(c) for c in rgb)
 
 
-def island(job: str, out: str) -> str | None:
+def island(job: str, out: str, target: str | None = None) -> str | None:
+    """Recorta a ilha; com `target`, puxa a cor do mar (pixels parecidos com o fundo) para a cor
+    do mapa de cima, para não ficar emenda entre o cenário e a ilha."""
     p = src(job)
     if p is None:
         return None
     im = Image.open(p).convert("RGB").resize((720, 1280), Image.LANCZOS)
     crop = im.crop((0, TOP, 720, BOTTOM))
+    a = np.asarray(crop).astype(np.float32)
+    corners = np.concatenate([a[:40, :40], a[:40, -40:], a[-40:, :40], a[-40:, -40:]]).reshape(-1, 3)
+    sea = np.median(corners, axis=0)
+    if target:
+        t = np.array([int(target[i:i + 2], 16) for i in (0, 2, 4)], dtype=np.float32)
+        w = np.exp(-(np.linalg.norm(a - sea, axis=2) ** 2) / (2 * 45.0 ** 2))[..., None]
+        a = np.clip(a + w * (t - sea), 0, 255)
+        crop = Image.fromarray(a.astype(np.uint8))
+        sea = t
     h = BOTTOM - TOP
     alpha = np.full((h, 720), 255, dtype=np.float32)
     alpha[:FADE_TOP] *= (np.linspace(0, 1, FADE_TOP) ** 1.5)[:, None]
@@ -50,8 +63,7 @@ def island(job: str, out: str) -> str | None:
     rgba = crop.convert("RGBA")
     rgba.putalpha(Image.fromarray(alpha.astype(np.uint8)))
     rgba.resize((int(720 * SCALE), int(h * SCALE)), Image.LANCZOS).save(OUT / out, optimize=True)
-    # Cor do mar: média dos cantos de cima da faixa (onde só há fundo).
-    return hexc(np.asarray(crop)[:60, :80].reshape(-1, 3).mean(0))
+    return hexc(sea)
 
 
 def main() -> None:
@@ -63,6 +75,8 @@ def main() -> None:
         if s in old:
             continue
         p = src(f"g8_{s}_lv")
+        if (OUT / f"{s}_lv5.png").exists() and "--tudo" not in sys.argv:
+            continue
         if p is None:
             missing.append(s)
             continue
@@ -104,9 +118,15 @@ def main() -> None:
         a = np.asarray(im.resize((720, 1280)))
         colors[d] = {"top": hexc(a[:40].reshape(-1, 3).mean(0)), "bottom": hexc(a[-40:].reshape(-1, 3).mean(0))}
         colors[d]["sea"] = island(f"g8_{d}_ilhota1", f"{d}_expansao.png")
-        island(f"g8_{d}_ilhota2", f"{d}_expansao2.png")
+        # A segunda ilha segue o mar da primeira (as duas vêm do mesmo tema).
+        island(f"g8_{d}_ilhota2", f"{d}_expansao2.png", colors[d]["sea"])
+    # Mapas antigos: o mar da ilha nova segue o da ilha que já existe (a praia, o do cenário).
+    import re
+    gd = (ROOT / "game/scripts/layout.gd").read_text()
     for d in OLD:
-        sea = island(f"g8_{d}_ilhota2", f"{d}_expansao.png" if d == "praia" else f"{d}_expansao2.png")
+        m = re.search(rf'"{d}": {{.*?"expansion": {{[^}}]*"sea_color": Color\("(\w+)"\)', gd, re.S)
+        prev = m.group(1) if m and d != "praia" else "017272"
+        sea = island(f"g8_{d}_ilhota2", f"{d}_expansao.png" if d == "praia" else f"{d}_expansao2.png", prev)
         colors[d] = {"sea": sea}
     # Miniaturas da trilha de mapas (a trilha abre os 20 de uma vez).
     names = {"praia": "island_base", "cidade": "city_base"}
