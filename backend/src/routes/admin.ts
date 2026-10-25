@@ -4,6 +4,7 @@ import type { FastifyInstance, FastifyRequest } from "fastify";
 import { z } from "zod";
 import type { Db } from "../db/prisma.js";
 import { AppError } from "../errors.js";
+import { toBig } from "../lib/big.js";
 import { randomInt } from "node:crypto";
 import { BUSINESS_CATALOG } from "../economy/catalog.js";
 import { DISTRICTS } from "../economy/districts.js";
@@ -272,7 +273,7 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
         .map((f) => ({
           currency: f.currency,
           reason: f.reason,
-          total: BigInt(f.total).toString(),
+          total: toBig(f.total).toString(),
           count: Number(f.count),
         }))
         .sort((a, b) => (BigInt(b.total) > BigInt(a.total) ? 1 : -1)),
@@ -306,7 +307,7 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
     ]);
     return {
       week: { id: week, start: start.toISOString(), end: end.toISOString() },
-      top: top.map((t, i) => ({ ...t, rank: i + 1, score: t.score.toString() })),
+      top: top.map((t, i) => ({ ...t, rank: i + 1, score: toBig(t.score).toString() })),
       leagues: LEAGUES.map((name, tier) => ({
         tier,
         name,

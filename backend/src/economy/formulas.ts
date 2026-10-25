@@ -16,10 +16,10 @@ export interface EconomyDefinition {
 }
 
 /**
- * Teto de qualquer valor econômico: cabe no BIGINT do banco (9,22×10^18) e no inteiro de 64
- * bits do jogo, com folga para somar.
+ * Teto de qualquer valor econômico (ADR 0033): as colunas são NUMERIC(65,0) e o jogo usa
+ * números decimais sem limite (scripts/big.gd); 10^60 deixa folga para somar.
  */
-export const MAX_ECONOMY_VALUE = 9_000_000_000_000_000_000n;
+export const MAX_ECONOMY_VALUE = 10n ** 60n;
 
 // Crescimentos como frações exatas (1,15 = 23/20; 1,10 = 11/10): conta inteira, sem perda de
 // precisão do float acima de 2^53 (os mapas novos passam disso no nível 100).

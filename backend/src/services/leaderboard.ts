@@ -1,4 +1,5 @@
 import type { Db } from "../db/prisma.js";
+import { toBig } from "../lib/big.js";
 import { AppError } from "../errors.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { track } from "./analytics.js";
@@ -55,7 +56,7 @@ export async function getLeaderboard(db: Db, playerId: string, now: Date, asPlay
     rank: Number(r.rank),
     playerId: r.playerId,
     displayName: r.displayName,
-    score: r.score.toString(),
+    score: toBig(r.score).toString(),
     isMe: r.playerId === playerId,
   });
   const me = rows.find((r) => r.playerId === playerId);
@@ -124,7 +125,7 @@ async function leagueScores(
   show: string = NO_PLAYER,
 ): Promise<ScoreRow[]> {
   const { start, end } = weekBounds(week);
-  return db.$queryRaw<ScoreRow[]>`
+  const rows = await db.$queryRaw<ScoreRow[]>`
     WITH resets AS (
       SELECT player_id, MAX(created_at) AS at
       FROM wallet_ledger
@@ -132,7 +133,7 @@ async function leagueScores(
       GROUP BY player_id
     )
     SELECT lw.player_id AS "playerId", p.display_name AS "displayName",
-           COALESCE(SUM(l.delta), 0)::bigint AS score
+           COALESCE(SUM(l.delta), 0) AS score
     FROM player_league_weeks lw
     JOIN players p ON p.id = lw.player_id
     LEFT JOIN resets r ON r.player_id = lw.player_id
@@ -143,6 +144,7 @@ async function leagueScores(
       AND (NOT p.is_staff OR p.id = ${show}::uuid)
     GROUP BY lw.player_id, p.display_name
     ORDER BY score DESC, p.display_name`;
+  return rows.map((r) => ({ ...r, score: toBig(r.score) }));
 }
 
 /** Quantos sobem/descem numa liga com `n` jogadores. */
@@ -322,7 +324,7 @@ async function weekRank(
     )
     SELECT * FROM ranked WHERE "playerId" = ${playerId}::uuid`;
   const r = rows[0];
-  return r ? { rank: Number(r.rank), score: BigInt(r.score) } : null;
+  return r ? { rank: Number(r.rank), score: toBig(r.score) } : null;
 }
 
 /** Confere a semana anterior uma vez e registra os prêmios de pódio do jogador. */

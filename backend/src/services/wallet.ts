@@ -1,8 +1,10 @@
+import { toBig } from "../lib/big.js";
 import type { Tx } from "../db/prisma.js";
 import { AppError, Errors } from "../errors.js";
 
 /** Maior saldo de moedas possível (cabe com folga em 9,22×10^18). */
-export const MAX_COINS = 9_000_000_000_000_000_000n;
+/** Teto do saldo (ADR 0033): NUMERIC(65,0) no banco — 10^60 deixa folga para somar. */
+export const MAX_COINS = 10n ** 60n;
 
 export interface LockedWallet {
   playerId: string;
@@ -24,7 +26,7 @@ export async function lockWallet(tx: Tx, playerId: string): Promise<LockedWallet
     FOR UPDATE`;
   const wallet = rows[0];
   if (!wallet) throw Errors.unauthorized();
-  return { ...wallet, coins: BigInt(wallet.coins), gems: BigInt(wallet.gems) };
+  return { ...wallet, coins: toBig(wallet.coins), gems: toBig(wallet.gems) };
 }
 
 /**
