@@ -50,7 +50,7 @@ describe("auto-coleta ao vivo", () => {
 describe("missões por fase", () => {
   const advanced = {
     incomePerSecond: 50_000,
-    ownedCount: 18,
+    ownedCount: 30,
     canBuy: true,
     canHire: false,
     hasHelper: true,

@@ -34,7 +34,7 @@ async function stats(db: Reader, playerId: string): Promise<AchievementStats> {
   return {
     prestigeCount: player?.prestigeCount ?? 0,
     ownedCount: owned.length,
-    praiaComplete: (ownedByDistrict.praia ?? 0) >= (totalByDistrict.praia ?? 4),
+    praiaComplete: (ownedByDistrict.praia ?? 0) >= (totalByDistrict.praia ?? 6),
     ownedByDistrict,
     totalByDistrict,
     helpers: owned.filter((pb) => pb.managerUnlocked).length,

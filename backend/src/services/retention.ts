@@ -1,7 +1,7 @@
 import type { Db, Tx } from "../db/prisma.js";
 import { AppError } from "../errors.js";
 import { DAILY_REWARDS, MISSION_CHEST } from "../economy/daily.js";
-import { previousDistrict } from "../economy/districts.js";
+import { DISTRICTS, unlockedDistricts } from "../economy/districts.js";
 import { EVENT_PRIZE_GEMS, EVENT_TARGET_SECONDS, weekendEvent } from "../economy/events.js";
 import { profitPerCycle } from "../economy/formulas.js";
 import { niceRound, rewardCap } from "../economy/missions.js";
@@ -171,17 +171,8 @@ async function latestUnlocked(db: Reader, playerId: string): Promise<string> {
     db.businessDefinition.findMany({ orderBy: { sortOrder: "asc" } }),
     db.playerBusiness.findMany({ where: { playerId } }),
   ]);
-  const ownedIds = new Set(owned.map((pb) => pb.businessId));
-  const order = [...new Set(defs.map((d) => d.district))];
-  let latest = order[0] ?? "praia";
-  for (const d of order) {
-    const prev = previousDistrict(d);
-    const prevComplete =
-      prev === null || defs.filter((x) => x.district === prev).every((x) => ownedIds.has(x.id));
-    if (!prevComplete) break;
-    latest = d;
-  }
-  return latest;
+  const open = unlockedDistricts(defs, new Set(owned.map((pb) => pb.businessId)));
+  return [...DISTRICTS].reverse().find((d) => open.has(d)) ?? "praia";
 }
 
 async function earnedBetween(db: Reader, playerId: string, start: Date, end: Date) {

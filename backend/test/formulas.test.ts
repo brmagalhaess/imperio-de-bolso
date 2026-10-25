@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { BUSINESS_CATALOG } from "../src/economy/catalog.js";
+import { BUSINESS_CATALOG, BUSINESSES_PER_MAP } from "../src/economy/catalog.js";
+import { DISTRICTS } from "../src/economy/districts.js";
 import {
   nextUpgradeCost,
   profitPerCycle,
@@ -11,10 +12,17 @@ import {
 const agua = BUSINESS_CATALOG[0]!;
 
 describe("fórmulas de economia", () => {
-  it("catálogo: praia com 4 negócios e os outros 7 mapas com 9 cada", () => {
+  it("catálogo: 20 mapas, praia com 6 negócios e os outros com 12 cada", () => {
     const byDistrict = (d: string) =>
       BUSINESS_CATALOG.filter((b) => b.district === d).map((b) => b.slug);
-    expect(byDistrict("praia")).toEqual(["agua", "pipoca", "sorveteria", "quiosque_coco"]);
+    expect(byDistrict("praia")).toEqual([
+      "agua",
+      "pipoca",
+      "sorveteria",
+      "quiosque_coco",
+      "pastel",
+      "acai",
+    ]);
     expect(byDistrict("cidade")).toEqual([
       "mercadinho",
       "padaria",
@@ -25,16 +33,19 @@ describe("fórmulas de economia", () => {
       "cinema",
       "hotel",
       "shopping",
+      "pizzaria",
+      "livraria",
+      "pet_shop",
     ]);
-    for (const d of ["porto", "centro", "industrial", "serra", "ilha", "espaco"])
-      expect(byDistrict(d)).toHaveLength(9);
-    expect(BUSINESS_CATALOG).toHaveLength(67);
+    expect(DISTRICTS).toHaveLength(20);
+    for (const d of DISTRICTS.slice(1)) expect(byDistrict(d)).toHaveLength(BUSINESSES_PER_MAP);
+    expect(BUSINESS_CATALOG).toHaveLength(234);
     // Cada negócio custa mais que o anterior (progressão contínua entre mapas).
     for (let i = 1; i < BUSINESS_CATALOG.length; i++)
       expect(BUSINESS_CATALOG[i]!.cost).toBeGreaterThan(BUSINESS_CATALOG[i - 1]!.cost);
-    // Nível 100 do mais caro cabe no BIGINT do PostgreSQL.
+    // Nível 100 do mais caro cabe com folga no teto de moedas (10^60, ADR 0033).
     const top = BUSINESS_CATALOG[BUSINESS_CATALOG.length - 1]!;
-    expect(upgradeCostTo(top, 100)).toBeLessThan(9_223_372_036_854_775_807n);
+    expect(upgradeCostTo(top, 100)).toBeLessThan(10n ** 40n);
     expect(agua).toMatchObject({ cost: 100n, revenue: 10n, cycleSeconds: 10 });
   });
 

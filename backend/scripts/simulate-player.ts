@@ -7,7 +7,7 @@ import { DAILY_REWARDS, MISSION_CHEST } from "../src/economy/daily.js";
 import { DISTRICTS } from "../src/economy/districts.js";
 import { nextUpgradeCost, profitPerCycle } from "../src/economy/formulas.js";
 import { OFFLINE_CAP_MS } from "../src/economy/offline.js";
-import { starsFor } from "../src/economy/prestige.js";
+import { PRESTIGE_MAPS, starsFor } from "../src/economy/prestige.js";
 import { baseSpeedPercent, effectiveCycleMs } from "../src/economy/speed.js";
 
 interface Profile {
@@ -281,7 +281,13 @@ function simulate(p: Profile) {
             firstSession.purchases.push(t - start);
           }
         }
-        if (prestigeAt < 0 && biz.every((b) => b.level > 0 && b.helper)) prestigeAt = t;
+        if (
+          prestigeAt < 0 &&
+          biz
+            .filter((b) => DISTRICTS.indexOf(b.def.district as never) < PRESTIGE_MAPS)
+            .every((b) => b.level > 0 && b.helper)
+        )
+          prestigeAt = t;
       }
       longestGap = Math.max(longestGap, t - lastBuy);
       if (missionsDone) {
@@ -410,6 +416,6 @@ for (const p of profiles) {
   console.log(`Vender império liberado em: ${r.prestigeAt < 0 ? "não chegou" : dur(r.prestigeAt)}`);
   const e = r.end;
   console.log(
-    `Fim: ${e.owned}/67 negócios, ${e.helpers} ajudantes, nível médio ${e.avgLevel.toFixed(0)}, renda ${fmt(e.income)}/s, faturou ${fmt(e.totalEarned)}, ${e.gems} 💎`,
+    `Fim: ${e.owned}/${BUSINESS_CATALOG.length} negócios, ${e.helpers} ajudantes, nível médio ${e.avgLevel.toFixed(0)}, renda ${fmt(e.income)}/s, faturou ${fmt(e.totalEarned)}, ${e.gems} 💎`,
   );
 }

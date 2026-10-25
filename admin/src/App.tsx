@@ -70,6 +70,18 @@ const DISTRICT_NAMES: Record<string, string> = {
   serra: "Serra Nevada",
   ilha: "Ilha Paraíso",
   espaco: "Centro Espacial",
+  piratas: "Ilha dos Piratas",
+  atlantida: "Atlântida",
+  dinos: "Vale dos Dinossauros",
+  pinguins: "Reino dos Pinguins",
+  doces: "Cidade dos Doces",
+  brinquedos: "Cidade dos Brinquedos",
+  lua: "Base Lunar",
+  marte: "Colônia em Marte",
+  gatos: "Planeta dos Gatos",
+  saturno: "Anéis de Saturno",
+  gelatina: "Planeta Gelatina",
+  galaxia: "Império Galáctico",
 };
 const districtName = (d: string | null) => (d ? (DISTRICT_NAMES[d] ?? d) : "—");
 

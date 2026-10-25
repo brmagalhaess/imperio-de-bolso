@@ -36,19 +36,36 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
   {
     id: "praia_complete",
     title: "Rei da praia",
-    description: "Construa os 4 negócios da praia",
+    description: "Construa os 6 negócios da praia",
     rewardGems: 3,
     progress: (s) => count(s.praiaComplete ? 1 : 0, 1),
   },
   ...(
     [
-      ["cidade", "Prefeito da cidade", "Construa os 9 negócios da cidade", 5],
-      ["porto", "Capitão do porto", "Construa os 9 negócios do porto", 8],
-      ["centro", "Magnata do centro", "Construa os 9 negócios do centro financeiro", 12],
-      ["industrial", "Barão da indústria", "Construa os 9 negócios do polo industrial", 15],
-      ["serra", "Rei da montanha", "Construa os 9 negócios da serra", 18],
-      ["ilha", "Dono do paraíso", "Construa os 9 negócios da ilha", 22],
-      ["espaco", "Magnata das estrelas", "Construa os 9 negócios do centro espacial", 30],
+      ["cidade", "Prefeito da cidade", "Construa os 12 negócios da cidade", 5],
+      ["porto", "Capitão do porto", "Construa os 12 negócios do porto", 8],
+      ["centro", "Magnata do centro", "Construa os 12 negócios do centro financeiro", 12],
+      ["industrial", "Barão da indústria", "Construa os 12 negócios do polo industrial", 15],
+      ["serra", "Rei da montanha", "Construa os 12 negócios da serra", 18],
+      ["ilha", "Dono do paraíso", "Construa os 12 negócios da ilha", 22],
+      ["espaco", "Magnata das estrelas", "Construa os 12 negócios do centro espacial", 30],
+      ["piratas", "Capitão pirata", "Construa os 12 negócios da Ilha dos Piratas", 34],
+      ["atlantida", "Rei dos mares", "Construa os 12 negócios de Atlântida", 38],
+      ["dinos", "Domador de dinossauros", "Construa os 12 negócios do Vale dos Dinossauros", 42],
+      ["pinguins", "Amigo dos pinguins", "Construa os 12 negócios do Reino dos Pinguins", 46],
+      ["doces", "Barão do açúcar", "Construa os 12 negócios da Cidade dos Doces", 50],
+      [
+        "brinquedos",
+        "Mestre dos brinquedos",
+        "Construa os 12 negócios da Cidade dos Brinquedos",
+        54,
+      ],
+      ["lua", "Magnata da Lua", "Construa os 12 negócios da Base Lunar", 58],
+      ["marte", "Pioneiro de Marte", "Construa os 12 negócios da Colônia em Marte", 62],
+      ["gatos", "Melhor amigo dos gatos", "Construa os 12 negócios do Planeta dos Gatos", 66],
+      ["saturno", "Senhor dos anéis", "Construa os 12 negócios dos Anéis de Saturno", 70],
+      ["gelatina", "Rei da gelatina", "Construa os 12 negócios do Planeta Gelatina", 75],
+      ["galaxia", "Imperador galáctico", "Construa os 12 negócios do Império Galáctico", 100],
     ] as const
   ).map(([district, title, description, rewardGems]) => ({
     id: `${district}_complete`,
@@ -56,7 +73,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
     description,
     rewardGems,
     progress: (s: AchievementStats) =>
-      count(s.ownedByDistrict?.[district] ?? 0, s.totalByDistrict?.[district] ?? 9),
+      count(s.ownedByDistrict?.[district] ?? 0, s.totalByDistrict?.[district] ?? 12),
   })),
   {
     id: "first_prestige",
@@ -156,6 +173,20 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
     rewardGems: 25,
     progress: (s) => ({ value: s.lifetimeEarned, target: 1_000_000_000_000n }),
   },
+  ...(
+    [
+      ["earned_1qa", "Quatrilionário", "Fature 1 quatrilhão de moedas", 35, 10n ** 15n],
+      ["earned_1qi", "Quintilionário", "Fature 1 quintilhão de moedas", 50, 10n ** 18n],
+      ["earned_1sx", "Sextilionário", "Fature 1 sextilhão de moedas", 75, 10n ** 21n],
+      ["earned_1sp", "Dono do universo", "Fature 1 septilhão de moedas", 100, 10n ** 24n],
+    ] as const
+  ).map(([id, title, description, rewardGems, target]) => ({
+    id,
+    title,
+    description,
+    rewardGems,
+    progress: (s: AchievementStats) => ({ value: s.lifetimeEarned, target }),
+  })),
 ];
 
 export function achievementById(id: string): AchievementDef | undefined {

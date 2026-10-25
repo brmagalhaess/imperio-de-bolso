@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { BUSINESS_CATALOG } from "../src/economy/catalog.js";
+import { DISTRICTS } from "../src/economy/districts.js";
 import { starsFor, withPrestige } from "../src/economy/prestige.js";
 import {
   coinsOf,
@@ -21,11 +22,14 @@ afterEach(async () => {
   await ctx?.close();
 });
 
-const ALL = BUSINESS_CATALOG.map((b) => b.slug);
+// Império da Terra: os 8 primeiros mapas (ADR 0034).
+const ALL = BUSINESS_CATALOG.filter((b) =>
+  (DISTRICTS.slice(0, 8) as string[]).includes(b.district),
+).map((b) => b.slug);
 
 /** Compra os negócios (em ordem de mapa) e, se pedido, contrata os ajudantes. */
 async function buildEmpire(g: Guest, slugs: string[], helpers: boolean) {
-  await setCoins(ctx.db, g.playerId, 10n ** 15n);
+  await setCoins(ctx.db, g.playerId, 10n ** 26n);
   for (const slug of slugs) {
     const r = await post(ctx.app, g, "/businesses/purchase", { businessSlug: slug });
     expect(r.statusCode).toBe(201);
@@ -117,10 +121,9 @@ describe("vender o império", () => {
     expect(state.player).toMatchObject({ prestigeStars: 33, prestigeBonusPercent: 66 });
     expect(state.wallet).toEqual({ coins: "100", gems: "42" });
     expect(state.businesses.every((b: { owned: boolean }) => !b.owned)).toBe(true);
-    expect(state.districts.map((d: { unlocked: boolean }) => d.unlocked)).toEqual([
-      true,
-      ...Array(7).fill(false),
-    ]);
+    expect(state.districts.map((d: { unlocked: boolean }) => d.unlocked)).toEqual(
+      state.districts.map((_: unknown, i: number) => i === 0),
+    );
     // Lucro com bônus: água 10 → 16 (+66%).
     const agua = state.businesses.find((b: { slug: string }) => b.slug === "agua");
     expect(agua.profitPerCycle).toBe("16");

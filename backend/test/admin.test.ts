@@ -27,19 +27,19 @@ describe("painel admin", () => {
     await post(ctx.app, g, "/businesses/purchase", { businessSlug: "agua" });
     const o = (await admin("GET", "/overview")).json();
     expect(o).toMatchObject({ players: 1, openReports: 0, weekendEvent: null });
-    expect(o.mapFunnel).toHaveLength(8);
+    expect(o.mapFunnel).toHaveLength(20);
     expect(o.mapFunnel[0]).toEqual({ district: "praia", players: 1 });
     expect(o.prestige).toEqual({ players: 0, sales: 0, stars: 0 });
     expect(o.boosts).toEqual({ autoCollect: 0, turbo: 0, vip: 0 });
     expect(o.today).toMatchObject({ missionsClaimed: 0, gemsSpent: "0" });
   });
 
-  it("economia lista os 67 negócios com donos, ajudantes e faixas visuais", async () => {
+  it("economia lista os 234 negócios com donos, ajudantes e faixas visuais", async () => {
     ctx = await createTestContext();
     const g = await newGuest(ctx.app);
     await post(ctx.app, g, "/businesses/purchase", { businessSlug: "agua" });
     const e = (await admin("GET", "/economy")).json();
-    expect(e.businesses).toHaveLength(67);
+    expect(e.businesses).toHaveLength(234);
     expect(e.businesses[0]).toMatchObject({
       slug: "agua",
       owners: 1,

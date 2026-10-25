@@ -11,7 +11,7 @@ import {
   templateById,
 } from "../economy/missions.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
-import { previousDistrict } from "../economy/districts.js";
+import { unlockedDistricts, type District } from "../economy/districts.js";
 import { dayBounds, gameDay } from "../lib/time.js";
 import { track } from "./analytics.js";
 import { autoCollectActive } from "./entitlements.js";
@@ -47,13 +47,9 @@ export async function missionContext(
     starsOf(db, playerId),
   ]);
   const ownedIds = new Set(owned.map((pb) => pb.businessId));
-  // Um mapa abre quando todos os negócios do mapa anterior foram comprados (em cadeia).
-  const complete = (district: string) =>
-    defs.filter((d) => d.district === district).every((d) => ownedIds.has(d.id));
-  const unlocked = (district: string): boolean => {
-    const prev = previousDistrict(district);
-    return prev === null || (unlocked(prev) && complete(prev));
-  };
+  // Um mapa abre quando o anterior está completo (em cadeia) ou já há negócio nele.
+  const open = unlockedDistricts(defs, ownedIds);
+  const unlocked = (district: string) => open.has(district as District);
   const cityUnlocked = unlocked("cidade");
   const [player, wallet] = await Promise.all([
     db.player.findUnique({ where: { id: playerId } }),

@@ -13,11 +13,13 @@ export const STAR_BONUS_PERCENT = 2;
 export const STAR_SCALE = 1_000_000n;
 export const STARS_PER_DECADE = 20;
 /**
- * Requisito para vender (revisão 2026-10-15): o império completo — todos os negócios de todos os
- * mapas comprados e todos os ajudantes contratados. Os níveis ficam livres (nível máximo em tudo
- * custaria quase o teto de moedas e levaria meses).
+ * Requisito para vender (revisão 2026-10-15): o império completo — todos os negócios e todos os
+ * ajudantes. Com os 20 mapas (ADR 0034) vale o império da Terra: os 8 primeiros mapas (até o
+ * Centro Espacial) — senão a venda ficaria a meses. Quem vai além vende com mais estrelas, porque
+ * elas vêm do faturamento. Os níveis ficam livres.
  */
 export const PRESTIGE_REQUIRES = "imperio_completo";
+export const PRESTIGE_MAPS = 8;
 
 /** Estrelas que o faturamento de produção desde o último prestígio rende. */
 export function starsFor(earned: bigint): number {

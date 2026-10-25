@@ -1,6 +1,7 @@
 import type { Db, Tx } from "../db/prisma.js";
 import { AppError } from "../errors.js";
-import { bonusPercent, PRESTIGE_REQUIRES, starsFor } from "../economy/prestige.js";
+import { DISTRICTS } from "../economy/districts.js";
+import { bonusPercent, PRESTIGE_MAPS, PRESTIGE_REQUIRES, starsFor } from "../economy/prestige.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { PRESTIGE_REASON, PRODUCTION_REASONS } from "./achievements.js";
 import { track } from "./analytics.js";
@@ -19,7 +20,7 @@ export interface PrestigeView {
   starsToGain: number;
   /** Bônus total depois de vender agora. */
   nextBonusPercent: number;
-  /** Requisito: "imperio_completo" (todos os negócios e todos os ajudantes). */
+  /** Requisito: "imperio_completo" (negócios e ajudantes dos 8 primeiros mapas — ADR 0034). */
   requires: string;
   totalBusinesses: number;
   ownedBusinesses: number;
@@ -27,6 +28,8 @@ export interface PrestigeView {
   requirementMet: boolean;
   available: boolean;
 }
+
+const REQUIRED_MAPS = DISTRICTS.slice(0, PRESTIGE_MAPS) as string[];
 
 /** Situação do prestígio do jogador (tela "Vender o império"). */
 export async function getPrestige(db: Reader, playerId: string): Promise<PrestigeView> {
@@ -41,9 +44,11 @@ export async function getPrestige(db: Reader, playerId: string): Promise<Prestig
       },
       _sum: { delta: true },
     }),
-    db.businessDefinition.count(),
-    db.playerBusiness.count({ where: { playerId } }),
-    db.playerBusiness.count({ where: { playerId, managerUnlocked: true } }),
+    db.businessDefinition.count({ where: { district: { in: REQUIRED_MAPS } } }),
+    db.playerBusiness.count({ where: { playerId, business: { district: { in: REQUIRED_MAPS } } } }),
+    db.playerBusiness.count({
+      where: { playerId, managerUnlocked: true, business: { district: { in: REQUIRED_MAPS } } },
+    }),
   ]);
   const earnedSince = earned._sum.delta ?? 0n;
   const starsToGain = starsFor(earnedSince);

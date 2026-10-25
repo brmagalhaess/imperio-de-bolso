@@ -54,9 +54,9 @@ export function niceRound(value: number): bigint {
  * já evoluiu).
  */
 export function missionTier(ctx: MissionContext): number {
-  if (ctx.ownedCount < 4) return 0;
-  if (ctx.ownedCount < 10) return 1;
-  if (ctx.ownedCount < 16) return 2;
+  if (ctx.ownedCount < 6) return 0;
+  if (ctx.ownedCount < 18) return 1;
+  if (ctx.ownedCount < 30) return 2;
   return 3;
 }
 

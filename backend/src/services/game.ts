@@ -1,7 +1,12 @@
 import type { Db, Tx } from "../db/prisma.js";
 import type { BusinessDefinition, PlayerBusiness } from "../generated/prisma/client.js";
 import { Errors } from "../errors.js";
-import { DISTRICTS, previousDistrict } from "../economy/districts.js";
+import {
+  DISTRICTS,
+  previousDistrict,
+  unlockedDistricts,
+  type District,
+} from "../economy/districts.js";
 import { bonusPercent } from "../economy/prestige.js";
 import { nextUpgradeCost, profitPerCycle } from "../economy/formulas.js";
 import { EVENT_PROFIT_PERCENT, weekendEvent } from "../economy/events.js";
@@ -286,13 +291,13 @@ export async function listBusinesses(
   return defs.map((def) => toBusinessView(def, byBusiness.get(def.id), now, stars, ctx, ev));
 }
 
-/** Distrito liberado quando todos os negócios do distrito anterior foram comprados. */
+/** Distrito liberado quando o anterior está completo (ou já há negócio nele — ADR 0034). */
 export function districtViews(businesses: BusinessView[]): DistrictView[] {
-  const complete = (d: string) => businesses.filter((b) => b.district === d).every((b) => b.owned);
-  return DISTRICTS.map((id) => {
-    const requires = previousDistrict(id);
-    return { id, unlocked: requires === null || complete(requires), requires };
-  });
+  const open = unlockedDistricts(
+    businesses.map((b) => ({ id: b.slug, district: b.district })),
+    new Set(businesses.filter((b) => b.owned).map((b) => b.slug)),
+  );
+  return DISTRICTS.map((id) => ({ id, unlocked: open.has(id), requires: previousDistrict(id) }));
 }
 
 export async function getPlayerState(
@@ -346,13 +351,15 @@ export function purchaseBusiness(slug: string, now: Date) {
 
     const requires = previousDistrict(def.district);
     if (requires) {
-      const [total, owned] = await Promise.all([
-        tx.businessDefinition.count({ where: { district: requires } }),
-        tx.playerBusiness.count({
-          where: { playerId: wallet.playerId, business: { district: requires } },
+      const [defs, mine] = await Promise.all([
+        tx.businessDefinition.findMany({ select: { id: true, district: true } }),
+        tx.playerBusiness.findMany({
+          where: { playerId: wallet.playerId },
+          select: { businessId: true },
         }),
       ]);
-      if (owned < total) throw Errors.districtLocked(def.district, requires);
+      const open = unlockedDistricts(defs, new Set(mine.map((pb) => pb.businessId)));
+      if (!open.has(def.district as District)) throw Errors.districtLocked(def.district, requires);
     }
 
     const current = await settleLive(tx, wallet, now, `${idempotencyKey}:live`);
