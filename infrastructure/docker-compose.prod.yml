@@ -47,8 +47,8 @@ services:
       # Loja paga só no iPhone (ADR 0022); a versão 1.0.0 não manda a plataforma e segue sem loja paga.
       PURCHASES_PLATFORMS: ${PURCHASES_PLATFORMS:-ios}
       # Atualização obrigatória por plataforma (vazio = o jogo só sugere atualizar).
-      MIN_APP_VERSION_IOS: ${MIN_APP_VERSION_IOS:-}
-      MIN_APP_VERSION_ANDROID: ${MIN_APP_VERSION_ANDROID:-}
+      MIN_APP_VERSION_IOS: ${MIN_APP_VERSION_IOS:-1.1.0}
+      MIN_APP_VERSION_ANDROID: ${MIN_APP_VERSION_ANDROID:-1.1.0}
       APPLE_BUNDLE_ID: ${APPLE_BUNDLE_ID:-br.com.imperiodebolso.game}
       # Google Play Billing (ADR 0028): conta de serviço (base64 do JSON) para verificar compras.
       GOOGLE_PLAY_PACKAGE: ${GOOGLE_PLAY_PACKAGE:-br.com.imperiodebolso.game}
