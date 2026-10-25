@@ -103,7 +103,10 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Mapas 5–8 com 24 negócios novos (ADR 0016) · iPad habilitado
 - [x] Contas vinculadas no servidor + tela (ADR 0015)
 - [x] Login com Apple (iOS) no Perfil (ADR 0022)
-- [ ] Login nativo Google (Android)
+- [x] Login nativo Google (Android) — ADR 0032 (SHA-1 da Play corrigida em 2026-10-25)
+- [x] 20 mapas e 12 negócios por mapa (ADR 0034) · dinheiro sem teto (ADR 0033)
+- [ ] Publicar servidor + site dos 20 mapas quando a 1.1.0 estiver nas duas lojas
+      (`MIN_APP_VERSION_IOS/ANDROID=1.1.0`)
 - [ ] V1.2b Temporadas, passe de temporada e cosméticos
 - [ ] Fichas das lojas e políticas em inglês/espanhol (lançamento fora do Brasil)
 - [ ] V1.3 Amigos, visitas e compartilhamento (depende de vincular conta Google/Apple)

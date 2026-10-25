@@ -2,6 +2,25 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-25 — 1.1.0: 20 mapas e 12 negócios por mapa (ADR 0034); dinheiro sem teto (ADR 0033)
+
+- Servidor: 234 negócios em 20 mapas (12 novos depois do Centro Espacial; praia 4→6, demais
+  9→12); desbloqueio único (`unlockedDistricts`) com mapa já aberto preservado; venda pelos 8
+  primeiros mapas; conquistas novas; fases das missões 6/18/30; colunas NUMERIC(65,0), teto 10^60.
+- Jogo: só o mapa aberto fica montado; trilha com miniaturas; segunda ilha de expansão; lotes,
+  ilhas e mapas que o servidor não envia ficam escondidos (1.1.0 funciona no servidor atual).
+  Traduções en/es dos textos novos.
+- Arte (Higgsfield, ~US$ 17,50 de US$ 60 aprovados): 12 cenários, 32 ilhas, 167 negócios × 5
+  evoluções (folha única por negócio) e 167 ajudantes. Texturas novas em WebP com perda.
+- Vínculo Google no Android: causa era a SHA-1 real da Play (`2C:39:…:7B:AD`) fora do OAuth —
+  cliente novo criado; jogo sem o resumo por cima do Perfil e com aviso quando não conclui.
+- Testes: servidor **177**, jogo **162** unitários e **202** com a API local, 0 falhas. Capturas
+  reais dos 20 mapas conferidas (topo e ilhas).
+- Builds: Android **1.1.0 (código 9)** enviado à revisão (interno + produção); iOS **1.1.0
+  (build 16)** enviado ao TestFlight — a 1.0.6 ainda aguarda revisão da Apple.
+- **Bloqueio de publicação:** servidor (deploy/servidor) e site com os 20 mapas só depois da
+  1.1.0 aprovada nas duas lojas, com `MIN_APP_VERSION_IOS/ANDROID=1.1.0`.
+
 ## 2026-10-25 — Android 1.0.7: atualização dentro do app (Google Play)
 
 - Plugin `ImperioAndroid` ganha `checkForUpdate()` (Play In-App Updates, tela cheia: baixa,
