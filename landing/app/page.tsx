@@ -10,13 +10,25 @@ const MAPS = [
   "Serra Nevada",
   "Ilha Paraíso",
   "Centro Espacial",
+  "Ilha dos Piratas",
+  "Atlântida",
+  "Vale dos Dinossauros",
+  "Reino dos Pinguins",
+  "Cidade dos Doces",
+  "Cidade dos Brinquedos",
+  "Base Lunar",
+  "Colônia em Marte",
+  "Planeta dos Gatos",
+  "Anéis de Saturno",
+  "Planeta Gelatina",
+  "Império Galáctico",
 ];
 
 const FEATURES = [
   {
     icon: "/img/ui/icon_map.webp",
-    title: "8 mapas para conquistar",
-    text: "Da praia ao centro espacial: cada mapa traz negócios novos, uma ilha de expansão e prédios que evoluem até o nível 100.",
+    title: "20 mapas para conquistar",
+    text: "Da praia ao império galáctico, passando por piratas, dinossauros, doces, a Lua e Marte: cada mapa traz 12 negócios, duas ilhas de expansão e prédios que evoluem até o nível 100.",
   },
   {
     icon: "/img/ui/icon_helpers.webp",
@@ -48,7 +60,7 @@ const FEATURES = [
 const SHOTS = [
   ["01_praia", "A Ilha da Praia com os primeiros negócios"],
   ["02_cidade", "A Cidade, com mercadinho, restaurante e shopping"],
-  ["03_mapas", "Os 8 mapas do jogo"],
+  ["03_mapas", "Os mapas do jogo"],
   ["04_missoes", "Missões diárias e baú de prêmios"],
   ["05_loja", "A Loja com auto-coleta, turbo e diamantes"],
   ["06_diario", "O prêmio diário de 7 dias"],
@@ -176,8 +188,8 @@ export default function Home() {
               <GooglePlayButton />
             </div>
             <ul className="chips" aria-label="Destaques">
-              <li>8 mapas</li>
-              <li>67 negócios</li>
+              <li>20 mapas</li>
+              <li>234 negócios</li>
               <li>Português · English · Español</li>
             </ul>
           </div>
@@ -273,7 +285,7 @@ export default function Home() {
             </li>
             <li>
               <span>3</span>
-              <strong>Libere os 8 mapas</strong> — {MAPS.join(", ")}.
+              <strong>Libere os 20 mapas</strong> — {MAPS.join(", ")}.
             </li>
           </ol>
         </div>

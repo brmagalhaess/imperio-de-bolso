@@ -18,9 +18,13 @@ var district := ""
 var config: Dictionary
 var lots := {}  # slug → BusinessLot
 var _helpers := {}  # slug → Sprite2D do ajudante (visível quando contratado)
+## Ilhas de expansão: cada uma some (e a câmera para antes) se o servidor ainda não tem os
+## negócios dela (jogo novo com servidor antigo — ADR 0034).
+var _islands: Array[Sprite2D] = []
+var _world_height := 1280.0
 var _sorted: Node2D
 var _press_pos := Vector2.ZERO
-## Mapas maiores (9 negócios): arrastar move a câmera e pinça aproxima (pedido de 2026-10-15).
+## Mapas maiores (12 negócios): arrastar move a câmera e pinça aproxima (pedido de 2026-10-15).
 const MAX_ZOOM_FACTOR := 1.8
 var _camera: Camera2D
 var _touches := {}  # índice do dedo → posição
@@ -60,13 +64,18 @@ func _ready() -> void:
 	bg.scale = Vector2(720, 1280) / bg.texture.get_size()
 	add_child(bg)
 
-	if not exp.is_empty():
+	# Ilhas de expansão: a primeira (2026-10-15) e a segunda (12 negócios por mapa, ADR 0034).
+	for e in [exp, config.get("expansion2", {})]:
+		if e.is_empty():
+			continue
 		var island := Sprite2D.new()
-		island.texture = load("res://assets/optimized/%s" % exp.base)
+		island.texture = load("res://assets/optimized/%s" % e.base)
 		island.centered = false
 		island.scale = Vector2.ONE * (720.0 / island.texture.get_width())
-		island.position = Vector2(0, float(exp.y))
+		island.position = Vector2(0, float(e.y))
 		add_child(island)
+		_islands.append(island)
+	if not exp.is_empty():
 		# Dica no fim do mapa principal: há mais lotes descendo.
 		var hint := Label.new()
 		hint.text = tr("▼ Arraste para ver mais negócios ▼")
@@ -136,7 +145,7 @@ func _clamp_camera() -> void:
 	_camera.zoom = Vector2.ONE * z
 	var half := get_viewport_rect().size / z / 2.0
 	var lo := half
-	var hi := Vector2(720, float(config.get("world_height", 1280))) - half
+	var hi := Vector2(720, _world_height) - half
 	_camera.position = Vector2(
 			clamp(_camera.position.x, min(lo.x, hi.x), max(lo.x, hi.x)) if lo.x <= hi.x else 360.0,
 			clamp(_camera.position.y, min(lo.y, hi.y), max(lo.y, hi.y)) if lo.y <= hi.y else config.camera_center.y)
@@ -148,9 +157,23 @@ func _zoom_by(factor: float) -> void:
 
 
 func _sync() -> void:
+	var known := {}
 	for b in GameState.businesses():
+		known[b.slug] = true
 		if lots.has(b.slug):
 			lots[b.slug].update_from(b)
+	for slug in lots:
+		lots[slug].visible = known.is_empty() or known.has(slug)
+	_world_height = 1280.0
+	for island in _islands:
+		var bottom := island.position.y + island.texture.get_height() * island.scale.y
+		var any := false
+		for slug in lots:
+			var y: float = lots[slug].position.y
+			any = any or (lots[slug].visible and y > island.position.y and y < bottom)
+		island.visible = any
+		if any:
+			_world_height = maxf(_world_height, bottom)
 	for slug in _helpers:
 		var b := GameState.business(slug)
 		var show: bool = b.get("managed", false)
@@ -179,7 +202,7 @@ func focus(slug: String) -> void:
 	var target: Vector2 = lots[slug].position - Vector2(0, 120)
 	var half := get_viewport_rect().size / _camera.zoom.x / 2.0
 	var lo_y := half.y
-	var hi_y := float(config.get("world_height", 1280)) - half.y
+	var hi_y := _world_height - half.y
 	target.y = clamp(target.y, min(lo_y, hi_y), max(lo_y, hi_y))
 	target.x = _camera.position.x
 	if absf(target.y - _camera.position.y) > half.y * 0.6:

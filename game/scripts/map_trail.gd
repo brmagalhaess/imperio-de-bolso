@@ -88,7 +88,7 @@ func open(current: String) -> void:
 		c.queue_free()
 	_cards.clear()
 	_nodes.clear()
-	var order: Array = Layout.DISTRICT_ORDER
+	var order: Array = Layout.DISTRICT_ORDER.filter(func(d): return GameState.district_known(d))
 	var count := order.size() + 1  # + "Em breve"
 	var height := TOP_MARGIN + STEP * (count - 1) + CARD_SIZE.y + BOTTOM_MARGIN
 	_canvas.custom_minimum_size = Vector2(720, height)
@@ -159,7 +159,9 @@ func _district_card(id: String, is_current: bool) -> Control:
 	card.add_child(clip)
 	var pic := TextureRect.new()
 	var atlas := AtlasTexture.new()
-	atlas.atlas = load("res://assets/optimized/%s" % info.base)
+	# Miniatura (a trilha mostra os 20 mapas de uma vez; o cenário inteiro pesaria na memória).
+	var thumb := "res://assets/optimized/%s_trilha.jpg" % id
+	atlas.atlas = load(thumb if ResourceLoader.exists(thumb) else "res://assets/optimized/%s" % info.base)
 	var s: Vector2 = atlas.atlas.get_size()
 	var rh := s.x * clip.size.y / clip.size.x
 	atlas.region = Rect2(0, clamp(s.y * float(info.get("trail_center", 0.5)) - rh / 2, 0, s.y - rh), s.x, rh)

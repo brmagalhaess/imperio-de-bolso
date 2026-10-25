@@ -4,7 +4,9 @@ extends Node2D
 const Layout := preload("res://scripts/layout.gd")
 const DistrictView := preload("res://scripts/district_view.gd")
 
-var districts := {}  # id → DistrictView
+## Só o mapa aberto fica montado (20 mapas com cenário em alta resolução não cabem juntos na
+## memória de um celular — ADR 0034). id → DistrictView
+var districts := {}
 var current := ""
 
 @onready var camera: Camera2D = $Camera2D
@@ -13,12 +15,6 @@ var current := ""
 
 func _ready() -> void:
 	RenderingServer.set_default_clear_color(Color("017272"))
-	for id in Layout.DISTRICT_ORDER:
-		var view := DistrictView.new(id)
-		view.visible = false
-		view.lot_selected.connect(hud.show_business)
-		$World.add_child(view)
-		districts[id] = view
 	_show_district("praia")
 
 	hud.business_requested.connect(_on_business_requested)
@@ -41,14 +37,14 @@ func _boot() -> void:
 	if await GameState.boot():
 		hud.hide_overlay()
 		# Jogador novo: já mostra o carrinho de água para a primeira compra.
-		if not GameState.business("agua").get("owned", true):
+		if not GameState.business("agua").get("owned", true) and districts.has("praia"):
 			districts["praia"].select("agua")
 		hud.maybe_show_popups()  # pódio da semana e prêmio do dia (ADR 0014/0017)
 
 
 ## Troca de distrito com fade (usado pelo Mapa e pela lista Construir).
 func go_to_district(id: String) -> void:
-	if id == current or not districts.has(id):
+	if id == current or not Layout.DISTRICTS.has(id):
 		return
 	await hud.fade(true)
 	_show_district(id)
@@ -62,8 +58,15 @@ func _show_district(id: String) -> void:
 	GameState.current_district = id
 	hud.current_district = id
 	hud.close_sheet()
-	for d in districts:
-		districts[d].visible = d == id
+	for d in districts.keys():
+		if d != id:
+			districts[d].queue_free()
+			districts.erase(d)
+	if not districts.has(id):
+		var view := DistrictView.new(id)
+		view.lot_selected.connect(hud.show_business)
+		$World.add_child(view)
+		districts[id] = view
 	districts[id].frame(camera)
 	Audio.play_music(id)
 

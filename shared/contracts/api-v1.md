@@ -56,8 +56,9 @@ Corpo vazio → cria conta convidada (100 moedas). Corpo `{ guestId, guestSecret
   "managed": false, "automatic": false, "managerCost": "150", "pendingAmount": "0"
 }
 ```
-Slugs atuais: `agua`, `pipoca`, `sorveteria`, `quiosque_coco` (Ilha da Praia), `mercadinho`,
-`restaurante`, `supermercado`, `academia`, `hotel`, `shopping` (Cidade).
+Catálogo: 234 negócios em 20 mapas (6 na praia, 12 nos demais — ADR 0034); a lista completa está em
+`backend/src/economy/catalog.ts`. `districts` traz os 20 mapas em ordem; um mapa está liberado com
+o anterior completo ou quando o jogador já tem negócio nele.
 
 Não comprado: `owned: false`, `level: 0`, `profitPerCycle` do nível 1, `nextUpgradeCost: null`.
 
@@ -185,7 +186,7 @@ Corpo `{ events: [{ name, props? }] }` (1–20). Nomes permitidos: `tutorial_sta
 ### `GET /prestige` · `POST /prestige` (ADR 0011)
 `GET` → `{ stars, bonusPercent, count, earnedSinceLast, starsToGain, nextBonusPercent, requires,
 totalBusinesses, ownedBusinesses, hiredHelpers, requirementMet, available }` — `requires` =
-`"imperio_completo"`: todos os negócios comprados e todos os ajudantes contratados (rev. 2026-10-15). `POST` (comando, `Idempotency-Key`) vende o império →
+`"imperio_completo"`: negócios e ajudantes dos 8 primeiros mapas, até o Centro Espacial (rev. 2026-10-25, ADR 0034; `totalBusinesses` conta só esses). `POST` (comando, `Idempotency-Key`) vende o império →
 `200 { gained, prestige, state }`; `409 PRESTIGE_NOT_AVAILABLE` sem a cidade completa ou sem
 estrela a ganhar. `PlayerState.player` ganha `prestigeStars` e `prestigeBonusPercent`; o
 `profitPerCycle` dos negócios já vem com o bônus.

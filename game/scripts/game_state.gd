@@ -178,9 +178,14 @@ func refresh(force := false) -> void:
 		_set_online(false)
 
 
+## Janela do sistema aberta pelo jogo (login Google/Apple): ao voltar dela não é "volta ao
+## jogo" — sem o resumo "Bem-vindo de volta", que cobria a tela do vínculo.
+var external_ui := false
+
+
 ## Ao voltar do segundo plano: o servidor paga o AFK do mapa aberto (com resumo).
 func resume() -> void:
-	await enter_district(current_district, true)
+	await enter_district(current_district, not external_ui)
 
 
 ## Sinal periódico de presença: espera as confirmações da fila (nunca corre na frente delas).
@@ -1006,8 +1011,11 @@ var linked_providers: Array = []
 ## Vincula a conta convidada à Apple (iPhone) ou ao Google (Android). Devolve {ok, code, token};
 ## code "IDENTITY_IN_USE" traz o token para oferecer carregar o progresso daquela conta.
 func link_account(provider: String) -> Dictionary:
+	external_ui = true
 	var auth: Dictionary = await (preload("res://scripts/apple_auth.gd") if provider == "apple" \
 			else preload("res://scripts/google_auth.gd")).request_token()
+	# O retorno ao jogo chega logo depois do resultado: espera um pouco antes de liberar o resumo.
+	(Engine.get_main_loop() as SceneTree).create_timer(3.0).timeout.connect(func(): external_ui = false)
 	if auth.token == "":
 		# Fechar a folha não é erro; qualquer outra falha precisa aparecer.
 		var err := str(auth.error).to_lower()
@@ -1091,6 +1099,15 @@ func cycle_progress(b: Dictionary) -> float:
 
 
 ## true se o servidor já liberou o distrito (todos os negócios do anterior comprados).
+## Mapa que o servidor conhece (o jogo novo pode chegar à loja antes do servidor com os mapas
+## novos — ADR 0034; até lá eles nem aparecem).
+func district_known(id: String) -> bool:
+	var list: Array = state.get("districts", [])
+	if list.is_empty():
+		return true
+	return list.any(func(d): return d.id == id)
+
+
 func district_unlocked(id: String) -> bool:
 	for d in state.get("districts", []):
 		if d.id == id:

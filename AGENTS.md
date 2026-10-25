@@ -25,7 +25,8 @@ exclusão de conta, suporte). Dados da empresa via build args; o build recusa ca
 
 1. **Servidor é a autoridade.** Saldo, tempo, produção, missões, compras e ranking são decididos
    na API. O cliente nunca envia saldo, horário ou tempo decorrido.
-2. **Dinheiro virtual em BIGINT** no banco e **string** no JSON. Nunca usar float para saldo.
+2. **Dinheiro virtual em NUMERIC(65,0)** no banco (BigInt no Prisma) e **string** no JSON. Nunca usar
+   float para saldo. Nunca rodar `prisma migrate dev`: migrações escritas à mão (ADR 0033).
 3. **Todo comando econômico** passa por `runIdempotentCommand` (backend/src/lib/idempotency.ts):
    trava a carteira (`SELECT … FOR UPDATE`), exige `Idempotency-Key`, grava ledger.
 4. **Sem segredos no Git.** Use `.env` (ignorado) e `.env.example`. Keystores, certificados e

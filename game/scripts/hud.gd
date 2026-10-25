@@ -820,7 +820,11 @@ func _on_link_pressed(button: Button, provider: String) -> void:
 		show_toast(tr("Progresso salvo na sua conta Apple!") if provider == "apple" else tr("Progresso salvo na sua conta Google!"))
 	elif r.code == "IDENTITY_IN_USE":
 		_offer_load_linked_progress(provider, str(r.token))
-	elif r.code != "CANCELLED":
+	elif r.code == "CANCELLED":
+		# O Android também responde "cancelado" quando o Google recusa o app (ex.: assinatura não
+		# cadastrada) — sem aviso o jogador achava que tinha vinculado.
+		show_toast(tr("Conta não vinculada. Tente de novo e escolha sua conta Google."))
+	else:
 		show_toast(GameState.message_for(str(r.code)))
 
 
@@ -858,7 +862,7 @@ func _add_prestige_section() -> void:
 	var status: String
 	if not p.get("requirementMet", false):
 		var total := int(p.get("totalBusinesses", 0))
-		status = tr("Complete o império para vender: todos os negócios e todos os ajudantes.") \
+		status = tr("Complete os 8 primeiros mapas (até o Centro Espacial) para vender: negócios e ajudantes.") \
 				+ "\n" + tr("Negócios %d/%d · Ajudantes %d/%d") % [
 					int(p.get("ownedBusinesses", 0)), total, int(p.get("hiredHelpers", 0)), total]
 	elif gain < 1:

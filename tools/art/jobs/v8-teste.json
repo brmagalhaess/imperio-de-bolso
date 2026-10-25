@@ -1,0 +1,64 @@
+[
+ {
+  "id": "t8b_piratas_base",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Edit this image into a funny PIRATE ISLAND district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same square diorama tile shape and the same layout of gray roads with crosswalks. Keep EXACTLY the six large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes as in the reference; the two small decorative blocks become: a treasure chest overflowing with gold coins next to a palm tree, and a small pirate flag on a sandy hill with crossed cannons. Replace the outer edges with golden sand beaches, palm trees, wooden docks, barrels, ropes and old cannons. Far behind the tile a big pirate ship with black sails floats on the turquoise sea (blurred, not on the lots). Bright and cheerful. No buildings on the six lots. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/0168290d-df30-4f84-a3e8-6b41a2ecde01.jpg"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "t8b_lua_base",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Edit this image into a MOON BASE in outer space district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same square diorama tile shape and the same layout of gray roads with crosswalks. Keep EXACTLY the six large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes as in the reference; the two small decorative blocks become: a little moon crater with a planted flag-less pole and a moon rover, and a glass dome greenhouse with plants. The tile is gray moon rock with craters at the edges, futuristic lamp posts and small antennas; the roads have glowing blue lane lines. The tile floats in deep outer space instead of the sea, with stars all around. Far behind the tile the blue planet Earth rises over the horizon (blurred, not on the lots). Bright and cheerful. No buildings on the six lots. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/0168290d-df30-4f84-a3e8-6b41a2ecde01.jpg"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "t8b_piratas_ilhota",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Edit this image into the funny PIRATE ISLAND theme. Keep the exact same glossy cartoon mobile city-builder art style, isometric camera angle, the same small separate diorama tile in the middle of the image with EXACTLY THREE EMPTY flat building lots (plain light concrete plazas, nothing on them) in one diagonal row separated by gray roads with crosswalks, and the short bridge leaving the top-right of the tile. The tile edges get golden sand, palm trees, barrels, ropes and a small old cannon; the bridge is made of wood. Only turquoise sea around the tile. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/9319d05f-f0c4-4b24-9d56-6099c84ef066.jpg"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "t8b_taverna_papagaio_lv",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (a row of five upgrade levels of one building) (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines), the same isometric camera angle and the same square light-gray sidewalk base. Draw ONE horizontal row of FIVE separate versions of the SAME business: a funny pirate TAVERN shaped like an old wooden ship hull with a giant green parrot statue on the roof. From left to right they are its upgrade levels 1 to 5: level 1 is a small humble starter version and each next level is clearly bigger, taller, richer and more detailed, level 5 is a spectacular luxurious landmark. Keep the same identity and main colors in all five so it is clearly the same business. All five stand on the same baseline, evenly spaced, with wide empty white space between them, none touching, each fully visible. Plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/41adb379-c2ec-420e-8b0f-d2498f46bfef.jpg"
+   ],
+   "aspect_ratio": "16:9",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "t8b_queijo_lunar_lv",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (a row of five upgrade levels of one building) (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines), the same isometric camera angle and the same square light-gray sidewalk base. Draw ONE horizontal row of FIVE separate versions of the SAME business: a funny MOON CHEESE MINE: a small mining shed digging out giant yellow cheese blocks from a gray moon rock, with a little crane. From left to right they are its upgrade levels 1 to 5: level 1 is a small humble starter version and each next level is clearly bigger, taller, richer and more detailed, level 5 is a spectacular luxurious landmark. Keep the same identity and main colors in all five so it is clearly the same business. All five stand on the same baseline, evenly spaced, with wide empty white space between them, none touching, each fully visible. Plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no sign boards with writing, no UI.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/05f8f314-f78d-4846-95d7-7f064b61e224.jpg"
+   ],
+   "aspect_ratio": "16:9",
+   "resolution": "2k"
+  }
+ }
+]

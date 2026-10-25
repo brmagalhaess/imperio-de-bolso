@@ -1,0 +1,553 @@
+[
+ {
+  "id": "g8_helpers_01",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "pastel",
+   "acai",
+   "pizzaria",
+   "livraria",
+   "pet_shop",
+   "restaurante_flutuante",
+   "escola_vela"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the beach PASTRY KIOSK selling big golden fried pastries in a matching themed uniform holding an item related to it; (2) a cute worker of the beach ACAI BOWL STAND in a matching themed uniform holding an item related to it; (3) a cute worker of the cozy PIZZERIA in a matching themed uniform holding an item related to it; (4) a cute worker of the charming BOOKSTORE in a matching themed uniform holding an item related to it; (5) a cute worker of the cute PET SHOP in a matching themed uniform holding an item related to it; (6) a cute worker of the FLOATING RESTAURANT on a wooden barge in a matching themed uniform holding an item related to it; (7) a cute worker of the SAILING SCHOOL in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_02",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "cruzeiro",
+   "galeria_arte",
+   "hotel_luxo",
+   "arranha_ceu",
+   "eletronicos",
+   "fabrica_avioes",
+   "hidreletrica"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the docked CRUISE SHIP terminal in a matching themed uniform holding an item related to it; (2) a cute worker of the modern ART GALLERY in a matching themed uniform holding an item related to it; (3) a cute worker of the luxurious FIVE STAR HOTEL tower in a matching themed uniform holding an item related to it; (4) a cute worker of the gleaming SKYSCRAPER of blue glass in a matching themed uniform holding an item related to it; (5) a cute worker of the ELECTRONICS FACTORY in a matching themed uniform holding an item related to it; (6) a cute worker of the AIRPLANE FACTORY hangar in a matching themed uniform holding an item related to it; (7) a cute worker of the HYDROELECTRIC POWER PLANT in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_03",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "cafe_montanha",
+   "hotel_gelo",
+   "castelo_neve",
+   "bar_praia",
+   "golfinhos",
+   "ilha_particular",
+   "restaurante_orbital"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the cozy MOUNTAIN COFFEE HOUSE in a matching themed uniform holding an item related to it; (2) a cute worker of the ICE HOTEL made of translucent blue ice blocks in a matching themed uniform holding an item related to it; (3) a cute worker of the fairy tale SNOW CASTLE in a matching themed uniform holding an item related to it; (4) a cute worker of the TROPICAL JUICE BAR made of bamboo in a matching themed uniform holding an item related to it; (5) a cute worker of the DOLPHIN PARK in a matching themed uniform holding an item related to it; (6) a cute worker of the PRIVATE ISLAND villa: luxury white villa in a matching themed uniform holding an item related to it; (7) a cute worker of the ORBITAL RESTAURANT: a flying-saucer shaped restaurant on a tall pillar in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_04",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "hotel_espacial",
+   "estacao_espacial",
+   "tapa_olho",
+   "taverna_papagaio",
+   "mapas_tesouro",
+   "oficina_barcos",
+   "canhoes"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the SPACE HOTEL in a matching themed uniform holding an item related to it; (2) a cute worker of the SPACE STATION replica in a matching themed uniform holding an item related to it; (3) a cute worker of the pirate EYE PATCH SHOP in a matching themed uniform holding an item related to it; (4) a cute worker of the pirate TAVERN shaped like an old wooden ship hull in a matching themed uniform holding an item related to it; (5) a cute worker of the TREASURE MAP SHOP in a matching themed uniform holding an item related to it; (6) a cute worker of the pirate BOAT WORKSHOP in a matching themed uniform holding an item related to it; (7) a cute worker of the CANNON FACTORY in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_05",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "moedas_ouro",
+   "escola_piratas",
+   "farol_pirata",
+   "caverna_tesouro",
+   "galeao",
+   "forte_pirata",
+   "navio_fantasma"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the GOLD COIN MINT in a matching themed uniform holding an item related to it; (2) a cute worker of the PIRATE SCHOOL in a matching themed uniform holding an item related to it; (3) a cute worker of the PIRATE LIGHTHOUSE in a matching themed uniform holding an item related to it; (4) a cute worker of the TREASURE CAVE in a rocky hill in a matching themed uniform holding an item related to it; (5) a cute worker of the big pirate GALLEON ship in a matching themed uniform holding an item related to it; (6) a cute worker of the PIRATE FORT made of stone walls in a matching themed uniform holding an item related to it; (7) a cute worker of the friendly GHOST SHIP glowing green in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_06",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "perolas",
+   "salao_polvo",
+   "corais",
+   "restaurante_submarino",
+   "escola_sereias",
+   "cavalos_marinhos",
+   "hotel_bolhas"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the underwater PEARL STAND made of a giant open clam shell in a matching themed uniform holding an item related to it; (2) a cute worker of the OCTOPUS BEAUTY SALON in a matching themed uniform holding an item related to it; (3) a cute worker of the CORAL GARDEN in a matching themed uniform holding an item related to it; (4) a cute worker of the UNDERWATER RESTAURANT in a glass dome in a matching themed uniform holding an item related to it; (5) a cute worker of the MERMAID SCHOOL in a matching themed uniform holding an item related to it; (6) a cute worker of the SEAHORSE EXPRESS station in a matching themed uniform holding an item related to it; (7) a cute worker of the BUBBLE HOTEL made of big transparent bubbles stacked like rooms in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_07",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "templo_netuno",
+   "fabrica_algas",
+   "submarino",
+   "palacio_cristal",
+   "cidade_perdida",
+   "ovos_dino",
+   "pet_raptor"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the TEMPLE OF NEPTUNE in a matching themed uniform holding an item related to it; (2) a cute worker of the SEAWEED FACTORY in a matching themed uniform holding an item related to it; (3) a cute worker of the yellow TOURIST SUBMARINE docked at a small pier in a matching themed uniform holding an item related to it; (4) a cute worker of the CRYSTAL PALACE made of glowing turquoise crystals and pearl domes in a matching themed uniform holding an item related to it; (5) a cute worker of the LOST CITY of Atlantis: a golden domed city in a matching themed uniform holding an item related to it; (6) a cute worker of the DINOSAUR EGG STAND in a matching themed uniform holding an item related to it; (7) a cute worker of the RAPTOR PET SHOP in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_08",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "samambaia",
+   "escola_ptero",
+   "rodeio_tricera",
+   "fosseis",
+   "spa_lama",
+   "arena_trex",
+   "vulcao"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the FERN SALAD BAR in a matching themed uniform holding an item related to it; (2) a cute worker of the PTERODACTYL FLYING SCHOOL in a matching themed uniform holding an item related to it; (3) a cute worker of the TRICERATOPS RODEO arena in a matching themed uniform holding an item related to it; (4) a cute worker of the FOSSIL PARK in a matching themed uniform holding an item related to it; (5) a cute worker of the MUD SPA in a matching themed uniform holding an item related to it; (6) a cute worker of the T-REX ARENA in a matching themed uniform holding an item related to it; (7) a cute worker of the TOURIST VOLCANO in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_09",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "museu_jurassico",
+   "hotel_arvore",
+   "parque_dinos",
+   "peixe_gelado",
+   "iglu",
+   "escola_patinacao",
+   "gravatas"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the JURASSIC MUSEUM in a matching themed uniform holding an item related to it; (2) a cute worker of the GIANT TREE HOTEL in a matching themed uniform holding an item related to it; (3) a cute worker of the big DINO THEME PARK in a matching themed uniform holding an item related to it; (4) a cute worker of the FROZEN FISH STAND in a matching themed uniform holding an item related to it; (5) a cute worker of the IGLOO SNACK BAR in a matching themed uniform holding an item related to it; (6) a cute worker of the ICE SKATING SCHOOL in a matching themed uniform holding an item related to it; (7) a cute worker of the BOW TIE FACTORY for penguins in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_10",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "tobogan",
+   "aquario_polar",
+   "treno",
+   "teatro_pinguins",
+   "fabrica_sorvete",
+   "estacao_polar",
+   "castelo_gelo"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the ICE SLIDE park in a matching themed uniform holding an item related to it; (2) a cute worker of the POLAR AQUARIUM in a matching themed uniform holding an item related to it; (3) a cute worker of the SLED RACE station in a matching themed uniform holding an item related to it; (4) a cute worker of the PENGUIN THEATER in a matching themed uniform holding an item related to it; (5) a cute worker of the ICE CREAM FACTORY in a matching themed uniform holding an item related to it; (6) a cute worker of the POLAR RESEARCH STATION in a matching themed uniform holding an item related to it; (7) a cute worker of the ICE CASTLE in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_11",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "palacio_pinguim",
+   "algodao_doce",
+   "pirulitos",
+   "confeitaria",
+   "jujubas",
+   "casa_biscoito",
+   "rio_chocolate"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the PENGUIN KING PALACE in a matching themed uniform holding an item related to it; (2) a cute worker of the COTTON CANDY STAND in a matching themed uniform holding an item related to it; (3) a cute worker of the LOLLIPOP SHOP decorated in a matching themed uniform holding an item related to it; (4) a cute worker of the PASTRY SHOP in a matching themed uniform holding an item related to it; (5) a cute worker of the GUMMY CANDY FACTORY in a matching themed uniform holding an item related to it; (6) a cute worker of the GINGERBREAD HOUSE in a matching themed uniform holding an item related to it; (7) a cute worker of the CHOCOLATE RIVER mill in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_12",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "chiclete",
+   "montanha_sorvete",
+   "torre_bolo",
+   "cupcakes",
+   "castelo_marshmallow",
+   "fabrica_doces",
+   "pioes"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the BUBBLE GUM FACTORY in a matching themed uniform holding an item related to it; (2) a cute worker of the ICE CREAM MOUNTAIN in a matching themed uniform holding an item related to it; (3) a cute worker of the tall LAYER CAKE TOWER in a matching themed uniform holding an item related to it; (4) a cute worker of the CUPCAKE PARK in a matching themed uniform holding an item related to it; (5) a cute worker of the MARSHMALLOW CASTLE in a matching themed uniform holding an item related to it; (6) a cute worker of the GIANT CANDY FACTORY in a matching themed uniform holding an item related to it; (7) a cute worker of the SPINNING TOP SHOP in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_13",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "ursinhos",
+   "pipas",
+   "trem_brinquedo",
+   "castelo_blocos",
+   "robos_brinquedo",
+   "bonecos",
+   "carrinhos"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the TEDDY BEAR WORKSHOP in a matching themed uniform holding an item related to it; (2) a cute worker of the KITE FACTORY in a matching themed uniform holding an item related to it; (3) a cute worker of the TOY TRAIN station in a matching themed uniform holding an item related to it; (4) a cute worker of the TOY BLOCK CASTLE built from giant colorful building blocks in a matching themed uniform holding an item related to it; (5) a cute worker of the TOY ROBOT SHOP in a matching themed uniform holding an item related to it; (6) a cute worker of the PUPPET PARK in a matching themed uniform holding an item related to it; (7) a cute worker of the TOY CAR RACE TRACK in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_14",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "baloes",
+   "caixa_surpresa",
+   "roda_gigante",
+   "palacio_brinquedos",
+   "lanchonete_lunar",
+   "queijo_lunar",
+   "estufa_lunar"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the BALLOON FACTORY in a matching themed uniform holding an item related to it; (2) a cute worker of the giant JACK-IN-THE-BOX surprise toy building in a matching themed uniform holding an item related to it; (3) a cute worker of the colorful FERRIS WHEEL attraction in a matching themed uniform holding an item related to it; (4) a cute worker of the TOY PALACE made of giant toys in a matching themed uniform holding an item related to it; (5) a cute worker of the MOON DINER in a matching themed uniform holding an item related to it; (6) a cute worker of the MOON CHEESE MINE: a small mining shed digging out giant yellow cheese blocks from a gray moon rock in a matching themed uniform holding an item related to it; (7) a cute worker of the MOON GREENHOUSE glass dome full of green plants in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_15",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "pista_pulo",
+   "hotel_cratera",
+   "capacetes",
+   "telescopio_lunar",
+   "helio",
+   "rovers",
+   "mercado_lunar"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the LOW GRAVITY JUMP park in a matching themed uniform holding an item related to it; (2) a cute worker of the CRATER HOTEL built inside a small moon crater in a matching themed uniform holding an item related to it; (3) a cute worker of the SPACE HELMET FACTORY in a matching themed uniform holding an item related to it; (4) a cute worker of the MOON TELESCOPE observatory in a matching themed uniform holding an item related to it; (5) a cute worker of the HELIUM-3 PLANT in a matching themed uniform holding an item related to it; (6) a cute worker of the ROVER BASE garage in a matching themed uniform holding an item related to it; (7) a cute worker of the MOON MARKET in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_16",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "domo_lunar",
+   "porto_lunar",
+   "batatas_marte",
+   "lava_poeira",
+   "mina_ferro",
+   "hotel_marte",
+   "corrida_rovers"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the MOON RESIDENTIAL DOME in a matching themed uniform holding an item related to it; (2) a cute worker of the MOON SPACEPORT in a matching themed uniform holding an item related to it; (3) a cute worker of the MARTIAN POTATO FARM in a matching themed uniform holding an item related to it; (4) a cute worker of the DUST CAR WASH for rovers in a matching themed uniform holding an item related to it; (5) a cute worker of the RED IRON MINE in a matching themed uniform holding an item related to it; (6) a cute worker of the MARTIAN HOTEL in a matching themed uniform holding an item related to it; (7) a cute worker of the ROVER RACE track in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_17",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "oxigenio",
+   "shopping_marte",
+   "universidade_marte",
+   "gelo_marte",
+   "monte_olimpo",
+   "torre_marte",
+   "cidade_domo"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the OXYGEN FACTORY in a matching themed uniform holding an item related to it; (2) a cute worker of the MARS DOME MALL in a matching themed uniform holding an item related to it; (3) a cute worker of the MARS UNIVERSITY in a matching themed uniform holding an item related to it; (4) a cute worker of the POLAR ICE STATION mining white ice blocks on red ground in a matching themed uniform holding an item related to it; (5) a cute worker of the OLYMPUS MONS RESORT on a small red volcano in a matching themed uniform holding an item related to it; (6) a cute worker of the tall COMMUNICATION TOWER in a matching themed uniform holding an item related to it; (7) a cute worker of the MARS DOME CITY in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_18",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "novelos",
+   "cafe_gatos",
+   "arranhadores",
+   "spa_soneca",
+   "torre_caixas",
+   "peixaria_real",
+   "laser"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the YARN BALL STAND in a matching themed uniform holding an item related to it; (2) a cute worker of the CAT CAFE in a matching themed uniform holding an item related to it; (3) a cute worker of the SCRATCHING POST FACTORY in a matching themed uniform holding an item related to it; (4) a cute worker of the NAP SPA for cats in a matching themed uniform holding an item related to it; (5) a cute worker of the TOWER OF CARDBOARD BOXES in a matching themed uniform holding an item related to it; (6) a cute worker of the ROYAL FISH MARKET in a matching themed uniform holding an item related to it; (7) a cute worker of the LASER POINTER GYM in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_19",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "hotel_almofada",
+   "teatro_miau",
+   "parque_ratinho",
+   "foguete_atum",
+   "palacio_gato",
+   "gelo_aneis",
+   "patinacao_orbital"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the PILLOW HOTEL made of giant stacked soft pillows in a matching themed uniform holding an item related to it; (2) a cute worker of the MEOW THEATER in a matching themed uniform holding an item related to it; (3) a cute worker of the TOY MOUSE PARK in a matching themed uniform holding an item related to it; (4) a cute worker of the TUNA CAN ROCKET in a matching themed uniform holding an item related to it; (5) a cute worker of the CAT KING PALACE in a matching themed uniform holding an item related to it; (6) a cute worker of the RING ICE COLLECTOR in a matching themed uniform holding an item related to it; (7) a cute worker of the ORBITAL ICE SKATING ring floating above its base in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_20",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "hotel_aneis",
+   "cristais",
+   "combustivel",
+   "gravidade_zero",
+   "observatorio_aneis",
+   "fabrica_naves",
+   "meteoros"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the RING HOTEL in a matching themed uniform holding an item related to it; (2) a cute worker of the CRYSTAL MINE in a matching themed uniform holding an item related to it; (3) a cute worker of the STAR FUEL STATION for spaceships in a matching themed uniform holding an item related to it; (4) a cute worker of the ZERO GRAVITY RESTAURANT in a matching themed uniform holding an item related to it; (5) a cute worker of the RING OBSERVATORY in a matching themed uniform holding an item related to it; (6) a cute worker of the SPACESHIP FACTORY in a matching themed uniform holding an item related to it; (7) a cute worker of the METEOR PARK in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_21",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "estaleiro_espacial",
+   "cidade_flutuante",
+   "coroa_saturno",
+   "barraca_gelatina",
+   "pula_pula",
+   "geleca",
+   "hotel_balanca"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the SPACE SHIPYARD in a matching themed uniform holding an item related to it; (2) a cute worker of the FLOATING CITY of towers on a hovering platform in a matching themed uniform holding an item related to it; (3) a cute worker of the CROWN OF SATURN in a matching themed uniform holding an item related to it; (4) a cute worker of the JELLY STAND in a matching themed uniform holding an item related to it; (5) a cute worker of the GIANT BOUNCY CASTLE made of jelly in a matching themed uniform holding an item related to it; (6) a cute worker of the SLIME FACTORY in a matching themed uniform holding an item related to it; (7) a cute worker of the WOBBLY JELLY HOTEL in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_22",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "piscina_gelatina",
+   "escorregador",
+   "tremelique",
+   "bolhas",
+   "parque_elastico",
+   "torre_molenga",
+   "vulcao_geleia"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the JELLY POOL in a matching themed uniform holding an item related to it; (2) a cute worker of the RAINBOW JELLY SLIDE attraction in a matching themed uniform holding an item related to it; (3) a cute worker of the WOBBLE MOUNTAIN made of stacked jelly domes in a matching themed uniform holding an item related to it; (4) a cute worker of the BUBBLE FACTORY blowing big soap bubbles in a matching themed uniform holding an item related to it; (5) a cute worker of the ELASTIC PARK in a matching themed uniform holding an item related to it; (6) a cute worker of the SQUISHY TOWER of soft colorful jelly blocks in a matching themed uniform holding an item related to it; (7) a cute worker of the JAM VOLCANO erupting strawberry jam in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_23",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "castelo_gelatina",
+   "teletransporte",
+   "mercado_galactico",
+   "fabrica_estrelas",
+   "hotel_supernova",
+   "universidade_cosmica",
+   "buraco_negro"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 7 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the JELLY CASTLE in a matching themed uniform holding an item related to it; (2) a cute worker of the TELEPORT CENTER in a matching themed uniform holding an item related to it; (3) a cute worker of the INTERGALACTIC MARKET in a matching themed uniform holding an item related to it; (4) a cute worker of the STAR FACTORY producing glowing little stars in a matching themed uniform holding an item related to it; (5) a cute worker of the SUPERNOVA HOTEL in a matching themed uniform holding an item related to it; (6) a cute worker of the COSMIC UNIVERSITY in a matching themed uniform holding an item related to it; (7) a cute worker of the BLACK HOLE STATION in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g8_helpers_24",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "slugs": [
+   "banco_galactico",
+   "naves_mae",
+   "arena_planetas",
+   "usina_nebulosa",
+   "esfera_dyson",
+   "palacio_imperador"
+  ],
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 6 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cute worker of the GALACTIC BANK in a matching themed uniform holding an item related to it; (2) a cute worker of the MOTHERSHIP SHIPYARD in a matching themed uniform holding an item related to it; (3) a cute worker of the PLANET ARENA stadium in a matching themed uniform holding an item related to it; (4) a cute worker of the NEBULA POWER PLANT drawing colorful cosmic gas in a matching themed uniform holding an item related to it; (5) a cute worker of the DYSON SPHERE in a matching themed uniform holding an item related to it; (6) a cute worker of the GALACTIC EMPEROR PALACE in a matching themed uniform holding an item related to it. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/e93ced8b-ea6c-4bdc-8cbb-69d1119b0096.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ }
+]
