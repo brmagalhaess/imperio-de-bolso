@@ -8,7 +8,7 @@ export const SITE = {
   name: "Império de Bolso",
   url: "https://imperio.crowntech.com.br",
   tagline:
-    "Comece com um carrinho de água na praia, contrate ajudantes e construa um império em 8 mapas — da praia ao espaço.",
+    "Comece com um carrinho de água na praia, contrate ajudantes e construa um império em 20 mapas — da praia ao Império Galáctico, passando por piratas, dinossauros, doces, a Lua e Marte.",
   description:
     "Jogo de construir negócios para celular: comece com um carrinho de água na praia, " +
     "contrate ajudantes e transforme a ilha em uma cidade inteira. Grátis para Android e iPhone.",
@@ -33,7 +33,9 @@ export function pendingFields(): string[] {
 }
 
 if (process.env.SITE_STRICT === "1" && pendingFields().length > 0) {
-  throw new Error(`Dados da empresa pendentes no site: ${pendingFields().join(", ")}`);
+  throw new Error(
+    `Dados da empresa pendentes no site: ${pendingFields().join(", ")}`,
+  );
 }
 
 export const STORES = {
@@ -41,5 +43,7 @@ export const STORES = {
   googlePlay:
     process.env.SITE_GOOGLE_PLAY_URL ||
     "https://play.google.com/store/apps/details?id=br.com.imperiodebolso.game",
-  appStore: process.env.SITE_APP_STORE_URL || "https://apps.apple.com/br/app/id6822892071",
+  appStore:
+    process.env.SITE_APP_STORE_URL ||
+    "https://apps.apple.com/br/app/id6822892071",
 };
