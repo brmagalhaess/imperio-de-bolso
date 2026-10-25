@@ -121,7 +121,10 @@ describe("compartilhar a posição", () => {
 
     await ctx.db.player.update({ where: { id: g.playerId }, data: { staff: true } });
     const staff = await ctx.app.inject({ method: "GET", url: `/api/v1/share/rank/${g.playerId}` });
-    expect(staff.body).not.toContain("lugar");
+    // Conta da equipe também compartilha a posição que teria (e segue fora das listas).
+    expect(staff.body).toContain(`${name} está em 1º lugar no ranking da semana`);
+    const lb = (await get(ctx.app, g, "/leaderboard")).json();
+    expect(lb.me).toBeNull();
     expect(
       (await ctx.app.inject({ method: "GET", url: "/api/v1/share/rank/abc" })).statusCode,
     ).toBe(400);

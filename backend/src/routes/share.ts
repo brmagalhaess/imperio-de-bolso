@@ -38,14 +38,15 @@ export async function shareRoutes(app: FastifyInstance, deps: ShareDeps): Promis
       select: { displayName: true, staff: true },
     });
     let title = "Império de Bolso — monte seu império";
-    if (player && !player.staff) {
+    // Conta da equipe também compartilha: a posição que teria (ela segue fora das listas).
+    if (player) {
       let rank: number | null = null;
       let where = "no ranking da semana";
       if (t === "estrelas") {
-        rank = (await getStarsRanking(deps.db, playerId, now)).me?.rank ?? null;
+        rank = (await getStarsRanking(deps.db, playerId, now, true)).me?.rank ?? null;
         where = "no ranking de estrelas";
       } else {
-        const lb = await getLeaderboard(deps.db, playerId, now);
+        const lb = await getLeaderboard(deps.db, playerId, now, true);
         if (t === "liga") {
           rank = lb.league.me?.rank ?? null;
           where = `na Liga ${lb.league.name}`;

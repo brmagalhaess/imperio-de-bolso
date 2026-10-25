@@ -34,7 +34,12 @@ body {
   margin: 0;
   background: var(--cream);
   color: var(--ink);
-  font: 17px/1.6 "Fredoka", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font:
+    17px/1.6 "Fredoka",
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
 }
 
 a {
@@ -103,7 +108,12 @@ img {
 
 /* Herói */
 .hero {
-  background: radial-gradient(circle at 70% 20%, #3fd6c6 0%, var(--sea) 55%, var(--sea-dark) 100%);
+  background: radial-gradient(
+    circle at 70% 20%,
+    #3fd6c6 0%,
+    var(--sea) 55%,
+    var(--sea-dark) 100%
+  );
   color: #fff;
   overflow: hidden;
 }
@@ -396,8 +406,16 @@ footer.bottom nav {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(600px 300px at 85% 10%, rgba(255, 214, 102, 0.35), transparent 70%),
-    radial-gradient(500px 400px at 10% 90%, rgba(43, 196, 182, 0.45), transparent 70%);
+    radial-gradient(
+      600px 300px at 85% 10%,
+      rgba(255, 214, 102, 0.35),
+      transparent 70%
+    ),
+    radial-gradient(
+      500px 400px at 10% 90%,
+      rgba(43, 196, 182, 0.45),
+      transparent 70%
+    );
   pointer-events: none;
 }
 
@@ -450,13 +468,18 @@ footer.bottom nav {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 22px 12px 18px;
-  border-radius: 16px;
-  background: #111;
+  min-width: 190px;
+  padding: 10px 22px 10px 16px;
+  border-radius: 12px;
+  border: 1.5px solid #a6a6a6;
+  background: #000;
   color: #fff;
+  font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
   text-decoration: none;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .btn-store:hover {
@@ -471,12 +494,14 @@ footer.bottom nav {
 }
 
 .btn-store small {
-  font-size: 12px;
-  opacity: 0.8;
+  font-size: 11px;
+  letter-spacing: 0.02em;
 }
 
 .btn-store strong {
-  font-size: 21px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .btn-store.light {

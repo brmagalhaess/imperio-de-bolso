@@ -1042,9 +1042,14 @@ func open_ranking_menu(tab := -1) -> void:
 		_modal.add_section(tr("Sua posição"))
 		_modal.add_rank_row(int(me.rank), me.displayName, ("⭐ " + str(me.score)) if shown_tab == 2 else me.score, true,
 				Callable(), GameState.vip_until() != null)
-	if me != null and not data.get("staff", false) and str(me.get("playerId", "")) != "":
+	# A conta da equipe fica fora das listas, mas compartilha a posição que teria (a página do
+	# servidor calcula).
+	var share_id := str(me.get("playerId", "")) if me != null else ""
+	if share_id == "" and data.get("staff", false):
+		share_id = str(GameState.state.get("player", {}).get("id", ""))
+	if share_id != "":
 		var tab_key: String = ["liga", "semana", "estrelas"][shown_tab]
-		var player_id := str(me.playerId)
+		var player_id := share_id
 		_modal.add_action(tr("Compartilhar minha posição"), func(): share_rank(player_id, tab_key),
 				Color("1877f2"), Color("0d5bbf"))
 	_modal.refit()

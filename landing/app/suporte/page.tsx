@@ -30,7 +30,7 @@ const FAQ = [
     a: "Assinaturas são canceladas na loja: Google Play → Pagamentos e assinaturas → Assinaturas, ou iPhone → Ajustes → seu nome → Assinaturas.",
   },
   {
-    q: "Mostra \"Sem conexão com o servidor\".",
+    q: 'Mostra "Sem conexão com o servidor".',
     a: "O jogo precisa de internet. Confira sua conexão e toque em Tentar novamente. Seu progresso fica salvo no servidor.",
   },
 ];
@@ -40,7 +40,8 @@ export default function Suporte() {
     <Legal title="Suporte">
       <p>
         Precisa de ajuda? Escreva para <Company field="email" /> e informe o{" "}
-        <strong>Código do jogador</strong> (Perfil do jogo). Respondemos em até 2 dias úteis.
+        <strong>Código do jogador</strong> (Perfil do jogo). Respondemos em até
+        2 dias úteis.
       </p>
       <h2>Perguntas frequentes</h2>
       {FAQ.map((f) => (

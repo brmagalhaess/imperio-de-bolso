@@ -83,30 +83,66 @@ const FAQ = [
   },
 ];
 
+/** Selos no padrão das lojas: fundo preto, logo oficial e "Baixar na / Disponível no". */
 function AppStoreButton() {
   if (!STORES.appStore) return null;
   return (
-    <a className="btn-store" href={STORES.appStore} rel="noopener">
-      <svg viewBox="0 0 24 24" aria-hidden width="26" height="26">
+    <a
+      className="btn-store"
+      href={STORES.appStore}
+      rel="noopener"
+      aria-label="Baixar na App Store"
+    >
+      <svg viewBox="0 0 384 512" aria-hidden width="28" height="34">
         <path
           fill="currentColor"
-          d="M12 3a1 1 0 0 1 1 1v9.59l3.3-3.3a1 1 0 1 1 1.4 1.42l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.42l3.3 3.3V4a1 1 0 0 1 1-1Zm-7 15a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1Z"
+          d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"
         />
       </svg>
       <span>
-        <small>Baixar grátis na</small>
+        <small>Baixar na</small>
         <strong>App Store</strong>
       </span>
     </a>
   );
 }
 
+function PlayLogo() {
+  // Triângulo colorido do Google Play.
+  return (
+    <svg viewBox="0 0 48 48" aria-hidden width="30" height="30">
+      <path
+        fill="#00d7fe"
+        d="M7.6 4.3c-.5.5-.8 1.3-.8 2.3v34.8c0 1 .3 1.8.8 2.3l.1.1L27.2 24.3v-.5L7.7 4.2z"
+      />
+      <path
+        fill="#ffce00"
+        d="M33.7 30.8l-6.5-6.5v-.5l6.5-6.5.1.1 7.7 4.4c2.2 1.3 2.2 3.3 0 4.6l-7.7 4.4z"
+      />
+      <path
+        fill="#ff3a44"
+        d="M33.8 30.7L27.2 24 7.6 43.7c.7.8 1.9.9 3.3.1l22.9-13.1"
+      />
+      <path
+        fill="#48ff48"
+        d="M33.8 17.3L10.9 4.3c-1.4-.8-2.6-.7-3.3.1L27.2 24z"
+      />
+    </svg>
+  );
+}
+
 function GooglePlayButton() {
   if (STORES.googlePlay) {
     return (
-      <a className="btn-store light" href={STORES.googlePlay} rel="noopener">
+      <a
+        className="btn-store"
+        href={STORES.googlePlay}
+        rel="noopener"
+        aria-label="Disponível no Google Play"
+      >
+        <PlayLogo />
         <span>
-          <small>Disponível no</small>
+          <small>DISPONÍVEL NO</small>
           <strong>Google Play</strong>
         </span>
       </a>
@@ -114,6 +150,7 @@ function GooglePlayButton() {
   }
   return (
     <span className="btn-store soon" aria-label="Google Play — em breve">
+      <PlayLogo />
       <span>
         <small>Em breve no</small>
         <strong>Google Play</strong>
@@ -153,9 +190,27 @@ export default function Home() {
                 height={1174}
               />
             </div>
-            <img className="float f1" src="/img/ui/status_double.webp" alt="" width={96} height={96} />
-            <img className="float f2" src="/img/ui/offer_natal.webp" alt="" width={96} height={96} />
-            <img className="float f3" src="/img/ui/status_turbo.webp" alt="" width={84} height={84} />
+            <img
+              className="float f1"
+              src="/img/ui/status_double.webp"
+              alt=""
+              width={96}
+              height={96}
+            />
+            <img
+              className="float f2"
+              src="/img/ui/offer_natal.webp"
+              alt=""
+              width={96}
+              height={96}
+            />
+            <img
+              className="float f3"
+              src="/img/ui/status_turbo.webp"
+              alt=""
+              width={84}
+              height={84}
+            />
           </div>
         </div>
       </section>
@@ -163,7 +218,10 @@ export default function Home() {
       <section className="block">
         <div className="wrap">
           <h2>Um império que cabe no bolso</h2>
-          <p className="sub">Jogue poucos minutos por dia, no seu ritmo — o império cresce mesmo quando você sai.</p>
+          <p className="sub">
+            Jogue poucos minutos por dia, no seu ritmo — o império cresce mesmo
+            quando você sai.
+          </p>
           <div className="features">
             {FEATURES.map((f) => (
               <article className="feature" key={f.title}>
@@ -179,12 +237,20 @@ export default function Home() {
       <section className="block shots-block" aria-label="Telas do jogo">
         <div className="wrap">
           <h2>Veja o jogo</h2>
-          <p className="sub">Telas reais, direto do iPhone. Deslize para ver mais.</p>
+          <p className="sub">
+            Telas reais, direto do iPhone. Deslize para ver mais.
+          </p>
         </div>
         <div className="shots">
           {SHOTS.map(([file, alt]) => (
             <figure key={file}>
-              <img src={`/img/telas/${file}.webp`} alt={alt} width={540} height={1174} loading="lazy" />
+              <img
+                src={`/img/telas/${file}.webp`}
+                alt={alt}
+                width={540}
+                height={1174}
+                loading="lazy"
+              />
             </figure>
           ))}
         </div>
@@ -197,13 +263,13 @@ export default function Home() {
           <ol className="steps">
             <li>
               <span>1</span>
-              <strong>Abra o carrinho de água</strong> com as moedas iniciais e toque na moeda a
-              cada venda.
+              <strong>Abra o carrinho de água</strong> com as moedas iniciais e
+              toque na moeda a cada venda.
             </li>
             <li>
               <span>2</span>
-              <strong>Melhore e contrate ajudantes</strong> para vender sozinho e abrir novos
-              negócios.
+              <strong>Melhore e contrate ajudantes</strong> para vender sozinho
+              e abrir novos negócios.
             </li>
             <li>
               <span>3</span>
@@ -237,6 +303,7 @@ export default function Home() {
           </div>
           <div className="stores">
             <AppStoreButton />
+            <GooglePlayButton />
           </div>
         </div>
       </section>

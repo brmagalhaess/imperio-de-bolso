@@ -6,7 +6,10 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
-  title: { default: `${SITE.name} — jogo de construir negócios`, template: `%s · ${SITE.name}` },
+  title: {
+    default: `${SITE.name} — jogo de construir negócios`,
+    template: `%s · ${SITE.name}`,
+  },
   description: SITE.description,
   icons: { icon: "/favicon.ico", apple: "/icon.png" },
   openGraph: {
@@ -16,14 +19,24 @@ export const metadata: Metadata = {
     siteName: SITE.name,
     locale: "pt_BR",
     type: "website",
-    images: [{ url: "/img/icone.png", width: 512, height: 512, alt: SITE.name }],
+    images: [
+      { url: "/img/icone.png", width: 512, height: 512, alt: SITE.name },
+    ],
   },
   robots: { index: true, follow: true },
 };
 
-export const viewport: Viewport = { themeColor: "#0c8a85", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = {
+  themeColor: "#0c8a85",
+  width: "device-width",
+  initialScale: 1,
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="pt-BR">
       <body>

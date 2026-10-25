@@ -21,7 +21,14 @@ interface Row {
   rank: bigint;
 }
 
-export async function getLeaderboard(db: Db, playerId: string, now: Date) {
+/**
+ * Conta da equipe fica fora do ranking (ADR 0027), mas pode compartilhar a posição que teria:
+ * com `asPlayer`, a consulta inclui este jogador mesmo sendo da equipe (só a página do post usa).
+ */
+const NO_PLAYER = "00000000-0000-0000-0000-000000000000";
+
+export async function getLeaderboard(db: Db, playerId: string, now: Date, asPlayer = false) {
+  const show = asPlayer ? playerId : NO_PLAYER;
   const { start, end } = weekBounds(now);
   const rows = await db.$queryRaw<Row[]>`
     WITH resets AS (
@@ -39,7 +46,7 @@ export async function getLeaderboard(db: Db, playerId: string, now: Date) {
       SELECT s.player_id AS "playerId", p.display_name AS "displayName", s.score,
              RANK() OVER (ORDER BY s.score DESC) AS rank
       FROM scores s JOIN players p ON p.id = s.player_id
-      WHERE NOT p.is_staff
+      WHERE (NOT p.is_staff OR p.id = ${show}::uuid)
     )
     SELECT * FROM ranked
     WHERE rank <= ${LEADERBOARD_SIZE} OR "playerId" = ${playerId}::uuid
@@ -56,7 +63,7 @@ export async function getLeaderboard(db: Db, playerId: string, now: Date) {
     week: { start: start.toISOString(), end: end.toISOString() },
     entries: rows.filter((r) => Number(r.rank) <= LEADERBOARD_SIZE).map(view),
     me: me ? view(me) : null,
-    league: await getLeague(db, playerId, now),
+    league: await getLeague(db, playerId, now, asPlayer),
     prizes: podiumPrizes((await leagueOf(db, playerId, now)).league, now),
     vip: await vipIds(
       db,
@@ -114,6 +121,7 @@ async function leagueScores(
   week: Date,
   league: number,
   bracket: number,
+  show: string = NO_PLAYER,
 ): Promise<ScoreRow[]> {
   const { start, end } = weekBounds(week);
   return db.$queryRaw<ScoreRow[]>`
@@ -132,7 +140,7 @@ async function leagueScores(
       AND l.reason = ANY(${PRODUCTION_REASONS})
       AND l.created_at >= ${start} AND (r.at IS NULL OR l.created_at > r.at) AND l.created_at < ${end}
     WHERE lw.week = ${weekId(week)} AND lw.league = ${league} AND lw.bracket = ${bracket}
-      AND NOT p.is_staff
+      AND (NOT p.is_staff OR p.id = ${show}::uuid)
     GROUP BY lw.player_id, p.display_name
     ORDER BY score DESC, p.display_name`;
 }
@@ -188,9 +196,9 @@ export async function leagueOf(
   return { league: row.league, bracket: row.bracket };
 }
 
-export async function getLeague(db: Db, playerId: string, now: Date) {
+export async function getLeague(db: Db, playerId: string, now: Date, asPlayer = false) {
   const { league: tier, bracket } = await leagueOf(db, playerId, now);
-  const standings = await leagueScores(db, now, tier, bracket);
+  const standings = await leagueScores(db, now, tier, bracket, asPlayer ? playerId : NO_PLAYER);
   const view = (r: ScoreRow, i: number) => ({
     rank: i + 1,
     playerId: r.playerId,
@@ -215,14 +223,15 @@ export async function getLeague(db: Db, playerId: string, now: Date) {
 
 // --- Ranking de estrelas (prestígio, de todos os tempos) ----------------------
 
-export async function getStarsRanking(db: Db, playerId: string, now: Date) {
+export async function getStarsRanking(db: Db, playerId: string, now: Date, asPlayer = false) {
+  const show = asPlayer ? playerId : NO_PLAYER;
   const rows = await db.$queryRaw<
     { playerId: string; displayName: string; stars: number; rank: bigint }[]
   >`
     WITH ranked AS (
       SELECT id AS "playerId", display_name AS "displayName", prestige_stars AS stars,
              RANK() OVER (ORDER BY prestige_stars DESC) AS rank
-      FROM players WHERE prestige_stars > 0 AND NOT is_staff
+      FROM players WHERE prestige_stars > 0 AND (NOT is_staff OR id = ${show}::uuid)
     )
     SELECT * FROM ranked
     WHERE rank <= ${LEADERBOARD_SIZE} OR "playerId" = ${playerId}::uuid
