@@ -267,8 +267,8 @@ func _status(id: String, unlocked: bool, is_current: bool) -> String:
 	if is_current:
 		return tr("Você está aqui · ") + text
 	var pending := GameState.pending_in(id)
-	if pending > 0:
-		text += " · " + tr("ajudantes +%s") % Fmt.coins(str(pending))
+	if pending != "0":
+		text += " · " + tr("ajudantes +%s") % Fmt.coins(pending)
 	return text
 
 

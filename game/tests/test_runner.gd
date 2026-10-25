@@ -369,6 +369,15 @@ func _i18n_tests() -> bool:
 			"idiomas: números no padrão inglês")
 	var mission := {"title": "Fature 1.000 moedas", "titleTemplate": "Fature {n} moedas", "target": "1000"}
 	check(Hud.mission_title(mission) == "Earn 1,000 coins", "idiomas: missão traduzida com o alvo formatado")
+	# Dinheiro sem teto (ADR 0033): contas exatas acima de 9,2×10^18.
+	var Big := preload("res://scripts/big.gd")
+	check(Big.add("9223372036854775807", "1") == "9223372036854775808", "big: soma passa do int64")
+	check(Big.sub("1000000000000000000000000", "1") == "999999999999999999999999", "big: subtração com empréstimo")
+	check(Big.sub("5", "8") == "-3" and Big.add("-3", "3") == "0", "big: negativos")
+	check(Big.mul_int("123456789012345678901234567890", 1000) == "123456789012345678901234567890000", "big: multiplica por inteiro")
+	check(Big.mul_int("7", 3000000000) == "21000000000", "big: multiplicador acima de 10^9")
+	check(Big.lt("99999999999999999999", "100000000000000000000") and Big.lte("10", "10") and not Big.lt("-1", "-2"), "big: compara")
+	check(Fmt.coins("1234567890123456789012345").ends_with("ad") and Fmt.coins("9223372036854775808").ends_with("ab"), "big: formata acima de 10^18 com sufixo")
 	check(Hud.version_less("1.0.5", "1.0.6") and Hud.version_less("1.0.9", "1.0.10")
 			and not Hud.version_less("1.0.6", "1.0.6") and not Hud.version_less("1.1", "1.0.9"),
 			"atualização: compara versões por partes")

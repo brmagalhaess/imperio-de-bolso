@@ -31,8 +31,8 @@ const PRESENCE_INTERVAL := 15.0
 const RECONNECT_INTERVAL := 5.0
 ## Abaixo disso não mostra o resumo offline (foi só uma pausa curta).
 const OFFLINE_SUMMARY_MIN_SECONDS := 60
-## Teto do saldo no servidor (services/wallet.ts MAX_COINS).
-const MAX_COINS := 9_000_000_000_000_000_000
+## Dinheiro sem teto (ADR 0033): contas de moedas em texto, exatas (scripts/big.gd).
+const Big := preload("res://scripts/big.gd")
 
 const AppleAuth := preload("res://scripts/apple_auth.gd")
 
@@ -220,11 +220,11 @@ func enter_district(district: String, show_summary: bool) -> void:
 
 
 ## AFK acumulado (ainda não pago) dos ajudantes de um mapa.
-func pending_in(district: String) -> int:
-	var total := 0
+func pending_in(district: String) -> String:
+	var total := "0"
 	for b in businesses():
 		if b.get("district", "") == district and b.get("automatic", false):
-			total += str(b.get("pendingAmount", "0")).to_int()
+			total = Big.add(total, b.get("pendingAmount", "0"))
 	return total
 
 
@@ -288,7 +288,7 @@ func claim_achievement(achievement_id: String) -> bool:
 
 func _add_coins(amount: Variant) -> void:
 	var wallet: Dictionary = state.get("wallet", {})
-	wallet["coins"] = str(str(wallet.get("coins", "0")).to_int() + str(amount).to_int())
+	wallet["coins"] = Big.add(wallet.get("coins", "0"), amount)
 
 
 func _add_gems(amount: Variant) -> void:
@@ -380,7 +380,7 @@ func buy_with_gems(item_id: String) -> Dictionary:
 		if item.is_empty() or cost <= 0 or gems().to_int() < cost:
 			return false
 		var estimate := boost_estimate(int(item.get("hours", 0)) * 3600)
-		if item.get("kind", "") == "boost" and estimate.to_int() <= 0:
+		if item.get("kind", "") == "boost" and not Big.lt("0", estimate):
 			return false
 		_add_gems(-cost)
 		if item.get("kind", "") == "boost":
@@ -808,7 +808,7 @@ func _confirm(call: Callable) -> void:
 func _spend(amount: Variant) -> bool:
 	if amount == null or not can_afford(amount):
 		return false
-	state.wallet["coins"] = str(coins().to_int() - str(amount).to_int())
+	state.wallet["coins"] = Big.sub(coins(), amount)
 	return true
 
 
@@ -896,7 +896,7 @@ func collect_fast(slug: String) -> void:
 	# Novo ciclo começa agora (como o servidor faz ao coletar).
 	b["secondsRemaining"] = float(b.cycleSeconds) + (Time.get_ticks_msec() - _received_at_ms) / 1000.0
 	var wallet: Dictionary = state.get("wallet", {})
-	wallet["coins"] = str(coins().to_int() + str(b.profitPerCycle).to_int())
+	wallet["coins"] = Big.add(coins(), b.profitPerCycle)
 	collected.emit([{"slug": slug, "amount": str(b.profitPerCycle)}])
 	state_changed.emit()
 	await _confirm(Api.collect.bind(slug))
@@ -908,7 +908,7 @@ func collect_fast(slug: String) -> void:
 func coins() -> String:
 	var wallet := str(state.get("wallet", {}).get("coins", "0"))
 	var live := live_coins()
-	return wallet if live == 0 else str(wallet.to_int() + live)
+	return wallet if live == "0" else Big.add(wallet, live)
 
 
 ## Auto-coleta ao vivo: negócio com ajudante produzindo sozinho no mapa aberto.
@@ -930,12 +930,12 @@ func _live_cycles(b: Dictionary) -> int:
 
 
 ## Moedas ainda não pagas pelo servidor dos negócios ao vivo (pendentes + ciclos locais).
-func live_coins() -> int:
-	var total := 0
+func live_coins() -> String:
+	var total := "0"
 	for b in businesses():
 		if is_live(b):
-			total += str(b.get("pendingAmount", "0")).to_int() \
-					+ str(b.profitPerCycle).to_int() * _live_cycles(b)
+			total = Big.add(Big.add(total, b.get("pendingAmount", "0")),
+					Big.mul_int(b.profitPerCycle, _live_cycles(b)))
 	return total
 
 
@@ -946,9 +946,9 @@ func _bank_live() -> void:
 		if not is_live(b):
 			continue
 		var cycles := _live_cycles(b)
-		var amount := str(b.get("pendingAmount", "0")).to_int() + str(b.profitPerCycle).to_int() * cycles
-		if amount != 0:
-			wallet["coins"] = str(str(wallet.get("coins", "0")).to_int() + amount)
+		var amount := Big.add(b.get("pendingAmount", "0"), Big.mul_int(b.profitPerCycle, cycles))
+		if amount != "0":
+			wallet["coins"] = Big.add(wallet.get("coins", "0"), amount)
 		b["pendingAmount"] = "0"
 		b["secondsRemaining"] = float(b.secondsRemaining) + cycles * float(b.cycleSeconds)
 		_live_shown[b.slug] = 0
@@ -965,7 +965,7 @@ func _process(_delta: float) -> void:
 		var cycles := _live_cycles(b)
 		var shown := int(_live_shown.get(b.slug, 0))
 		if cycles > shown:
-			items.append({"slug": b.slug, "amount": str(str(b.profitPerCycle).to_int() * (cycles - shown))})
+			items.append({"slug": b.slug, "amount": Big.mul_int(b.profitPerCycle, cycles - shown)})
 			_live_shown[b.slug] = cycles
 	if not items.is_empty():
 		collected.emit(items)
@@ -1046,16 +1046,13 @@ func businesses() -> Array:
 ## Moedas da coleta antecipada de `seconds` no mapa atual, calculadas do estado (mesma conta do
 ## servidor: ciclos que cabem no tempo × lucro). O catálogo da Loja ficava velho e mostrava 0.
 func boost_estimate(seconds: int) -> String:
-	var total := 0
+	var total := "0"
 	for b in businesses():
 		if not b.get("owned", false) or b.get("district", "") != current_district:
 			continue
 		var cycles := int(floor(seconds / max(0.001, float(b.cycleSeconds))))
-		var profit := str(b.profitPerCycle).to_int()
-		if cycles > 0 and profit > (MAX_COINS - total) / cycles:
-			return str(MAX_COINS)
-		total += profit * cycles
-	return str(total)
+		total = Big.add(total, Big.mul_int(b.profitPerCycle, cycles))
+	return total
 
 
 func business(slug: String) -> Dictionary:
@@ -1114,7 +1111,7 @@ func income_per_second() -> float:
 func can_afford(amount: Variant) -> bool:
 	if amount == null:
 		return false
-	return str(amount).to_int() <= coins().to_int()
+	return Big.lte(amount, coins())
 
 
 static func message_for(code: String) -> String:

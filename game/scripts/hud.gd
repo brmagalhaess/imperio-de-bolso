@@ -440,7 +440,7 @@ func open_store_menu() -> void:
 			var item := GameState.store_item(item_id)
 			var cost: String = item.get("costGems", "0")
 			var estimate := GameState.boost_estimate(int(item.get("hours", 0)) * 3600)
-			var has_income := estimate.to_int() > 0
+			var has_income := estimate != "0" and not estimate.begins_with("-")
 			return {
 				"title": item.get("title", item_id), "icon": COIN_TEX,
 				"subtitle": tr("≈ %s moedas na hora") % Fmt.coins(estimate) if has_income
