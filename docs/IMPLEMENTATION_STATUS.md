@@ -12,8 +12,9 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
   a contagem "Hoje" some.
 - "Nada acontece ao assistir": conta AdMob ainda em revisão (veiculação limitada), então o bloco
   real quase sempre volta sem anúncio; a 1.1.0 esperava 8 s sem retorno visual antes do aviso.
-- Testes: Godot 162 verificações, 0 falhas; `tsc` e Prettier ok. Vitest local não rodou (Docker do
-  Mac só-leitura com o disco 98% cheio) — validado pelo CI do GitHub.
+- Testes: Godot 162 verificações, 0 falhas; `tsc` e Prettier ok. Vitest 177/177 num Postgres temporário
+  (Homebrew), porque o Docker do Mac ficou só-leitura com o disco 98% cheio. CI do GitHub parado
+  por cobrança da conta.
 
 ## 2026-10-25 — 1.1.0: 20 mapas e 12 negócios por mapa (ADR 0034); dinheiro sem teto (ADR 0033)
 
