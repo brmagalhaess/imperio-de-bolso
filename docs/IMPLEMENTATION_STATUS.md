@@ -2,6 +2,19 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-10-26 — Anúncios ligados (iPhone e Android) e coleta com anúncio sem limite
+
+- Produção: `ADS_PLATFORMS=ios,android` (ligado pelo titular no Dokploy), `ADS_MODE=admob`.
+- Servidor: `ad_boost.dailyLimit` 5 → 1000 (teto só contra abuso, pedido do titular). O dobro do
+  offline continua 3/dia. Clientes 1.1.0 mostram "Hoje: N/1000" até a próxima versão.
+- Jogo (próxima versão): toque em "Assistir" mostra "Carregando anúncio…", o botão fica
+  "Carregando…" e trava contra toque duplo; espera pelo AdMob subiu de 8 para 15 s; com teto ≥ 1000
+  a contagem "Hoje" some.
+- "Nada acontece ao assistir": conta AdMob ainda em revisão (veiculação limitada), então o bloco
+  real quase sempre volta sem anúncio; a 1.1.0 esperava 8 s sem retorno visual antes do aviso.
+- Testes: Godot 162 verificações, 0 falhas; `tsc` e Prettier ok. Vitest local não rodou (Docker do
+  Mac só-leitura com o disco 98% cheio) — validado pelo CI do GitHub.
+
 ## 2026-10-25 — 1.1.0: 20 mapas e 12 negócios por mapa (ADR 0034); dinheiro sem teto (ADR 0033)
 
 - Servidor: 234 negócios em 20 mapas (12 novos depois do Centro Espacial; praia 4→6, demais

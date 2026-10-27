@@ -111,7 +111,9 @@ export const STORE_ITEMS: readonly StoreItem[] = [
     title: "Coleta antecipada de 15 min",
     placement: "ad_boost",
     minutes: 15,
-    dailyLimit: 5,
+    // Sem limite na prática (pedido do titular): só um teto contra abuso. Clientes até a 1.1.0
+    // mostram "Hoje: N/1000"; os novos escondem o teto a partir de AD_BOOST_NO_LIMIT.
+    dailyLimit: 1000,
   },
 ];
 

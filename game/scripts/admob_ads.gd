@@ -89,7 +89,7 @@ func show_rewarded(session_id: String) -> Dictionary:
 	if not available():
 		return {"shown": false, "earned": false}
 	start()
-	for i in 80:  # até ~8 s esperando consentimento + carregamento
+	for i in 150:  # até ~15 s esperando consentimento + carregamento
 		if _ad != null:
 			break
 		_load_ad()

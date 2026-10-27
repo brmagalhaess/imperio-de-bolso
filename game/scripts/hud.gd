@@ -54,6 +54,9 @@ var _helper_cards := {}
 ## Cartões de Missões/Conquistas abertos (id → identificador), atualizados no lugar.
 var _reward_cards := {}
 var _reward_kind := ""  # "missions" | "achievements" | ""
+var _ad_busy := false  # anúncio sendo carregado/exibido (evita toque duplo)
+## A partir deste teto diário o servidor está "sem limite": a Loja não mostra a contagem.
+const AD_BOOST_NO_LIMIT := 1000
 var _missions_button: Control
 var _ranking_button: Control
 var _daily_button: Control
@@ -569,12 +572,16 @@ func _add_ad_boost_card() -> void:
 		var ad := GameState.store_item("ad_boost")
 		var used := int(ad.get("usedToday", 0))
 		var limit := int(ad.get("dailyLimit", 5))
+		var coins := Fmt.coins(GameState.boost_estimate(int(ad.get("minutes", 15)) * 60))
+		# Teto alto do servidor = sem limite na prática: não mostra o "Hoje: N/1000".
+		var subtitle := tr("Grátis com anúncio · ≈ %s moedas") % coins if limit >= AD_BOOST_NO_LIMIT \
+				else tr("Grátis com anúncio · ≈ %s moedas\nHoje: %d/%d") % [coins, used, limit]
+		var open := used < limit and not _ad_busy
 		return {
 			"title": ad.get("title", tr("Coleta antecipada")), "icon": COIN_TEX,
-			"subtitle": tr("Grátis com anúncio · ≈ %s moedas\nHoje: %d/%d") % [
-				Fmt.coins(GameState.boost_estimate(int(ad.get("minutes", 15)) * 60)), used, limit],
-			"button": tr("Assistir") if used < limit else "%d/%d" % [used, limit],
-			"color": PURPLE, "edge": PURPLE_DARK, "enabled": used < limit,
+			"subtitle": subtitle,
+			"button": tr("Carregando…") if _ad_busy else (tr("Assistir") if used < limit else "%d/%d" % [used, limit]),
+			"color": PURPLE, "edge": PURPLE_DARK, "enabled": open,
 		}, func(): watch_ad("ad_boost"))
 
 
@@ -654,7 +661,21 @@ func _restore_purchases() -> void:
 
 
 ## Anúncio recompensado: sessão no servidor → anúncio (de teste) → confirmação → resgate.
+## Um por vez: o botão mostra "Carregando…" enquanto o anúncio do AdMob é buscado (até ~15 s).
 func watch_ad(placement: String) -> void:
+	if _ad_busy:
+		return
+	_ad_busy = true
+	if _modal.visible:
+		_modal.refresh_store_cards()
+	show_toast(tr("Carregando anúncio…"))
+	await _watch_ad(placement)
+	_ad_busy = false
+	if _modal.visible:
+		_modal.refresh_store_cards()
+
+
+func _watch_ad(placement: String) -> void:
 	var start := await Api.ad_start(placement, current_district)
 	if not start.ok:
 		show_toast(GameState.message_for(start.error_code))

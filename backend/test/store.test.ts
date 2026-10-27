@@ -163,7 +163,7 @@ describe("anúncios recompensados (modo de teste)", () => {
     return { start, early, claim, id };
   }
 
-  it("+15 min de produção: só paga depois de confirmado, uma vez, com limite diário", async () => {
+  it("+15 min de produção: só paga depois de confirmado, uma vez, sem o antigo limite de 5", async () => {
     ctx = await createTestContext();
     const g = await newGuest(ctx.app);
     await post(ctx.app, g, "/businesses/purchase", { businessSlug: "agua" });
@@ -173,13 +173,8 @@ describe("anúncios recompensados (modo de teste)", () => {
     expect(r.claim!.json().coins).toBe("900");
     const again = await post(ctx.app, g, "/ads/claim", { sessionId: r.id });
     expect(again.json().error.code).toBe("AD_ALREADY_CLAIMED");
-    for (let i = 0; i < 4; i++) await watch(g, "ad_boost", "praia");
-    const sixth = await post(ctx.app, g, "/ads/start", {
-      placement: "ad_boost",
-      district: "praia",
-    });
-    expect(sixth.json().error.code).toBe("AD_DAILY_LIMIT");
-    expect(await coinsOf(ctx.db, g.playerId)).toBe(5n * 900n);
+    for (let i = 0; i < 5; i++) await watch(g, "ad_boost", "praia");
+    expect(await coinsOf(ctx.db, g.playerId)).toBe(6n * 900n); // o 6º também paga
   });
 
   it("dobrar ganhos offline: paga o AFK de novo uma única vez, logo após o resumo", async () => {

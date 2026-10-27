@@ -147,7 +147,8 @@ Corpo `{ events: [{ name, props? }] }` (1–20). Nomes permitidos: `tutorial_sta
 
 ### Loja, compras e anúncios (ADR 0008)
 - `GET /store/catalog?district=praia` → `{ sandbox, district, items (coleta antecipada com
-  `estimateCoins`; anúncio com `usedToday`/`dailyLimit`), entitlements: { autoCollectUntil, vipUntil,
+  `estimateCoins`; anúncio com `usedToday`/`dailyLimit`;
+  `dailyLimit` ≥ 1000 = sem limite na prática, o cliente não mostra a contagem), entitlements: { autoCollectUntil, vipUntil,
   vipDailyGems, vipDailyClaimed }, serverTime }`.
 - `POST /vip/daily` — `Idempotency-Key`. `{}` → `200 { gems, state }`. `409 VIP_REQUIRED`,
   `409 VIP_DAILY_CLAIMED`.

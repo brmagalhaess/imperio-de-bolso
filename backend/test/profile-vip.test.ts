@@ -27,7 +27,7 @@ describe("coleta antecipada na Loja", () => {
       title: "Coleta antecipada de 15 min",
       estimateCoins: "900",
       usedToday: 0,
-      dailyLimit: 5,
+      dailyLimit: 1000,
     });
     expect(cat.items.find((i: { id: string }) => i.id === "boost_4h")).toMatchObject({
       title: "Coleta antecipada de 4 horas",
