@@ -1,0 +1,16 @@
+[
+ {
+  "id": "g_rank_icons",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Using the exact glossy rounded cartoon art style of this mobile game icon sheet, draw a clean icon sheet of 4 separate eye-catching icons in a single row with generous white space between them: 1) a shiny golden royal crown with red and blue gems (first place); 2) a shiny silver medal on a blue ribbon with a laurel (second place); 3) a shiny bronze medal on a red ribbon with a laurel (third place); 4) a glossy golden VIP badge shield with a purple center and a small crown on top, WITHOUT any letters. Plain solid pure white background, no text, no letters, no numbers, no labels.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/411d809c-8f09-4f4f-8bf2-fa3f8c981970.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "2:1"
+  }
+ }
+]

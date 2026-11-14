@@ -1,0 +1,15 @@
+[
+ {
+  "id": "g_estaleiro_lv1_r2",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a SHIPYARD, level 1: an industrial boat workshop shed with a large open door showing a wooden boat hull under construction, a small crane and stacked timber. Absolutely NO sign board and NO writing anywhere on the building. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ }
+]

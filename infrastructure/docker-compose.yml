@@ -1,0 +1,58 @@
+# Ambiente LOCAL de desenvolvimento. Staging/produção usam stacks Dockploy
+# separadas com segredos próprios (ver infrastructure/README.md).
+name: imperio-de-bolso
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: imperio
+      POSTGRES_PASSWORD: imperio
+      POSTGRES_DB: imperio
+    ports:
+      - "55432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U imperio -d imperio"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    profiles: ["api"]
+    build:
+      context: ../backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://imperio:imperio@postgres:5432/imperio
+      JWT_SECRET: ${JWT_SECRET:-dev-only-segredo-local-nao-usar-em-producao-123}
+      STARTING_COINS: "100"
+      # Painel admin: defina ADMIN_TOKEN (openssl rand -hex 32) para ligar /api/admin.
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+    networks:
+      default:
+        aliases: [imperio-api]
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  admin:
+    profiles: ["api"]
+    build:
+      context: ../admin
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+
+volumes:
+  pgdata:

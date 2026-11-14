@@ -1,0 +1,44 @@
+[
+ {
+  "id": "g_offers_a",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Using the exact glossy rounded cartoon art style of this mobile game icon sheet, draw a clean icon sheet of 8 separate eye-catching SHOP OFFER icons arranged in a 4 by 2 grid with generous white space between them. Each icon is a vibrant glossy rounded-square badge with a thick golden rim and small sparkles, with one object inside: 1) a small gift box with green ribbon and three blue gems (starter kit); 2) a yellow lightning bolt over a tiny rocket with orange flame (turbo); 3) a brown leather briefcase with blue gems spilling out (entrepreneur); 4) a beach umbrella and sun with blue gems (weekend); 5) an open wooden treasure chest overflowing with blue gems (investor); 6) a golden alarm clock surrounded by gold coins (express); 7) a shiny golden suitcase (golden suitcase); 8) a heavy steel bank vault door with gold bars (tycoon). Bright saturated colors that pop on a game screen. Plain solid pure white background, no text, no letters, no numbers, no labels, no logos, no flags.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/411d809c-8f09-4f4f-8bf2-fa3f8c981970.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "2:1"
+  }
+ },
+ {
+  "id": "g_offers_b",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Using the exact glossy rounded cartoon art style of this mobile game icon sheet, draw a clean icon sheet of 8 separate eye-catching SHOP OFFER icons arranged in a 4 by 2 grid with generous white space between them. Each icon is a vibrant glossy rounded-square badge with a thick golden rim and small sparkles, with one object inside: 1) a royal golden crown on a pile of gold coins and gems (royal treasure); 2) a legendary purple and gold trophy cup with glowing gems (legend); 3) a colorful carnival mask with feathers and confetti (carnival); 4) a decorated chocolate easter egg with a ribbon (easter); 5) a pink heart-shaped gift with flowers (mother's day); 6) colorful triangular festival bunting with a small bonfire and a straw hat (june festival); 7) a blue gift box with a necktie ribbon (father's day); 8) a green and yellow ribbon rosette with a star (independence day). Bright saturated colors that pop on a game screen. Plain solid pure white background, no text, no letters, no numbers, no labels, no logos, no flags.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/411d809c-8f09-4f4f-8bf2-fa3f8c981970.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "2:1"
+  }
+ },
+ {
+  "id": "g_offers_c",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Using the exact glossy rounded cartoon art style of this mobile game icon sheet, draw a clean icon sheet of 4 separate eye-catching SHOP OFFER icons arranged in a 2 by 2 grid with generous white space between them. Each icon is a vibrant glossy rounded-square badge with a thick golden rim and small sparkles, with one object inside: 1) a colorful toy pinwheel with balloons (children's day); 2) a black shopping bag with a golden price tag (black friday); 3) a red christmas gift with a santa hat and holly (christmas); 4) golden fireworks bursting behind a champagne glass (new year). Bright saturated colors that pop on a game screen. Plain solid pure white background, no text, no letters, no numbers, no labels, no logos, no flags.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/411d809c-8f09-4f4f-8bf2-fa3f8c981970.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "1:1"
+  }
+ }
+]

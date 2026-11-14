@@ -1,0 +1,134 @@
+// Catálogo da Loja (ADR 0008). Preços em reais são os da doc (§12) / conversa original;
+// valores em diamantes são proposta inicial, ajustáveis aqui.
+
+export type StoreItem =
+  | { id: string; kind: "iap"; productId: string; title: string; priceBRL: string; gems: bigint }
+  | {
+      id: string;
+      kind: "subscription";
+      productId: string;
+      title: string;
+      priceBRL: string;
+      periodDays: number;
+      benefits: string[];
+    }
+  | { id: string; kind: "auto_collect"; title: string; costGems: bigint; hours: number }
+  | { id: string; kind: "boost"; title: string; costGems: bigint; hours: number }
+  | { id: string; kind: "turbo"; title: string; costGems: bigint; hours: number }
+  | {
+      // Dobro de moedas (ADR 0025): dinheiro real, ×2 em toda a produção, limite por mês.
+      id: string;
+      kind: "double";
+      productId: string;
+      title: string;
+      priceBRL: string;
+      hours: number;
+      monthlyLimit: number;
+    }
+  | {
+      id: string;
+      kind: "ad";
+      title: string;
+      placement: "ad_boost";
+      minutes: number;
+      dailyLimit: number;
+    };
+
+const P = "br.com.imperiodebolso";
+
+export const STORE_ITEMS: readonly StoreItem[] = [
+  {
+    id: "gems_50",
+    kind: "iap",
+    productId: `${P}.gems_50`,
+    title: "Punhado de diamantes",
+    priceBRL: "4,90",
+    gems: 50n,
+  },
+  {
+    id: "gems_120",
+    kind: "iap",
+    productId: `${P}.gems_120`,
+    title: "Saco de diamantes",
+    priceBRL: "9,90",
+    gems: 120n,
+  },
+  {
+    id: "gems_300",
+    kind: "iap",
+    productId: `${P}.gems_300`,
+    title: "Baú de diamantes",
+    priceBRL: "19,90",
+    gems: 300n,
+  },
+  {
+    id: "vip_monthly",
+    kind: "subscription",
+    productId: `${P}.vip_monthly`,
+    title: "Passe VIP",
+    priceBRL: "14,90",
+    periodDays: 30,
+    benefits: [
+      "Auto-coleta em todos os mapas",
+      "Produção +50% mais rápida",
+      "5 diamantes por dia",
+      "Selo VIP no perfil",
+    ],
+  },
+  {
+    id: "auto_collect_24h",
+    kind: "auto_collect",
+    title: "Auto-coleta por 24 horas",
+    costGems: 20n,
+    hours: 24,
+  },
+  {
+    id: "auto_collect_7d",
+    kind: "auto_collect",
+    title: "Auto-coleta por 7 dias",
+    costGems: 100n,
+    hours: 24 * 7,
+  },
+  // "Coleta antecipada" (pedido do titular): recebe agora X horas de produção do mapa atual.
+  { id: "boost_1h", kind: "boost", title: "Coleta antecipada de 1 hora", costGems: 10n, hours: 1 },
+  { id: "boost_4h", kind: "boost", title: "Coleta antecipada de 4 horas", costGems: 30n, hours: 4 },
+  // Turbo (ADR 0013): produção 2× em todos os mapas pelo período; soma tempo se já ativo.
+  { id: "turbo_1h", kind: "turbo", title: "Turbo 2× por 1 hora", costGems: 10n, hours: 1 },
+  { id: "turbo_4h", kind: "turbo", title: "Turbo 2× por 4 horas", costGems: 30n, hours: 4 },
+  { id: "turbo_24h", kind: "turbo", title: "Turbo 2× por 24 horas", costGems: 120n, hours: 24 },
+  {
+    id: "double_1h",
+    kind: "double",
+    productId: `${P}.double_1h`,
+    title: "Dobro de moedas por 1 hora",
+    priceBRL: "129,90",
+    hours: 1,
+    monthlyLimit: 3,
+  },
+  {
+    id: "ad_boost",
+    kind: "ad",
+    title: "Coleta antecipada de 15 min",
+    placement: "ad_boost",
+    minutes: 15,
+    // Sem limite na prática (pedido do titular): só um teto contra abuso. Clientes até a 1.1.0
+    // mostram "Hoje: N/1000"; os novos escondem o teto a partir de AD_BOOST_NO_LIMIT.
+    dailyLimit: 1000,
+  },
+];
+
+/** Recompensa diária do Passe VIP (diamantes por dia do jogo). */
+export const VIP_DAILY_GEMS = 5;
+
+/** Anúncio "dobrar ganhos" do resumo offline: limite diário e janela após o resumo. */
+export const OFFLINE_DOUBLE_DAILY_LIMIT = 3;
+export const OFFLINE_DOUBLE_WINDOW_MS = 15 * 60 * 1000;
+export const AD_SESSION_TTL_MS = 10 * 60 * 1000;
+
+export function storeItem(id: string): StoreItem | undefined {
+  return STORE_ITEMS.find((i) => i.id === id);
+}
+
+export function itemByProductId(productId: string): StoreItem | undefined {
+  return STORE_ITEMS.find((i) => "productId" in i && i.productId === productId);
+}

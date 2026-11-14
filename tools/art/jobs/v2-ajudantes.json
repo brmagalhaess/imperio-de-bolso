@@ -1,0 +1,45 @@
+[
+  {
+    "id": "g_helpers_praia",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 5 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a beach water seller with a blue cap and a small blue cooler bag, holding a water bottle; (2) a popcorn seller with a red and white striped paper hat and apron, holding a popcorn bucket; (3) an ice cream seller girl with a pink apron and a pastel cap, holding an ice cream cone; (4) a coconut water seller with a straw hat and a floral shirt, holding a green coconut with a straw; (5) a grocer with a green apron holding a small crate of fruits. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01f21ab3-c6fe-4cc6-9660-66ca62b5654b.png"
+      ],
+      "quality": "medium",
+      "resolution": "2k",
+      "aspect_ratio": "16:9"
+    }
+  },
+  {
+    "id": "g_helpers_cidade",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 5 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a cheerful chef with a tall white chef hat and white jacket, holding a plate of food; (2) a supermarket cashier with a blue vest and name badge, holding a shopping basket; (3) a fitness trainer in a sporty tracksuit with a whistle, holding a small dumbbell; (4) a hotel bellhop in a red uniform with a little round cap, holding a suitcase; (5) a shopping mall manager woman in a smart blazer, holding a tablet. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01f21ab3-c6fe-4cc6-9660-66ca62b5654b.png"
+      ],
+      "quality": "medium",
+      "resolution": "2k",
+      "aspect_ratio": "16:9"
+    }
+  },
+  {
+    "id": "g_icon_helpers",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Using the exact user interface icon style of these references (glossy rounded cartoon square buttons with a thick bottom edge), draw ONE single game button icon: a purple rounded square button showing two small smiling cartoon helper faces wearing caps side by side, with a tiny golden star badge. Single isolated icon, centered, fully visible with margin, on a plain solid pure white background, no text, no letters, no numbers.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/411d809c-8f09-4f4f-8bf2-fa3f8c981970.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/c4a9d33a-830c-4e7c-9ba8-36963f448001.png"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  }
+]

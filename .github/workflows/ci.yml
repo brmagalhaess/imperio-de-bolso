@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, "feature/**"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: imperio
+          POSTGRES_PASSWORD: imperio
+          POSTGRES_DB: imperio_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U imperio -d imperio_test"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://imperio:imperio@localhost:5432/imperio_test
+      TEST_DATABASE_URL: postgresql://imperio:imperio@localhost:5432/imperio_test
+      JWT_SECRET: ci-somente-teste-segredo-com-mais-de-32-caracteres
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run typecheck
+      - run: npm run format:check
+      - run: npm run build
+      - run: npm test
+
+  admin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: admin
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  game:
+    runs-on: ubuntu-latest
+    # Erro de script no executor de testes deixa o Godot aberto: o limite derruba o job.
+    timeout-minutes: 10
+    env:
+      GODOT_VERSION: 4.7.2
+    steps:
+      - uses: actions/checkout@v5
+      - name: Baixar Godot (binário oficial)
+        run: |
+          curl -fsSL -o godot.zip \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip
+          mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" godot
+      - name: Importar projeto
+        run: ./godot --headless --path game --import
+      - name: Testes do jogo
+        run: ./godot --headless --path game res://tests/test_runner.tscn

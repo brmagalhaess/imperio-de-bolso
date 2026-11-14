@@ -1,0 +1,38 @@
+# Sistema
+.DS_Store
+
+# Segredos — nunca versionar
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+export_credentials.cfg
+
+# Node
+node_modules/
+dist/
+coverage/
+backend/src/generated/
+
+# Godot
+game/.godot/
+game/build/
+
+# Builds exportados (APK/AAB) — nunca versionar
+/build/
+# Template Gradle do Android (instalado pelo Godot)
+game/android/
+*.keystore
+*.jks
+game/i18n/*.translation
+
+# Godot Apple Plugins (binários ~250 MB; instalar com tools/apple/fetch_plugins.sh)
+game/addons/GodotApplePlugins*/
+game/addons/admob/
+tools/android/imperio-plugin/.gradle/
+tools/android/imperio-plugin/build/
+tools/android/imperio-plugin/plugin/build/
+tools/android/imperio-plugin/local.properties

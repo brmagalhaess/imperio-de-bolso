@@ -1,0 +1,24 @@
+[
+  {
+    "id": "t2_water_cart_ref",
+    "model": "ideogram/v4.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Game asset: a cute small beach water vendor cart, level 1 humble starter version: little wooden pushcart with a blue cooler full of water bottles and a red and white striped parasol. Bright cartoon vibrant casual mobile game art, same art style as the reference image: saturated cheerful colors, chunky rounded toy-like shapes, clean soft dark outlines, soft shading, polished look. 2:1 isometric view from the front-right. Single isolated object centered, fully visible with margin, on a plain solid pure white background, no ground, no sand, no shadow, no scenery, no people, no text, no letters, no logo, no watermark.",
+      "image_url": "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+      "image_weight": 25,
+      "aspect_ratio": "1:1",
+      "rendering_speed": "DEFAULT"
+    }
+  },
+  {
+    "id": "t2_water_cart_txt",
+    "model": "ideogram/v4.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Game asset: a cute small beach water vendor cart, level 1 humble starter version: little wooden pushcart with a blue cooler full of water bottles and a red and white striped parasol. Bright cartoon vibrant casual mobile game art, saturated cheerful colors, chunky rounded toy-like shapes, clean soft dark outlines, soft shading, polished look. 2:1 isometric view from the front-right. Single isolated object centered, fully visible with margin, on a plain solid pure white background, no ground, no sand, no shadow, no scenery, no people, no text, no letters, no logo, no watermark.",
+      "aspect_ratio": "1:1",
+      "rendering_speed": "DEFAULT"
+    }
+  }
+]

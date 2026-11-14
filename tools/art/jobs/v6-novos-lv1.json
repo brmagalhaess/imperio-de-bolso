@@ -1,0 +1,254 @@
+[
+ {
+  "id": "g_padaria_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a small neighborhood BAKERY with a bread display window, a striped awning and a giant bread loaf decoration, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_farmacia_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a small PHARMACY drugstore with a green cross sign frame without text, glass front and shelves inside, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_cinema_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a small MOVIE THEATER with a marquee frame without text, a film reel decoration and red carpet entrance, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_feira_porto_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a harbor STREET MARKET with colorful stalls of fruit, fish and crafts under canvas tents, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/6f351495-db83-431b-be17-5f8332278d05.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_clube_nautico_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a small YACHT CLUB house with a flag pole, a little pier and sailboats docked, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/6f351495-db83-431b-be17-5f8332278d05.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_farol_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a red-and-white LIGHTHOUSE on rocks with a small keeper's house, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/6f351495-db83-431b-be17-5f8332278d05.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_hospital_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a modern HOSPITAL building with a red cross symbol, an entrance canopy and an ambulance bay without vehicles, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/8bd0826d-8f9a-4619-8cd5-2b00fdf1e557.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_universidade_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a UNIVERSITY building with columns, a clock tower frame without numbers and a green campus lawn, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/8bd0826d-8f9a-4619-8cd5-2b00fdf1e557.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_bolsa_valores_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a STOCK EXCHANGE building with classic columns, a golden bull statue and screens frames without text, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/8bd0826d-8f9a-4619-8cd5-2b00fdf1e557.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_fabrica_brinquedos_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a colorful TOY FACTORY with rainbow chimneys, giant toy blocks and a teddy bear decoration, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/1c21f1fe-e5bc-4629-8447-c9cc103b2f59.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_centro_logistica_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a LOGISTICS warehouse with loading docks, stacked boxes and a conveyor, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/1c21f1fe-e5bc-4629-8447-c9cc103b2f59.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_parque_eolico_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a small WIND FARM with three white wind turbines and a control cabin on grass, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/1c21f1fe-e5bc-4629-8447-c9cc103b2f59.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_queijaria_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a cozy mountain CHEESE SHOP chalet with cheese wheels on display and a wooden balcony, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/77644156-ee90-47ec-b287-a23936049198.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_vinicola_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a small mountain WINERY with grape vine rows, wooden barrels and a stone cellar house, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/77644156-ee90-47ec-b287-a23936049198.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_pista_patinacao_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw an outdoor ICE SKATING rink with a small wooden hut and string lights around it, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/77644156-ee90-47ec-b287-a23936049198.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_mercado_artesanato_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a tropical CRAFT MARKET with straw-roof stalls of baskets, pottery and colorful fabrics, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/2c7eb97a-7dba-4359-a893-61101b813180.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_aquario_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a big AQUARIUM building with a curved glass wall showing fish and a whale-tail fountain, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/2c7eb97a-7dba-4359-a893-61101b813180.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_hotel_flutuante_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a small FLOATING HOTEL on the lagoon water with a wooden deck and palm trees, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/2c7eb97a-7dba-4359-a893-61101b813180.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_escola_astronautas_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw an ASTRONAUT TRAINING school with a centrifuge ring, a white dome and a small rocket model, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/2c7884a7-7001-409b-85d0-be7e2dc1a2cf.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_laboratorio_robos_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a ROBOTICS lab building with glass walls, robot arms and a friendly robot statue, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/2c7884a7-7001-409b-85d0-be7e2dc1a2cf.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_elevador_espacial_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of the reference image (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle. The building stands on its own square light-gray sidewalk base exactly like the reference. Draw a SPACE ELEVATOR base station with a tall glowing cable tower rising into the sky, level 1 humble starter version. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/2c7884a7-7001-409b-85d0-be7e2dc1a2cf.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ }
+]
