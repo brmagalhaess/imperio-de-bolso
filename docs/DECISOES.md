@@ -38,3 +38,4 @@
 | [0032](ADRs/0032-login-google-android-e-compartilhar-nativo.md) | Login com Google no Android (plugin próprio, Credential Manager) e compartilhar pela folha nativa do celular | aceita |
 | [0033](ADRs/0033-dinheiro-sem-teto.md) | Dinheiro sem teto: colunas NUMERIC(65,0), teto 10^60, `toBig()` nas consultas diretas e números exatos em texto no jogo | aceita |
 | [0034](ADRs/0034-vinte-mapas.md) | 20 mapas e 12 negócios por mapa (234), mapa já aberto continua aberto, venda pelos 8 primeiros mapas, servidor só depois do jogo 1.1.0 nas lojas | aceita |
+| [0035](ADRs/0035-evolucao-ajudantes-temporada.md) | Mapa novo só com o atual no nível máximo, evolução ×3, ajudantes com nível, estrelas de evolução, temporada de 20 dias, desafios da semana, anúncios 10/24 h, convide amigos e mapa 2D | aceita |

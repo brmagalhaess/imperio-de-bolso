@@ -105,9 +105,14 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] Login com Apple (iOS) no Perfil (ADR 0022)
 - [x] Login nativo Google (Android) — ADR 0032 (SHA-1 da Play corrigida em 2026-10-25)
 - [x] 20 mapas e 12 negócios por mapa (ADR 0034) · dinheiro sem teto (ADR 0033)
-- [ ] Publicar servidor + site dos 20 mapas quando a 1.1.0 estiver nas duas lojas
+- [x] Publicar servidor + site dos 20 mapas quando a 1.1.0 estiver nas duas lojas
       (`MIN_APP_VERSION_IOS/ANDROID=1.1.0`)
-- [ ] V1.2b Temporadas, passe de temporada e cosméticos
+- [x] 1.2.0 (ADR 0035): mapa novo só com o atual no nível máximo, evolução ×3, ajudantes com
+      nível, estrelas de evolução, temporada de 20 dias, desafios da semana, anúncios 10/24 h,
+      convide amigos, mapa 2D com ilhas ligadas, aba Progresso no painel
+- [ ] Publicar a 1.2.0 nas duas lojas e subir `MIN_APP_VERSION_*` para 1.2.0
+- [ ] Compartilhar convite pela folha nativa do celular (hoje copia o texto)
+- [ ] V1.2b Passe de temporada e cosméticos
 - [ ] Fichas das lojas e políticas em inglês/espanhol (lançamento fora do Brasil)
 - [ ] V1.3 Amigos, visitas e compartilhamento (depende de vincular conta Google/Apple)
 - [ ] V2.0 Imóveis, cadeias produtivas, corporações e LiveOps

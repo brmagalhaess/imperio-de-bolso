@@ -311,3 +311,25 @@ em `POST /store/buy` → `200 { bought, turboUntil, state }` (soma tempo se já 
   storeUrl }`. `latest` = versão no ar na loja (null se a loja não respondeu); `minimum` = versão
   mínima aceita (null = sem obrigatoriedade).
 
+### Evolução, ajudantes, temporada, desafios e convites (ADR 0035)
+- `GET /player/state`: `player.evoStars`; cada negócio traz `evolution` (0–5),
+  `nextEvolutionLevel` e `helper { kind: receita|tempo|noturno, level, maxLevel, nextCost,
+  profitPercent, speedPoints, offlineHours }`; cada distrito traz `total`, `owned`, `maxed`,
+  `stars`, `maxStars`. Um distrito abre quando o anterior está todo no nível máximo.
+- `POST /managers/upgrade` — `Idempotency-Key`. `{ businessSlug }` → `200 { upgraded,
+  helperLevel, state }`. `409 MANAGER_NOT_HIRED`, `409 MANAGER_MAX_LEVEL`, `409 INSUFFICIENT_FUNDS`.
+- `GET /leaderboard/evolution` → `{ entries, me, vip, staff }` (score = estrelas de evolução).
+- `GET /leaderboard/season` → `{ season { number, start, end, days }, entries (score = estrelas
+  da temporada, coins), me, prizes { tiers [{ upTo, gems }], participationStars,
+  participationGems } }`. Prêmio da temporada: `GET /rewards/weekly` com `kind: "temporada"`,
+  `week: "T<n>"`; resgate em `POST /rewards/weekly/claim`.
+- `GET /missions` → também `challenges { week, resetsAt, items[] }` (desafios da semana, mesmo
+  formato das missões; resgate em `POST /missions/claim`).
+- `GET /store/catalog`: `ad_boost` com `dailyLimit: 10`, `usedToday` (últimas 24 h) e `nextAt`
+  (ISO de quando libera o próximo, ou null).
+- `GET /prestige`: `maxedBusinesses` (a venda exige todos no nível máximo).
+- `GET /invites` → `{ code, canRedeem, friends, rewarded, claimable, claimableGems, guestGems,
+  hostGems, stars, maxRewarded }`. `POST /invites/redeem { code }` → `200 { gems, state }`
+  (`400 INVITE_INVALID`, `404 INVITE_NOT_FOUND`, `409 INVITE_ALREADY_USED`, `409 INVITE_SELF`).
+  `POST /invites/claim` → `200 { gems, friends, state }` (`409 INVITE_NOTHING_TO_CLAIM`).
+

@@ -2,6 +2,21 @@
 
 Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
 
+## 2026-11-25 — 1.2.0: evolução por mapa, ajudantes com nível, temporada, desafios e mapa 2D (ADR 0035)
+
+- Servidor: mapa novo só com o atual todo no nível 100; evolução ×3 no lucro; ajudantes nível
+  1–10 (Vendedor/Veloz/Noturno); estrelas de evolução; rankings Evolução e Temporada (20 dias,
+  prêmios em diamantes); 3 missões novas e desafios da semana; anúncios 10/24 h com 5 min de
+  prêmio; venda do império exige nível 100; convide amigos. Migração
+  `20261125120000_evolucao_ajudantes_temporadas` (só acrescenta; ninguém é zerado).
+- Jogo 1.2.0: mapa 2D com ilhas ligadas e câmera livre com inércia; estrelas nos lotes; evoluir
+  ajudante; abas novas no ranking; desafios; convite no Perfil; sem anel amarelo de seleção.
+- Painel admin: aba Progresso.
+- Testes: Vitest 187/187 (Postgres temporário do Homebrew — Docker do Mac segue só-leitura);
+  Godot 162 unitários e 202 com a API local; `tsc` e Prettier ok; build do admin ok.
+- Pendente: instalar no aparelho e conferir o toque/inércia do mapa 2D; subir o servidor e
+  publicar a 1.2.0 nas lojas; depois subir a versão mínima para 1.2.0.
+
 ## 2026-10-26 — Anúncios ligados (iPhone e Android) e coleta com anúncio sem limite
 
 - Produção: `ADS_PLATFORMS=ios,android` (ligado pelo titular no Dokploy), `ADS_MODE=admob`.
