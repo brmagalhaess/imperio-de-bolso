@@ -1,3 +1,5 @@
+import { seasonAt } from "../economy/seasons.js";
+import { challengeWeek } from "../services/missions.js";
 import type { Prisma } from "../generated/prisma/client.js";
 import { createHash, timingSafeEqual } from "node:crypto";
 import type { FastifyInstance, FastifyRequest } from "fastify";
@@ -325,6 +327,109 @@ export async function adminRoutes(app: FastifyInstance, deps: AdminDeps): Promis
           claimed: r.claimedAt !== null,
         })),
       },
+    };
+  });
+
+  // --- Progresso (ADR 0035): temporada, estrelas, mapas abertos, ajudantes, convites, anúncios ---
+  app.get("/progress", async () => {
+    const at = now();
+    const season = seasonAt(at);
+    const dayAgo = new Date(at.getTime() - DAY_MS);
+    const weekAgo = new Date(at.getTime() - 7 * DAY_MS);
+    const [seasonTop, evoTop, maps, helpers, invites, ads, challenges, prizes] = await Promise.all([
+      db.$queryRaw<{ playerId: string; displayName: string; stars: number; coins: bigint }[]>`
+        SELECT s.player_id AS "playerId", p.display_name AS "displayName", s.stars,
+               COALESCE((SELECT SUM(l.delta) FROM wallet_ledger l
+                         WHERE l.player_id = s.player_id AND l.currency = 'COINS'
+                           AND l.reason = ANY(${PRODUCTION_REASONS})
+                           AND l.created_at >= ${season.start} AND l.created_at < ${season.end}), 0) AS coins
+        FROM player_seasons s JOIN players p ON p.id = s.player_id
+        WHERE s.season = ${season.number} AND s.stars > 0 AND NOT p.is_staff
+        ORDER BY s.stars DESC, coins DESC LIMIT 20`,
+      db.player.findMany({
+        where: { ...REAL_PLAYER, evoStars: { gt: 0 } },
+        select: { id: true, displayName: true, evoStars: true, unlockedMaps: true },
+        orderBy: { evoStars: "desc" },
+        take: 20,
+      }),
+      db.player.groupBy({ by: ["unlockedMaps"], where: REAL_PLAYER, _count: { _all: true } }),
+      db.playerBusiness.groupBy({
+        by: ["managerLevel"],
+        where: { managerUnlocked: true, player: REAL_PLAYER },
+        _count: { _all: true },
+      }),
+      Promise.all([
+        db.player.count({ where: { ...REAL_PLAYER, invitedBy: { not: null } } }),
+        db.player.count({ where: { ...REAL_PLAYER, inviteRewardedAt: { not: null } } }),
+      ]),
+      Promise.all([
+        db.adReward.count({ where: { status: "CLAIMED", claimedAt: { gt: dayAgo } } }),
+        db.adReward.count({ where: { status: "CLAIMED", claimedAt: { gt: weekAgo } } }),
+        db.adReward.groupBy({
+          by: ["playerId"],
+          where: { status: "CLAIMED", claimedAt: { gt: dayAgo } },
+          _count: { _all: true },
+        }),
+      ]),
+      Promise.all([
+        db.playerMission.count({ where: { day: challengeWeek(at) } }),
+        db.playerMission.count({ where: { day: challengeWeek(at), claimedAt: { not: null } } }),
+      ]),
+      db.playerWeeklyReward.findMany({
+        where: { kind: "temporada", player: REAL_PLAYER },
+        include: { player: { select: { displayName: true } } },
+        orderBy: [{ week: "desc" }, { rank: "asc" }],
+        take: 30,
+      }),
+    ]);
+    return {
+      season: {
+        number: season.number,
+        start: season.start.toISOString(),
+        end: season.end.toISOString(),
+        top: seasonTop.map((r, i) => ({
+          rank: i + 1,
+          playerId: r.playerId,
+          displayName: r.displayName,
+          stars: r.stars,
+          coins: toBig(r.coins).toString(),
+        })),
+        prizes: prizes.map((r) => ({
+          season: r.week,
+          playerId: r.playerId,
+          displayName: r.player.displayName,
+          rank: r.rank,
+          gems: r.gems,
+          claimed: r.claimedAt !== null,
+        })),
+      },
+      evolution: evoTop.map((p, i) => ({
+        rank: i + 1,
+        playerId: p.id,
+        displayName: p.displayName,
+        stars: p.evoStars ?? 0,
+        maps: p.unlockedMaps,
+      })),
+      // Quantos jogadores têm N mapas abertos (null = ainda não abriu o jogo na regra nova).
+      unlockedMaps: maps
+        .map((m) => ({ maps: m.unlockedMaps, players: m._count._all }))
+        .sort((a, b) => (a.maps ?? 0) - (b.maps ?? 0)),
+      helperLevels: helpers
+        .map((h) => ({ level: Math.max(1, h.managerLevel), helpers: h._count._all }))
+        .sort((a, b) => a.level - b.level),
+      invites: { redeemed: invites[0], rewarded: invites[1] },
+      ads: {
+        last24h: ads[0],
+        last7d: ads[1],
+        playersLast24h: ads[2].length,
+        atLimit: ads[2].filter((g) => g._count._all >= 10).length,
+      },
+      challenges: {
+        week: challengeWeek(at).slice(1),
+        created: challenges[0],
+        claimed: challenges[1],
+      },
+      serverTime: at.toISOString(),
     };
   });
 

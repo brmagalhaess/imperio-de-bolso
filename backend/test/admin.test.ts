@@ -49,6 +49,26 @@ describe("painel admin", () => {
     expect(e.flows7d.some((f: { reason: string }) => f.reason === "initial_grant")).toBe(true);
   });
 
+  it("progresso mostra temporada, estrelas, mapas abertos, ajudantes e anúncios", async () => {
+    ctx = await createTestContext();
+    const g = await newGuest(ctx.app);
+    await ctx.db.playerWallet.update({
+      where: { playerId: g.playerId },
+      data: { coins: 10n ** 9n },
+    });
+    await post(ctx.app, g, "/businesses/purchase", { businessSlug: "agua" });
+    await post(ctx.app, g, "/businesses/upgrade", { businessSlug: "agua", times: 12 });
+    await post(ctx.app, g, "/managers/hire", { businessSlug: "agua" });
+    await post(ctx.app, g, "/managers/upgrade", { businessSlug: "agua" });
+    const p = (await admin("GET", "/progress")).json();
+    expect(p.season.top[0]).toMatchObject({ playerId: g.playerId, stars: 2, rank: 1 });
+    expect(p.evolution[0]).toMatchObject({ playerId: g.playerId, stars: 2, maps: 1 });
+    expect(p.unlockedMaps).toEqual([{ maps: 1, players: 1 }]);
+    expect(p.helperLevels).toEqual([{ level: 2, helpers: 1 }]);
+    expect(p.ads).toMatchObject({ last24h: 0, atLimit: 0 });
+    expect(p.invites).toEqual({ redeemed: 0, rewarded: 0 });
+  });
+
   it("ranking mostra o top da semana e as 5 ligas", async () => {
     ctx = await createTestContext();
     const g = await newGuest(ctx.app);

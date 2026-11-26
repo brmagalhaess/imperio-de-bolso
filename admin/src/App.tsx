@@ -9,6 +9,7 @@ import {
   type Overview,
   type PlayerDetail,
   type PlayerRow,
+  type Progress,
   type Ranking,
   type Reports,
   setToken,
@@ -119,6 +120,7 @@ type Tab =
   | "revenue"
   | "economy"
   | "ranking"
+  | "progress"
   | "moderation"
   | "players"
   | "events";
@@ -128,6 +130,7 @@ const TABS: [Tab, string, string][] = [
   ["players", "👥", "Jogadores"],
   ["economy", "🪙", "Economia"],
   ["ranking", "🏆", "Ranking"],
+  ["progress", "⭐", "Progresso"],
   ["moderation", "🛡️", "Moderação"],
   ["events", "📜", "Eventos"],
 ];
@@ -191,6 +194,7 @@ export function App() {
         {tab === "revenue" && <RevenueView {...props} />}
         {tab === "economy" && <EconomyView {...props} />}
         {tab === "ranking" && <RankingView {...props} />}
+        {tab === "progress" && <ProgressView {...props} />}
         {tab === "moderation" && <ModerationView {...props} />}
         {tab === "players" &&
           (player ? (
@@ -516,6 +520,181 @@ function EconomyView(props: ViewProps) {
           ))}
         </tbody>
       </table>
+    </>
+  );
+}
+
+/** Progresso (ADR 0035): temporada de 20 dias, estrelas, mapas, ajudantes, convites e anúncios. */
+function ProgressView(props: ViewProps) {
+  const { data, reload } = useAdmin<Progress>("/progress", props);
+  if (!data) return <p className="muted">Carregando…</p>;
+  const date = (iso: string) => new Date(iso).toLocaleDateString("pt-BR");
+  const daysLeft = Math.max(
+    0,
+    Math.ceil(
+      (new Date(data.season.end).getTime() -
+        new Date(data.serverTime).getTime()) /
+        86_400_000,
+    ),
+  );
+  const totalPlayers = data.unlockedMaps.reduce((n, m) => n + m.players, 0);
+  const totalHelpers = data.helperLevels.reduce((n, h) => n + h.helpers, 0);
+  return (
+    <>
+      <div className="toolbar">
+        <span className="muted">
+          Temporada {data.season.number}: {date(data.season.start)} a{" "}
+          {date(
+            new Date(new Date(data.season.end).getTime() - 1).toISOString(),
+          )}{" "}
+          · faltam {daysLeft} dias
+        </span>
+        <button onClick={() => void reload()}>Atualizar</button>
+      </div>
+      <Cards
+        items={[
+          [
+            "Anúncios (24 h)",
+            fmt(data.ads.last24h),
+            `${fmt(data.ads.playersLast24h)} jogadores · ${fmt(data.ads.atLimit)} no limite de 10`,
+          ],
+          ["Anúncios (7 dias)", fmt(data.ads.last7d)],
+          [
+            "Convites usados",
+            fmt(data.invites.redeemed),
+            `${fmt(data.invites.rewarded)} já renderam prêmio a quem convidou`,
+          ],
+          [
+            "Desafios da semana",
+            `${fmt(data.challenges.claimed)} resgatados`,
+            `de ${fmt(data.challenges.created)} sorteados`,
+          ],
+        ]}
+      />
+      <h2>Top 20 da temporada (estrelas ganhas · faturamento)</h2>
+      {data.season.top.length === 0 ? (
+        <p className="muted">Ninguém ganhou estrelas nesta temporada ainda.</p>
+      ) : (
+        <table>
+          <tbody>
+            {data.season.top.map((t) => (
+              <tr
+                key={t.playerId}
+                className="clickable"
+                onClick={() => props.openPlayer(t.playerId)}
+              >
+                <td className="num">#{t.rank}</td>
+                <td>{t.displayName}</td>
+                <td className="num">⭐ {fmt(t.stars)}</td>
+                <td className="num">{short(t.coins)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      <h2>Top 20 de evolução (estrelas de todos os tempos)</h2>
+      {data.evolution.length === 0 ? (
+        <p className="muted">Ninguém evoluiu ainda.</p>
+      ) : (
+        <table>
+          <thead>
+            <tr>
+              <th className="num">#</th>
+              <th>Jogador</th>
+              <th className="num">Estrelas</th>
+              <th className="num">Mapas abertos</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.evolution.map((t) => (
+              <tr
+                key={t.playerId}
+                className="clickable"
+                onClick={() => props.openPlayer(t.playerId)}
+              >
+                <td className="num">#{t.rank}</td>
+                <td>{t.displayName}</td>
+                <td className="num">⭐ {fmt(t.stars)}</td>
+                <td className="num">{t.maps ?? "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      <h2>Até que mapa os jogadores chegaram</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Mapas abertos</th>
+            <th className="num">Jogadores</th>
+            <th className="num">%</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.unlockedMaps.map((m) => (
+            <tr key={String(m.maps)}>
+              <td>
+                {m.maps === null
+                  ? "Ainda não abriu o jogo na regra nova"
+                  : `${m.maps} — ${Object.values(DISTRICT_NAMES)[m.maps - 1] ?? ""}`}
+              </td>
+              <td className="num">{fmt(m.players)}</td>
+              <td className="num">
+                {totalPlayers
+                  ? Math.round((m.players * 100) / totalPlayers)
+                  : 0}
+                %
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <h2>Nível dos ajudantes contratados</h2>
+      {totalHelpers === 0 ? (
+        <p className="muted">Nenhum ajudante contratado ainda.</p>
+      ) : (
+        <Cards
+          items={data.helperLevels.map((h) => [
+            `Nível ${h.level}`,
+            fmt(h.helpers),
+            `${Math.round((h.helpers * 100) / totalHelpers)}%`,
+          ])}
+        />
+      )}
+      <h2>Prêmios de temporada</h2>
+      {data.season.prizes.length === 0 ? (
+        <p className="muted">
+          Nenhum prêmio ainda (é gerado quando o jogador abre o jogo depois do
+          fim da temporada).
+        </p>
+      ) : (
+        <table>
+          <thead>
+            <tr>
+              <th>Temporada</th>
+              <th className="num">Lugar</th>
+              <th>Jogador</th>
+              <th className="num">Diamantes</th>
+              <th>Resgatado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.season.prizes.map((r) => (
+              <tr
+                key={`${r.playerId}-${r.season}`}
+                className="clickable"
+                onClick={() => props.openPlayer(r.playerId)}
+              >
+                <td>{r.season}</td>
+                <td className="num">{r.rank}º</td>
+                <td>{r.displayName}</td>
+                <td className="num">{fmt(r.gems)}</td>
+                <td>{r.claimed ? "Sim" : "Não"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </>
   );
 }

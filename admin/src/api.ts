@@ -272,3 +272,44 @@ export interface Revenue {
   recent: PurchaseRow[];
   serverTime: string;
 }
+
+export interface Progress {
+  season: {
+    number: number;
+    start: string;
+    end: string;
+    top: {
+      rank: number;
+      playerId: string;
+      displayName: string;
+      stars: number;
+      coins: string;
+    }[];
+    prizes: {
+      season: string;
+      playerId: string;
+      displayName: string;
+      rank: number;
+      gems: number;
+      claimed: boolean;
+    }[];
+  };
+  evolution: {
+    rank: number;
+    playerId: string;
+    displayName: string;
+    stars: number;
+    maps: number | null;
+  }[];
+  unlockedMaps: { maps: number | null; players: number }[];
+  helperLevels: { level: number; helpers: number }[];
+  invites: { redeemed: number; rewarded: number };
+  ads: {
+    last24h: number;
+    last7d: number;
+    playersLast24h: number;
+    atLimit: number;
+  };
+  challenges: { week: string; created: number; claimed: number };
+  serverTime: string;
+}
