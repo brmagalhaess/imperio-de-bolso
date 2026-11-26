@@ -1,0 +1,142 @@
+# Stack de STAGING/PRODUÇÃO para o Dockploy (uma stack por ambiente, plano §24).
+# Todos os segredos vêm das variáveis de ambiente da stack no Dockploy — nada aqui é segredo.
+# Exemplo de variáveis em infrastructure/prod.env.example. HTTPS e domínios ficam no Traefik
+# do proxy do servidor: o nginx-proxy (jwilder) + acme-companion lê VIRTUAL_HOST/LETSENCRYPT_HOST
+# dos containers na rede `PROXY_NETWORK` (padrão nginx-proxy) e emite o certificado sozinho.
+name: imperio-${STACK_ENV:-staging}
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: imperio
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD}
+      POSTGRES_DB: imperio
+    # Sem porta publicada: o banco só é acessível pela rede interna da stack.
+    networks:
+      default:
+        aliases: [imperio-postgres]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U imperio -d imperio"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: ../backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://imperio:${POSTGRES_PASSWORD}@imperio-postgres:5432/imperio
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      STARTING_COINS: ${STARTING_COINS:-100}
+      STORE_MODE: ${STORE_MODE:-live}
+      ADS_MODE: ${ADS_MODE:-admob}
+      BETA_SANDBOX: ${BETA_SANDBOX:-false}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+      # Contas vinculadas (ADR 0015): vazio = vínculo desligado.
+      PURCHASES_ENABLED: ${PURCHASES_ENABLED:-false}
+      # Loja paga só no iPhone (ADR 0022); a versão 1.0.0 não manda a plataforma e segue sem loja paga.
+      PURCHASES_PLATFORMS: ${PURCHASES_PLATFORMS:-ios}
+      # Atualização obrigatória por plataforma (vazio = o jogo só sugere atualizar).
+      MIN_APP_VERSION_IOS: ${MIN_APP_VERSION_IOS:-1.1.0}
+      MIN_APP_VERSION_ANDROID: ${MIN_APP_VERSION_ANDROID:-1.1.0}
+      APPLE_BUNDLE_ID: ${APPLE_BUNDLE_ID:-br.com.imperiodebolso.game}
+      # Google Play Billing (ADR 0028): conta de serviço (base64 do JSON) para verificar compras.
+      GOOGLE_PLAY_PACKAGE: ${GOOGLE_PLAY_PACKAGE:-br.com.imperiodebolso.game}
+      GOOGLE_PLAY_SERVICE_ACCOUNT: ${GOOGLE_PLAY_SERVICE_ACCOUNT:-}
+      ADS_ENABLED: ${ADS_ENABLED:-false}
+      # Anúncios só no iPhone: ADS_PLATFORMS=ios com ADS_MODE=admob (mock é recusado em produção).
+      ADS_PLATFORMS: ${ADS_PLATFORMS:-}
+      # Login com Google (ADR 0032): cliente "web" do projeto imperio-de-bolso-pagamentos (público).
+      GOOGLE_CLIENT_IDS: ${GOOGLE_CLIENT_IDS:-373550280191-u2o0tvukq24t6ptib8ndfvnpk7i82vqp.apps.googleusercontent.com}
+      APPLE_AUDIENCES: ${APPLE_AUDIENCES:-br.com.imperiodebolso.game}
+      TRUST_PROXY: "true"
+      RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-600}
+      RATE_LIMIT_AUTH_PER_MINUTE: ${RATE_LIMIT_AUTH_PER_MINUTE:-20}
+      # nginx-proxy + acme-companion do servidor (jwilder): roteia pelo domínio e emite o HTTPS.
+      VIRTUAL_HOST: ${API_DOMAIN:-api-imperio.crowntech.com.br}
+      VIRTUAL_PORT: "3000"
+      LETSENCRYPT_HOST: ${API_DOMAIN:-api-imperio.crowntech.com.br}
+    expose:
+      - "3000"
+    networks:
+      default:
+        aliases: [imperio-api]
+      proxy:
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      interval: 15s
+      timeout: 3s
+      retries: 10
+
+  admin:
+    build:
+      context: ../admin
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      VIRTUAL_HOST: ${ADMIN_DOMAIN:-admin-imperio.crowntech.com.br}
+      VIRTUAL_PORT: "80"
+      LETSENCRYPT_HOST: ${ADMIN_DOMAIN:-admin-imperio.crowntech.com.br}
+    expose:
+      - "80"
+    networks:
+      - default
+      - proxy
+
+  # Site do jogo (landing + políticas das lojas). Dados da empresa são públicos (CNPJ).
+  landing:
+    build:
+      context: ../landing
+      args:
+        SITE_LEGAL_NAME: ${SITE_LEGAL_NAME:-CROWN TECH LTDA}
+        SITE_CNPJ: ${SITE_CNPJ:-65.586.793/0001-18}
+        SITE_CITY: ${SITE_CITY:-Maricá/RJ}
+        SITE_EMAIL: ${SITE_EMAIL:-suporte-imperio@crowntech.com.br}
+        SITE_GOOGLE_PLAY_URL: ${SITE_GOOGLE_PLAY_URL:-}
+        SITE_APP_STORE_URL: ${SITE_APP_STORE_URL:-https://apps.apple.com/br/app/id6822892071}
+    restart: unless-stopped
+    environment:
+      VIRTUAL_HOST: ${LANDING_DOMAIN:-imperio.crowntech.com.br}
+      VIRTUAL_PORT: "80"
+      LETSENCRYPT_HOST: ${LANDING_DOMAIN:-imperio.crowntech.com.br}
+    expose:
+      - "80"
+    networks:
+      - default
+      - proxy
+
+  backup:
+    build:
+      context: ./backup
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://imperio:${POSTGRES_PASSWORD}@imperio-postgres:5432/imperio
+      BACKUP_PASSPHRASE: ${BACKUP_PASSPHRASE:?defina BACKUP_PASSPHRASE}
+      BACKUP_KEEP: ${BACKUP_KEEP:-14}
+      BACKUP_CRON: ${BACKUP_CRON:-30 3 * * *}
+    volumes:
+      - backups:/backups
+
+networks:
+  default:
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK:-nginx-proxy}
+
+volumes:
+  pgdata:
+  backups:

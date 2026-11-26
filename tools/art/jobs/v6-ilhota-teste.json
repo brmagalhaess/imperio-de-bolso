@@ -1,0 +1,14 @@
+[
+ {
+  "id": "g_industrial_ilhota3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Same glossy cartoon mobile city-builder art style, colors and isometric camera angle as the reference. Draw a SMALL NARROW island diorama floating on open blue sea: a long thin rectangle running diagonally from the upper-right to the lower-left, holding ONLY THREE EMPTY flat light-concrete building lots in a single diagonal row, with a short gray road beside them. Small edge decorations: a railway track with a tiny cargo train, a few containers and trees. A short road bridge leaves the upper end of the island toward the top of the image. Lots of empty sea around it, the island occupies only the middle third of the picture. No other lots, no buildings on the lots, no sky, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/5cb853d7-677c-4b4b-9836-40a256122c5c.jpeg"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ }
+]

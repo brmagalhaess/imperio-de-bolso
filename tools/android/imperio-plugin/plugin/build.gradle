@@ -1,0 +1,25 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'br.com.crowntech.imperio'
+    compileSdk 36
+    defaultConfig { minSdk 24 }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = '17' }
+}
+
+dependencies {
+    // Biblioteca do Godot do próprio template de exportação (mesma versão do jogo).
+    compileOnly files('../../../../game/android/build/libs/release/godot-lib.template_release.aar')
+    implementation "androidx.credentials:credentials:1.5.0"
+    implementation "androidx.credentials:credentials-play-services-auth:1.5.0"
+    implementation "com.google.android.libraries.identity.googleid:googleid:1.1.1"
+    implementation "com.google.android.play:app-update:2.1.0"
+    implementation "androidx.core:core:1.15.0"
+}

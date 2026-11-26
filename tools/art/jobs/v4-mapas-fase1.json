@@ -1,0 +1,418 @@
+[
+ {
+  "id": "g_industrial_base",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into an INDUSTRIAL PARK district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same square diorama tile shape floating on the sea, and the same layout of gray roads with crosswalks. Keep EXACTLY four of the green blocks as EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions as in the reference; the other two blocks become decorative: a small green park with trees and benches, and a field of solar panels. Replace the outer grass edges with a railway track carrying a small colorful cargo train, stacked shipping containers, pallets and forklifts parked at the tile edges; add a soft background of factory sheds with chimneys and wind turbines far behind the tile (blurred, not on the lots). Roads get yellow lane markings. Bright sunny day. No buildings on the four lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/97616650-d57e-4e79-a6a7-4327f693c2ce.png"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_serra_base",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a cozy SNOWY MOUNTAIN SKI VILLAGE district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same square diorama tile shape floating on the sea, and the same layout of gray roads with crosswalks. Keep EXACTLY four of the green blocks as EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions as in the reference; the other two blocks become decorative: a small frozen pond for ice skating surrounded by pine trees, and a snowy plaza with a snowman. Cover the outer ground with fresh snow and snowy pine trees, wooden fences and cozy street lamps; add tall snowy mountain peaks with ski slopes and a chairlift far behind the tile (blurred, not on the lots). The roads are cleared of snow. The four lots are cleared light stone plazas without snow. Cold clear blue sky, sunny. Bright sunny day. No buildings on the four lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/97616650-d57e-4e79-a6a7-4327f693c2ce.png"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_ilha_base",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a luxury TROPICAL ISLAND RESORT district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same square diorama tile shape floating on the sea, and the same layout of gray roads with crosswalks. Keep EXACTLY four of the green blocks as EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions as in the reference; the other two blocks become decorative: a small infinity pool with sun loungers and umbrellas, and a tropical garden with hibiscus flowers and a little waterfall. Replace the outer edges with white sand beaches, a turquoise lagoon with a visible coral reef, wooden boardwalks over the water and many palm trees; the tile floats on a crystal clear turquoise sea with a few small islands far away. Bright sunny day. No buildings on the four lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/97616650-d57e-4e79-a6a7-4327f693c2ce.png"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_espaco_base",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a futuristic SPACE CENTER district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same square diorama tile shape floating on the sea, and the same layout of gray roads with crosswalks. Keep EXACTLY four of the green blocks as EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions as in the reference; the other two blocks become decorative: a small park with trees and a big planet globe statue, and a plaza with a model of a satellite. Make the ground clean light gray with neat green lawns; roads have glowing blue lane lines; add big white satellite dishes at the tile edges and a tall white rocket standing on a launch tower far behind the tile (in the background, not on the lots). Clear sky. Bright sunny day. No buildings on the four lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/97616650-d57e-4e79-a6a7-4327f693c2ce.png"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_oficina_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a small car REPAIR WORKSHOP: a one-story garage with a big open roll-up door, a car lift inside, tires stacked outside and a red tool cabinet, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_moveis_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a small FURNITURE FACTORY: a brick workshop with a sawtooth roof, stacks of wooden planks and a finished wooden armchair by the door, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_metalurgica_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a STEEL MILL: a gray industrial shed with a short chimney with white steam, steel beams stacked outside and a glowing orange furnace window, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_montadora_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a CAR ASSEMBLY FACTORY: a long modern white factory with blue stripes, a short conveyor with a colorful car body coming out and a small parking lot, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_refinaria_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw an OIL REFINERY: white cylindrical storage tanks, silver pipes and a tall distillation tower with a small flame on top, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_usina_solar_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a SOLAR POWER PLANT: a modern control building surrounded by rows of shiny blue solar panels and a small wind turbine, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_chocolateria_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a cozy alpine CHOCOLATE SHOP: a small wooden chalet with snow on the roof, a big chocolate bar decoration, warm lit windows and a hot cocoa stand, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_pousada_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a mountain INN: a two-story stone and timber chalet with snowy roof, balconies with flower boxes, warm lights and a stack of firewood, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_aluguel_esqui_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a SKI RENTAL shop: a wooden cabin with colorful skis and snowboards racked outside, a small sled and snowy roof, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_teleferico_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a CABLE CAR STATION: a modern stone and glass station with a red gondola cabin hanging from cables leaving the station, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_spa_termal_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a THERMAL SPA: an elegant wooden building with steaming outdoor hot pools surrounded by stones and small pine trees, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_estacao_esqui_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a big SKI RESORT LODGE: a large alpine lodge with a tall pointed roof, a small ski lift tower beside it and snow all around, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_escola_mergulho_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a DIVING SCHOOL: a small turquoise beach hut with diving tanks, flippers and masks on racks and a little wooden dock, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_bangalos_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw luxury OVERWATER BUNGALOWS: three thatched-roof wooden villas on stilts connected by a wooden walkway over a small square of turquoise water, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_parque_aquatico_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a WATER PARK: colorful twisting water slides, a splash pool and a big tipping bucket on a play tower, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_clube_golfe_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a GOLF CLUB: an elegant white clubhouse with a terracotta roof next to a tiny putting green with a red flag and golf carts, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_heliponto_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a VIP HELIPORT: a round landing pad with a parked white helicopter on top of a modern glass terminal building, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_resort_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a LUXURY BEACH RESORT HOTEL: a curved white multi-story hotel with balconies, a pool in front and palm trees, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_observatorio_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw an astronomical OBSERVATORY: a white round building with a big silver dome slightly open showing a telescope, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_museu_espaco_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a SPACE MUSEUM: a modern glass building with a big planet sculpture and a small vintage rocket displayed outside, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_fabrica_satelites_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a SATELLITE FACTORY: a clean white high-tech factory with a big glass wall showing a golden satellite being assembled, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_centro_controle_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a MISSION CONTROL CENTER: a futuristic low building with big glass windows, screens glowing inside and a large antenna on the roof, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_foguete_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a ROCKET BASE: a launch pad with a white and red rocket standing on a steel launch tower and a small fueling tank, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_porto_espacial_lv1",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own square light-gray sidewalk base exactly like the references; more expensive businesses may use a slightly larger base. Draw a SPACEPORT terminal: a large futuristic white terminal with a curved roof and a sleek space plane parked in front of it, level 1. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg",
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/db8481c7-8cff-45ec-8951-7439ed3043af.jpeg"
+   ],
+   "aspect_ratio": "1:1"
+  }
+ },
+ {
+  "id": "g_helpers_industrial",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 6 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a mechanic in blue overalls holding a wrench; (2) a carpenter with a pencil behind the ear holding a wooden plank; (3) a steelworker in a silver heat suit and helmet; (4) a factory engineer in a white coat holding a tablet; (5) a refinery technician in an orange jumpsuit and hard hat; (6) a solar technician in a green vest holding a small solar panel. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01f21ab3-c6fe-4cc6-9660-66ca62b5654b.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g_helpers_serra",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 6 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a chocolatier in a brown apron holding a tray of chocolates; (2) an innkeeper in a cozy sweater holding a key; (3) a ski rental clerk in a red jacket holding skis; (4) a cable car operator in a blue uniform and cap; (5) a spa attendant in a white robe holding a towel; (6) a ski instructor in a bright ski suit and goggles holding ski poles. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01f21ab3-c6fe-4cc6-9660-66ca62b5654b.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g_helpers_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 6 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a diving instructor in a wetsuit holding a mask; (2) a resort butler in a white uniform holding a tray with a coconut drink; (3) a lifeguard in red shorts and a yellow shirt with a whistle; (4) a golf caddie in a polo shirt and cap holding a golf bag; (5) a helicopter pilot in a flight suit holding a helmet; (6) a hotel manager in an elegant suit holding a clipboard. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01f21ab3-c6fe-4cc6-9660-66ca62b5654b.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g_helpers_espaco",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 6 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) an astronomer in a sweater holding a small telescope; (2) a museum guide in a blue uniform holding a toy rocket; (3) an engineer in a white clean-room suit holding a small satellite; (4) a flight controller with a headset holding a tablet; (5) an astronaut in a white space suit holding a helmet; (6) a space pilot in a futuristic flight suit giving a thumbs up. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01f21ab3-c6fe-4cc6-9660-66ca62b5654b.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ }
+]

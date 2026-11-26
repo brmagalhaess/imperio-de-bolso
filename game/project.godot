@@ -1,0 +1,95 @@
+; Engine configuration file.
+; Império de Bolso — Godot 4.7, GDScript, 2D isométrico, retrato 9:16.
+
+config_version=5
+
+[application]
+
+config/name="Império de Bolso"
+config/description="Idle tycoon isométrico 2D"
+config/version="1.2.0"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://assets/app_icon/icon_512.png"
+boot_splash/bg_color=Color(0.0471, 0.5412, 0.5216, 1)
+boot_splash/image="res://assets/app_icon/adaptive_fg_432.png"
+boot_splash/fullsize=false
+boot_splash/use_filter=true
+
+[admob]
+
+; Anúncios no iPhone e no Android (ADR 0023/0028). Todas as chaves do plugin ficam aqui de
+; propósito: se faltar alguma, o plugin regrava o project.godot sozinho (e perde configurações).
+; App IDs da conta da empresa (pub-9538653038510274).
+general/android/enabled=true
+general/android/app_id="ca-app-pub-9538653038510274~1940408178"
+general/android/enable_r8_optimization=false
+general/android/disable_initialization_optimization=false
+general/android/disable_ad_loading_optimization=false
+general/ios/enabled=true
+general/ios/app_id="ca-app-pub-9538653038510274~3260733869"
+mediation/applovin=false
+mediation/bidmachine=false
+mediation/chartboost=false
+mediation/dtexchange=false
+mediation/imobile=false
+mediation/inmobi=false
+mediation/ironsource=false
+mediation/line=false
+mediation/maio=false
+mediation/meta=false
+mediation/mintegral=false
+mediation/moloco=false
+mediation/mytarget=false
+mediation/pangle=false
+mediation/pubmatic=false
+mediation/unity_ads=false
+mediation/vungle=false
+
+[autoload]
+
+Lang="*res://scripts/lang.gd"
+Audio="*res://scripts/audio_manager.gd"
+Api="*res://scripts/api_client.gd"
+GameState="*res://scripts/game_state.gd"
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://i18n/translations.pt_BR.translation", "res://i18n/translations.en.translation", "res://i18n/translations.es.translation")
+locale/fallback="pt_BR"
+
+[display]
+
+window/size/viewport_width=720
+window/size/viewport_height=1280
+window/size/window_width_override=405
+window/size/window_height_override=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/admob/plugin.cfg", "res://addons/GodotGooglePlayBilling/plugin.cfg", "res://addons/ImperioAndroid/plugin.cfg")
+
+[imperio]
+
+api/base_url="http://127.0.0.1:3000/api/v1"
+api/base_url_mobile="https://api-imperio.crowntech.com.br/api/v1"
+ads/ios_rewarded_unit="ca-app-pub-9538653038510274/3843187791"
+ads/android_rewarded_unit="ca-app-pub-9538653038510274/8046651528"
+; Login com Google no Android (ADR 0032): cliente "web" do projeto imperio-de-bolso-pagamentos —
+; o ID token sai com este público, que o servidor aceita em GOOGLE_CLIENT_IDS.
+auth/google_web_client_id="373550280191-u2o0tvukq24t6ptib8ndfvnpk7i82vqp.apps.googleusercontent.com"
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+buffering/agile_event_flushing=true
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/canvas_textures/default_texture_filter=1
+textures/vram_compression/import_etc2_astc=true

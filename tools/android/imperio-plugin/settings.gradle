@@ -1,0 +1,14 @@
+// Plugin Android do Império de Bolso (ADR 0032): login com Google (Credential Manager) e folha
+// de compartilhar nativa. Gera o AAR que vai em game/addons/ImperioAndroid/bin.
+pluginManagement {
+    repositories { google(); mavenCentral(); gradlePluginPortal() }
+    plugins {
+        id 'com.android.library' version '8.6.1'
+        id 'org.jetbrains.kotlin.android' version '2.1.21'
+    }
+}
+dependencyResolutionManagement {
+    repositories { google(); mavenCentral() }
+}
+rootProject.name = "ImperioAndroid"
+include ':plugin'

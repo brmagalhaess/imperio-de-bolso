@@ -1,0 +1,16 @@
+[
+ {
+  "id": "g_status_icons",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Using the exact glossy rounded cartoon art style of this mobile game icon sheet, draw a clean icon sheet of 2 separate eye-catching ROUND status icons side by side with generous white space between them. Each icon is a glossy CIRCLE badge with a thick golden rim and small sparkles: 1) bright orange-red circle with a big yellow lightning bolt and speed lines (turbo boost active); 2) deep green circle with two big shiny stacked gold coins glowing, one slightly behind the other (double coins active). Plain solid pure white background, no text, no letters, no numbers, no labels.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/411d809c-8f09-4f4f-8bf2-fa3f8c981970.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "2:1"
+  }
+ }
+]

@@ -1,0 +1,257 @@
+[
+  {
+    "id": "g_market_lv2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw the SAME grocery store upgraded to level 2: a bigger two-story mini market with a wider striped awning, more fruit crates, a small fridge outside and potted plants, same colors. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_market_lv3",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw the SAME grocery store upgraded to level 3: a modern bright neighborhood market with large glass windows, two awnings, shopping carts by the door and a rooftop sign without letters, same colors. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_restaurant_lv1",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw a cozy small Brazilian restaurant, level 1: one-story yellow house with a clay tile roof, a red awning and two small outdoor tables with umbrellas. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_restaurant_lv2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw the same restaurant upgraded to level 2: two-story with a terrace, string lights, more outdoor tables and a big chalkboard without letters. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_restaurant_lv3",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw the same restaurant upgraded to level 3: an elegant big restaurant with a rooftop garden terrace, large windows, warm lights and a fountain at the entrance. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_supermarket_lv1",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw a small supermarket, level 1: a wide one-story green and white building with big glass doors and a few shopping carts. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_supermarket_lv2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw the same supermarket upgraded to level 2: larger building with a loading dock, solar panels on the roof and more carts. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_supermarket_lv3",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw the same supermarket upgraded to level 3: a big modern hypermarket with a curved glass facade, rooftop parking, flags and many carts. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_gym_lv1",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw a small gym, level 1: one-story orange building with big windows showing treadmills and dumbbells. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_gym_lv2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw the same gym upgraded to level 2: two-story fitness center with glass walls, a rooftop running track and a small pool. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_gym_lv3",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw the same gym upgraded to level 3: a big sports center with glass dome, outdoor courts, a pool and climbing wall. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_hotel_lv1",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw a small beach hotel (pousada), level 1: a charming two-story pastel blue house with balconies, palm tree and clay tile roof. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_hotel_lv2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw the same hotel upgraded to level 2: a four-story pastel hotel with balconies, rooftop pool and palm trees. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_hotel_lv3",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw the same hotel upgraded to level 3: a tall luxury resort tower with glass balconies, infinity rooftop pool, palm trees and a grand entrance. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_mall_lv1",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw a small shopping gallery, level 1: a one-story pink and white building with several shop windows and awnings. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_mall_lv2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw the same shopping gallery upgraded to level 2: a two-story mall with a glass atrium entrance, colorful shop fronts and banners without letters. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_mall_lv3",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile city-builder, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle as the grocery store reference. The building stands on its own small square light-gray sidewalk base exactly like the grocery store reference; bigger levels may use a slightly larger base. Draw the same mall upgraded to level 3: a big modern shopping mall with a glass dome, multiple floors, rooftop food court and fountains. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no logos, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/ba1f2864-5173-45d8-b82f-d128ef9807d2.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  }
+]

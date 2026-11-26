@@ -1,0 +1,30 @@
+[
+  {
+    "id": "g_city_base",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Edit this image: remove ALL the user interface (top bar, coin counters, title, bottom buttons) and remove EVERY building, house, shop, construction crane, car, person, umbrella, coin bubble and number. Keep exactly the same camera, the same floating square city block diorama with its thick grass-and-soil side walls, the gray streets with white markings and sidewalks forming a clear street grid, the beach strip with sand and sea along one side, the turquoise water background, and the trees and palm trees only along the outer edges. Where buildings were, leave flat empty light-green grass building plots with a thin sidewalk border, so there are six large clearly separated empty plots ready for buildings. Same glossy cartoon art style. No text anywhere.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png"
+      ],
+      "quality": "medium",
+      "resolution": "2k",
+      "aspect_ratio": "9:16"
+    }
+  },
+  {
+    "id": "g_market_lv1",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Using the exact art style and isometric camera angle of the buildings in this mobile game city image (glossy cartoon, saturated colors, chunky rounded shapes, clay tile roofs, soft outlines), draw ONLY a small neighborhood grocery store (mercadinho), level 1 humble version: a small one-story colorful corner shop with a striped awning, fruit and vegetable crates at the door and a small sign without letters, standing on its own small square sidewalk base. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no cars, no text, no letters, no numbers, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/67ea3561-efae-479e-b430-22a62c392f2f.png"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  }
+]

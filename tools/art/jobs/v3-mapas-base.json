@@ -1,0 +1,26 @@
+[
+ {
+  "id": "g_porto_base",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a BRAZILIAN HARBOR / MARINA district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same square diorama tile shape floating on the sea, and the same layout of gray roads with crosswalks. Keep EXACTLY four of the green blocks as EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions as in the reference; the other two blocks become decorative: a small plaza with palm trees and a fountain, and a little lighthouse corner. Replace the outer grass and beach edges with wooden piers and docks reaching into turquoise water, small colorful fishing boats and sailboats moored around the tile, stacked crates and ropes on the docks. Bright sunny day. No buildings on the four lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/97616650-d57e-4e79-a6a7-4327f693c2ce.png"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ },
+ {
+  "id": "g_centro_base",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a modern DOWNTOWN FINANCIAL DISTRICT. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same square diorama tile shape floating on the sea, and the same layout of gray roads with crosswalks. Keep EXACTLY four of the green blocks as EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions as in the reference; the other two blocks become decorative: a small green park with trees and a round fountain, and a plaza with flower beds. Make the roads wider avenues with modern street lamps and neat sidewalks, and add a soft skyline of tall glass skyscrapers in the far background behind the tile (blurred, not on the lots). Bright sunny day, blue sky. No buildings on the four lots, no people, no cars, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/97616650-d57e-4e79-a6a7-4327f693c2ce.png"
+   ],
+   "aspect_ratio": "9:16"
+  }
+ }
+]

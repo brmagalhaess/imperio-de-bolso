@@ -1,0 +1,225 @@
+[
+  {
+    "id": "g_water_cart_lv2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile game, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle and scale as the water cart reference. Draw the SAME water cart from the reference upgraded to level 2: a sturdier and slightly bigger cart, two coolers full of water bottles and green coconuts, a bigger striped parasol and a string of small colorful lights, keeping the same wood and colors. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no sand, no ground, no shadow, no text, no letters, no numbers, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/78141297-4850-4fb7-b911-86f0fcc0be4a.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_water_cart_lv3",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile game, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle and scale as the water cart reference. Draw the SAME water cart from the reference upgraded to level 3 deluxe: a small premium beverage kiosk on wheels with a glass-door mini fridge full of water bottles, a coconut display, a wide red and white striped awning and a potted plant, keeping the same wood and colors. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no sand, no ground, no shadow, no text, no letters, no numbers, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/78141297-4850-4fb7-b911-86f0fcc0be4a.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_popcorn_cart_lv1",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile game, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle and scale as the water cart reference. Draw a cute small popcorn cart, level 1: little red and white cart with a glass popcorn machine full of popcorn and two wheels. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no sand, no ground, no shadow, no text, no letters, no numbers, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/78141297-4850-4fb7-b911-86f0fcc0be4a.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_popcorn_cart_lv2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile game, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle and scale as the water cart reference. Draw the popcorn cart upgraded to level 2: bigger red and white checkered popcorn stand with a large glass popcorn machine, paper popcorn buckets and a small awning. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no sand, no ground, no shadow, no text, no letters, no numbers, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/78141297-4850-4fb7-b911-86f0fcc0be4a.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_popcorn_cart_lv3",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile game, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle and scale as the water cart reference. Draw the popcorn cart upgraded to level 3 deluxe: a fancy popcorn kiosk on wheels with two glass popcorn machines, colorful popcorn buckets, a red striped canopy and light bulbs. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no sand, no ground, no shadow, no text, no letters, no numbers, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/78141297-4850-4fb7-b911-86f0fcc0be4a.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_icecream_cart_lv1",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile game, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle and scale as the water cart reference. Draw a cute small ice cream cart, level 1: pastel pink and mint cart with a freezer box and a big ice cream cone decoration on top. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no sand, no ground, no shadow, no text, no letters, no numbers, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/78141297-4850-4fb7-b911-86f0fcc0be4a.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_icecream_cart_lv2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile game, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle and scale as the water cart reference. Draw the ice cream cart upgraded to level 2: a bigger pastel ice cream stand with a striped pink canopy, glass freezer showing colorful ice cream tubs and a giant cone on top. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no sand, no ground, no shadow, no text, no letters, no numbers, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/78141297-4850-4fb7-b911-86f0fcc0be4a.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_icecream_cart_lv3",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile game, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle and scale as the water cart reference. Draw the ice cream cart upgraded to level 3 deluxe: a charming small ice cream parlor kiosk with pink and mint striped awning, display freezer, two small stools and a giant swirl cone sign. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no sand, no ground, no shadow, no text, no letters, no numbers, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/78141297-4850-4fb7-b911-86f0fcc0be4a.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_coconut_kiosk_lv1",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile game, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle and scale as the water cart reference. Draw a small rustic coconut water stand, level 1: tiny wooden counter with a straw roof and a pile of green coconuts. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no sand, no ground, no shadow, no text, no letters, no numbers, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/78141297-4850-4fb7-b911-86f0fcc0be4a.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_coconut_kiosk_lv2",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile game, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle and scale as the water cart reference. Draw the coconut water stand upgraded to level 2: a straw-roof beach hut kiosk with a wooden counter, green coconuts with straws, a small fridge and a hammock post. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no sand, no ground, no shadow, no text, no letters, no numbers, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/78141297-4850-4fb7-b911-86f0fcc0be4a.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_coconut_kiosk_lv3",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile game, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle and scale as the water cart reference. Draw the coconut water stand upgraded to level 3 deluxe: a big tiki beach bar with a large thatched roof, wooden bar counter, green coconuts, tropical juice dispensers and two bar stools. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no sand, no ground, no shadow, no text, no letters, no numbers, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/78141297-4850-4fb7-b911-86f0fcc0be4a.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_lot_lock",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile game, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle and scale as the water cart reference. Draw a small wooden sign post with a big golden padlock on it, marking a locked lot for sale, with a small patch of rope fence. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no sand, no ground, no shadow, no text, no letters, no numbers, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/78141297-4850-4fb7-b911-86f0fcc0be4a.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_beach_umbrella",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Use the exact art style of these reference images (glossy cartoon mobile game, saturated colors, chunky rounded shapes, soft outlines) and the same isometric camera angle and scale as the water cart reference. Draw a colorful beach umbrella standing over a beach towel and a small cooler. Single isolated game asset, centered, fully visible with margin, on a plain solid pure white background. No people, no sand, no ground, no shadow, no text, no letters, no numbers, no UI.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png",
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/78141297-4850-4fb7-b911-86f0fcc0be4a.jpeg"
+      ],
+      "quality": "medium",
+      "resolution": "1k",
+      "aspect_ratio": "1:1"
+    }
+  },
+  {
+    "id": "g_characters",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Using the exact character art style of this mobile game image (cute chibi cartoon people, big heads, glossy, saturated colors), draw a character sheet of 6 different cute chibi beach characters standing in a single row, evenly spaced with clear white space between them, full body, facing the viewer at a slight angle: a water vendor with a yellow cap and apron, a girl in a swimsuit with a sun hat, a boy with surf shorts holding a ball, a grandma with sunglasses, a tourist with a camera, a kid with an ice cream. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/fa85b3b8-071d-41cc-a6c4-907efa62f6d1.png"
+      ],
+      "quality": "medium",
+      "resolution": "2k",
+      "aspect_ratio": "16:9"
+    }
+  },
+  {
+    "id": "g_ui_icons",
+    "model": "xai/grok-imagine-image-2.0",
+    "variations": 1,
+    "input": {
+      "prompt": "Using the exact user interface art style of this mobile game screenshot (glossy rounded cartoon buttons and icons), draw a clean icon sheet: 8 separate game icons arranged in a 4 by 2 grid with generous white space between them, each icon alone without any label: 1) red rounded button with a hammer (build), 2) mint green rounded button with a shopping bag (shop), 3) yellow rounded button with a map pin (map), 4) blue rounded button with a smiling vendor face with cap (profile), 5) a shiny golden coin, 6) a golden coin inside a soft glossy translucent bubble, 7) a pink rounded button with a white gear (settings), 8) a cream rounded button with a question mark (help). Plain solid pure white background, no text, no letters, no labels, no numbers.",
+      "image_urls": [
+        "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/c4a9d33a-830c-4e7c-9ba8-36963f448001.png"
+      ],
+      "quality": "medium",
+      "resolution": "2k",
+      "aspect_ratio": "2:1"
+    }
+  }
+]

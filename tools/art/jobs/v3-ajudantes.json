@@ -1,0 +1,30 @@
+[
+ {
+  "id": "g_helpers_porto",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 6 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) a fishmonger in a white apron and rubber boots holding a big fish; (2) a tanned surf instructor in board shorts and a rash guard holding a small surfboard; (3) a seafood cook in a striped apron holding a plate with a lobster; (4) a yacht captain in a white uniform and captain hat holding binoculars; (5) a shipbuilder in a yellow hard hat and overalls holding a hammer; (6) a port crane operator in an orange safety vest and helmet holding a walkie-talkie. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01f21ab3-c6fe-4cc6-9660-66ca62b5654b.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ },
+ {
+  "id": "g_helpers_centro",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 1,
+  "input": {
+   "prompt": "Using the exact character art style of this reference sheet (cute chibi cartoon people, big heads, glossy, saturated colors, same proportions and rendering), draw a NEW character sheet of 6 different cute chibi workers standing in a single row, evenly spaced with wide white space between them, full body, fully clothed, family-friendly, facing the viewer at a slight angle, each one clearly showing their job: (1) an elegant jeweler in a black vest holding a small sparkling ring box; (2) a bank manager in a navy suit and tie holding a gold coin; (3) an office executive woman in a smart blazer holding a laptop; (4) an event host in a purple blazer holding a microphone; (5) a football coach in a green and yellow tracksuit holding a ball; (6) an airline pilot in a dark uniform and pilot cap holding a small suitcase. Plain solid pure white background, no ground, no shadow, no text, no letters, no numbers, no logos.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01f21ab3-c6fe-4cc6-9660-66ca62b5654b.png"
+   ],
+   "quality": "medium",
+   "resolution": "2k",
+   "aspect_ratio": "16:9"
+  }
+ }
+]
