@@ -27,3 +27,8 @@ CREATE TABLE "player_seasons" (
 CREATE INDEX "player_seasons_season_stars_idx" ON "player_seasons"("season", "stars");
 ALTER TABLE "player_seasons" ADD CONSTRAINT "player_seasons_player_id_fkey"
     FOREIGN KEY ("player_id") REFERENCES "players"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Convide amigos: quem convidou este jogador e quando o convite já rendeu prêmio a quem convidou.
+ALTER TABLE "players" ADD COLUMN "invited_by" UUID;
+ALTER TABLE "players" ADD COLUMN "invite_rewarded_at" TIMESTAMPTZ(3);
+CREATE INDEX "players_invited_by_idx" ON "players"("invited_by");

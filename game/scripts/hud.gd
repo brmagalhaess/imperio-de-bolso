@@ -835,6 +835,7 @@ func open_profile_menu() -> void:
 		show_toast(tr("Código copiado!")))
 	if player.get("canChangeName", false):
 		_modal.add_action(tr("Alterar nome (só 1 vez)"), open_name_form, Style.TEAL_LIGHT, Style.TEAL_DARK)
+	_modal.add_action(tr("Convidar amigos · ganhe diamantes"), open_invite_menu, PURPLE, PURPLE_DARK)
 	_add_prestige_section()
 	_modal.add_section(tr("Conquistas"))
 	for a in GameState.achievements:
@@ -1028,6 +1029,59 @@ func choose_language(code: String) -> void:
 
 
 ## Troca de nome: permitida uma única vez (pedido do titular); o servidor valida.
+## Convide amigos (ADR 0035): o código do jogador vale como convite. Quem usa ganha diamantes
+## na hora; quem convidou ganha quando o amigo evolui.
+func open_invite_menu() -> void:
+	_reward_kind = "invite"
+	_reward_cards.clear()
+	_modal.open(tr("Convidar amigos"))
+	_modal.add_message(null, "", tr("Carregando…"))
+	var res := await Api.invites()
+	if _reward_kind != "invite" or not _modal.visible:
+		return
+	_modal.clear_list()
+	if not res.ok:
+		_modal.add_message(null, "", GameState.message_for(res.error_code))
+		_modal.add_action(tr("Voltar"), open_profile_menu, Style.GREY, Style.GREY_DARK)
+		return
+	var d: Dictionary = res.data
+	_modal.add_message(_gem_tex, tr("Chame seus amigos!"),
+			tr("Seu amigo ganha %d diamantes ao usar seu código. Você ganha %d diamantes quando ele chegar a %d estrelas de evolução.") % [
+				int(d.guestGems), int(d.hostGems), int(d.stars)])
+	var code := str(d.code)
+	var invite_text := tr("Jogue Império de Bolso comigo! Use meu código %s no Perfil e ganhe %d diamantes: %s") % [
+			code, int(d.guestGems), "https://imperio.crowntech.com.br"]
+	_modal.add_copy_row(tr("Seu código de convite"), code, func(): show_toast(tr("Código copiado!")))
+	_modal.add_action(tr("Copiar convite para enviar"), func():
+		DisplayServer.clipboard_set(invite_text)
+		GameState.track("invite_copied")
+		show_toast(tr("Convite copiado! Cole no WhatsApp ou onde quiser.")), Color("1877f2"), Color("0d5bbf"))
+	_modal.add_message(null, "", tr("Amigos que usaram seu código: %d · já premiados: %d de %d") % [
+			int(d.friends), int(d.rewarded), int(d.maxRewarded)])
+	if int(d.claimable) > 0:
+		_modal.add_action(tr("Resgatar +%d diamantes") % int(d.claimableGems), func():
+			var r := await Api.claim_invites()
+			if r.ok:
+				GameState._apply_state(r.data.state)
+				show_toast(tr("+%d diamantes!") % int(r.data.gems))
+			else:
+				show_toast(GameState.message_for(r.error_code))
+			open_invite_menu(), Style.ORANGE, Style.ORANGE_DARK)
+	if d.get("canRedeem", false):
+		_modal.add_section(tr("Tem o código de um amigo?"))
+		var edit: LineEdit = _modal.add_line_edit(tr("Código do amigo"), 8)
+		_modal.add_action(tr("Usar código (+%d diamantes)") % int(d.guestGems), func():
+			var r := await Api.redeem_invite(edit.text.strip_edges())
+			if r.ok:
+				GameState._apply_state(r.data.state)
+				show_toast(tr("+%d diamantes!") % int(r.data.gems))
+				open_invite_menu()
+			else:
+				show_toast(GameState.message_for(r.error_code)), Style.GREEN, Style.GREEN_DARK)
+	_modal.add_action(tr("Voltar"), open_profile_menu, Style.GREY, Style.GREY_DARK)
+	_modal.refit()
+
+
 func open_name_form() -> void:
 	_reward_kind = "name"
 	_reward_cards.clear()

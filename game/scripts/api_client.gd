@@ -265,6 +265,19 @@ func leaderboard_season() -> Dictionary:
 	return await _authed(HTTPClient.METHOD_GET, "/leaderboard/season", null, "")
 
 
+## Convide amigos (ADR 0035).
+func invites() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_GET, "/invites", null, "")
+
+
+func redeem_invite(code: String) -> Dictionary:
+	return await _command("/invites/redeem", {"code": code})
+
+
+func claim_invites() -> Dictionary:
+	return await _command("/invites/claim", {})
+
+
 func complete_tutorial() -> Dictionary:
 	return await _authed(HTTPClient.METHOD_POST, "/tutorial/complete", {}, "")
 

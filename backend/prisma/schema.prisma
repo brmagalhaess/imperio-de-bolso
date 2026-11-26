@@ -66,6 +66,9 @@ model Player {
   evoStars            Int?      @map("evo_stars")
   // Temporada de 20 dias: última já conferida para prêmios.
   rewardsCheckedSeason Int?     @map("rewards_checked_season")
+  // Convide amigos (ADR 0035): quem convidou e quando o convite rendeu prêmio a quem convidou.
+  invitedBy           String?   @map("invited_by") @db.Uuid
+  inviteRewardedAt    DateTime? @map("invite_rewarded_at") @db.Timestamptz(3)
   createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
 
   wallet         PlayerWallet?
@@ -87,6 +90,7 @@ model Player {
   weeklyRewards  PlayerWeeklyReward[]
   seasons        PlayerSeason[]
 
+  @@index([invitedBy])
   @@map("players")
 }
 

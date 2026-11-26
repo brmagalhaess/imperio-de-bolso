@@ -69,6 +69,53 @@ func _ready() -> void:
 			print("PASSO %s %dx%d" % [shot[0], img.get_width(), img.get_height()])
 		get_tree().quit()
 		return
+	if mode == "v12":
+		# Conferência da 1.2.0 (ADR 0035): painel com estrelas, ajudantes com nível, ranking,
+		# missões com desafios e Loja. Estado montado só na tela.
+		var out := OS.get_environment("CAPTURE_DIR")
+		await _wait(3.0)
+		hud._modal.close()
+		GameState._presence_timer.stop()
+		GameState.daily["claimedToday"] = true
+		var levels := [1, 10, 25, 50, 100, 37]
+		var i := 0
+		for b in GameState.businesses():
+			if b.district != "praia":
+				continue
+			b["owned"] = true
+			b["level"] = levels[i % 6]
+			b["evolution"] = Layout.visual_tier(int(b.level))
+			b["nextEvolutionLevel"] = [10, 25, 50, 100, null][int(b.evolution) - 1]
+			b["managed"] = i != 5
+			if b.has("helper") and i != 5:
+				b.helper["level"] = [1, 3, 10, 5, 2][i % 5]
+				b.helper["nextCost"] = null if int(b.helper.level) >= 10 else "64000"
+				b.helper["profitPercent"] = 20 * (int(b.helper.level) - 1)
+			i += 1
+		GameState.state.wallet["coins"] = "98765432"
+		GameState.state_changed.emit()
+		var snap := func(name: String):
+			await _wait(1.2)
+			get_viewport().get_texture().get_image().save_png(out.path_join(name + ".png"))
+		main.districts["praia"].select("sorveteria")
+		await snap.call("01_painel")
+		hud.close_sheet()
+		hud.open_helpers_menu()
+		await snap.call("02_ajudantes")
+		for t in [2, 3]:
+			hud.open_ranking_menu(t)
+			await _wait(1.5)
+			await snap.call("03_ranking_%d" % t)
+		await GameState.refresh_missions()
+		hud.open_missions_menu()
+		await snap.call("04_missoes")
+		hud._modal._scroll.scroll_vertical = 600
+		await snap.call("05_desafios")
+		hud.open_map_menu()
+		await snap.call("06_mapa")
+		print("PASSO v12")
+		get_tree().quit()
+		return
 	if mode == "mapas20":
 		# Conferência dos 20 mapas (ADR 0034): cada mapa todo construído (só na tela), no topo e
 		# rolado até as ilhas; níveis variados para ver as 5 evoluções.

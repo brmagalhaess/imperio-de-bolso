@@ -31,6 +31,7 @@ import {
 } from "../services/purchases.js";
 import { STORE_PLATFORM, adsFor, features, purchasesFor, storePlatform } from "../lib/features.js";
 import { deleteAccount } from "../services/account.js";
+import { claimInvites, getInvites, redeemInvite } from "../services/invites.js";
 import { getPrestige, sellEmpire } from "../services/prestige.js";
 import { changeName } from "../services/profile.js";
 import { buyWithGems, claimVipDaily, getCatalog } from "../services/store.js";
@@ -353,6 +354,20 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
 
   app.get("/leaderboard/stars", { preHandler: authenticate }, async (request) =>
     getStarsRanking(db, playerIdOf(request), now()),
+  );
+
+  // Convide amigos (ADR 0035).
+  app.get("/invites", { preHandler: authenticate }, async (request) =>
+    getInvites(db, playerIdOf(request)),
+  );
+
+  app.post("/invites/redeem", { preHandler: authenticate }, async (request, reply) => {
+    const { code } = z.object({ code: z.string().trim().min(1).max(16) }).parse(request.body);
+    return command(request, reply, "invites.redeem", (at) => redeemInvite(code, at));
+  });
+
+  app.post("/invites/claim", { preHandler: authenticate }, async (request, reply) =>
+    command(request, reply, "invites.claim", (at) => claimInvites(at)),
   );
 
   // Ranking global de evolução (estrelas de evolução) e temporada de 20 dias (ADR 0035).

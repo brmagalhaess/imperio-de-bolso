@@ -174,3 +174,36 @@ describe("temporada e desafios (ADR 0035)", () => {
     expect(claim.json().state.wallet.gems).toBe("8");
   });
 });
+
+describe("convide amigos (ADR 0035)", () => {
+  it("quem usa o código ganha na hora; quem convidou ganha quando o amigo evolui", async () => {
+    ctx = await createTestContext();
+    const host = await newGuest(ctx.app);
+    const friend = await newGuest(ctx.app);
+    const code = (await get(ctx.app, host, "/invites")).json().code;
+    expect(code).toBe(host.playerId.slice(0, 8).toUpperCase());
+    const redeem = (g: Guest, c: string) => post(ctx.app, g, "/invites/redeem", { code: c });
+    expect((await redeem(host, code)).json().error.code).toBe("INVITE_SELF");
+    expect((await redeem(friend, "zzzzzzzz")).json().error.code).toBe("INVITE_INVALID");
+    const ok = await redeem(friend, code.toLowerCase());
+    expect(ok.statusCode).toBe(200);
+    expect(ok.json().state.wallet.gems).toBe("20");
+    expect((await redeem(friend, code)).json().error.code).toBe("INVITE_ALREADY_USED");
+    // Convite cruzado não vale.
+    const back = (await get(ctx.app, friend, "/invites")).json().code;
+    expect((await redeem(host, back)).json().error.code).toBe("INVITE_SELF");
+    // Amigo ainda sem estrelas: nada para resgatar.
+    const claim = () => post(ctx.app, host, "/invites/claim", {});
+    expect((await claim()).json().error.code).toBe("INVITE_NOTHING_TO_CLAIM");
+    await ctx.db.player.update({ where: { id: friend.playerId }, data: { evoStars: 20 } });
+    expect((await get(ctx.app, host, "/invites")).json()).toMatchObject({
+      friends: 1,
+      claimable: 1,
+      claimableGems: 40,
+    });
+    const paid = await claim();
+    expect(paid.json()).toMatchObject({ gems: 40, friends: 1 });
+    expect(paid.json().state.wallet.gems).toBe("40");
+    expect((await claim()).json().error.code).toBe("INVITE_NOTHING_TO_CLAIM");
+  });
+});
