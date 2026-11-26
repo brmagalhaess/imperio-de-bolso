@@ -207,8 +207,9 @@ describe("pódio semanal e prestígio no ranking", () => {
         data: {
           playerId,
           businessId: def.id,
-          level: 1,
+          level: def.maxLevel,
           managerUnlocked: true,
+          managerLevel: 1,
           cycleStartedAt: ctx.clock.now,
           lastSettlementAt: ctx.clock.now,
         },
