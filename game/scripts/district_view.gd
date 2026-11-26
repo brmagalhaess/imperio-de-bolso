@@ -154,6 +154,7 @@ func _ready() -> void:
 
 	GameState.state_changed.connect(_sync)
 	GameState.collected.connect(_on_collected)
+	GameState.evolved.connect(_on_evolved)
 	_sync()
 
 
@@ -307,6 +308,13 @@ func _on_collected(items: Array) -> void:
 		if lots.has(item.slug):
 			var lot: Node2D = lots[item.slug]
 			add_child(FloatingText.new("+" + Fmt.coins(item.amount), lot.position + lot.bubble_position()))
+
+
+## Evolução (ADR 0035): estrela subindo do negócio que evoluiu.
+func _on_evolved(evolved_slug: String, evolution: int) -> void:
+	if lots.has(evolved_slug) and is_visible_in_tree():
+		var lot: Node2D = lots[evolved_slug]
+		add_child(FloatingText.new("⭐ ×%d" % evolution, lot.position + Vector2(0, -150)))
 
 
 func _unhandled_input(event: InputEvent) -> void:

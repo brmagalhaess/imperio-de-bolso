@@ -376,7 +376,26 @@ func _update_cycle(b: Dictionary) -> void:
 			else tr("Pronto em %s") % Fmt.duration(GameState.seconds_remaining(b))
 
 
+const HOLD_DELAY := 0.45
+const HOLD_REPEAT := 0.09
+var _hold_timer: Timer
+var _held := false
+
+
+## Botão "Melhorar" segurado: um nível a cada 0,09 s enquanto houver saldo.
+func _on_hold_tick() -> void:
+	var b := GameState.business(slug)
+	if b.is_empty() or not b.owned or not _action_button.button_pressed or _action_button.disabled:
+		return
+	_held = true
+	GameState.upgrade(slug)
+	_hold_timer.start(HOLD_REPEAT)
+
+
 func _on_action_pressed() -> void:
+	if _held:  # soltou depois de segurar: os níveis já subiram
+		_held = false
+		return
 	var b := GameState.business(slug)
 	if b.is_empty():
 		return
@@ -1931,6 +1950,15 @@ func _build_sheet() -> void:
 	_collect_button = _make_button(buttons, _on_collect_pressed)
 	Style.style_button(_collect_button, Style.ORANGE, Style.ORANGE_DARK)
 	_action_button = _make_button(buttons, _on_action_pressed)
+	# Segurar "Melhorar" sobe níveis em sequência (ADR 0035: agora o mapa vai até o nível 100).
+	_hold_timer = Timer.new()
+	_hold_timer.one_shot = true
+	_hold_timer.timeout.connect(_on_hold_tick)
+	add_child(_hold_timer)
+	_action_button.button_down.connect(func():
+		_held = false
+		_hold_timer.start(HOLD_DELAY))
+	_action_button.button_up.connect(func(): _hold_timer.stop())
 	_hire_button = _make_button(col, _on_hire_pressed)
 	Style.style_button(_hire_button, Style.TEAL_LIGHT, Style.TEAL_DARK)
 
