@@ -8,6 +8,7 @@ import {
   get,
   key,
   newGuest,
+  openMaps,
   post,
   setCoins,
   type Guest,
@@ -30,6 +31,7 @@ const ALL = BUSINESS_CATALOG.filter((b) =>
 /** Compra os negócios (em ordem de mapa) e, se pedido, contrata os ajudantes. */
 async function buildEmpire(g: Guest, slugs: string[], helpers: boolean) {
   await setCoins(ctx.db, g.playerId, 10n ** 26n);
+  await openMaps(ctx.db, g.playerId);
   for (const slug of slugs) {
     const r = await post(ctx.app, g, "/businesses/purchase", { businessSlug: slug });
     expect(r.statusCode).toBe(201);
@@ -121,9 +123,8 @@ describe("vender o império", () => {
     expect(state.player).toMatchObject({ prestigeStars: 33, prestigeBonusPercent: 66 });
     expect(state.wallet).toEqual({ coins: "100", gems: "42" });
     expect(state.businesses.every((b: { owned: boolean }) => !b.owned)).toBe(true);
-    expect(state.districts.map((d: { unlocked: boolean }) => d.unlocked)).toEqual(
-      state.districts.map((_: unknown, i: number) => i === 0),
-    );
+    // Mapas já conquistados continuam abertos depois da venda (ADR 0035).
+    expect(state.districts.every((d: { unlocked: boolean }) => d.unlocked)).toBe(true);
     // Lucro com bônus: água 10 → 16 (+66%).
     const agua = state.businesses.find((b: { slug: string }) => b.slug === "agua");
     expect(agua.profitPerCycle).toBe("16");

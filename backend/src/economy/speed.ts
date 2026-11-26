@@ -5,6 +5,8 @@
 // base): 1 s real com velocidade 200% rende 2 s de trabalho. Assim, se o Turbo ou o VIP
 // acabam no meio do tempo fora, cada trecho conta com a velocidade que tinha.
 
+import { helperSpeedPoints } from "./helpers.js";
+
 export const HELPER_SPEED = 25;
 export const MILESTONE_SPEED = 50;
 export const MILESTONES = [10, 25, 50, 75, 100] as const;
@@ -45,6 +47,9 @@ function turboActive(ctx: SpeedContext, t: number): boolean {
 export interface SpeedSubject {
   level: number;
   managerUnlocked: boolean;
+  /** Nível e negócio do ajudante (ADR 0035): os de especialidade "tempo" aceleram mais. */
+  managerLevel?: number | null;
+  businessId?: number;
 }
 
 /** Marcos de nível atingidos (0–5). */
@@ -55,7 +60,12 @@ export function milestonesReached(level: number): number {
 /** Bônus que não dependem do tempo (nível e ajudante), em pontos percentuais. */
 export function baseSpeedPercent(b: SpeedSubject): number {
   return (
-    100 + (b.managerUnlocked ? HELPER_SPEED : 0) + MILESTONE_SPEED * milestonesReached(b.level)
+    100 +
+    (b.managerUnlocked ? HELPER_SPEED : 0) +
+    (b.managerUnlocked && b.businessId !== undefined
+      ? helperSpeedPoints({ businessId: b.businessId, managerLevel: b.managerLevel })
+      : 0) +
+    MILESTONE_SPEED * milestonesReached(b.level)
   );
 }
 

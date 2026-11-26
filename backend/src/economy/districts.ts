@@ -32,7 +32,8 @@ export function previousDistrict(district: string): District | null {
 }
 
 /**
- * Mapas liberados para o jogador. Regra: o anterior liberado e completo. Quando um mapa ganha
+ * REGRA ANTIGA (até a ADR 0035) — hoje só serve para converter quem já jogava: os mapas que
+ * ele tinha abertos continuam abertos (services/progress.ts). Regra: o anterior liberado e completo. Quando um mapa ganha
  * negócios novos (ADR 0034), quem já tinha negócio no mapa seguinte continua com ele aberto —
  * possuir qualquer negócio num mapa o mantém liberado.
  */

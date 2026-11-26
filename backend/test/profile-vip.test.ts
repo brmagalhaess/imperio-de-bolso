@@ -24,10 +24,11 @@ describe("coleta antecipada na Loja", () => {
     let cat = await catalog(g);
     const ad = cat.items.find((i: { id: string }) => i.id === "ad_boost");
     expect(ad).toMatchObject({
-      title: "Coleta antecipada de 15 min",
-      estimateCoins: "900",
+      title: "Coleta antecipada de 5 min",
+      estimateCoins: "300",
       usedToday: 0,
-      dailyLimit: 1000,
+      dailyLimit: 10,
+      nextAt: null,
     });
     expect(cat.items.find((i: { id: string }) => i.id === "boost_4h")).toMatchObject({
       title: "Coleta antecipada de 4 horas",

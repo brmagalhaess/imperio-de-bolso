@@ -2,8 +2,8 @@ import type { Db, Tx } from "../db/prisma.js";
 import { AppError, Errors } from "../errors.js";
 import { profitPerCycle } from "../economy/formulas.js";
 import { adsFor, purchasesFor } from "../lib/features.js";
-import { STORE_ITEMS, VIP_DAILY_GEMS, storeItem } from "../economy/store.js";
-import { dayBounds, gameDay, monthBounds } from "../lib/time.js";
+import { AD_WINDOW_MS, STORE_ITEMS, VIP_DAILY_GEMS, storeItem } from "../economy/store.js";
+import { gameDay, monthBounds } from "../lib/time.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
 import { track } from "./analytics.js";
 import { offersFor } from "./bundles.js";
@@ -33,12 +33,13 @@ export async function productionFor(
     speedContext(db, playerId, now),
     eventDistrict(db, playerId, now),
   ]);
-  // Com aceleradores (ADR 0013): ciclos que caberiam em `seconds` na velocidade atual.
+  // Com aceleradores (ADR 0013): produção proporcional a `seconds` na velocidade atual (fração
+  // de ciclo conta — com 5 min, os negócios de ciclo longo não ficam de fora).
   return owned.reduce((sum, pb) => {
     const cycleMs = effectiveCycleMs(pb.business.cycleSeconds, speedPercentAt(pb, ctx, now));
     return (
       sum +
-      profitNow(pb.business, pb.level, stars, ev) * BigInt(Math.floor((seconds * 1000) / cycleMs))
+      (profitNow(pb.business, pb.level, stars, ev, pb) * BigInt(seconds * 1000)) / BigInt(cycleMs)
     );
   }, 0n);
 }
@@ -60,13 +61,16 @@ export async function getCatalog(
   const player = await db.player.findUniqueOrThrow({ where: { id: playerId } });
   const [vip, adsToday, vipClaim] = await Promise.all([
     vipUntil(db, playerId, now),
-    db.adReward.count({
+    // Janela corrida de 24 h (ADR 0035): mais antigo primeiro, para dizer quando libera.
+    db.adReward.findMany({
       where: {
         playerId,
         placement: "ad_boost",
         status: "CLAIMED",
-        claimedAt: { gte: dayBounds(now).start },
+        claimedAt: { gt: new Date(now.getTime() - AD_WINDOW_MS) },
       },
+      select: { claimedAt: true },
+      orderBy: { claimedAt: "asc" },
     }),
     db.vipDailyClaim.findUnique({ where: { playerId_day: { playerId, day: gameDay(now) } } }),
   ]);
@@ -88,7 +92,16 @@ export async function getCatalog(
               estimateCoins: (await productionFor(db, playerId, district, seconds, now)).toString(),
             }
           : {}),
-        ...(i.kind === "ad" ? { usedToday: adsToday } : {}),
+        ...(i.kind === "ad"
+          ? {
+              usedToday: adsToday.length,
+              // Quando o próximo anúncio libera (só com o limite cheio); null = já pode assistir.
+              nextAt:
+                adsToday.length >= i.dailyLimit && adsToday[0]?.claimedAt
+                  ? new Date(adsToday[0].claimedAt.getTime() + AD_WINDOW_MS).toISOString()
+                  : null,
+            }
+          : {}),
         ...(i.kind === "double"
           ? {
               usedThisMonth: await db.purchaseReceipt.count({

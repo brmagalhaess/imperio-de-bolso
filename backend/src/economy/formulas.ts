@@ -1,6 +1,7 @@
 // Fórmulas de economia (docs/README.md §6). Configuráveis via catálogo;
 // os multiplicadores ficam aqui até existir game_config_versions.
 
+import { evolutionMult } from "./evolution.js";
 import { withPrestige } from "./prestige.js";
 
 export const UPGRADE_COST_GROWTH = 1.15;
@@ -65,8 +66,11 @@ export function revenueAt(def: EconomyDefinition, level: number): bigint {
   return grow(def.revenue, REVENUE_NUM, REVENUE_DEN, level - 1);
 }
 
-/** Lucro por ciclo = receita bruta − custo operacional, nunca negativo. */
+/**
+ * Lucro por ciclo = (receita bruta − custo operacional) × evolução (×3 a cada uma, ADR 0035),
+ * com o bônus das estrelas de investidor; nunca negativo.
+ */
 export function profitPerCycle(def: EconomyDefinition, level: number, stars = 0): bigint {
   const profit = revenueAt(def, level) - def.operatingCost;
-  return profit > 0n ? withPrestige(profit, stars) : 0n;
+  return profit > 0n ? withPrestige(profit * evolutionMult(level), stars) : 0n;
 }

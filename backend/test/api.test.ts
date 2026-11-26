@@ -6,7 +6,9 @@ import {
   createTestContext,
   get,
   key,
+  maxOutMap,
   newGuest,
+  openMaps,
   post,
   setCoins,
   type Guest,
@@ -316,9 +318,22 @@ describe("distritos", () => {
   it("cidade começa bloqueada e o estado informa os distritos", async () => {
     const guest = await newGuest(ctx.app);
     const state = (await get(ctx.app, guest, "/player/state")).json();
-    expect(state.districts).toEqual(
+    expect(
+      state.districts.map((d: { id: string; unlocked: boolean; requires: string | null }) => ({
+        id: d.id,
+        unlocked: d.unlocked,
+        requires: d.requires,
+      })),
+    ).toEqual(
       DISTRICTS.map((id, i) => ({ id, unlocked: i === 0, requires: DISTRICTS[i - 1] ?? null })),
     );
+    expect(state.districts[0]).toMatchObject({
+      total: 6,
+      owned: 0,
+      maxed: 0,
+      stars: 0,
+      maxStars: 30,
+    });
     expect(state.businesses.find((b: { slug: string }) => b.slug === "mercadinho").district).toBe(
       "cidade",
     );
@@ -339,6 +354,7 @@ describe("distritos", () => {
   it("porto e centro abrem em cadeia (mapas 3 e 4) e a cidade completa vira conquista", async () => {
     const guest = await newGuest(ctx.app);
     await setCoins(ctx.db, guest.playerId, 100_000_000_000n);
+    const max = (d: string) => maxOutMap(ctx.db, guest.playerId, d);
     const buy = (slug: string) =>
       post(ctx.app, guest, "/businesses/purchase", { businessSlug: slug });
     const inMap = (d: string) =>
@@ -346,13 +362,19 @@ describe("distritos", () => {
     const praia = inMap("praia");
     const cidade = inMap("cidade");
     const porto = inMap("porto");
-    for (const slug of [...praia, ...cidade]) expect((await buy(slug)).statusCode).toBe(201);
+    for (const slug of praia) expect((await buy(slug)).statusCode).toBe(201);
+    await max("praia");
+    for (const slug of cidade) expect((await buy(slug)).statusCode).toBe(201);
+    await max("cidade");
     const early = await buy("joalheria");
     expect(early.json().error).toMatchObject({
       code: "DISTRICT_LOCKED",
       details: { district: "centro", requires: "porto" },
     });
     for (const slug of porto) expect((await buy(slug)).statusCode).toBe(201);
+    // Comprar tudo não basta (ADR 0035): o porto precisa estar todo no nível máximo.
+    expect((await buy("joalheria")).json().error.code).toBe("DISTRICT_LOCKED");
+    await max("porto");
     expect((await buy("joalheria")).statusCode).toBe(201);
     const state = (await get(ctx.app, guest, "/player/state")).json();
     expect(state.districts.map((d: { unlocked: boolean }) => d.unlocked)).toEqual(
@@ -365,27 +387,47 @@ describe("distritos", () => {
     expect(byId("centro_complete")).toMatchObject({ unlocked: false, progress: "1", target: "12" });
   });
 
-  it("com os 6 negócios da praia a cidade libera e a compra passa", async () => {
+  it("a cidade só libera com a praia toda no nível máximo, e fica liberada ao vender", async () => {
     const guest = await newGuest(ctx.app);
     await setCoins(ctx.db, guest.playerId, 100_000n);
     for (const slug of PRAIA) {
       const r = await post(ctx.app, guest, "/businesses/purchase", { businessSlug: slug });
       expect(r.statusCode).toBe(201);
     }
-    const res = await post(ctx.app, guest, "/businesses/purchase", { businessSlug: "mercadinho" });
+    const buyCity = () =>
+      post(ctx.app, guest, "/businesses/purchase", { businessSlug: "mercadinho" });
+    expect((await buyCity()).json().error.code).toBe("DISTRICT_LOCKED");
+    // Cinco no máximo e um no 99: ainda não.
+    await maxOutMap(ctx.db, guest.playerId, "praia");
+    await ctx.db.playerBusiness.updateMany({
+      where: { playerId: guest.playerId, business: { slug: "agua" } },
+      data: { level: 99 },
+    });
+    expect((await buyCity()).json().error.code).toBe("DISTRICT_LOCKED");
+    await setCoins(ctx.db, guest.playerId, 10n ** 12n);
+    const up = await post(ctx.app, guest, "/businesses/upgrade", { businessSlug: "agua" });
+    expect(up.json().state.districts[0]).toMatchObject({ maxed: 6, stars: 30 });
+    expect(up.json().state.districts[1]).toMatchObject({ id: "cidade", unlocked: true });
+    const res = await buyCity();
     expect(res.statusCode).toBe(201);
-    expect(res.json().state.districts[1]).toMatchObject({ id: "cidade", unlocked: true });
+    // Mapa conquistado não tranca de novo, mesmo sem negócios (venda do império).
+    await ctx.db.playerBusiness.deleteMany({ where: { playerId: guest.playerId } });
+    const state = (await get(ctx.app, guest, "/player/state")).json();
+    expect(state.districts[1]).toMatchObject({ id: "cidade", unlocked: true, owned: 0 });
   });
 
   it("quem já tinha negócio num mapa continua com ele aberto quando o anterior cresce", async () => {
     const guest = await newGuest(ctx.app);
     await setCoins(ctx.db, guest.playerId, 1_000_000n);
+    await openMaps(ctx.db, guest.playerId, 2);
     for (const slug of [...PRAIA, "mercadinho"])
       await post(ctx.app, guest, "/businesses/purchase", { businessSlug: slug });
-    // Jogador da versão antiga: a praia tinha 4 negócios — não possui os 2 novos.
+    // Jogador da versão antiga: a praia tinha 4 negócios — não possui os 2 novos — e ainda não
+    // foi convertido para a regra nova (unlocked_maps NULL).
     await ctx.db.playerBusiness.deleteMany({
       where: { playerId: guest.playerId, business: { slug: { in: ["pastel", "acai"] } } },
     });
+    await ctx.db.player.update({ where: { id: guest.playerId }, data: { unlockedMaps: null } });
     const state = (await get(ctx.app, guest, "/player/state")).json();
     expect(state.districts[1]).toMatchObject({ id: "cidade", unlocked: true });
     expect(state.districts[2]).toMatchObject({ id: "porto", unlocked: false });
@@ -485,6 +527,7 @@ describe("ajudantes e produção AFK por mapa (ADR 0006)", () => {
 
   it("ao abrir o jogo, o resumo paga os ajudantes de TODOS os mapas (teto de 4h em cada)", async () => {
     const guest = await waterWithHelper();
+    await openMaps(ctx.db, guest.playerId);
     await setCoins(ctx.db, guest.playerId, 1_000_000n);
     for (const slug of [...PRAIA.slice(1), "mercadinho"]) {
       await post(ctx.app, guest, "/businesses/purchase", { businessSlug: slug });
@@ -506,6 +549,7 @@ describe("ajudantes e produção AFK por mapa (ADR 0006)", () => {
 
   it("auto-coleta vale em todas as cidades: a cidade fechada não para no teto de 4h", async () => {
     const guest = await waterWithHelper();
+    await openMaps(ctx.db, guest.playerId);
     await setCoins(ctx.db, guest.playerId, 1_000_000n);
     for (const slug of [...PRAIA.slice(1), "mercadinho"]) {
       await post(ctx.app, guest, "/businesses/purchase", { businessSlug: slug });

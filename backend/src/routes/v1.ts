@@ -39,6 +39,8 @@ import { createGuest, resumeGuest } from "../services/auth.js";
 import {
   claimWeeklyReward,
   getLeaderboard,
+  getEvolutionRanking,
+  getSeasonRanking,
   getStarsRanking,
   getWeeklyRewards,
 } from "../services/leaderboard.js";
@@ -56,6 +58,7 @@ import {
   enterDistrict,
   getPlayerState,
   hireManager,
+  upgradeManager,
   listBusinesses,
   purchaseBusiness,
   upgradeBusiness,
@@ -307,6 +310,12 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
     return command(request, reply, "managers.hire", (at) => hireManager(businessSlug, at));
   });
 
+  // Evolui o ajudante um nível (ADR 0035).
+  app.post("/managers/upgrade", { preHandler: authenticate }, async (request, reply) => {
+    const { businessSlug } = BusinessBody.parse(request.body);
+    return command(request, reply, "managers.upgrade", (at) => upgradeManager(businessSlug, at));
+  });
+
   app.post("/presence", { preHandler: authenticate }, async (request, reply) => {
     const { district } = PresenceBody.parse(request.body);
     return command(request, reply, "presence", (at) => enterDistrict(district, at));
@@ -346,6 +355,15 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
     getStarsRanking(db, playerIdOf(request), now()),
   );
 
+  // Ranking global de evolução (estrelas de evolução) e temporada de 20 dias (ADR 0035).
+  app.get("/leaderboard/evolution", { preHandler: authenticate }, async (request) =>
+    getEvolutionRanking(db, playerIdOf(request), now()),
+  );
+
+  app.get("/leaderboard/season", { preHandler: authenticate }, async (request) =>
+    getSeasonRanking(db, playerIdOf(request), now()),
+  );
+
   // Pódio semanal (ADR 0017): prêmios de 1º/2º/3º lugar da semana anterior.
   app.get("/rewards/weekly", { preHandler: authenticate }, async (request) =>
     getWeeklyRewards(db, playerIdOf(request), now()),
@@ -353,7 +371,10 @@ export async function v1Routes(app: FastifyInstance, deps: V1Deps): Promise<void
 
   app.post("/rewards/weekly/claim", { preHandler: authenticate }, async (request, reply) => {
     const { week, kind } = z
-      .object({ week: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), kind: z.enum(["semana", "liga"]) })
+      .object({
+        week: z.string().regex(/^(\d{4}-\d{2}-\d{2}|T\d+)$/),
+        kind: z.enum(["semana", "liga", "temporada"]),
+      })
       .parse(request.body);
     return command(request, reply, "rewards.weekly", (at) => claimWeeklyReward(week, kind, at));
   });

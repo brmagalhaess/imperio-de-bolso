@@ -43,6 +43,10 @@ export const Errors = {
     new AppError(409, "MANAGER_ACTIVE", "Este negócio está produzindo sozinho", { slug }),
   districtNotFound: (district: string) =>
     new AppError(404, "DISTRICT_NOT_FOUND", "Mapa não encontrado", { district }),
+  managerNotHired: (slug: string) =>
+    new AppError(409, "MANAGER_NOT_HIRED", "Contrate o ajudante primeiro", { slug }),
+  managerMaxLevel: (slug: string) =>
+    new AppError(409, "MANAGER_MAX_LEVEL", "Ajudante já está no nível máximo", { slug }),
   managerAlreadyHired: (slug: string) =>
     new AppError(409, "MANAGER_ALREADY_HIRED", "Este negócio já tem ajudante", { slug }),
   missionNotFound: (id: string) =>

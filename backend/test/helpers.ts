@@ -123,6 +123,19 @@ export async function coinsOf(db: Db, playerId: string): Promise<bigint> {
   return wallet.coins;
 }
 
+/** Libera os `count` primeiros mapas (testes que não são sobre a regra de liberar mapa). */
+export async function openMaps(db: Db, playerId: string, count = 20): Promise<void> {
+  await db.player.update({ where: { id: playerId }, data: { unlockedMaps: count } });
+}
+
+/** Leva todos os negócios comprados de um mapa ao nível máximo (direto no banco). */
+export async function maxOutMap(db: Db, playerId: string, district: string): Promise<void> {
+  await db.playerBusiness.updateMany({
+    where: { playerId, business: { district } },
+    data: { level: 100 },
+  });
+}
+
 export async function setCoins(db: Db, playerId: string, coins: bigint): Promise<void> {
   await db.playerWallet.update({ where: { playerId }, data: { coins } });
 }

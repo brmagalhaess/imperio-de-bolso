@@ -108,12 +108,12 @@ export const STORE_ITEMS: readonly StoreItem[] = [
   {
     id: "ad_boost",
     kind: "ad",
-    title: "Coleta antecipada de 15 min",
+    title: "Coleta antecipada de 5 min",
     placement: "ad_boost",
-    minutes: 15,
-    // Sem limite na prática (pedido do titular): só um teto contra abuso. Clientes até a 1.1.0
-    // mostram "Hoje: N/1000"; os novos escondem o teto a partir de AD_BOOST_NO_LIMIT.
-    dailyLimit: 1000,
+    // ADR 0035 (pedido do titular): 10 anúncios a cada 24 h corridas (cada um libera de novo
+    // 24 h depois de assistido) e prêmio de 5 min de produção do mapa — 15 min pesava na economia.
+    minutes: 5,
+    dailyLimit: 10,
   },
 ];
 
@@ -124,6 +124,8 @@ export const VIP_DAILY_GEMS = 5;
 export const OFFLINE_DOUBLE_DAILY_LIMIT = 3;
 export const OFFLINE_DOUBLE_WINDOW_MS = 15 * 60 * 1000;
 export const AD_SESSION_TTL_MS = 10 * 60 * 1000;
+/** Janela corrida do limite de anúncios da coleta antecipada. */
+export const AD_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 export function storeItem(id: string): StoreItem | undefined {
   return STORE_ITEMS.find((i) => i.id === id);

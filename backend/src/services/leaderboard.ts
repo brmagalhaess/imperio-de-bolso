@@ -8,6 +8,16 @@ import { gameDay, weekBounds } from "../lib/time.js";
 import { PRESTIGE_REASON, PRODUCTION_REASONS } from "./achievements.js";
 import { weekIndex } from "../economy/bundles.js";
 import { grantBundle } from "./bundles.js";
+import {
+  SEASON_DAYS,
+  SEASON_PARTICIPATION_GEMS,
+  SEASON_PARTICIPATION_STARS,
+  SEASON_PRIZES,
+  type Season,
+  seasonAt,
+  seasonByNumber,
+  seasonPrize,
+} from "../economy/seasons.js";
 
 // Ranking semanal — "Desafio dos 7 dias" da conversa original: quem faturou mais com
 // produção na semana (segunda 00:00 → domingo 23:59, horário de Brasília). Quem vende o império
@@ -386,6 +396,7 @@ export async function ensureWeeklyRewards(db: Db, playerId: string, now: Date): 
 
 export async function getWeeklyRewards(db: Db, playerId: string, now: Date) {
   await ensureWeeklyRewards(db, playerId, now);
+  await ensureSeasonRewards(db, playerId, now);
   const rows = await db.playerWeeklyReward.findMany({
     where: { playerId, claimedAt: null },
     orderBy: [{ week: "asc" }, { kind: "asc" }],
@@ -444,4 +455,148 @@ export function claimWeeklyReward(week: string, kind: string, now: Date) {
       },
     };
   };
+}
+
+// --- Ranking de evolução e temporada de 20 dias (ADR 0035) -----------------------
+// Evolução: estrelas de evolução acumuladas (1 por evolução de cada negócio), de todos os tempos.
+// Temporada: estrelas ganhas nos 20 dias; desempate pelo faturamento de produção do período.
+// Fechada a temporada, o prêmio em diamantes entra nos avisos de pódio (kind "temporada").
+
+export async function getEvolutionRanking(db: Db, playerId: string, now: Date, asPlayer = false) {
+  const show = asPlayer ? playerId : NO_PLAYER;
+  const rows = await db.$queryRaw<
+    { playerId: string; displayName: string; stars: number; rank: bigint }[]
+  >`
+    WITH ranked AS (
+      SELECT id AS "playerId", display_name AS "displayName", evo_stars AS stars,
+             RANK() OVER (ORDER BY evo_stars DESC) AS rank
+      FROM players WHERE evo_stars > 0 AND (NOT is_staff OR id = ${show}::uuid)
+    )
+    SELECT * FROM ranked
+    WHERE rank <= ${LEADERBOARD_SIZE} OR "playerId" = ${playerId}::uuid
+    ORDER BY rank, "displayName"`;
+  const view = (r: (typeof rows)[number]) => ({
+    rank: Number(r.rank),
+    playerId: r.playerId,
+    displayName: r.displayName,
+    score: String(r.stars),
+    isMe: r.playerId === playerId,
+  });
+  const me = rows.find((r) => r.playerId === playerId);
+  return {
+    entries: rows.filter((r) => Number(r.rank) <= LEADERBOARD_SIZE).map(view),
+    me: me ? view(me) : null,
+    vip: await vipIds(
+      db,
+      rows.map((r) => r.playerId),
+      now,
+    ),
+    staff: await isStaff(db, playerId),
+    serverTime: now.toISOString(),
+  };
+}
+
+interface SeasonRow {
+  playerId: string;
+  displayName: string;
+  stars: number;
+  coins: bigint;
+  rank: bigint;
+}
+
+async function seasonRows(db: Db, season: Season, playerId: string, show: string, limit: number) {
+  return db.$queryRaw<SeasonRow[]>`
+    WITH coins AS (
+      SELECT player_id, SUM(delta) AS coins
+      FROM wallet_ledger
+      WHERE currency = 'COINS' AND reason = ANY(${PRODUCTION_REASONS})
+        AND created_at >= ${season.start} AND created_at < ${season.end}
+      GROUP BY player_id
+    ), ranked AS (
+      SELECT s.player_id AS "playerId", p.display_name AS "displayName", s.stars,
+             COALESCE(c.coins, 0) AS coins,
+             RANK() OVER (ORDER BY s.stars DESC, COALESCE(c.coins, 0) DESC) AS rank
+      FROM player_seasons s
+      JOIN players p ON p.id = s.player_id
+      LEFT JOIN coins c ON c.player_id = s.player_id
+      WHERE s.season = ${season.number} AND s.stars > 0
+        AND (NOT p.is_staff OR p.id = ${show}::uuid)
+    )
+    SELECT * FROM ranked
+    WHERE rank <= ${limit} OR "playerId" = ${playerId}::uuid
+    ORDER BY rank, "displayName"`;
+}
+
+export async function getSeasonRanking(db: Db, playerId: string, now: Date, asPlayer = false) {
+  const season = seasonAt(now);
+  const rows = await seasonRows(
+    db,
+    season,
+    playerId,
+    asPlayer ? playerId : NO_PLAYER,
+    LEADERBOARD_SIZE,
+  );
+  const view = (r: SeasonRow) => ({
+    rank: Number(r.rank),
+    playerId: r.playerId,
+    displayName: r.displayName,
+    score: String(r.stars),
+    coins: toBig(r.coins).toString(),
+    isMe: r.playerId === playerId,
+  });
+  const me = rows.find((r) => r.playerId === playerId);
+  return {
+    season: {
+      number: season.number,
+      start: season.start.toISOString(),
+      end: season.end.toISOString(),
+      days: SEASON_DAYS,
+    },
+    entries: rows.filter((r) => Number(r.rank) <= LEADERBOARD_SIZE).map(view),
+    me: me ? view(me) : null,
+    prizes: {
+      tiers: SEASON_PRIZES.map((p) => ({ upTo: p.upTo, gems: p.gems })),
+      participationStars: SEASON_PARTICIPATION_STARS,
+      participationGems: SEASON_PARTICIPATION_GEMS,
+    },
+    vip: await vipIds(
+      db,
+      rows.map((r) => r.playerId),
+      now,
+    ),
+    staff: await isStaff(db, playerId),
+    serverTime: now.toISOString(),
+  };
+}
+
+/** Confere a temporada anterior uma vez e registra o prêmio do jogador (aviso de pódio). */
+export async function ensureSeasonRewards(db: Db, playerId: string, now: Date): Promise<void> {
+  const prev = seasonAt(now).number - 1;
+  const player = await db.player.findUniqueOrThrow({
+    where: { id: playerId },
+    select: { rewardsCheckedSeason: true, staff: true },
+  });
+  if (prev < 1 || (player.rewardsCheckedSeason ?? 0) >= prev) return;
+  if (!player.staff) {
+    const rows = await seasonRows(db, seasonByNumber(prev), playerId, NO_PLAYER, 0);
+    const me = rows.find((r) => r.playerId === playerId);
+    const gems = me ? seasonPrize(Number(me.rank), me.stars) : 0;
+    if (me && gems > 0) {
+      await db.playerWeeklyReward.createMany({
+        data: [
+          {
+            playerId,
+            week: `T${prev}`,
+            kind: "temporada",
+            rank: Number(me.rank),
+            gems,
+            bonusKind: null,
+            bonusHours: 0,
+          },
+        ],
+        skipDuplicates: true,
+      });
+    }
+  }
+  await db.player.update({ where: { id: playerId }, data: { rewardsCheckedSeason: prev } });
 }

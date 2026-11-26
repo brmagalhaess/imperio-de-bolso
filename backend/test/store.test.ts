@@ -163,18 +163,39 @@ describe("anúncios recompensados (modo de teste)", () => {
     return { start, early, claim, id };
   }
 
-  it("+15 min de produção: só paga depois de confirmado, uma vez, sem o antigo limite de 5", async () => {
+  it("+5 min de produção: só paga depois de confirmado, uma vez; 10 a cada 24 h corridas", async () => {
     ctx = await createTestContext();
     const g = await newGuest(ctx.app);
     await post(ctx.app, g, "/businesses/purchase", { businessSlug: "agua" });
     const r = await watch(g, "ad_boost", "praia");
-    expect(r.start.json().rewardCoins).toBe("900"); // 90 ciclos × 10
+    expect(r.start.json().rewardCoins).toBe("300"); // 30 ciclos × 10
     expect(r.early!.json().error.code).toBe("AD_NOT_VERIFIED");
-    expect(r.claim!.json().coins).toBe("900");
+    expect(r.claim!.json().coins).toBe("300");
     const again = await post(ctx.app, g, "/ads/claim", { sessionId: r.id });
     expect(again.json().error.code).toBe("AD_ALREADY_CLAIMED");
-    for (let i = 0; i < 5; i++) await watch(g, "ad_boost", "praia");
-    expect(await coinsOf(ctx.db, g.playerId)).toBe(6n * 900n); // o 6º também paga
+    // Os outros 9 saem 1 h depois do primeiro.
+    ctx.clock.advance(3_600);
+    for (let i = 0; i < 9; i++) await watch(g, "ad_boost", "praia");
+    expect(await coinsOf(ctx.db, g.playerId)).toBe(10n * 300n);
+    const start = () =>
+      post(ctx.app, g, "/ads/start", { placement: "ad_boost", district: "praia" });
+    expect((await start()).json().error.code).toBe("AD_DAILY_LIMIT");
+    const ad = async () =>
+      (await get(ctx.app, g, "/store/catalog?district=praia"))
+        .json()
+        .items.find((i: { id: string }) => i.id === "ad_boost");
+    expect(await ad()).toMatchObject({ usedToday: 10, dailyLimit: 10 });
+    expect((await ad()).nextAt).not.toBeNull();
+    // 23 h 30 depois do primeiro: ainda cheio. Passadas as 24 h do primeiro, libera 1 — e só 1.
+    ctx.clock.advance(22 * 3_600 + 1_800);
+    expect((await start()).json().error.code).toBe("AD_DAILY_LIMIT");
+    ctx.clock.advance(1_801);
+    expect(await ad()).toMatchObject({ usedToday: 9, nextAt: null });
+    expect((await watch(g, "ad_boost", "praia")).claim!.statusCode).toBe(200);
+    expect((await start()).json().error.code).toBe("AD_DAILY_LIMIT");
+    // 24 h depois dos outros: todos de volta.
+    ctx.clock.advance(24 * 3_600);
+    expect(await ad()).toMatchObject({ usedToday: 0 });
   });
 
   it("dobrar ganhos offline: paga o AFK de novo uma única vez, logo após o resumo", async () => {
@@ -255,7 +276,7 @@ describe("SSV do AdMob (produção)", () => {
     expect(replay.json()).toEqual({ verified: true });
 
     const claim = await post(ctx.app, g, "/ads/claim", { sessionId: id });
-    expect(claim.json().coins).toBe("900");
+    expect(claim.json().coins).toBe("300");
 
     // Teste "Verificar URL" do AdMob: assinado, sem sessão (ou lixo) → 200 sem confirmar nada.
     for (const data of ["", "lixo", "00000000-0000-4000-8000-000000000000"]) {

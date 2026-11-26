@@ -2,6 +2,7 @@ import type { Db, Tx } from "../db/prisma.js";
 import { AppError } from "../errors.js";
 import {
   AD_SESSION_TTL_MS,
+  AD_WINDOW_MS,
   OFFLINE_DOUBLE_DAILY_LIMIT,
   OFFLINE_DOUBLE_WINDOW_MS,
   storeItem,
@@ -25,11 +26,36 @@ export type Placement = "ad_boost" | "offline_double";
 
 const AD_BOOST = storeItem("ad_boost") as { minutes: number; dailyLimit: number };
 
+/**
+ * Anúncios já pagos que ainda contam no limite. Coleta antecipada: janela corrida de 24 h (cada
+ * anúncio volta a ficar disponível 24 h depois de assistido). Dobro offline: dia do jogo.
+ */
 async function claimedToday(db: Db | Tx, playerId: string, placement: Placement, now: Date) {
-  const { start } = dayBounds(now);
+  const since =
+    placement === "ad_boost" ? new Date(now.getTime() - AD_WINDOW_MS) : dayBounds(now).start;
   return db.adReward.count({
-    where: { playerId, placement, status: "CLAIMED", claimedAt: { gte: start } },
+    where: { playerId, placement, status: "CLAIMED", claimedAt: { gt: since } },
   });
+}
+
+/** Uso da coleta com anúncio na janela de 24 h e quando o próximo libera (null = já pode). */
+export async function adBoostUsage(db: Db | Tx, playerId: string, now: Date) {
+  const rows = await db.adReward.findMany({
+    where: {
+      playerId,
+      placement: "ad_boost",
+      status: "CLAIMED",
+      claimedAt: { gt: new Date(now.getTime() - AD_WINDOW_MS) },
+    },
+    select: { claimedAt: true },
+    orderBy: { claimedAt: "asc" },
+  });
+  const oldest = rows[0]?.claimedAt ?? null;
+  const full = rows.length >= AD_BOOST.dailyLimit;
+  return {
+    used: rows.length,
+    nextAt: full && oldest ? new Date(oldest.getTime() + AD_WINDOW_MS).toISOString() : null,
+  };
 }
 
 export function startAd(placement: Placement, district: string | undefined, now: Date) {

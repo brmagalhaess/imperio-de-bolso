@@ -47,7 +47,8 @@ describe("exclusão de conta", () => {
     expect(await ctx.db.analyticsEvent.count({ where: { playerId: g.playerId } })).toBeGreaterThan(
       0,
     );
-    expect(await ctx.db.playerMission.count({ where: { playerId: g.playerId } })).toBe(3);
+    // 3 missões do dia + 3 desafios da semana (ADR 0035).
+    expect(await ctx.db.playerMission.count({ where: { playerId: g.playerId } })).toBe(6);
 
     const res = await del(g);
     expect(res.statusCode).toBe(200);

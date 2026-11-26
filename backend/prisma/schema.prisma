@@ -59,6 +59,13 @@ model Player {
   missionChestDay     String?   @map("mission_chest_day")
   // Pódio semanal (ADR 0017): última semana já conferida para prêmios de 1º/2º/3º lugar.
   rewardsCheckedWeek  String?   @map("rewards_checked_week")
+  // ADR 0035: quantos mapas estão liberados (na ordem). NULL = jogador antigo ainda não
+  // convertido (o servidor grava o que ele já tinha aberto). Não volta ao vender o império.
+  unlockedMaps        Int?      @default(1) @map("unlocked_maps")
+  // Estrelas de evolução acumuladas (1 por evolução de negócio; NULL = ainda não contadas).
+  evoStars            Int?      @map("evo_stars")
+  // Temporada de 20 dias: última já conferida para prêmios.
+  rewardsCheckedSeason Int?     @map("rewards_checked_season")
   createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
 
   wallet         PlayerWallet?
@@ -78,6 +85,7 @@ model Player {
   reportsMade     PlayerReport[] @relation("reporter")
   reportsReceived PlayerReport[] @relation("reported")
   weeklyRewards  PlayerWeeklyReward[]
+  seasons        PlayerSeason[]
 
   @@map("players")
 }
@@ -138,6 +146,8 @@ model PlayerBusiness {
   businessId       Int       @map("business_id")
   level            Int       @default(1)
   managerUnlocked  Boolean   @default(false) @map("manager_unlocked")
+  // Nível do ajudante (ADR 0035): 0 = sem ajudante, 1 = contratado … 10.
+  managerLevel     Int       @default(0) @map("manager_level")
   // Ciclo manual: início do ciclo em andamento (null = parado aguardando ação).
   cycleStartedAt   DateTime? @map("cycle_started_at") @db.Timestamptz(3)
   // Com ajudante: sobra de tempo (ms) entre liquidações — docs/README.md §7.
@@ -361,6 +371,20 @@ model PlayerWeeklyReward {
 
   @@id([playerId, week, kind])
   @@map("player_weekly_rewards")
+}
+
+/// Temporada de 20 dias (ADR 0035): estrelas de evolução ganhas pelo jogador na temporada.
+model PlayerSeason {
+  playerId  String   @map("player_id") @db.Uuid
+  season    Int
+  stars     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@id([playerId, season])
+  @@index([season, stars])
+  @@map("player_seasons")
 }
 
 /// Denúncia de nome impróprio no ranking (diretriz 1.2 da Apple): um por denunciante e alvo.

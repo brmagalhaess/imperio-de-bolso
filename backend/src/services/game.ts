@@ -1,12 +1,18 @@
 import type { Db, Tx } from "../db/prisma.js";
 import type { BusinessDefinition, PlayerBusiness } from "../generated/prisma/client.js";
 import { Errors } from "../errors.js";
+import { DISTRICTS, previousDistrict, type District } from "../economy/districts.js";
+import { evolutionOf, nextEvolutionLevel } from "../economy/evolution.js";
 import {
-  DISTRICTS,
-  previousDistrict,
-  unlockedDistricts,
-  type District,
-} from "../economy/districts.js";
+  HELPER_MAX_LEVEL,
+  helperKind,
+  helperOfflineExtraMs,
+  helperProfitPercent,
+  helperSpeedPoints,
+  helperUpgradeCost,
+  withHelper,
+  type HelperSubject,
+} from "../economy/helpers.js";
 import { bonusPercent } from "../economy/prestige.js";
 import { nextUpgradeCost, profitPerCycle } from "../economy/formulas.js";
 import { EVENT_PROFIT_PERCENT, weekendEvent } from "../economy/events.js";
@@ -24,6 +30,7 @@ import { track } from "./analytics.js";
 import { autoCollectActive, vipUntil } from "./entitlements.js";
 import { trackMission } from "./missions.js";
 import { weekBounds } from "../lib/time.js";
+import { addEvoStars, ensureProgress, type MapProgress } from "./progress.js";
 import { applyCoins, type LockedWallet } from "./wallet.js";
 
 // Ciclo manual: ao terminar, o negócio fica parado com 1 ciclo pronto até o jogador
@@ -65,13 +72,32 @@ export interface BusinessView {
   managerCost: string;
   /** Automático: lucro já produzido e ainda não liquidado (estimativa de leitura). */
   pendingAmount: string;
+  /** Evolução 1–5 (0 = não comprado), nível da próxima e multiplicador de lucro (ADR 0035). */
+  evolution: number;
+  nextEvolutionLevel: number | null;
+  /** Ajudante: especialidade, nível (0–10), preço do próximo nível e bônus atuais. */
+  helper: {
+    kind: string;
+    level: number;
+    maxLevel: number;
+    nextCost: string | null;
+    profitPercent: number;
+    speedPoints: number;
+    offlineHours: number;
+  };
 }
 
 export interface DistrictView {
   id: string;
   unlocked: boolean;
-  /** Distrito que precisa estar completo (todos os negócios comprados), ou null. */
+  /** Distrito que precisa estar todo no nível máximo (ADR 0035), ou null. */
   requires: string | null;
+  /** Andamento do mapa: negócios, quantos no nível máximo e estrelas de evolução. */
+  total: number;
+  owned: number;
+  maxed: number;
+  stars: number;
+  maxStars: number;
 }
 
 export interface PlayerStateView {
@@ -92,6 +118,8 @@ export interface PlayerStateView {
     turboUntil: string | null;
     /** Dobro de moedas (×2 em tudo, ADR 0025) ativo até (ISO) ou null. */
     doubleUntil: string | null;
+    /** Estrelas de evolução acumuladas (ranking global, ADR 0035). */
+    evoStars: number;
   };
   wallet: { coins: string; gems: string };
   businesses: BusinessView[];
@@ -144,8 +172,9 @@ export function profitNow(
   level: number,
   stars: number,
   evDistrict: string | null,
+  helper?: HelperSubject,
 ): bigint {
-  const p = profitPerCycle(def, level, stars);
+  const p = withHelper(profitPerCycle(def, level, stars), helper);
   return evDistrict === def.district ? (p * BigInt(100 + EVENT_PROFIT_PERCENT)) / 100n : p;
 }
 
@@ -167,13 +196,18 @@ function doubledCycles(
   if (!ctx.doubleUntil || cycles === 0) return 0;
   const from = Math.max(
     pb.lastSettlementAt?.getTime() ?? now.getTime(),
-    now.getTime() - OFFLINE_CAP_MS,
+    now.getTime() - offlineCapMs(pb),
     ctx.doubleFrom?.getTime() ?? 0,
   );
   const to = Math.min(now.getTime(), ctx.doubleUntil.getTime());
   if (to <= from) return 0;
   const work = workBetween(pb, ctx, from, to);
   return Math.min(cycles, Math.floor(work / (pb.business.cycleSeconds * 1000)));
+}
+
+/** Teto de produção offline do negócio: 4 h + o extra do ajudante noturno (ADR 0035). */
+export function offlineCapMs(pb: HelperSubject): number {
+  return OFFLINE_CAP_MS + helperOfflineExtraMs(pb);
 }
 
 /** Trabalho do ajudante entre dois instantes (função para settle). */
@@ -196,6 +230,7 @@ function cycleStatus(
       lastSettlementAt: pb.lastSettlementAt,
       carryMs: pb.carryMs,
       cycleSeconds,
+      capMs: offlineCapMs(pb),
       work: workOf(pb, ctx),
     });
     // Falta (em trabalho) para fechar o ciclo, convertida para tempo real na velocidade atual.
@@ -258,7 +293,9 @@ function toBusinessView(
     level: pb ? level : 0,
     maxLevel: def.maxLevel,
     // Com o Dobro ativo o jogo já mostra o valor ×2 de cada coleta.
-    profitPerCycle: (profitNow(def, level, stars, evDistrict) * doubleMult(ctx, now)).toString(),
+    profitPerCycle: (
+      profitNow(def, level, stars, evDistrict, pb) * doubleMult(ctx, now)
+    ).toString(),
     nextUpgradeCost: upgrade === null ? null : upgrade.toString(),
     cycleStartedAt: status.startedAt?.toISOString() ?? null,
     cycleEndsAt: status.endsAt?.toISOString() ?? null,
@@ -268,10 +305,28 @@ function toBusinessView(
     automatic: isAutomatic(pb),
     managerCost: def.managerCost.toString(),
     pendingAmount: (
-      profitNow(def, level, stars, evDistrict) *
+      profitNow(def, level, stars, evDistrict, pb) *
       doubleMult(ctx, now) *
       BigInt(status.pendingCycles)
     ).toString(),
+    evolution: pb ? evolutionOf(level) : 0,
+    nextEvolutionLevel: pb ? nextEvolutionLevel(level) : null,
+    helper: helperView(def, pb),
+  };
+}
+
+function helperView(def: BusinessDefinition, pb: PlayerBusiness | undefined) {
+  const subject = { businessId: def.id, managerLevel: pb?.managerLevel ?? 0 };
+  const level = pb?.managerUnlocked ? Math.max(1, pb.managerLevel) : 0;
+  const next = level >= 1 ? helperUpgradeCost(def.managerCost, level + 1) : null;
+  return {
+    kind: helperKind(def.id),
+    level,
+    maxLevel: HELPER_MAX_LEVEL,
+    nextCost: next === null ? null : next.toString(),
+    profitPercent: helperProfitPercent(subject),
+    speedPoints: helperSpeedPoints(subject),
+    offlineHours: offlineCapMs(subject) / 3_600_000,
   };
 }
 
@@ -291,13 +346,18 @@ export async function listBusinesses(
   return defs.map((def) => toBusinessView(def, byBusiness.get(def.id), now, stars, ctx, ev));
 }
 
-/** Distrito liberado quando o anterior está completo (ou já há negócio nele — ADR 0034). */
-export function districtViews(businesses: BusinessView[]): DistrictView[] {
-  const open = unlockedDistricts(
-    businesses.map((b) => ({ id: b.slug, district: b.district })),
-    new Set(businesses.filter((b) => b.owned).map((b) => b.slug)),
-  );
-  return DISTRICTS.map((id) => ({ id, unlocked: open.has(id), requires: previousDistrict(id) }));
+/** Mapa liberado quando o anterior está todo no nível máximo (ADR 0035). */
+export function districtViews(maps: MapProgress[]): DistrictView[] {
+  return maps.map((m) => ({
+    id: m.id,
+    unlocked: m.unlocked,
+    requires: previousDistrict(m.id),
+    total: m.total,
+    owned: m.owned,
+    maxed: m.maxed,
+    stars: m.stars,
+    maxStars: m.maxStars,
+  }));
 }
 
 export async function getPlayerState(
@@ -308,6 +368,7 @@ export async function getPlayerState(
   const player = await db.player.findUnique({ where: { id: playerId }, include: { wallet: true } });
   if (!player?.wallet) throw Errors.unauthorized();
   const businesses = await listBusinesses(db, playerId, now);
+  const progress = await ensureProgress(db, playerId);
   return {
     player: {
       id: player.id,
@@ -327,10 +388,11 @@ export async function getPlayerState(
         player.turboUntil && player.turboUntil > now ? player.turboUntil.toISOString() : null,
       doubleUntil:
         player.doubleUntil && player.doubleUntil > now ? player.doubleUntil.toISOString() : null,
+      evoStars: progress.evoStars,
     },
     wallet: { coins: player.wallet.coins.toString(), gems: player.wallet.gems.toString() },
     businesses,
-    districts: districtViews(businesses),
+    districts: districtViews(progress.maps),
     serverTime: now.toISOString(),
   };
 }
@@ -351,14 +413,7 @@ export function purchaseBusiness(slug: string, now: Date) {
 
     const requires = previousDistrict(def.district);
     if (requires) {
-      const [defs, mine] = await Promise.all([
-        tx.businessDefinition.findMany({ select: { id: true, district: true } }),
-        tx.playerBusiness.findMany({
-          where: { playerId: wallet.playerId },
-          select: { businessId: true },
-        }),
-      ]);
-      const open = unlockedDistricts(defs, new Set(mine.map((pb) => pb.businessId)));
+      const { open } = await ensureProgress(tx, wallet.playerId);
       if (!open.has(def.district as District)) throw Errors.districtLocked(def.district, requires);
     }
 
@@ -373,6 +428,7 @@ export function purchaseBusiness(slug: string, now: Date) {
         lastSettlementAt: now,
       },
     });
+    await addEvoStars(tx, wallet.playerId, 1, now);
     await trackMission(tx, wallet.playerId, "purchase_count", 1n, now);
     await track(tx, wallet.playerId, "business_purchased", { business: slug });
 
@@ -426,6 +482,9 @@ export function upgradeBusiness(slug: string, now: Date, times = 1) {
       where: { playerId_businessId: { playerId: wallet.playerId, businessId: def.id } },
       data: { level },
     });
+    const evolved = evolutionOf(level) - evolutionOf(pb.level);
+    await addEvoStars(tx, wallet.playerId, evolved, now);
+    await trackMission(tx, wallet.playerId, "evolve_count", BigInt(evolved), now);
     await trackMission(tx, wallet.playerId, "upgrade_count", BigInt(done), now);
     await track(tx, wallet.playerId, "business_upgraded", { business: slug, level, levels: done });
 
@@ -470,7 +529,7 @@ export function collectProduction(slug: string | undefined, now: Date) {
     const ev = await eventDistrict(tx, wallet.playerId, now);
     const collected = ready.map((pb) => ({
       slug: pb.business.slug,
-      amount: profitNow(pb.business, pb.level, stars, ev) * doubleMult(ctx, now),
+      amount: profitNow(pb.business, pb.level, stars, ev, pb) * doubleMult(ctx, now),
     }));
     const total = collected.reduce((sum, c) => sum + c.amount, 0n);
 
@@ -552,10 +611,11 @@ async function settleAutomatic(
       lastSettlementAt: pb.lastSettlementAt,
       carryMs: pb.carryMs,
       cycleSeconds: pb.business.cycleSeconds,
+      capMs: offlineCapMs(pb),
       work: workOf(pb, ctx),
     });
     const doubled = doubledCycles(pb, ctx, now, s.cycles);
-    const amount = profitNow(pb.business, pb.level, stars, ev) * BigInt(s.cycles + doubled);
+    const amount = profitNow(pb.business, pb.level, stars, ev, pb) * BigInt(s.cycles + doubled);
     total += amount;
     if (amount > 0n && pb.lastSettlementAt < weekStart) {
       const span = now.getTime() - pb.lastSettlementAt.getTime();
@@ -761,7 +821,7 @@ export function hireManager(slug: string, now: Date) {
 
     const current = await settleLive(tx, wallet, now, `${idempotencyKey}:live`);
     await applyCoins(tx, current, -def.managerCost, `manager_hire:${slug}`, idempotencyKey, now);
-    await tx.playerBusiness.update({ where, data: { managerUnlocked: true } });
+    await tx.playerBusiness.update({ where, data: { managerUnlocked: true, managerLevel: 1 } });
     await trackMission(tx, wallet.playerId, "hire_count", 1n, now);
     await track(tx, wallet.playerId, "manager_hired", { business: slug });
 
@@ -785,4 +845,47 @@ export async function completeTutorial(db: Db, playerId: string, now: Date): Pro
     data: { tutorialCompletedAt: now },
   });
   if (r.count === 1) await track(db, playerId, "tutorial_completed");
+}
+
+/**
+ * Evolui o ajudante um nível (2–10): reforça a especialidade dele (ADR 0035). O que o negócio já
+ * produziu sozinho é pago antes, com o bônus antigo.
+ */
+export function upgradeManager(slug: string, now: Date) {
+  return async ({ tx, wallet, idempotencyKey }: CommandContext): Promise<CommandResult> => {
+    const def = await findDefinition(tx, slug);
+    const where = { playerId_businessId: { playerId: wallet.playerId, businessId: def.id } };
+    const pb = await tx.playerBusiness.findUnique({ where });
+    if (!pb) throw Errors.businessNotOwned(slug);
+    if (!pb.managerUnlocked) throw Errors.managerNotHired(slug);
+    const level = Math.max(1, pb.managerLevel);
+    const cost = helperUpgradeCost(def.managerCost, level + 1);
+    if (cost === null) throw Errors.managerMaxLevel(slug);
+
+    let current = await settleLive(tx, wallet, now, `${idempotencyKey}:live`);
+    if (isAutomatic(await tx.playerBusiness.findUniqueOrThrow({ where }))) {
+      current = (
+        await settleAutomatic(tx, current, now, `${idempotencyKey}:settle`, { businessId: def.id })
+      ).wallet;
+    }
+    await applyCoins(
+      tx,
+      current,
+      -cost,
+      `manager_upgrade:${slug}:${level + 1}`,
+      idempotencyKey,
+      now,
+    );
+    await tx.playerBusiness.update({ where, data: { managerLevel: level + 1 } });
+    await trackMission(tx, wallet.playerId, "helper_upgrade", 1n, now);
+    await track(tx, wallet.playerId, "manager_upgraded", { business: slug, level: level + 1 });
+    return {
+      statusCode: 200,
+      body: {
+        upgraded: slug,
+        helperLevel: level + 1,
+        state: await getPlayerState(tx, wallet.playerId, now),
+      },
+    };
+  };
 }

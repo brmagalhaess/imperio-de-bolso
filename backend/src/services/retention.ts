@@ -171,8 +171,11 @@ async function latestUnlocked(db: Reader, playerId: string): Promise<string> {
     db.businessDefinition.findMany({ orderBy: { sortOrder: "asc" } }),
     db.playerBusiness.findMany({ where: { playerId } }),
   ]);
-  const open = unlockedDistricts(defs, new Set(owned.map((pb) => pb.businessId)));
-  return [...DISTRICTS].reverse().find((d) => open.has(d)) ?? "praia";
+  // Mapa mais avançado em que o jogador tem negócio (depois de vender o império os mapas já
+  // conquistados seguem abertos, mas vazios — ADR 0035).
+  const ids = new Set(owned.map((pb) => pb.businessId));
+  const withBusiness = new Set(defs.filter((d) => ids.has(d.id)).map((d) => d.district));
+  return [...DISTRICTS].reverse().find((d) => withBusiness.has(d)) ?? "praia";
 }
 
 async function earnedBetween(db: Reader, playerId: string, start: Date, end: Date) {

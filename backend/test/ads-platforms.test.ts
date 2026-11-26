@@ -37,7 +37,7 @@ describe("anúncios só no iPhone (ADS_PLATFORMS=ios)", () => {
       200,
     );
     const claim = await post(ctx.app, g, "/ads/claim", { sessionId });
-    expect(claim.json().coins).toBe("900");
+    expect(claim.json().coins).toBe("300");
     expect(claim.statusCode).toBe(200);
   });
 

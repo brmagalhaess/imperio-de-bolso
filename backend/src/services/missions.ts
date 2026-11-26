@@ -2,6 +2,11 @@ import type { Db, Tx } from "../db/prisma.js";
 import { Errors } from "../errors.js";
 import { profitPerCycle } from "../economy/formulas.js";
 import {
+  CHALLENGE_PREFIX,
+  CHALLENGE_REWARD_GEMS,
+  CHALLENGE_TEMPLATES,
+  challengeRewardCoins,
+  pickWeeklyChallenges,
   MISSION_REWARD_GEMS,
   type MissionContext,
   type MissionMetric,
@@ -11,8 +16,10 @@ import {
   templateById,
 } from "../economy/missions.js";
 import type { CommandContext, CommandResult } from "../lib/idempotency.js";
-import { unlockedDistricts, type District } from "../economy/districts.js";
-import { dayBounds, gameDay } from "../lib/time.js";
+import type { District } from "../economy/districts.js";
+import { helperUpgradeCost } from "../economy/helpers.js";
+import { dayBounds, gameDay, weekBounds } from "../lib/time.js";
+import { openDistricts } from "./progress.js";
 import { track } from "./analytics.js";
 import { autoCollectActive } from "./entitlements.js";
 import { getPlayerState, starsOf } from "./game.js";
@@ -47,8 +54,8 @@ export async function missionContext(
     starsOf(db, playerId),
   ]);
   const ownedIds = new Set(owned.map((pb) => pb.businessId));
-  // Um mapa abre quando o anterior está completo (em cadeia) ou já há negócio nele.
-  const open = unlockedDistricts(defs, ownedIds);
+  // Um mapa abre quando o anterior está todo no nível máximo (ADR 0035).
+  const open = await openDistricts(db, playerId);
   const unlocked = (district: string) => open.has(district as District);
   const cityUnlocked = unlocked("cidade");
   const [player, wallet] = await Promise.all([
@@ -64,6 +71,13 @@ export async function missionContext(
     manualCount: owned.filter((pb) => !(autoCollect && pb.managerUnlocked)).length,
     cheapestBuy: min(buyable.map((d) => d.cost)),
     cheapestHire: min(hireable.map((pb) => pb.business.managerCost)),
+    cheapestHelperUp: min(
+      owned.flatMap((pb) =>
+        pb.managerUnlocked
+          ? (helperUpgradeCost(pb.business.managerCost, Math.max(1, pb.managerLevel) + 1) ?? [])
+          : [],
+      ),
+    ),
     coins: Number(wallet?.coins ?? 0n),
     incomePerSecond: owned.reduce(
       (sum, pb) =>
@@ -141,6 +155,41 @@ export async function trackMission(
     where: { playerId, day: gameDay(now), template: { in: templates }, claimedAt: null },
     data: { progress: { increment: amount } },
   });
+  // Desafios da semana que medem a mesma coisa.
+  await ensureWeeklyChallenges(tx, playerId, now);
+  const weekly = CHALLENGE_TEMPLATES.filter((t) => t.metric === metric).map((t) => t.id);
+  if (weekly.length > 0) {
+    await tx.playerMission.updateMany({
+      where: { playerId, day: challengeWeek(now), template: { in: weekly }, claimedAt: null },
+      data: { progress: { increment: amount } },
+    });
+  }
+}
+
+/** Chave da semana dos desafios na tabela de missões: "S" + segunda-feira (Brasília). */
+export function challengeWeek(now: Date): string {
+  return `S${gameDay(weekBounds(now).start)}`;
+}
+
+/** Garante os 3 desafios da semana (idempotente). */
+export async function ensureWeeklyChallenges(db: Reader, playerId: string, now: Date) {
+  const day = challengeWeek(now);
+  const existing = await db.playerMission.findMany({ where: { playerId, day } });
+  if (existing.length > 0) return existing;
+  const ctx = await missionContext(db, playerId, now);
+  const reward = challengeRewardCoins(ctx);
+  await db.playerMission.createMany({
+    data: pickWeeklyChallenges(playerId, day, ctx).map((t) => ({
+      playerId,
+      day,
+      template: t.id,
+      target: t.target(ctx),
+      rewardCoins: reward,
+      rewardGems: CHALLENGE_REWARD_GEMS,
+    })),
+    skipDuplicates: true,
+  });
+  return db.playerMission.findMany({ where: { playerId, day } });
 }
 
 function toView(m: {
@@ -177,6 +226,14 @@ export async function listMissions(db: Reader, playerId: string, now: Date) {
     resetsAt: dayBounds(now).end.toISOString(),
     missions: missions.map(toView),
     chest: await missionChestView(db, playerId, now),
+    // Desafios da semana (ADR 0035): resgatados pela mesma rota das missões.
+    challenges: {
+      week: challengeWeek(now).slice(1),
+      resetsAt: weekBounds(now).end.toISOString(),
+      items: (await ensureWeeklyChallenges(db, playerId, now))
+        .sort((a, b) => a.template.localeCompare(b.template))
+        .map(toView),
+    },
     serverTime: now.toISOString(),
   };
 }
@@ -185,7 +242,12 @@ export async function listMissions(db: Reader, playerId: string, now: Date) {
 export function claimMission(missionId: string, now: Date) {
   return async ({ tx, wallet, idempotencyKey }: CommandContext): Promise<CommandResult> => {
     const m = await tx.playerMission.findUnique({ where: { id: missionId } });
-    if (!m || m.playerId !== wallet.playerId || m.day !== gameDay(now)) {
+    const weekly = m?.template.startsWith(CHALLENGE_PREFIX) ?? false;
+    if (
+      !m ||
+      m.playerId !== wallet.playerId ||
+      m.day !== (weekly ? challengeWeek(now) : gameDay(now))
+    ) {
       throw Errors.missionNotFound(missionId);
     }
     if (m.claimedAt) throw Errors.missionAlreadyClaimed(missionId);
@@ -210,6 +272,7 @@ export function claimMission(missionId: string, now: Date) {
       );
     }
     await tx.playerMission.update({ where: { id: m.id }, data: { claimedAt: now } });
+    if (!weekly) await trackMission(tx, wallet.playerId, "mission_claimed", 1n, now);
     await track(tx, wallet.playerId, "mission_claimed", { template: m.template });
 
     return {
