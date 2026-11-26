@@ -72,6 +72,11 @@ func hire_manager(slug: String) -> Dictionary:
 	return await _command("/managers/hire", {"businessSlug": slug})
 
 
+## Evolui o ajudante um nível (ADR 0035).
+func upgrade_manager(slug: String) -> Dictionary:
+	return await _command("/managers/upgrade", {"businessSlug": slug})
+
+
 ## Presença no mapa (ADR 0006): ao abrir, ao trocar de mapa e a cada ~15 s. Ao entrar num
 ## mapa o servidor paga o AFK dos ajudantes dele.
 func presence(district: String) -> Dictionary:
@@ -249,6 +254,15 @@ func claim_weekly_reward(week: String, kind: String) -> Dictionary:
 
 func leaderboard_stars() -> Dictionary:
 	return await _authed(HTTPClient.METHOD_GET, "/leaderboard/stars", null, "")
+
+
+## Ranking global de evolução e temporada de 20 dias (ADR 0035).
+func leaderboard_evolution() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_GET, "/leaderboard/evolution", null, "")
+
+
+func leaderboard_season() -> Dictionary:
+	return await _authed(HTTPClient.METHOD_GET, "/leaderboard/season", null, "")
 
 
 func complete_tutorial() -> Dictionary:

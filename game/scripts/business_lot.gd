@@ -5,6 +5,7 @@ extends Node2D
 const Layout := preload("res://scripts/layout.gd")
 const Fmt := preload("res://scripts/fmt.gd")
 const UiFont := preload("res://scripts/ui_font.gd")
+const Stars := preload("res://scripts/stars.gd")
 
 const BUBBLE_RADIUS := 34.0
 const COIN := preload("res://assets/optimized/icon_coin.png")
@@ -107,7 +108,7 @@ func _draw_overlay() -> void:
 			_pill(font, Vector2(0, 58), Fmt.coins(business.cost), 22, Color("fff3d6"), Color("8a4b00"), true)
 		else:
 			var prev := Layout.previous_district(str(business.get("district", "praia")))
-			_pill(font, Vector2(0, 58), tr("Complete %s") % Layout.short_title(prev), 18, Color("e8e0d0"), Color("6b5d48"))
+			_pill(font, Vector2(0, 58), tr("Evolua %s ao máximo") % Layout.short_title(prev), 18, Color("e8e0d0"), Color("6b5d48"))
 		return
 
 	var top := bubble_position()
@@ -125,8 +126,10 @@ func _draw_overlay() -> void:
 		_overlay.draw_arc(top, 18, 0, TAU, 32, Color(0, 0, 0, 0.35), 9.0, true)
 		_overlay.draw_arc(top, 18, -PI / 2, -PI / 2 + TAU * p, 32, fill, 9.0, true)
 	_pill(font, Vector2(0, 22), tr("Nv %d") % int(business.level), 18, Color(0.12, 0.3, 0.32, 0.92), Color.WHITE)
-	if selected:
-		_overlay.draw_arc(Vector2(0, 4), 60, 0, TAU, 48, Color("ffd34d"), 4.0, true)
+	# Estrelas de evolução (ADR 0035): uma por evolução do negócio.
+	if business.has("evolution"):
+		Stars.draw_row(_overlay, Vector2(0, 46), int(business.evolution), 5, 7.0)
+	# Sem anel de seleção (pedido do titular em 2026-11-25: ficava fora de posição).
 
 
 ## Etiqueta arredondada centrada em `at`; `coin` adiciona o ícone de moeda à esquerda.

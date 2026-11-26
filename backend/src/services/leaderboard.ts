@@ -406,7 +406,9 @@ export async function getWeeklyRewards(db: Db, playerId: string, now: Date) {
       week: r.week,
       kind: r.kind,
       rank: r.rank,
-      league: r.league === null ? null : LEAGUES[r.league],
+      // "temporada": versões antigas do jogo mostram "na Liga <league>" para tudo que não é
+      // "semana" — o nome da temporada no lugar da liga deixa o aviso legível nelas.
+      league: r.kind === "temporada" ? "Temporada" : r.league === null ? null : LEAGUES[r.league],
       gems: r.gems,
       bonusKind: r.bonusKind,
       bonusHours: r.bonusHours,

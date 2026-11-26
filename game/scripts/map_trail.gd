@@ -258,7 +258,12 @@ func _card_frame() -> Control:
 
 func _status(id: String, unlocked: bool, is_current: bool) -> String:
 	if not unlocked:
-		return tr("Complete %s para abrir") % Layout.short_title(Layout.previous_district(id))
+		var prev := Layout.previous_district(id)
+		var info := GameState.district_info(prev)
+		if info.has("maxed"):
+			return tr("Evolua %s ao máximo para abrir (%d/%d)") % [
+					Layout.short_title(prev), int(info.maxed), int(info.total)]
+		return tr("Evolua %s ao máximo para abrir") % Layout.short_title(prev)
 	var total := 0
 	var owned := 0
 	for b in GameState.businesses():
@@ -266,6 +271,9 @@ func _status(id: String, unlocked: bool, is_current: bool) -> String:
 			total += 1
 			owned += 1 if b.owned else 0
 	var text := tr("%d de %d negócios") % [owned, total]
+	var here := GameState.district_info(id)
+	if here.has("stars"):
+		text += " · ⭐ %d/%d" % [int(here.stars), int(here.maxStars)]
 	if is_current:
 		return tr("Você está aqui · ") + text
 	var pending := GameState.pending_in(id)

@@ -25,6 +25,9 @@ signal catalog_changed
 signal daily_changed
 signal event_changed
 signal empire_sold(gained: int)
+## ADR 0035: um negócio evoluiu (arte nova, lucro ×3, +1 estrela) / um mapa novo foi liberado.
+signal evolved(slug: String, evolution: int)
+signal map_unlocked(district: String)
 
 ## Sinal de presença (o servidor considera "fora do mapa" após 45 s sem sinal).
 const PRESENCE_INTERVAL := 15.0
@@ -248,6 +251,24 @@ func hire_manager(slug: String) -> bool:
 	return await _optimistic(Api.hire_manager.bind(slug), _predict_hire.bind(slug), "hire")
 
 
+## Evolui o ajudante um nível (ADR 0035); responde na hora, o servidor confirma.
+func upgrade_manager(slug: String) -> bool:
+	return await _optimistic(Api.upgrade_manager.bind(slug), _predict_helper_upgrade.bind(slug), "hire")
+
+
+## Estrelas de evolução acumuladas do jogador (ranking global).
+func evo_stars() -> int:
+	return int(state.get("player", {}).get("evoStars", 0))
+
+
+## Dados do mapa no estado (andamento, estrelas); {} se o servidor ainda não mandou.
+func district_info(id: String) -> Dictionary:
+	for d in state.get("districts", []):
+		if d.id == id:
+			return d
+	return {}
+
+
 ## Listas com resgate na fila não são trocadas pela resposta velha (o botão voltaria a
 ## "Resgatar"); a fila, ao esvaziar, pede de novo.
 func refresh_missions() -> void:
@@ -268,7 +289,7 @@ func refresh_achievements() -> void:
 ## confirma na fila e, se recusar, tudo volta ao estado dele.
 func claim_mission(mission_id: String) -> bool:
 	var ok := await _optimistic(Api.claim_mission.bind(mission_id), func() -> bool:
-		for m in missions.get("missions", []):
+		for m in missions.get("missions", []) + missions.get("challenges", {}).get("items", []):
 			if m.id == mission_id and m.completed and not m.claimed:
 				m["claimed"] = true
 				_add_coins(m.rewardCoins)
@@ -303,7 +324,8 @@ func _add_gems(amount: Variant) -> void:
 
 ## Quantos prêmios esperam resgate (selo nos botões).
 func claimable_missions() -> int:
-	return missions.get("missions", []).filter(func(m): return m.completed and not m.claimed).size()
+	var all: Array = missions.get("missions", []) + missions.get("challenges", {}).get("items", [])
+	return all.filter(func(m): return m.completed and not m.claimed).size()
 
 
 func claimable_achievements() -> int:
@@ -828,6 +850,10 @@ func _predict_purchase(slug: String) -> bool:
 	b["cycleStartedAt"] = "previsto"
 	b["secondsRemaining"] = float(b.cycleSeconds) + (Time.get_ticks_msec() - _received_at_ms) / 1000.0
 	b["nextUpgradeCost"] = str(roundi(str(b.cost).to_float() * 1.15))
+	if b.has("evolution"):
+		b["evolution"] = 1
+		b["nextEvolutionLevel"] = 10
+		state.player["evoStars"] = evo_stars() + 1
 	return true
 
 
@@ -843,6 +869,18 @@ func _predict_upgrade(slug: String) -> bool:
 		_set_speed(b, int(b.get("speedPercent", 100)) + 50)
 	# Mesmas fórmulas do servidor (docs/README.md §6); a resposta oficial corrige qualquer diferença.
 	b["profitPerCycle"] = str(roundi(str(b.profitPerCycle).to_float() * 1.1))
+	# Evolução (ADR 0035): lucro ×3 e +1 estrela nos níveis 10, 25, 50 e 100.
+	if EVOLUTION_LEVELS.has(level) and b.has("evolution"):
+		b["profitPerCycle"] = Big.mul_int(b.profitPerCycle, 3)
+		b["evolution"] = int(b.evolution) + 1
+		var next_at: Variant = null
+		for l in EVOLUTION_LEVELS:
+			if l > level:
+				next_at = l
+				break
+		b["nextEvolutionLevel"] = next_at
+		state.player["evoStars"] = evo_stars() + 1
+		evolved.emit(slug, int(b.evolution))
 	var max_level := int(b.get("maxLevel", 100))
 	b["nextUpgradeCost"] = null if level >= max_level else str(roundi(str(b.cost).to_float() * pow(1.15, level)))
 	return true
@@ -856,7 +894,42 @@ func _predict_hire(slug: String) -> bool:
 		return false
 	b["managed"] = true
 	_set_speed(b, int(b.get("speedPercent", 100)) + 25)  # ajudante: +25% (ADR 0013)
+	if b.has("helper"):
+		b.helper["level"] = 1
+		b.helper["nextCost"] = Big.mul_int(b.managerCost, 4)
 	return true
+
+
+## Ajudante sobe um nível: mesma conta do servidor (economy/helpers.ts).
+func _predict_helper_upgrade(slug: String) -> bool:
+	var b := business(slug)
+	var h: Dictionary = b.get("helper", {})
+	if h.is_empty() or int(h.get("level", 0)) < 1 or h.get("nextCost") == null:
+		return false
+	if not _spend(h.nextCost):
+		return false
+	var level := int(h.level) + 1
+	h["level"] = level
+	h["nextCost"] = null if level >= int(h.get("maxLevel", 10)) else Big.mul_int(h.nextCost, 4)
+	match str(h.get("kind", "")):
+		"receita":
+			# +20 pontos sobre a base: lucro × (100 + 20n) / (100 + 20(n−1)).
+			var before := 100 + 20 * (level - 2)
+			b["profitPerCycle"] = str(roundi(str(b.profitPerCycle).to_float() * (before + 20) / before))
+			h["profitPercent"] = 20 * (level - 1)
+		"tempo":
+			_set_speed(b, int(b.get("speedPercent", 100)) + 30)
+			h["speedPoints"] = 30 * (level - 1)
+		"noturno":
+			var before_n := 100 + 8 * (level - 2)
+			b["profitPerCycle"] = str(roundi(str(b.profitPerCycle).to_float() * (before_n + 8) / before_n))
+			h["profitPercent"] = 8 * (level - 1)
+			h["offlineHours"] = 4 + (level - 1)
+	return true
+
+
+## Níveis em que o negócio evolui (arte nova, lucro ×3 e +1 estrela) — igual ao servidor.
+const EVOLUTION_LEVELS := [10, 25, 50, 100]
 
 
 ## Marcos de nível que aceleram o negócio em +50% cada (ADR 0013, igual ao servidor).
@@ -877,16 +950,32 @@ func _change_speed(delta: int) -> void:
 			_set_speed(b, int(b.get("speedPercent", 100)) + delta)
 
 
-## Mapa liberado quando todos os negócios do anterior estão comprados (previsão local).
+## Mapa liberado quando todos os negócios do anterior estão no nível máximo (ADR 0035; previsão
+## local). Também atualiza o andamento de cada mapa (comprados, no máximo, estrelas).
 func _predict_districts() -> void:
-	var owned_all := {}
+	var total := {}
+	var owned := {}
+	var maxed := {}
+	var stars := {}
 	for b in businesses():
 		var d := str(b.get("district", ""))
-		owned_all[d] = owned_all.get(d, true) and bool(b.get("owned", false))
+		total[d] = int(total.get(d, 0)) + 1
+		if b.get("owned", false):
+			owned[d] = int(owned.get(d, 0)) + 1
+			stars[d] = int(stars.get(d, 0)) + int(b.get("evolution", 1))
+			if int(b.level) >= int(b.get("maxLevel", 100)):
+				maxed[d] = int(maxed.get(d, 0)) + 1
 	for d in state.get("districts", []):
+		var id := str(d.id)
+		if d.has("maxed"):
+			d["owned"] = int(owned.get(id, 0))
+			d["maxed"] = int(maxed.get(id, 0))
+			d["stars"] = int(stars.get(id, 0))
 		var req: Variant = d.get("requires")
-		if req != null and not d.unlocked and owned_all.get(str(req), false):
+		if req != null and not d.unlocked and int(total.get(str(req), 0)) > 0 \
+				and int(maxed.get(str(req), 0)) >= int(total.get(str(req), 0)):
 			d["unlocked"] = true
+			map_unlocked.emit(id)
 
 
 ## Coleta pela moeda com resposta na hora (pedido do titular: pela internet a moeda demorava

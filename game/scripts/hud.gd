@@ -20,6 +20,7 @@ const MapTrail := preload("res://scripts/map_trail.gd")
 const Tutorial := preload("res://scripts/tutorial.gd")
 const GlyphButton := preload("res://scripts/glyph_button.gd")
 const MockAd := preload("res://scripts/mock_ad.gd")
+const Stars := preload("res://scripts/stars.gd")
 const COIN_TEX := preload("res://assets/optimized/icon_coin.png")
 const PURPLE := Color("9b7bff")
 const PURPLE_DARK := Color("6a4fd1")
@@ -43,6 +44,9 @@ var _progress: ProgressBar
 var _action_button: Button
 var _collect_button: Button
 var _hire_button: Button
+var _evo_row: HBoxContainer
+var _evo_stars: Control
+var _evo_label: Label
 var _modal: Control
 var tutorial: Control
 ## Tela de Mapas em trilha (mapas flutuando, bloqueados sob nuvens, "Em breve" no topo).
@@ -121,6 +125,12 @@ func _ready() -> void:
 	GameState.notice.connect(show_toast)
 	GameState.offline_summary.connect(show_offline_summary)
 	GameState.state_changed.connect(_sync_helper_cards)
+	# ADR 0035: comemora a evolução e avisa quando o próximo mapa abre.
+	GameState.evolved.connect(func(evolved_slug: String, evolution: int):
+		Audio.play("reward")
+		show_toast(tr("%s evoluiu! %d⭐ · lucro ×3") % [tr(str(GameState.business(evolved_slug).get("name", ""))), evolution]))
+	GameState.map_unlocked.connect(func(district: String):
+		show_toast(tr("%s foi liberado! Abra o Mapa.") % Layout.title(district)))
 	GameState.state_changed.connect(func(): _modal.refresh_store_cards())
 	GameState.catalog_changed.connect(func():
 		_modal.refresh_store_cards()
@@ -180,7 +190,7 @@ func open_helpers_menu() -> void:
 	_modal.open(tr("Ajudantes · %s") % Layout.title(current_district))
 	var auto_text := tr("Auto-coleta neste mapa: ativa") if GameState.auto_collect() \
 			else tr("Auto-coleta enquanto você joga neste mapa: em breve na Loja")
-	_modal.add_message(null, "", tr("Ajudantes produzem sozinhos enquanto você está em outro mapa ou com o jogo fechado — até 4 horas por mapa.") + "\n" + tr("Cada ajudante deixa o negócio 25% mais rápido.") + "\n" + auto_text)
+	_modal.add_message(null, "", tr("Ajudantes produzem sozinhos enquanto você está em outro mapa ou com o jogo fechado — até 4 horas por mapa.") + "\n" + tr("Cada ajudante deixa o negócio 25% mais rápido.") + "\n" + tr("Evolua cada ajudante até o nível 10: Vendedor rende mais, Veloz acelera e Noturno trabalha mais horas offline.") + "\n" + auto_text)
 	for b in GameState.businesses():
 		if Layout.district_of(b.slug) != current_district:
 			continue
@@ -189,7 +199,9 @@ func open_helpers_menu() -> void:
 
 
 func _helper_state(b: Dictionary) -> String:
-	return "hired" if b.get("managed", false) else ("buy" if b.owned else "locked")
+	if b.get("managed", false):
+		return "upgrade" if b.get("helper", {}).get("nextCost") != null else "hired"
+	return "buy" if b.owned else "locked"
 
 
 ## Estado/saldo mudou com a tela de Ajudantes aberta: atualiza os cartões sem recriar.
@@ -205,7 +217,13 @@ func _sync_helper_cards() -> void:
 func _hire_from_menu(target: String) -> void:
 	# Sem aviso flutuante aqui: ele cobria o texto da janela. O próprio cartão vira
 	# "Contratado" e dá um pulinho de confirmação.
-	if await GameState.hire_manager(target):
+	var upgrading: bool = GameState.business(target).get("managed", false)
+	var done: bool
+	if upgrading:
+		done = await GameState.upgrade_manager(target)
+	else:
+		done = await GameState.hire_manager(target)
+	if done:
 		_sync_helper_cards()
 		var button: Button = _helper_cards.get(target, {}).get("button")
 		if button:
@@ -317,13 +335,26 @@ func _refresh() -> void:
 			_action_button.disabled = GameState.busy or not GameState.can_afford(b.cost)
 		else:
 			var prev := Layout.previous_district(str(b.get("district", "praia")))
-			_action_button.text = tr("Complete %s") % Layout.title(prev)
+			_action_button.text = tr("Evolua %s ao máximo") % Layout.title(prev)
 			_action_button.disabled = true
+	# Evolução (ADR 0035): estrelas e o que falta para a próxima.
+	_evo_row.visible = b.owned and b.has("evolution")
+	if _evo_row.visible:
+		_evo_stars.value = int(b.evolution)
+		var next_at: Variant = b.get("nextEvolutionLevel")
+		_evo_label.text = tr("Evolução máxima!") if next_at == null \
+				else tr("Próxima evolução no nível %d: lucro ×3") % int(next_at)
+	var helper: Dictionary = b.get("helper", {})
 	var can_hire: bool = b.owned and not b.get("managed", false)
-	_hire_button.visible = can_hire
+	var can_evolve_helper: bool = b.owned and b.get("managed", false) and helper.get("nextCost") != null
+	_hire_button.visible = can_hire or can_evolve_helper
 	if can_hire:
 		_hire_button.text = tr("Contratar ajudante  %s") % Fmt.coins(b.managerCost)
 		_hire_button.disabled = GameState.busy or not GameState.can_afford(b.managerCost)
+	elif can_evolve_helper:
+		_hire_button.text = tr("Ajudante Nv %d → %d (%s)  %s") % [int(helper.level), int(helper.level) + 1,
+				MenuModal.helper_next_gain(helper), Fmt.coins(helper.nextCost)]
+		_hire_button.disabled = GameState.busy or not GameState.can_afford(helper.nextCost)
 	_update_cycle(b)
 
 
@@ -368,6 +399,9 @@ func _on_collect_pressed() -> void:
 
 func _on_hire_pressed() -> void:
 	var b := GameState.business(slug)
+	if b.get("managed", false):
+		await GameState.upgrade_manager(slug)
+		return
 	if await GameState.hire_manager(slug):
 		# Regra (ADR 0006): o ajudante trabalha quando você sai do mapa; aqui dentro, coleta
 		# automática só com a Auto-coleta da Loja ou o Passe VIP.
@@ -573,9 +607,15 @@ func _add_ad_boost_card() -> void:
 		var used := int(ad.get("usedToday", 0))
 		var limit := int(ad.get("dailyLimit", 5))
 		var coins := Fmt.coins(GameState.boost_estimate(int(ad.get("minutes", 15)) * 60))
-		# Teto alto do servidor = sem limite na prática: não mostra o "Hoje: N/1000".
+		# 10 anúncios a cada 24 h (ADR 0035): com o limite cheio, mostra quando libera o próximo.
 		var subtitle := tr("Grátis com anúncio · ≈ %s moedas") % coins if limit >= AD_BOOST_NO_LIMIT \
-				else tr("Grátis com anúncio · ≈ %s moedas\nHoje: %d/%d") % [coins, used, limit]
+				else tr("Grátis com anúncio · ≈ %s moedas\nÚltimas 24 h: %d/%d") % [coins, used, limit]
+		var next_at: Variant = ad.get("nextAt")
+		if used >= limit and next_at != null:
+			var wait := _iso_seconds(str(next_at)) - GameState.server_now()
+			if wait <= 0.0:
+				GameState.refresh_catalog.call_deferred()  # liberou: busca a contagem nova
+			subtitle = tr("Limite de %d anúncios em 24 h atingido.\nPróximo em %s") % [limit, Fmt.duration(maxf(1.0, wait))]
 		var open := used < limit and not _ad_busy
 		return {
 			"title": ad.get("title", tr("Coleta antecipada")), "icon": COIN_TEX,
@@ -749,6 +789,15 @@ func open_missions_menu() -> void:
 		var mission: Dictionary = m
 		var id: String = mission.id
 		_reward_cards[id] = _modal.add_reward_card(_mission_item(mission), func(): GameState.claim_mission(id))
+	# Desafios da semana (ADR 0035): alvos maiores, prêmio em diamantes; viram toda segunda.
+	var challenges: Dictionary = GameState.missions.get("challenges", {})
+	if not challenges.get("items", []).is_empty():
+		var left := _iso_seconds(str(challenges.get("resetsAt", ""))) - GameState.server_now()
+		_modal.add_section(tr("Desafios da semana · termina em %s") % Fmt.duration(maxf(0.0, left)))
+		for c in challenges.get("items", []):
+			var challenge: Dictionary = c
+			var cid: String = challenge.id
+			_reward_cards[cid] = _modal.add_reward_card(_mission_item(challenge), func(): GameState.claim_mission(cid))
 	# Baú das missões (ADR 0014): abre com as 3 resgatadas.
 	if GameState.missions.has("chest"):
 		_modal.add_store_card(func():
@@ -777,7 +826,8 @@ func open_profile_menu() -> void:
 	var owned := GameState.businesses().filter(func(b): return b.owned).size()
 	var helpers := GameState.businesses().filter(func(b): return b.get("managed", false)).size()
 	_modal.add_message(Layout.texture("icon_profile"), str(player.get("displayName", "")),
-			tr("%d negócios · %d ajudantes · %s diamantes") % [owned, helpers, Fmt.coins(GameState.gems())])
+			tr("%d negócios · %d ajudantes · %s diamantes") % [owned, helpers, Fmt.coins(GameState.gems())]
+			+ ("\n" + tr("⭐ %d estrelas de evolução") % GameState.evo_stars() if player.has("evoStars") else ""))
 	if GameState.vip_until() != null:
 		_modal.add_vip_badge(tr("Jogador VIP"), tr("Passe VIP ativo até %s") % _date_text(GameState.vip_until()))
 	# Código usado no suporte e para pedir exclusão pelo site (sem o jogo instalado).
@@ -883,9 +933,11 @@ func _add_prestige_section() -> void:
 	var status: String
 	if not p.get("requirementMet", false):
 		var total := int(p.get("totalBusinesses", 0))
-		status = tr("Complete os 8 primeiros mapas (até o Centro Espacial) para vender: negócios e ajudantes.") \
+		status = tr("Evolua os 8 primeiros mapas (até o Centro Espacial) ao máximo para vender: todos os negócios no nível 100 e com ajudante.") \
 				+ "\n" + tr("Negócios %d/%d · Ajudantes %d/%d") % [
 					int(p.get("ownedBusinesses", 0)), total, int(p.get("hiredHelpers", 0)), total]
+		if p.has("maxedBusinesses"):
+			status += "\n" + tr("No nível máximo: %d/%d") % [int(p.maxedBusinesses), total]
 	elif gain < 1:
 		status = tr("Fature mais para ganhar a primeira estrela desta rodada.")
 	else:
@@ -1003,12 +1055,18 @@ func open_ranking_menu(tab := -1) -> void:
 		_ranking_tab = tab
 	GameState.track("screen_view", {"screen": "ranking"})
 	_modal.open(tr("Ranking"))
-	var tabs := [tr("Liga"), tr("Semana"), tr("Estrelas")]
+	# Liga e Semana (faturamento), Temporada de 20 dias e Evolução (estrelas de evolução, ADR
+	# 0035) e Investidor (estrelas de quem vendeu o império).
+	var tabs := [tr("Liga"), tr("Semana"), tr("Temporada"), tr("Evolução"), tr("Investidor")]
 	_modal.add_tabs(tabs, _ranking_tab, func(i): open_ranking_menu(i))
 	_modal.add_message(null, "", tr("Carregando…"))
 	var shown_tab := _ranking_tab
 	var res: Dictionary
 	if shown_tab == 2:
+		res = await Api.leaderboard_season()
+	elif shown_tab == 3:
+		res = await Api.leaderboard_evolution()
+	elif shown_tab == 4:
 		res = await Api.leaderboard_stars()
 	else:
 		res = await Api.leaderboard()
@@ -1046,6 +1104,27 @@ func open_ranking_menu(tab := -1) -> void:
 				tr("Quem faturar mais com seus negócios até domingo vence.\nTermina em %s.") % Fmt.duration(ends)
 				+ "\n" + tr("A pontuação zera toda segunda: todos começam do zero."))
 		_modal.add_prize_strip(tr("Prêmios desta semana"), _prize_items(data.get("prizes", {}).get("semana", [])))
+	elif shown_tab == 2:
+		var season: Dictionary = data.get("season", {})
+		var ends := _iso_seconds(str(season.get("end", data.serverTime))) - _iso_seconds(data.serverTime)
+		_modal.add_message(null, tr("Temporada %d · %d dias") % [int(season.get("number", 1)), int(season.get("days", 20))],
+				tr("Ganhe estrelas evoluindo seus negócios: quem ganhar mais estrelas na temporada vence. Empate? Vale quem faturou mais.")
+				+ "\n" + tr("Termina em %s.") % Fmt.duration(ends))
+		var prizes: Dictionary = data.get("prizes", {})
+		var tiers: Array = prizes.get("tiers", [])
+		_modal.add_prize_strip(tr("Prêmios da temporada"), tiers.slice(0, 3).map(func(t): return {"gems": int(t.gems)}))
+		var others := []
+		var from := 4
+		for t in tiers.slice(3):
+			others.append(tr("%dº ao %dº: %d diamantes") % [from, int(t.upTo), int(t.gems)])
+			from = int(t.upTo) + 1
+		others.append(tr("Ganhou %d estrelas ou mais na temporada? Leva %d diamantes de participação.") % [
+				int(prizes.get("participationStars", 10)), int(prizes.get("participationGems", 20))])
+		_modal.add_message(null, "", "\n".join(others))
+	elif shown_tab == 3:
+		_modal.add_message(null, tr("Ranking de evolução"),
+				tr("Cada evolução de um negócio vale 1 estrela (até 5 por negócio). Aqui conta tudo o que você já evoluiu, em todos os mapas.")
+				+ "\n" + tr("Suas estrelas: %d") % GameState.evo_stars())
 	else:
 		_modal.add_message(null, tr("Estrelas de investidor"),
 				tr("Quem acumulou mais estrelas vendendo o império (Perfil → Prestígio)."))
@@ -1053,27 +1132,28 @@ func open_ranking_menu(tab := -1) -> void:
 		_modal.add_message(null, tr("Conta da equipe"), tr("Esta conta é de testes da equipe e fica fora do ranking, para não concorrer com os jogadores."))
 	if entries.is_empty():
 		_modal.add_message(null, "", tr("Ninguém faturou nesta semana ainda. Colete moedas e saia na frente!")
-				if shown_tab < 2 else tr("Ninguém vendeu o império ainda. Seja o primeiro!"))
+				if shown_tab < 2 else (tr("Ninguém vendeu o império ainda. Seja o primeiro!") if shown_tab == 4
+				else tr("Ninguém evoluiu ainda. Evolua um negócio e saia na frente!")))
 	var hidden := GameState.hidden_players()
 	var vips: Array = data.get("vip", [])
 	for e in entries:
 		if not e.isMe and hidden.has(str(e.get("playerId", ""))):
 			continue
 		var entry: Dictionary = e
-		_modal.add_rank_row(int(e.rank), e.displayName, ("⭐ " + str(e.score)) if shown_tab == 2 else e.score, e.isMe,
+		_modal.add_rank_row(int(e.rank), e.displayName, ("⭐ " + str(e.score)) if shown_tab >= 2 else e.score, e.isMe,
 				Callable() if e.isMe or not e.has("playerId") else func(): open_player_options(entry),
 				vips.has(str(e.get("playerId", ""))))
 	if me != null and not entries.any(func(e): return e.isMe):
 		_modal.add_section(tr("Sua posição"))
-		_modal.add_rank_row(int(me.rank), me.displayName, ("⭐ " + str(me.score)) if shown_tab == 2 else me.score, true,
+		_modal.add_rank_row(int(me.rank), me.displayName, ("⭐ " + str(me.score)) if shown_tab >= 2 else me.score, true,
 				Callable(), GameState.vip_until() != null)
 	# A conta da equipe fica fora das listas, mas compartilha a posição que teria (a página do
 	# servidor calcula).
 	var share_id := str(me.get("playerId", "")) if me != null else ""
 	if share_id == "" and data.get("staff", false):
 		share_id = str(GameState.state.get("player", {}).get("id", ""))
-	if share_id != "":
-		var tab_key: String = ["liga", "semana", "estrelas"][shown_tab]
+	if share_id != "" and shown_tab != 2 and shown_tab != 3:
+		var tab_key: String = ["liga", "semana", "", "", "estrelas"][shown_tab]
 		var player_id := share_id
 		_modal.add_action(tr("Compartilhar minha posição"), func(): share_rank(player_id, tab_key),
 				Color("1877f2"), Color("0d5bbf"))
@@ -1193,6 +1273,8 @@ func open_podium_reward(r: Dictionary) -> void:
 	_reward_kind = "podium"
 	_modal.open(tr("Parabéns!"))
 	var where := tr("no ranking da semana") if r.kind == "semana" else tr("na Liga %s") % tr(str(r.get("league", "Bronze")))
+	if r.kind == "temporada":
+		where = tr("na temporada de 20 dias")
 	var rank := int(r.rank)
 	var medal: Texture2D = load("res://assets/optimized/rank_%d.png" % rank) if rank >= 1 and rank <= 3 else _gem_tex
 	var bonus := _bonus_text(str(r.get("bonusKind", "")), int(r.get("bonusHours", 0)))
@@ -1372,7 +1454,7 @@ func _sync_rewards() -> void:
 		if GameState.missions.get("missions", []).any(func(m): return not _reward_cards.has(m.id)):
 			open_missions_menu()
 			return
-		for m in GameState.missions.get("missions", []):
+		for m in GameState.missions.get("missions", []) + GameState.missions.get("challenges", {}).get("items", []):
 			if _reward_cards.has(m.id):
 				_modal.set_reward_card(_reward_cards[m.id], _mission_item(m))
 	elif _reward_kind == "achievements":
@@ -1772,6 +1854,18 @@ func _build_sheet() -> void:
 	_info.add_theme_font_size_override("font_size", 28)
 	_info.add_theme_font_override("font", UiFont.weight(500))
 	col.add_child(_info)
+	_evo_row = HBoxContainer.new()
+	_evo_row.add_theme_constant_override("separation", 12)
+	col.add_child(_evo_row)
+	_evo_stars = Stars.new(0, 13.0)
+	_evo_stars.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_evo_row.add_child(_evo_stars)
+	_evo_label = Label.new()
+	_evo_label.add_theme_font_size_override("font_size", 24)
+	_evo_label.add_theme_color_override("font_color", Style.INK_SOFT)
+	_evo_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_evo_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_evo_row.add_child(_evo_label)
 	_progress = ProgressBar.new()
 	_progress.custom_minimum_size.y = 24
 	_progress.show_percentage = false

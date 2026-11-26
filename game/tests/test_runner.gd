@@ -337,7 +337,7 @@ func _trail_tests() -> bool:
 	check(trail._nodes[0].y > trail._nodes[4].y, "trilha: primeiro mapa embaixo, Em breve em cima")
 	var texts := func(card: Control) -> String:
 		return " ".join(card.find_children("*", "Label", true, false).map(func(l): return l.text))
-	check(texts.call(trail._cards[2]).contains("???") and texts.call(trail._cards[2]).contains("Complete a cidade"),
+	check(texts.call(trail._cards[2]).contains("???") and texts.call(trail._cards[2]).contains("Evolua a cidade ao máximo"),
 			"trilha: mapa bloqueado escondido (nome oculto, diz o que falta)")
 	check(texts.call(trail._cards[0]).contains("Você está aqui"), "trilha: marca o mapa atual")
 	var chosen := []
@@ -641,7 +641,7 @@ func _store_tests() -> bool:
 		buttons.append(h.button)
 	var ad_button: Button = buttons[0]
 	var ad_sub: String = hud._modal._store_cards[0].sub.text
-	check(ad_button.text == "5/5" and ad_button.disabled and ad_sub.contains("Hoje: 5/5"),
+	check(ad_button.text == "5/5" and ad_button.disabled and ad_sub.contains("Últimas 24 h: 5/5"),
 			"coleta antecipada grátis mostra o uso de hoje e trava no limite")
 	check(ad_sub.contains("900"), "coleta antecipada mostra a estimativa de moedas")
 	var gem_button: Button = buttons[6]  # auto-coleta 24h (depois de coleta antecipada e Turbo)

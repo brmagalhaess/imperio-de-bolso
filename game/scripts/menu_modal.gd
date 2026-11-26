@@ -8,6 +8,8 @@ const Fmt := preload("res://scripts/fmt.gd")
 const Layout := preload("res://scripts/layout.gd")
 const TouchScroll := preload("res://scripts/touch_scroll.gd")
 
+const HELPER_UP := Color("9b7bff")
+const HELPER_UP_DARK := Color("6a4fd1")
 const COIN := preload("res://assets/optimized/icon_coin.png")
 const LOCK := preload("res://assets/optimized/lot_lock.png")
 const MEDALS := [preload("res://assets/optimized/rank_1.png"), preload("res://assets/optimized/rank_2.png"),
@@ -382,11 +384,17 @@ func add_helper(b: Dictionary, state: String, on_press: Callable) -> Dictionary:
 ## Atualiza um cartão de ajudante sem recriá-lo (preço fixo; só muda se dá para pagar).
 func set_helper_state(handle: Dictionary, b: Dictionary, state: String) -> void:
 	var button: Button = handle.button
-	handle.sub.text = {
-		"locked": tr("Construa o negócio primeiro"),
-		"buy": tr("Produz sozinho quando você sai do mapa"),
-		"hired": tr("Trabalhando · até 4h fora do mapa"),
-	}[state]
+	var h: Dictionary = b.get("helper", {})
+	var kind := helper_kind_name(str(h.get("kind", "")))
+	if state == "locked":
+		handle.sub.text = tr("Construa o negócio primeiro")
+	elif state == "buy":
+		handle.sub.text = tr("Produz sozinho quando você sai do mapa") if kind == "" \
+				else tr("%s · produz sozinho quando você sai do mapa") % kind
+	elif h.is_empty():
+		handle.sub.text = tr("Trabalhando · até 4h fora do mapa")
+	else:
+		handle.sub.text = tr("Nv %d/%d · %s") % [int(h.level), int(h.get("maxLevel", 10)), helper_effect(h)]
 	var dim := Color(0.4, 0.4, 0.4, 0.8) if state == "locked" else Color.WHITE
 	handle.portrait.modulate = dim
 	handle.thumb.modulate = Color(1, 1, 1, 0.5) if state == "locked" else Color.WHITE
@@ -405,8 +413,21 @@ func set_helper_state(handle: Dictionary, b: Dictionary, state: String) -> void:
 			faded.bg_color.a = 0.45
 			faded.border_color.a = 0.45
 			button.add_theme_stylebox_override("disabled", faded)
+	elif state == "upgrade":
+		# Evoluir o ajudante (ADR 0035): o preço muda a cada nível.
+		button.text = Fmt.coins(h.nextCost)
+		button.disabled = GameState.busy or not GameState.can_afford(h.nextCost)
+		if handle.state != "upgrade":
+			button.icon = COIN
+			button.add_theme_constant_override("icon_max_width", 28)
+			button.add_theme_font_size_override("font_size", 24)
+			Style.style_button(button, HELPER_UP, HELPER_UP_DARK)
+			var faded_up := Style.toy_button(HELPER_UP, HELPER_UP_DARK)
+			faded_up.bg_color.a = 0.45
+			faded_up.border_color.a = 0.45
+			button.add_theme_stylebox_override("disabled", faded_up)
 	elif state == "hired" and handle.state != "hired":
-		button.text = tr("Contratado")
+		button.text = tr("Contratado") if h.is_empty() else tr("Nível máximo")
 		button.icon = null
 		button.disabled = true
 		button.add_theme_font_size_override("font_size", 22)
@@ -419,6 +440,44 @@ func set_helper_state(handle: Dictionary, b: Dictionary, state: String) -> void:
 		button.disabled = true
 		Style.style_button(button, Style.GREY, Style.GREY_DARK)
 	handle.state = state
+
+
+## Nome da especialidade do ajudante (ADR 0035); "" se o servidor não informa.
+static func helper_kind_name(kind: String) -> String:
+	match kind:
+		"receita":
+			return TranslationServer.translate("Vendedor")
+		"tempo":
+			return TranslationServer.translate("Veloz")
+		"noturno":
+			return TranslationServer.translate("Noturno")
+	return ""
+
+
+## O que o ajudante rende agora, em uma linha ("Vendedor: +40% de lucro").
+static func helper_effect(h: Dictionary) -> String:
+	var name := helper_kind_name(str(h.get("kind", "")))
+	match str(h.get("kind", "")):
+		"receita":
+			return TranslationServer.translate("%s: +%d%% de lucro") % [name, int(h.get("profitPercent", 0))]
+		"tempo":
+			return TranslationServer.translate("%s: +%d%% de velocidade") % [name, 25 + int(h.get("speedPoints", 0))]
+		"noturno":
+			return TranslationServer.translate("%s: %d h offline, +%d%% de lucro") % [
+				name, int(h.get("offlineHours", 4)), int(h.get("profitPercent", 0))]
+	return ""
+
+
+## O que o próximo nível do ajudante acrescenta ("+20% de lucro").
+static func helper_next_gain(h: Dictionary) -> String:
+	match str(h.get("kind", "")):
+		"receita":
+			return TranslationServer.translate("+20% de lucro")
+		"tempo":
+			return TranslationServer.translate("+30% de velocidade")
+		"noturno":
+			return TranslationServer.translate("+1 h offline e +8% de lucro")
+	return ""
 
 
 ## Cartão de missão/conquista com barra de progresso e prêmio. Atualiza no lugar

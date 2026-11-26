@@ -22,6 +22,19 @@ var _helpers := {}  # slug → Sprite2D do ajudante (visível quando contratado)
 ## negócios dela (jogo novo com servidor antigo — ADR 0034).
 var _islands: Array[Sprite2D] = []
 var _world_height := 1280.0
+## Mapa em 2D (2026-11-25, pedido do titular: "só movimenta pra cima e pra baixo" e "as ilhas
+## não ficam juntas"). As ilhas de expansão descem em escada para a esquerda: a ponte desenhada
+## no canto superior direito de cada uma chega na terra da anterior. A arte e o layout seguem
+## feitos para a pilha antiga (ilha em x=0, y=`expansion.y`); aqui tudo é reposicionado.
+const ISLAND_POS := [Vector2(-470, 930), Vector2(-960, 1390)]
+const ISLAND_SIZE := Vector2(720, 870)
+const MAIN_RECT := Rect2(0, 0, 720, 1280)
+## Regiões por onde a câmera anda (mapa principal + ilhas visíveis).
+var _regions: Array[Rect2] = [MAIN_RECT]
+var _old_y: Array[float] = []
+var _velocity := Vector2.ZERO
+const INERTIA_DECAY := 4.5
+const MIN_ZOOM_FACTOR := 0.72
 var _sorted: Node2D
 var _press_pos := Vector2.ZERO
 ## Mapas maiores (12 negócios): arrastar move a câmera e pinça aproxima (pedido de 2026-10-15).
@@ -48,20 +61,29 @@ func _ready() -> void:
 		fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(fill)
 
-	# Mapa maior: mar contínuo abaixo do cenário principal, até o fim da ilha de expansão.
+	# Mapa maior: mar contínuo abaixo e à esquerda do cenário principal, onde ficam as ilhas.
 	var exp: Dictionary = config.get("expansion", {})
+	for e in [exp, config.get("expansion2", {})]:
+		if not e.is_empty():
+			_old_y.append(float(e.y))
 	if not exp.is_empty():
-		var sea := ColorRect.new()
-		sea.color = exp.sea_color
-		sea.position = Vector2(-1000, 1000)
-		sea.size = Vector2(2720, float(config.world_height) + 1000.0)
-		sea.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(sea)
+		for rect in [Rect2(-2400, 1000, 4200, 3200), Rect2(-2400, -1000, 2460, 4000)]:
+			var sea := ColorRect.new()
+			sea.color = exp.sea_color
+			sea.position = rect.position
+			sea.size = rect.size
+			sea.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			add_child(sea)
 
 	var bg := Sprite2D.new()
 	bg.texture = load("res://assets/optimized/%s" % config.base)
 	bg.centered = false
 	bg.scale = Vector2(720, 1280) / bg.texture.get_size()
+	if not exp.is_empty():
+		# Borda esquerda e de baixo se desfazem no mar (sem emenda reta ao andar para as ilhas).
+		var feather := ShaderMaterial.new()
+		feather.shader = EDGE_FEATHER
+		bg.material = feather
 	add_child(bg)
 
 	# Ilhas de expansão: a primeira (2026-10-15) e a segunda (12 negócios por mapa, ADR 0034).
@@ -72,20 +94,29 @@ func _ready() -> void:
 		island.texture = load("res://assets/optimized/%s" % e.base)
 		island.centered = false
 		island.scale = Vector2.ONE * (720.0 / island.texture.get_width())
-		island.position = Vector2(0, float(e.y))
+		island.position = ISLAND_POS[_islands.size()]
+		# O mar pintado na ilha se mistura ao mar do mapa; a ponte (canto de cima, à direita)
+		# quase não desbota para chegar inteira na terra vizinha.
+		var soft := ShaderMaterial.new()
+		soft.shader = EDGE_FEATHER
+		soft.set_shader_parameter("left", 0.16)
+		soft.set_shader_parameter("bottom", 0.16)
+		soft.set_shader_parameter("top", 0.07)
+		soft.set_shader_parameter("right", 0.03)
+		island.material = soft
 		add_child(island)
 		_islands.append(island)
 	if not exp.is_empty():
 		# Dica no fim do mapa principal: há mais lotes descendo.
 		var hint := Label.new()
-		hint.text = tr("▼ Arraste para ver mais negócios ▼")
+		hint.text = tr("◀ Arraste para explorar as ilhas")
 		hint.add_theme_font_size_override("font_size", 26)
 		hint.add_theme_color_override("font_color", Color.WHITE)
 		hint.add_theme_color_override("font_outline_color", Color("063a52"))
 		hint.add_theme_constant_override("outline_size", 8)
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		hint.size = Vector2(720, 40)
-		hint.position = Vector2(0, float(exp.y) + 40.0)
+		hint.position = Vector2(0, 1085)
 		hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(hint)
 
@@ -98,12 +129,12 @@ func _ready() -> void:
 		s.texture = Layout.texture(d[0])
 		s.scale = Vector2.ONE * Layout.ART_SCALE
 		s.offset = Vector2(0, -s.texture.get_height() / 2.0)
-		s.position = d[1]
+		s.position = _place(d[1])
 		_sorted.add_child(s)
 
 	for slug in config.lots:
 		var lot := BusinessLot.new(slug)
-		lot.position = config.lots[slug]
+		lot.position = _place(config.lots[slug])
 		_sorted.add_child(lot)
 		lots[slug] = lot
 
@@ -116,7 +147,7 @@ func _ready() -> void:
 		helper.texture = Layout.texture(Layout.helper_texture_name(slug))
 		helper.scale = Vector2.ONE * config.char_scale
 		helper.offset = Vector2(0, -helper.texture.get_height() / 2.0)
-		helper.position = config.lots[slug] + config.helper_offset
+		helper.position = _place(config.lots[slug]) + config.helper_offset
 		helper.visible = false
 		_sorted.add_child(helper)
 		_helpers[slug] = helper
@@ -126,6 +157,18 @@ func _ready() -> void:
 	_sync()
 
 
+## Borda do cenário principal que se desfaz (esquerda e embaixo).
+const EDGE_FEATHER := preload("res://scripts/edge_feather.gdshader")
+
+
+## Posição no mapa 2D de um ponto do layout antigo (ilhas empilhadas em x=0).
+func _place(pos: Vector2) -> Vector2:
+	for i in range(_old_y.size() - 1, -1, -1):
+		if pos.y >= _old_y[i] + 100.0:
+			return pos - Vector2(0, _old_y[i]) + ISLAND_POS[i]
+	return pos
+
+
 ## Posiciona a câmera para enquadrar este distrito.
 func frame(camera: Camera2D) -> void:
 	_camera = camera
@@ -133,22 +176,61 @@ func frame(camera: Camera2D) -> void:
 	camera.zoom = Vector2.ONE * config.zoom
 	_touches.clear()
 	_dragging = false
+	_velocity = Vector2.ZERO
 
 
 func _pannable() -> bool:
 	return config.get("pan", false) and _camera != null
 
 
-## Mantém a câmera dentro do cenário (720×1280) e o zoom entre o enquadramento e 1,8×.
+## Mantém a câmera sobre o mapa: zoom entre 0,72× e 1,8× do enquadramento e o centro dentro do
+## corredor formado pelo cenário principal e pelas ilhas visíveis (anda em todas as direções).
 func _clamp_camera() -> void:
-	var z: float = clamp(_camera.zoom.x, config.zoom, config.zoom * MAX_ZOOM_FACTOR)
+	var z: float = clamp(_camera.zoom.x, config.zoom * MIN_ZOOM_FACTOR, config.zoom * MAX_ZOOM_FACTOR)
 	_camera.zoom = Vector2.ONE * z
 	var half := get_viewport_rect().size / z / 2.0
-	var lo := half
-	var hi := Vector2(720, _world_height) - half
-	_camera.position = Vector2(
-			clamp(_camera.position.x, min(lo.x, hi.x), max(lo.x, hi.x)) if lo.x <= hi.x else 360.0,
-			clamp(_camera.position.y, min(lo.y, hi.y), max(lo.y, hi.y)) if lo.y <= hi.y else config.camera_center.y)
+	var top := _regions[0].position.y
+	var bottom := top
+	for r in _regions:
+		bottom = maxf(bottom, r.end.y)
+	var y := _camera.position.y
+	if bottom - top > half.y * 2.0:
+		y = clampf(y, top + half.y, bottom - half.y)
+	else:
+		y = (top + bottom) / 2.0
+	# Faixa de x: união das regiões na altura da câmera (centro da região se ela é mais
+	# estreita que a tela).
+	var lo := INF
+	var hi := -INF
+	for r in _regions:
+		if y < r.position.y - 1.0 or y > r.end.y + 1.0:
+			continue
+		var a := r.position.x + half.x
+		var b := r.end.x - half.x
+		if a > b:
+			a = r.get_center().x
+			b = a
+		lo = minf(lo, a)
+		hi = maxf(hi, b)
+	if lo > hi:
+		lo = config.camera_center.x
+		hi = lo
+	_camera.position = Vector2(clampf(_camera.position.x, lo, hi), y)
+
+
+## Inércia: depois de soltar o dedo o mapa continua deslizando e freia sozinho.
+func _process(delta: float) -> void:
+	if _camera == null or _dragging or not _touches.is_empty() or _velocity.length_squared() < 16.0:
+		return
+	if not is_visible_in_tree():
+		_velocity = Vector2.ZERO
+		return
+	var before := _camera.position
+	_camera.position += _velocity * delta
+	_clamp_camera()
+	if _camera.position.is_equal_approx(before):
+		_velocity = Vector2.ZERO
+	_velocity = _velocity.lerp(Vector2.ZERO, minf(1.0, INERTIA_DECAY * delta))
 
 
 func _zoom_by(factor: float) -> void:
@@ -165,15 +247,16 @@ func _sync() -> void:
 	for slug in lots:
 		lots[slug].visible = known.is_empty() or known.has(slug)
 	_world_height = 1280.0
+	_regions = [MAIN_RECT]
 	for island in _islands:
-		var bottom := island.position.y + island.texture.get_height() * island.scale.y
+		var rect := Rect2(island.position, ISLAND_SIZE)
 		var any := false
 		for slug in lots:
-			var y: float = lots[slug].position.y
-			any = any or (lots[slug].visible and y > island.position.y and y < bottom)
+			any = any or (lots[slug].visible and rect.has_point(lots[slug].position))
 		island.visible = any
 		if any:
-			_world_height = maxf(_world_height, bottom)
+			_regions.append(rect)
+			_world_height = maxf(_world_height, rect.end.y)
 	for slug in _helpers:
 		var b := GameState.business(slug)
 		var show: bool = b.get("managed", false)
@@ -199,14 +282,18 @@ func select(slug: String) -> void:
 func focus(slug: String) -> void:
 	if not _pannable() or not lots.has(slug):
 		return
-	var target: Vector2 = lots[slug].position - Vector2(0, 120)
 	var half := get_viewport_rect().size / _camera.zoom.x / 2.0
-	var lo_y := half.y
-	var hi_y := _world_height - half.y
-	target.y = clamp(target.y, min(lo_y, hi_y), max(lo_y, hi_y))
-	target.x = _camera.position.x
-	if absf(target.y - _camera.position.y) > half.y * 0.6:
-		create_tween().tween_property(_camera, "position", target, 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	var from := _camera.position
+	var offset: Vector2 = lots[slug].position - Vector2(0, 120) - from
+	if absf(offset.y) <= half.y * 0.6 and absf(offset.x) <= half.x * 0.6:
+		return
+	# O destino passa pelo mesmo limite da câmera (corredor das ilhas).
+	_velocity = Vector2.ZERO
+	_camera.position = from + offset
+	_clamp_camera()
+	var target := _camera.position
+	_camera.position = from
+	create_tween().tween_property(_camera, "position", target, 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
 ## Só o destaque visual (sem abrir painel); "" tira o destaque de todos.
@@ -242,8 +329,10 @@ func _unhandled_input(event: InputEvent) -> void:
 				_dragging = true
 			elif event.index == 0 and (_dragging or event.position.distance_to(_press_pos) > TAP_MAX_DRAG):
 				_dragging = true
-				_camera.position -= event.relative / _camera.zoom.x
+				var move: Vector2 = event.relative / _camera.zoom.x
+				_camera.position -= move
 				_clamp_camera()
+				_velocity = _velocity.lerp(-event.velocity / _camera.zoom.x, 0.5)
 		elif event is InputEventMouseButton and event.pressed:
 			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 				_zoom_by(1.1)
@@ -254,6 +343,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.pressed:
 			_press_pos = event.position
 			_dragging = false
+			_velocity = Vector2.ZERO
 		elif not _dragging and event.position.distance_to(_press_pos) <= TAP_MAX_DRAG:
 			_handle_tap(event.position)
 
