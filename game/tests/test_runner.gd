@@ -97,6 +97,19 @@ func _unit_tests() -> void:
 			for j in range(i + 1, points.size()):
 				lots_apart = lots_apart and points[i].distance_to(points[j]) > 120
 	check(lots_apart, "lotes afastados entre si (ilhas novas como a do Espaço)")
+	# Ilha única (2026-11-25): todo mapa tem o cenário novo com um lote por negócio, afastados.
+	var LayoutV9: GDScript = load("res://scripts/layout_v9.gd")
+	var islands_ok := true
+	for id in Layout.DISTRICT_ORDER:
+		var isl: Dictionary = LayoutV9.ISLANDS.get(id, {})
+		islands_ok = islands_ok and not isl.is_empty() \
+				and ResourceLoader.exists("res://assets/optimized/%s" % isl.get("base", "?")) \
+				and isl.get("lots", []).size() == Layout.DISTRICTS[id].lots.size()
+		var pts: Array = isl.get("lots", [])
+		for i in pts.size():
+			for j in range(i + 1, pts.size()):
+				islands_ok = islands_ok and pts[i].distance_to(pts[j]) > 100
+	check(islands_ok, "ilha única: cenário e um lote para cada negócio nos 20 mapas")
 	var ui_ok := true
 	for name in ["icon_build", "icon_shop", "icon_map", "icon_profile", "icon_coin",
 			"icon_settings", "icon_help", "lot_lock", "char_vendor"] + Layout.DISTRICTS.praia.walkers:

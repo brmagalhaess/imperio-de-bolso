@@ -1,0 +1,15 @@
+[
+ {
+  "id": "g9_mestre",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 4,
+  "input": {
+   "prompt": "Edit this image: zoom out and enlarge the diorama so it becomes ONE single big island tile, about twice as large, seen from the same isometric camera angle, in the exact same glossy cartoon mobile city-builder art style. The big tile is a colorful CITY district and contains EXACTLY TWELVE large EMPTY flat building lots (plain light concrete plazas, nothing on them), all the same size, arranged in a neat regular grid of 3 columns and 4 rows, each lot surrounded by gray asphalt roads with white crosswalks. Remove the rocket, the satellite dishes, the globe and the satellite. The edges of the tile get green lawns, trees, benches and street lamps. Only open blue sea around the tile, the whole island fully visible with sea margin on every side. Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d2ol7oe51mr4n9.cloudfront.net/user_3K1fiQrCKiDtJHQdFQZHUVpPtcq/0b975963-e39f-44ad-9b2b-a0b2895849d5.jpg"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ }
+]

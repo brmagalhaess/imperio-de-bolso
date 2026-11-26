@@ -151,20 +151,6 @@ func _ready() -> void:
 			await _wait(0.4)
 			get_viewport().get_texture().get_image().save_png(out.path_join("%s_a.png" % id))
 			var cfg: Dictionary = Layout.DISTRICTS[id]
-			# Mapa 2D (2026-11-25): visão geral afastada e cada ilha de perto.
-			var view: Node2D = main.districts[id]
-			main.camera.zoom = Vector2.ONE * 0.4
-			main.camera.position = Vector2(-120, 1130)
-			await _wait(0.6)
-			get_viewport().get_texture().get_image().save_png(out.path_join("%s_geral.png" % id))
-			main.camera.zoom = Vector2.ONE * float(cfg.zoom)
-			var n := 0
-			for k in ["expansion", "expansion2"]:
-				if cfg.has(k):
-					main.camera.position = view.ISLAND_POS[n] + Vector2(360, 420)
-					n += 1
-					await _wait(0.8)
-					get_viewport().get_texture().get_image().save_png(out.path_join("%s_%s.png" % [id, k]))
 			print("PASSO ", id)
 		get_tree().quit()
 		return

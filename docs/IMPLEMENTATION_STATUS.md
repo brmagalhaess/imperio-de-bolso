@@ -9,7 +9,9 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
   prêmios em diamantes); 3 missões novas e desafios da semana; anúncios 10/24 h com 5 min de
   prêmio; venda do império exige nível 100; convide amigos. Migração
   `20261125120000_evolucao_ajudantes_temporadas` (só acrescenta; ninguém é zerado).
-- Jogo 1.2.0: mapa 2D com ilhas ligadas e câmera livre com inércia; estrelas nos lotes; evoluir
+- 2026-11-26: ilha única por mapa (arte v9, 45 imagens, ~US$ 4 de teto US$ 15 aprovado) no
+  lugar das ilhas de expansão; Godot 163 verificações, 0 falhas; conferido por captura nos 20.
+- Jogo 1.2.0: ilha única por mapa e câmera livre com inércia; estrelas nos lotes; evoluir
   ajudante; abas novas no ranking; desafios; convite no Perfil; sem anel amarelo de seleção.
 - Painel admin: aba Progresso.
 - Testes: Vitest 187/187 (Postgres temporário do Homebrew — Docker do Mac segue só-leitura);

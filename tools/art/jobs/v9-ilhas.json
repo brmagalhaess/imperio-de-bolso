@@ -1,0 +1,262 @@
+[
+ {
+  "id": "g9_praia_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 3,
+  "input": {
+   "prompt": "Edit this image into a sunny TROPICAL BEACH island. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep ONLY SIX of them as large EMPTY flat building lots (plain light concrete plazas, nothing on them, same positions and sizes): the six lots that form the two widest rows of three lots. ALL the other eight lots are replaced by beach scenery: white sand with colorful beach umbrellas and sunbeds, a beach volleyball court, a blue swimming pool, sand castles, surfboards stuck in the sand and palm trees. The roads become light wooden boardwalks. The tile edges get white sand, palm trees, beach umbrellas and small dunes;  Only turquoise sea around the tile. Bright and cheerful. No buildings on the six lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_cidade_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a colorful CITY district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a round park with a big fountain, and at the bottom a playground with a colorful carousel. The tile edges get green lawns, trees, benches and street lamps. Only open sea around the tile. Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_porto_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a seaside MARINA PORT district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a small plaza with a red and white lighthouse and anchors, and at the bottom a fish market square with crates, nets and barrels. The tile edges get wooden docks, small boats, buoys, ropes and seagulls. Only open sea around the tile. Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_centro_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a modern FINANCIAL DOWNTOWN district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a modern plaza with a glass fountain, and at the bottom a small park with a golden abstract sculpture. The tile edges get neat lawns, modern lamp posts, fountains and small glass kiosks. Only open sea around the tile. Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_industrial_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a INDUSTRIAL PARK district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a big water tower with pipes, and at the bottom a yard of stacked colorful shipping containers. The tile edges get stacked containers, pallets, a small railway and pipes. Only open sea around the tile. Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_serra_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a SNOWY MOUNTAIN VILLAGE district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a frozen pond with a snowman, and at the bottom a wooden gazebo among snowy pine trees. The tile is covered with fresh snow at the edges, snowy pine trees and wooden fences; the lots and roads are clear. Only icy blue sea around the tile. Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_ilha_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a luxury TROPICAL RESORT district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a blue swimming pool with palm trees and sunbeds, and at the bottom a tiki garden with hibiscus flowers and a small waterfall. The tile edges get white sand, palm trees, hibiscus flowers and wooden boardwalks. Only crystal clear turquoise sea around the tile. Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_espaco_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a futuristic SPACE CENTER district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a launch pad with a small white rocket, and at the bottom a garden with a big white satellite dish. The tile edges get satellite dishes, white tanks and neat lawns; roads have glowing blue lines. Only open sea around the tile. Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_piratas_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a funny PIRATE ISLAND district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a treasure chest overflowing with gold coins next to a palm tree, and at the bottom a small sandy hill with old crossed cannons. Replace the outer edges with golden sand beaches, palm trees, wooden docks, barrels, ropes and old cannons. Far behind the tile a big pirate ship with black sails floats on the turquoise sea (blurred, not on the lots). Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_atlantida_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a magical UNDERWATER ATLANTIS city district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a giant open clam shell with a glowing pearl, and at the bottom a garden of colorful corals with small fishes. The tile is made of white marble and sand with seaweed, corals, sea shells and starfish at the edges; the roads are pale stone. The whole scene is deep underwater in turquoise ocean light with bubbles and sun rays from above instead of a sky. Far behind the tile there are ruins of golden domes and Greek columns (blurred, not on the lots). Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_dinos_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a funny PREHISTORIC DINOSAUR VALLEY district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a big nest with three giant spotted dinosaur eggs, and at the bottom a pond with a cute long-neck dinosaur. Replace the outer edges with lush prehistoric jungle, giant ferns, palm trees and rocks; the roads are dirt paths with stone curbs. Far behind the tile a smoking volcano and cute long-neck dinosaurs walk in the jungle (blurred, not on the lots). Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_pinguins_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a funny PENGUIN KINGDOM on the south pole district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a frozen pond with cute penguins sliding, and at the bottom a big snowman with a scarf. The tile is snow and ice with icebergs and igloos at the edges; the roads are cleared blue ice. Far behind the tile there are icebergs and snowy mountains on an icy sea (blurred, not on the lots). Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_doces_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a funny CANDY LAND city district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a fountain of pink lemonade with lollipop trees, and at the bottom a hill of whipped cream with a cherry on top. The ground is pink frosting, the edges have candy cane fences, lollipop trees, gumdrops and chocolate rocks; the roads are chocolate with white icing crosswalks. The tile floats on a sea of strawberry milk; far behind it there are cotton candy clouds and candy mountains (blurred, not on the lots). Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_brinquedos_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a funny TOY TOWN district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a giant rubber duck in a little pool, and at the bottom a playground with toy blocks and a rocking horse. The tile edges are made of giant colorful toy blocks, toy trees and toy soldiers; the roads are like a toy car play mat. Far behind the tile there are giant teddy bears and toy balloons (blurred, not on the lots). Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_lua_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a MOON BASE in outer space district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a little moon crater with a moon rover, and at the bottom a glass dome greenhouse with plants. The tile is gray moon rock with craters at the edges, futuristic lamp posts and small antennas; the roads have glowing blue lane lines. The tile floats in deep outer space instead of the sea, with stars all around. Far behind the tile the blue planet Earth rises over the horizon (blurred, not on the lots). Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_marte_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a MARS COLONY district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a small potato farm under a glass dome, and at the bottom a red rock formation with a parked rover. The tile is red martian soil and rocks with small domes and solar panels at the edges; the roads have glowing orange lane lines. The sky is a dusty orange-pink martian sky. Far behind the tile there are red mountains and a big volcano (blurred, not on the lots). Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_gatos_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a funny CAT PLANET district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a giant ball of yarn with a cat bed, and at the bottom a fish shaped fountain. The ground is soft lavender grass with cat paw prints, the edges have scratching posts, cardboard boxes and fish bone decorations; the roads are purple. The tile floats in deep outer space instead of the sea, with stars all around. Far behind the tile a big planet shaped like a cat face with ears glows in space (blurred, not on the lots). Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_saturno_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a RINGS OF SATURN colony district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a cluster of glowing purple crystals, and at the bottom a small ice skating rink. The tile is golden rock with sparkling ice crystals at the edges and futuristic lamp posts; the roads have glowing golden lane lines. The tile floats in deep outer space instead of the sea, with stars all around. Far behind the tile the giant planet Saturn with its rings fills the sky (blurred, not on the lots). Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_gelatina_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a funny JELLY PLANET district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a wobbly rainbow jelly dome, and at the bottom a pool of green slime with bubbles. The ground is shiny translucent jelly in rainbow colors with jelly trees and gummy rocks at the edges; the roads are blue jelly. The tile floats in deep outer space instead of the sea, with stars all around. Far behind the tile there are wobbly jelly planets (blurred, not on the lots). Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_galaxia_ilha",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Edit this image into a majestic GALACTIC EMPIRE capital district. Keep the exact same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same big island shape filling the image and the exact same layout of roads with crosswalks. There are fourteen lots in the reference: keep EXACTLY the TWELVE lots of the middle as large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same positions and sizes; ONLY the single lot at the very top corner and the single lot at the very bottom corner of the grid are replaced by decorations: at the top a glowing teleport portal ring, and at the bottom a small golden statue of a planet with rings. The tile is polished dark metal and gold with glowing purple lines at the edges and futuristic lamp posts; the roads have glowing purple lane lines. The tile floats in deep outer space instead of the sea, with stars all around. Far behind the tile there is a colorful spiral galaxy and a nebula (blurred, not on the lots). Bright and cheerful. No buildings on the twelve lots. No bridges. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ }
+]

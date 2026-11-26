@@ -45,9 +45,13 @@ limitados a 10 por 24 h com prêmio menor, e ideias para viralizar.
   `GET /invites`, `POST /invites/redeem`, `POST /invites/claim`.
 
 ### Jogo
-- **Mapa 2D**: as ilhas de expansão descem em escada para a esquerda, com a ponte de cada uma
-  chegando na terra anterior; bordas se desfazem no mar (`edge_feather.gdshader`). A câmera anda
-  em todas as direções com inércia e pinça (0,72× a 1,8×), dentro do corredor das ilhas.
+- **Ilha única por mapa** (revisão de 2026-11-26, pedido do titular: as ilhas de expansão
+  separadas ficaram feias): cada mapa tem um cenário só, maior, com os 12 lotes dentro (6 na
+  praia). Os 20 são edições do mesmo cenário-mestre (`tools/art/v9/`, Higgsfield, ~US$ 4), então
+  os lotes ficam nas mesmas posições; `processar.py` gera `layout_v9.gd`. Mundo 840×1120, a
+  câmera enquadra a ilha na largura da tela e anda em todas as direções com inércia e pinça
+  (até 2,2×); bordas se desfazem no fundo (`edge_feather.gdshader`). As artes `*_expansao*`
+  saíram do jogo.
 - Estrelas nos lotes e no painel, botão de evoluir ajudante, abas Temporada/Evolução no ranking,
   desafios na tela de missões, contagem regressiva do anúncio, convite no Perfil.
 - Sem o anel amarelo de seleção (ficava fora de posição).
