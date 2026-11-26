@@ -29,7 +29,7 @@ const ALL = BUSINESS_CATALOG.filter((b) =>
 ).map((b) => b.slug);
 
 /** Compra os negócios (em ordem de mapa) e, se pedido, contrata os ajudantes. */
-async function buildEmpire(g: Guest, slugs: string[], helpers: boolean) {
+async function buildEmpire(g: Guest, slugs: string[], helpers: boolean, maxed = true) {
   await setCoins(ctx.db, g.playerId, 10n ** 26n);
   await openMaps(ctx.db, g.playerId);
   for (const slug of slugs) {
@@ -40,6 +40,11 @@ async function buildEmpire(g: Guest, slugs: string[], helpers: boolean) {
       expect(h.statusCode).toBe(200);
     }
   }
+  if (maxed)
+    await ctx.db.playerBusiness.updateMany({
+      where: { playerId: g.playerId },
+      data: { level: 100 },
+    });
 }
 
 /** Simula faturamento de produção (o que conta para as estrelas). */
@@ -83,6 +88,20 @@ describe("vender o império", () => {
     const res = await post(ctx.app, g, "/prestige", {});
     expect(res.statusCode).toBe(409);
     expect(res.json().error.code).toBe("PRESTIGE_NOT_AVAILABLE");
+
+    // Negócios e ajudantes, mas um deles abaixo do nível 100: ainda não (ADR 0035).
+    const low = await newGuest(ctx.app);
+    await earn(low, 50_000_000n);
+    await buildEmpire(low, ALL, true);
+    await ctx.db.playerBusiness.updateMany({
+      where: { playerId: low.playerId, business: { slug: "agua" } },
+      data: { level: 99 },
+    });
+    expect((await get(ctx.app, low, "/prestige")).json()).toMatchObject({
+      maxedBusinesses: ALL.length - 1,
+      requirementMet: false,
+      available: false,
+    });
 
     // Todos os negócios comprados, mas sem ajudantes: ainda não.
     await buildEmpire(g, ALL, false);

@@ -25,6 +25,8 @@ export interface PrestigeView {
   totalBusinesses: number;
   ownedBusinesses: number;
   hiredHelpers: number;
+  /** Negócios no nível máximo (ADR 0035: a venda exige o império todo evoluído). */
+  maxedBusinesses: number;
   requirementMet: boolean;
   available: boolean;
 }
@@ -34,7 +36,7 @@ const REQUIRED_MAPS = DISTRICTS.slice(0, PRESTIGE_MAPS) as string[];
 /** Situação do prestígio do jogador (tela "Vender o império"). */
 export async function getPrestige(db: Reader, playerId: string): Promise<PrestigeView> {
   const player = await db.player.findUniqueOrThrow({ where: { id: playerId } });
-  const [earned, total, owned, helpers] = await Promise.all([
+  const [earned, total, owned, helpers, levels] = await Promise.all([
     db.walletLedger.aggregate({
       where: {
         playerId,
@@ -49,10 +51,15 @@ export async function getPrestige(db: Reader, playerId: string): Promise<Prestig
     db.playerBusiness.count({
       where: { playerId, managerUnlocked: true, business: { district: { in: REQUIRED_MAPS } } },
     }),
+    db.playerBusiness.findMany({
+      where: { playerId, business: { district: { in: REQUIRED_MAPS } } },
+      select: { level: true, business: { select: { maxLevel: true } } },
+    }),
   ]);
+  const maxed = levels.filter((pb) => pb.level >= pb.business.maxLevel).length;
   const earnedSince = earned._sum.delta ?? 0n;
   const starsToGain = starsFor(earnedSince);
-  const requirementMet = total > 0 && owned >= total && helpers >= total;
+  const requirementMet = total > 0 && owned >= total && helpers >= total && maxed >= total;
   return {
     stars: player.prestigeStars,
     bonusPercent: bonusPercent(player.prestigeStars),
@@ -64,6 +71,7 @@ export async function getPrestige(db: Reader, playerId: string): Promise<Prestig
     totalBusinesses: total,
     ownedBusinesses: owned,
     hiredHelpers: helpers,
+    maxedBusinesses: maxed,
     requirementMet,
     available: requirementMet && starsToGain >= 1,
   };
