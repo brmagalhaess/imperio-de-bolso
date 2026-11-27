@@ -10,6 +10,7 @@ const Walker := preload("res://scripts/walker.gd")
 const FloatingText := preload("res://scripts/floating_text.gd")
 const Fmt := preload("res://scripts/fmt.gd")
 const LayoutV9 := preload("res://scripts/layout_v9.gd")
+const StreetAgent := preload("res://scripts/street_agent.gd")
 
 ## Quanto o dedo pode escorregar entre tocar e soltar e ainda contar como toque (pixels da
 ## resolução base 720×1280; dedos reais se mexem bem mais que o mouse).
@@ -55,34 +56,20 @@ func _init(p_district: String) -> void:
 ## Ilha única (2026-11-25, pedido do titular: uma ilha maior com todos os negócios dentro, no
 ## lugar das ilhas de expansão separadas). Dados em layout_v9.gd; {} = mapa ainda no formato antigo.
 var _v9: Dictionary = {}
-## A tela tem o topo e a base cobertos pela interface: a câmera pode passar desse tanto da arte
-## para qualquer lote caber na área livre.
-const V9_MARGIN_TOP := 330.0
-const V9_MARGIN_BOTTOM := 240.0
-## Folga lateral: os botões das bordas cobrem os lotes de fora; dá para puxar a ilha para o lado.
-const V9_MARGIN_SIDE := 130.0
-const V9_MAX_ZOOM := 2.2
+const V9_MAX_ZOOM := 2.4
+## Zoom ao abrir o mapa (1 = lotes no tamanho da resolução base).
+const V9_START_ZOOM := 0.8
+const V9_CARS := 5
 
 
 func _ready_v9() -> void:
-	var world: Vector2 = LayoutV9.WORLD
-	# Fundo em volta da arte: a cor de cima (céu/mar) e a de baixo, emendadas atrás da ilha.
-	for half in [[_v9.get("sea_top", _v9.sea), -3000.0, 3000.0 + world.y / 2.0], [_v9.sea, world.y / 2.0, 3000.0 + world.y / 2.0]]:
-		var sea := ColorRect.new()
-		sea.color = half[0]
-		sea.position = Vector2(-3000, half[1])
-		sea.size = Vector2(6000 + world.x, half[2])
-		sea.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(sea)
+	# O cenário inteiro é o mundo: ilha completa com o entorno pintado até as bordas. A câmera
+	# nunca sai da arte, então não existe "quadrado" nem pedaço faltando.
+	var world: Vector2 = _v9.size
 	var bg := Sprite2D.new()
 	bg.texture = load("res://assets/optimized/%s" % _v9.base)
 	bg.centered = false
 	bg.scale = world / bg.texture.get_size()
-	var feather := ShaderMaterial.new()
-	feather.shader = EDGE_FEATHER
-	for side in ["left", "right", "top", "bottom"]:
-		feather.set_shader_parameter(side, 0.05)
-	bg.material = feather
 	add_child(bg)
 
 	_sorted = Node2D.new()
@@ -90,7 +77,7 @@ func _ready_v9() -> void:
 	add_child(_sorted)
 	# Lotes que sobram na arte (praia): área de guarda-sóis.
 	for at in _v9.get("cover", []):
-		for off in [Vector2(-34, 8), Vector2(30, 26)]:
+		for off in [Vector2(-40, 0), Vector2(36, 22)]:
 			var s := Sprite2D.new()
 			s.texture = Layout.texture("beach_umbrella")
 			s.scale = Vector2.ONE * Layout.ART_SCALE
@@ -113,12 +100,20 @@ func _ready_v9() -> void:
 		helper.visible = false
 		_sorted.add_child(helper)
 		_helpers[slug] = helper
-	var ways: Array = _v9.get("waypoints", [])
-	if ways.size() >= 2:
+
+	# Pessoas nas calçadas (beira dos lotes) e carros nas ruas (em volta deles).
+	var pads: Array = _v9.get("pads", [])
+	var pad: Vector2 = _v9.get("pad", Vector2(140, 90))
+	var step: Vector2 = _v9.get("step", pad * 1.1)
+	if pads.size() >= 2:
+		var walk: Dictionary = StreetAgent.build(pads, pad * 0.86, 6.0, pad.x * 0.6)
 		for i in config.walkers.size():
-			_sorted.add_child(Walker.new(config.walkers[i], ways, i * 2, config.char_scale))
-	_regions = [Rect2(-V9_MARGIN_SIDE, -V9_MARGIN_TOP, world.x + V9_MARGIN_SIDE * 2.0,
-			world.y + V9_MARGIN_TOP + V9_MARGIN_BOTTOM)]
+			_sorted.add_child(StreetAgent.new(walk.nodes, walk.links, i * 7 + 1, config.walkers[i], config.char_scale))
+		if _v9.get("cars", true):
+			var road: Dictionary = StreetAgent.build(pads, step, pad.x * 0.3, 0.0)
+			for i in V9_CARS:
+				_sorted.add_child(StreetAgent.new(road.nodes, road.links, i * 5 + 2, "car_%d" % (i % 3 + 1), 0.42, true))
+	_regions = [Rect2(Vector2.ZERO, world)]
 	_world_height = world.y
 	GameState.state_changed.connect(_sync)
 	GameState.collected.connect(_on_collected)
@@ -126,9 +121,11 @@ func _ready_v9() -> void:
 	_sync()
 
 
-## Zoom que enquadra a largura da ilha na tela (base do zoom mínimo no modo ilha única).
+## Menor zoom em que a tela ainda cabe inteira dentro da arte (ilha única).
 func _v9_zoom() -> float:
-	return get_viewport_rect().size.x / LayoutV9.WORLD.x
+	var view := get_viewport_rect().size
+	var world: Vector2 = _v9.size
+	return maxf(view.x / world.x, view.y / world.y)
 
 
 func _ready() -> void:
@@ -260,9 +257,12 @@ func frame(camera: Camera2D) -> void:
 	camera.position = config.camera_center
 	camera.zoom = Vector2.ONE * config.zoom
 	if not _v9.is_empty():
-		# Ilha inteira na largura da tela, com o meio dela na área livre entre os painéis.
-		camera.zoom = Vector2.ONE * _v9_zoom()
-		camera.position = LayoutV9.WORLD / 2.0 + Vector2(0, (V9_MARGIN_BOTTOM - V9_MARGIN_TOP) / 2.0 / _v9_zoom())
+		# Abre no meio da ilha, um pouco afastado; dali o jogador arrasta e dá zoom à vontade.
+		camera.zoom = Vector2.ONE * maxf(_v9_zoom(), V9_START_ZOOM)
+		var center := Vector2.ZERO
+		for p in _v9.lots:
+			center += p
+		camera.position = center / maxf(1.0, _v9.lots.size()) - Vector2(0, 40)
 		_clamp_camera()
 	_touches.clear()
 	_dragging = false
@@ -278,7 +278,7 @@ func _pannable() -> bool:
 func _clamp_camera() -> void:
 	var z: float = clamp(_camera.zoom.x, config.zoom * MIN_ZOOM_FACTOR, config.zoom * MAX_ZOOM_FACTOR)
 	if not _v9.is_empty():
-		z = clamp(_camera.zoom.x, _v9_zoom(), _v9_zoom() * V9_MAX_ZOOM)
+		z = clamp(_camera.zoom.x, _v9_zoom(), maxf(_v9_zoom(), 1.0) * V9_MAX_ZOOM)
 	_camera.zoom = Vector2.ONE * z
 	var half := get_viewport_rect().size / z / 2.0
 	var top := _regions[0].position.y

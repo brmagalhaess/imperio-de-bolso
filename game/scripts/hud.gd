@@ -376,6 +376,16 @@ func _update_cycle(b: Dictionary) -> void:
 			else tr("Pronto em %s") % Fmt.duration(GameState.seconds_remaining(b))
 
 
+## Seta do painel: vai para o negócio anterior/seguinte do mapa atual (dá a volta no fim).
+func _step_business(dir: int) -> void:
+	var slugs: Array = Layout.DISTRICTS[current_district].lots.keys()
+	var i := slugs.find(slug)
+	if i < 0 or slugs.size() < 2:
+		return
+	_hold_timer.stop()
+	business_requested.emit(str(slugs[posmod(i + dir, slugs.size())]))
+
+
 const HOLD_DELAY := 0.45
 const HOLD_REPEAT := 0.09
 var _hold_timer: Timer
@@ -1920,6 +1930,17 @@ func _build_sheet() -> void:
 	_title.clip_text = true
 	_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	head.add_child(_title)
+	# Setas: passa para o negócio anterior/seguinte do mapa sem fechar o painel.
+	head.add_theme_constant_override("separation", 10)
+	for step in [-1, 1]:
+		var arrow := Button.new()
+		arrow.text = "◀" if step < 0 else "▶"
+		arrow.custom_minimum_size = Vector2(88, 68)
+		arrow.add_theme_font_size_override("font_size", 30)
+		Style.style_button(arrow, Style.TEAL_LIGHT, Style.TEAL_DARK, 34)
+		var dir: int = step
+		arrow.pressed.connect(func(): _step_business(dir))
+		head.add_child(arrow)
 	head.add_child(Style.close_button(close_sheet))
 
 	_info = Label.new()

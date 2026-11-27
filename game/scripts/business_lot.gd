@@ -125,10 +125,7 @@ func _draw_overlay() -> void:
 		var fill := Color("7ee08a") if automatic else Color("ffd34d")
 		_overlay.draw_arc(top, 18, 0, TAU, 32, Color(0, 0, 0, 0.35), 9.0, true)
 		_overlay.draw_arc(top, 18, -PI / 2, -PI / 2 + TAU * p, 32, fill, 9.0, true)
-	_pill(font, Vector2(0, 22), tr("Nv %d") % int(business.level), 18, Color(0.12, 0.3, 0.32, 0.92), Color.WHITE)
-	# Estrelas de evolução (ADR 0035): uma por evolução do negócio.
-	if business.has("evolution"):
-		Stars.draw_row(_overlay, Vector2(0, 46), int(business.evolution), 5, 7.0)
+	# Mapa limpo (pedido do titular em 2026-11-26): nível e estrelas só no painel do negócio.
 	# Sem anel de seleção (pedido do titular em 2026-11-25: ficava fora de posição).
 
 

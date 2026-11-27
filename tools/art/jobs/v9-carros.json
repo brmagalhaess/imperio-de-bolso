@@ -1,0 +1,15 @@
+[
+ {
+  "id": "g9_carros",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Use the exact glossy cartoon mobile city-builder art style and the same isometric camera angle of the reference image. Draw a sprite sheet on a plain solid pure white background with EIGHT small cute toy-like vehicles, each fully visible, evenly spaced, none touching, in a grid of 4 columns and 2 rows. TOP ROW: four different vehicles (a red hatchback car, a yellow taxi, a blue pickup truck, a white delivery van) all seen from the FRONT in isometric three-quarter view, driving toward the BOTTOM-RIGHT of the image. BOTTOM ROW: the same four vehicles in the same order, seen from BEHIND in isometric three-quarter view, driving toward the TOP-RIGHT of the image. Soft small shadow under each vehicle. No roads, no ground, no people, no text, no letters, no numbers, no logos, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215a9-5ba7-701c-a79b-4dbe5fa8a610/b55434ac-9ad7-419d-b899-59f4c92c3f70.png"
+   ],
+   "aspect_ratio": "16:9",
+   "resolution": "2k"
+  }
+ }
+]

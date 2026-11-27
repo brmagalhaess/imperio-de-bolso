@@ -1,13 +1,14 @@
-"""Processa as ilhas únicas (v9): escolhe a variação de cada mapa, acha os lotes e grava
-game/assets/optimized/<mapa>_ilha.jpg, a miniatura da trilha e game/scripts/layout_v9.gd.
+"""Processa as ilhas únicas (v9, versão "de longe": ilha inteira com o entorno até as bordas).
+Escolhe a variação de cada mapa, acha os lotes e grava game/assets/optimized/<mapa>_ilha.jpg, a
+miniatura da trilha e game/scripts/layout_v9.gd.
 
     python3 tools/art/v9/processar.py            # processa tudo
-    python3 tools/art/v9/processar.py --contar   # só mostra quantos lotes cada variação tem
+    python3 tools/art/v9/processar.py --contar   # lotes, largura do lote e bordas de cada variação
 
-Mundo do jogo: 840×1120 (a imagem 3:4 inteira). Os lotes de todos os mapas partem dos 14 do
-cenário-mestre (o do topo e o de baixo viram decoração); cada um é ajustado ao lote detectado
-mais próximo na arte do mapa. A praia usa só os lotes que sobraram na arte dela (6).
-Escolha manual de variação: tools/art/v9/escolhas.json  {"cidade": 2, ...}."""
+O mundo de cada mapa é a própria imagem, numa escala em que o lote fica com PAD_WORLD de largura
+(bem maior que o prédio: sobra espaço entre as construções). A câmera do jogo nunca sai da imagem.
+Escolha manual: tools/art/v9/escolhas.json  {"cidade": 2, ...}; cache da detecção em
+/tmp/claude-501/v9_cache.json (a detecção é lenta)."""
 import json, sys
 from pathlib import Path
 
@@ -20,92 +21,117 @@ from lotes import lots
 ROOT = Path(__file__).resolve().parents[3]
 SRC = ROOT / "game/assets/source"
 OUT = ROOT / "game/assets/optimized"
-WORLD = (840, 1120)
-TEX_W = 1260  # 1,5× o mundo: nítido com zoom
+PAD_WORLD = 290.0
 ORDER = ["praia", "cidade", "porto", "centro", "industrial", "serra", "ilha", "espaco", "piratas",
          "atlantida", "dinos", "pinguins", "doces", "brinquedos", "lua", "marte", "gatos", "saturno",
          "gelatina", "galaxia"]
-CHOICES = json.loads((Path(__file__).parent / "escolhas.json").read_text()) \
-    if (Path(__file__).parent / "escolhas.json").exists() else {}
+HERE = Path(__file__).parent
+CHOICES = json.loads((HERE / "escolhas.json").read_text()) if (HERE / "escolhas.json").exists() else {}
+CACHE_FILE = Path("/tmp/claude-501/v9_cache.json")
+CACHE = json.loads(CACHE_FILE.read_text()) if CACHE_FILE.exists() else {}
 
 
 def variations(d: str) -> list[Path]:
-    return sorted((SRC / f"g9_{d}_ilha").glob("*.png"))
+    # Sem a versão "de longe" (créditos do Higgsfield acabaram em 2026-11-26): usa a da 1ª passada.
+    return sorted((SRC / f"g9_{d}_longe").glob("*.png")) or sorted((SRC / f"g9_{d}_ilha").glob("*.png"))
 
 
-def detect(path: Path):
-    (w, h), found = lots(str(path), 0.004)
-    # Praça de verdade: losango cheio (areia/neve espalhada tem preenchimento baixo ou é enorme).
-    ok = [p for p in found if 0.45 <= p["fill"] <= 0.68 and 0.012 < p["area"] / (w * h) < 0.03]
-    return (w, h), ok
+def detect(path: Path) -> dict:
+    key = f"{path.name}:{path.stat().st_mtime_ns}"
+    if key in CACHE:
+        return CACHE[key]
+    (w, h), found = lots(str(path), 0.002)
+    ok = [p for p in found if 0.45 <= p["fill"] <= 0.68 and 0.006 < p["area"] / (w * h) < 0.03]
+    CACHE[key] = {"w": w, "h": h, "lots": ok}
+    CACHE_FILE.write_text(json.dumps(CACHE, default=float))
+    return CACHE[key]
 
 
-def master():
-    (w, h), found = detect(SRC / "g9_mestre/g9_mestre_v04.png")
-    assert len(found) == 14, len(found)
-    found.sort(key=lambda p: (p["y"], p["x"]))
-    return (w, h), found[1:-1]  # sem o do topo e o de baixo
+def margin(det: dict) -> float:
+    """Folga lateral da ilha na imagem, em larguras de lote (a ilha passa ~0,35 lote além dos
+    lotes de fora). Negativa = ilha cortada pela borda."""
+    if not det["lots"]:
+        return -9.0
+    pw = float(np.median([p["w"] for p in det["lots"]]))
+    left = min(p["x"] for p in det["lots"]) - pw / 2
+    right = det["w"] - (max(p["x"] for p in det["lots"]) + pw / 2)
+    return round(min(left, right) / pw - 0.35, 2)
+
+
+def middle(found: list, want: int) -> tuple[list, list]:
+    """Os `want` lotes do meio: tira das pontas (cima/baixo) as fileiras de um lote só."""
+    pts = sorted(found, key=lambda p: (p["y"], p["x"]))
+    extra = []
+    while len(pts) > want:
+        hh = np.median([p["h"] for p in pts]) / 2
+        top = [p for p in pts if p["y"] - pts[0]["y"] < hh * 0.6]
+        bot = [p for p in pts if pts[-1]["y"] - p["y"] < hh * 0.6]
+        if len(top) <= len(bot):
+            extra.append(pts.pop(0))
+        else:
+            extra.append(pts.pop(-1))
+    return pts, extra
+
+
+def score(det: dict, want: int) -> tuple:
+    n = len(det["lots"])
+    pad = float(np.median([p["w"] for p in det["lots"]])) if n else 0.0
+    # Melhor: sem corte, com lotes suficientes e a ilha o maior possível (mais nitidez).
+    return (n < want, margin(det) < 0.0, n > want + 2, -pad)
 
 
 def main() -> None:
-    (mw, mh), base = master()
     if "--contar" in sys.argv:
         for d in ORDER:
-            print(d, [len(detect(v)[1]) for v in variations(d)])
+            print(d, [(len(x["lots"]), round(float(np.median([p["w"] for p in x["lots"]])) if x["lots"] else 0),
+                       margin(x)) for x in map(detect, variations(d))])
         return
     out = ["## GERADO por tools/art/v9/processar.py — não edite à mão.",
-           "## Ilha única por mapa (2026-11-25): cenário, cor do mar e lotes no mundo 840×1120.",
-           "extends RefCounted", "", "const WORLD := Vector2(%d, %d)" % WORLD, "", "const ISLANDS := {"]
-    sx, sy = WORLD[0] / mw, WORLD[1] / mh
+           "## Ilha única por mapa (2026-11-26): cenário (= mundo), lotes, calçadas e ruas.",
+           "extends RefCounted", "", "const ISLANDS := {"]
     for d in ORDER:
         want = 6 if d == "praia" else 12
         vs = variations(d)
+        # Escolha "ilha:N" = usar a variação N da 1ª passada (quando a "de longe" saiu ruim).
+        if str(CHOICES.get(d, "")).startswith("ilha:"):
+            vs = sorted((SRC / f"g9_{d}_ilha").glob("*.png"))
+            CHOICES[d] = int(str(CHOICES[d]).split(":")[1])
         if not vs:
             print("SEM ARTE:", d)
             continue
-        pick = CHOICES.get(d)
-        if pick is None:
-            counts = [len(detect(v)[1]) for v in vs]
-            pick = min(range(len(vs)), key=lambda i: (abs(counts[i] - want), i)) + 1
-        path = vs[pick - 1]
-        (w, h), found = detect(path)
-        extra = []
-        if d == "praia":
-            pts = sorted(found, key=lambda p: (round(p["y"] / (h * 0.03)), p["x"]))
-            # A arte da praia sobra com lotes vazios a mais: ficam os 6 do meio e os das pontas
-            # viram área de guarda-sóis (decoração por cima, no jogo).
-            while len(pts) > want:
-                extra.append(pts.pop(0 if len(extra) % 2 == 0 else -1))
-        else:
-            pts = []
-            for b in base:
-                near = min(found, key=lambda p: (p["x"] - b["x"]) ** 2 + (p["y"] - b["y"]) ** 2, default=None)
-                good = near is not None and abs(near["x"] - b["x"]) < 70 and abs(near["y"] - b["y"]) < 70
-                pts.append(near if good else b)
+        dets = [detect(v) for v in vs]
+        pick = CHOICES.get(d) or min(range(len(vs)), key=lambda i: score(dets[i], want)) + 1
+        det, path = dets[pick - 1], vs[pick - 1]
+        w, h = det["w"], det["h"]
+        pts, extra = middle(det["lots"], want)
+        pts.sort(key=lambda p: (round(p["y"] / (h * 0.025)), p["x"]))
+        pw = float(np.median([p["w"] for p in pts]))
+        ph = float(np.median([p["h"] for p in pts]))
+        s = PAD_WORLD / pw
+        # Passo da malha: distância (em x e em y) até o vizinho na diagonal.
+        dxs, dys = [], []
+        for a in pts:
+            near = sorted((b for b in pts if b is not a), key=lambda b: (b["x"] - a["x"]) ** 2 + (b["y"] - a["y"]) ** 2)[0]
+            dxs.append(abs(near["x"] - a["x"])); dys.append(abs(near["y"] - a["y"]))
+        step = (float(np.median(dxs)) * s, float(np.median(dys)) * s)
         im = Image.open(path).convert("RGB")
-        im.resize((TEX_W, round(TEX_W * h / w)), Image.LANCZOS).save(OUT / f"{d}_ilha.jpg", quality=88)
-        # Miniatura da trilha de mapas (mesmo formato das antigas: 540 de largura).
-        im.crop((0, int(h * 0.12), w, int(h * 0.82))).resize((540, round(540 * 0.70 * h / w)), Image.LANCZOS) \
-            .save(OUT / f"{d}_trilha.jpg", quality=82)
-        a = np.asarray(im)
-        k = 24
-        corners = np.concatenate([a[:k, :k].reshape(-1, 3), a[:k, -k:].reshape(-1, 3),
-                                  a[-k:, :k].reshape(-1, 3), a[-k:, -k:].reshape(-1, 3)])
-        sea = "%02x%02x%02x" % tuple(int(v) for v in np.median(corners[len(corners) // 2:], axis=0))
-        sea_top = "%02x%02x%02x" % tuple(int(v) for v in np.median(corners[:len(corners) // 2], axis=0))
-        vec = ", ".join("Vector2(%d, %d)" % (round(p["x"] * sx), round(p["foot"] * sy)) for p in pts)
-        cover = ", ".join("Vector2(%d, %d)" % (round(p["x"] * sx), round(p["y"] * sy)) for p in extra)
-        # Pontos de passeio das pessoas: no meio do caminho entre lotes vizinhos (ruas).
-        cs = [(p["x"] * sx, p["y"] * sy) for p in pts]
-        ways = []
-        for i, (ax, ay) in enumerate(cs):
-            for bx, by in cs[i + 1:]:
-                if 100 < ((ax - bx) ** 2 + (ay - by) ** 2) ** 0.5 < 180:
-                    ways.append("Vector2(%d, %d)" % (round((ax + bx) / 2), round((ay + by) / 2)))
-        out.append('\t"%s": {"base": "%s_ilha.jpg", "sea_top": Color("%s"), "sea": Color("%s"), "lots": [%s], "cover": [%s], "waypoints": [%s]},'
-                   % (d, d, sea_top, sea, vec, cover, ", ".join(ways)))
-        print(d, "variação", pick, "lotes", len(pts), "detectados", len(found), "mar", sea,
-              "" if len(pts) == want else "  <-- CONFERIR")
+        im.save(OUT / f"{d}_ilha.jpg", quality=88)
+        xs = [p["x"] for p in pts]; ys = [p["y"] for p in pts]
+        box = (max(0, int(min(xs) - pw * 1.2)), max(0, int(min(ys) - ph * 1.6)),
+               min(w, int(max(xs) + pw * 1.2)), min(h, int(max(ys) + ph * 1.4)))
+        thumb = im.crop(box)
+        thumb.resize((540, round(540 * thumb.height / thumb.width)), Image.LANCZOS).save(OUT / f"{d}_trilha.jpg", quality=82)
+        v2 = lambda x, y: "Vector2(%d, %d)" % (round(x * s), round(y * s))
+        out.append('\t"%s": {"base": "%s_ilha.jpg", "size": Vector2(%d, %d), "pad": Vector2(%d, %d), "step": Vector2(%d, %d), '
+                   '"lots": [%s], "pads": [%s], "cover": [%s], "cars": %s},'
+                   % (d, d, round(w * s), round(h * s), round(pw * s / 2), round(ph * s / 2), round(step[0]), round(step[1]),
+                      ", ".join(v2(p["x"], p["foot"]) for p in pts),
+                      ", ".join(v2(p["x"], p["y"]) for p in pts + (extra if d == "praia" else [])),
+                      ", ".join(v2(p["x"], p["y"]) for p in extra) if d == "praia" else "",
+                      "false" if d in ("praia", "atlantida") else "true"))
+        flag = "" if len(pts) == want and margin(det) >= 0.0 else "  <-- CONFERIR"
+        print(f"{d}: variação {pick}, {len(pts)} lotes de {len(det['lots'])}, lote {pw:.0f}px, mundo {w * s:.0f}×{h * s:.0f}, "
+              f"{pw / PAD_WORLD:.2f} px/un, folga {margin(det)}{flag}")
     out += ["}", ""]
     (ROOT / "game/scripts/layout_v9.gd").write_text("\n".join(out))
 
