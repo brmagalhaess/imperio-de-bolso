@@ -376,6 +376,21 @@ func _update_cycle(b: Dictionary) -> void:
 			else tr("Pronto em %s") % Fmt.duration(GameState.seconds_remaining(b))
 
 
+## Triângulo branco com contorno escuro, centrado no botão.
+class ArrowGlyph extends Control:
+	var left := false
+
+	func _draw() -> void:
+		var c := size / 2.0 + Vector2(-2.0 if left else 2.0, -2.0)
+		var w := 15.0
+		var pts := PackedVector2Array([c + Vector2(w, -w * 1.1), c + Vector2(w, w * 1.1), c + Vector2(-w, 0)]) if left \
+				else PackedVector2Array([c + Vector2(-w, -w * 1.1), c + Vector2(-w, w * 1.1), c + Vector2(w, 0)])
+		var outline := PackedVector2Array(pts)
+		outline.append(pts[0])
+		draw_colored_polygon(pts, Color.WHITE)
+		draw_polyline(outline, Color(0, 0, 0, 0.25), 3.0, true)
+
+
 ## Seta do painel: vai para o negócio anterior/seguinte do mapa atual (dá a volta no fim).
 func _step_business(dir: int) -> void:
 	var slugs: Array = Layout.DISTRICTS[current_district].lots.keys()
@@ -1934,10 +1949,14 @@ func _build_sheet() -> void:
 	head.add_theme_constant_override("separation", 10)
 	for step in [-1, 1]:
 		var arrow := Button.new()
-		arrow.text = "◀" if step < 0 else "▶"
 		arrow.custom_minimum_size = Vector2(88, 68)
-		arrow.add_theme_font_size_override("font_size", 30)
 		Style.style_button(arrow, Style.TEAL_LIGHT, Style.TEAL_DARK, 34)
+		# Seta desenhada (os símbolos ◀ ▶ não existem na fonte do jogo no iPhone).
+		var glyph := ArrowGlyph.new()
+		glyph.left = step < 0
+		glyph.set_anchors_preset(Control.PRESET_FULL_RECT)
+		glyph.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		arrow.add_child(glyph)
 		var dir: int = step
 		arrow.pressed.connect(func(): _step_business(dir))
 		head.add_child(arrow)
