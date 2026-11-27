@@ -110,7 +110,8 @@ Etapas conforme `docs/PROMPT_MESTRE_CODEX.md`. Marque `[x]` só com teste execut
 - [x] 1.2.0 (ADR 0035): mapa novo só com o atual no nível máximo, evolução ×3, ajudantes com
       nível, estrelas de evolução, temporada de 20 dias, desafios da semana, anúncios 10/24 h,
       convide amigos, mapa 2D com ilhas ligadas, aba Progresso no painel
-- [ ] Publicar a 1.2.0 nas duas lojas e subir `MIN_APP_VERSION_*` para 1.2.0
+- [x] Enviar a 1.2.0 às duas lojas (2026-11-27)
+- [ ] Quando aprovada nas duas: subir `MIN_APP_VERSION_*` para 1.2.0 e atualizar o site
 - [ ] Compartilhar convite pela folha nativa do celular (hoje copia o texto)
 - [ ] V1.2b Passe de temporada e cosméticos
 - [ ] Fichas das lojas e políticas em inglês/espanhol (lançamento fora do Brasil)

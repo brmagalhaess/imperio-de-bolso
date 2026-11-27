@@ -9,6 +9,9 @@ Também cumpre o papel de `docs/STATUS.md` citado no adendo do prompt mestre.
   prêmios em diamantes); 3 missões novas e desafios da semana; anúncios 10/24 h com 5 min de
   prêmio; venda do império exige nível 100; convide amigos. Migração
   `20261125120000_evolucao_ajudantes_temporadas` (só acrescenta; ninguém é zerado).
+- 2026-11-27: **1.2.0 enviada às lojas** — iOS build 17 em "Aguardando revisão" (App Store) e
+  Android código 10 enviado para revisão em produção e teste interno (Google Play). Depois de
+  aprovada nas duas, subir `MIN_APP_VERSION_*` para 1.2.0 e atualizar o site.
 - 2026-11-27: ilha inteira com o entorno até as bordas (3ª passada da arte e outpaint no Porto e
   em Marte), construções espaçadas, carros nas ruas e pessoas nas calçadas, mapa sem nível/estrelas
   e setas no painel para trocar de negócio. Gasto total da arte v9 ~US$ 10. Godot 163/0.
