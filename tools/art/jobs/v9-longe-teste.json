@@ -1,10 +1,10 @@
 [
  {
-  "id": "g9_brinquedos_longe",
+  "id": "g9_brinquedos_longe3",
   "model": "xai/grok-imagine-image-2.0",
   "variations": 2,
   "input": {
-   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 70 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only calm open turquoise sea with gentle small waves, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 60 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only calm open turquoise sea with gentle small waves, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
    "image_urls": [
     "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215c0-a5c2-78c7-91bd-59958eee1f2d/82b8591f-edf5-46ea-9d74-9c1b45e18afe.png"
    ],
@@ -13,11 +13,11 @@
   }
  },
  {
-  "id": "g9_lua_longe",
+  "id": "g9_lua_longe3",
   "model": "xai/grok-imagine-image-2.0",
   "variations": 2,
   "input": {
-   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 70 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only deep dark outer space with small stars, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 60 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only deep dark outer space with small stars, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
    "image_urls": [
     "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215af-2adb-7230-b396-e8998af42363/887c060a-179c-40c8-8c8a-7b4cc83a51d2.png"
    ],
@@ -26,11 +26,11 @@
   }
  },
  {
-  "id": "g9_gatos_longe",
+  "id": "g9_gatos_longe3",
   "model": "xai/grok-imagine-image-2.0",
   "variations": 2,
   "input": {
-   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 70 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only deep dark outer space with small stars, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 60 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only deep dark outer space with small stars, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
    "image_urls": [
     "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215c3-a75e-71cb-8e87-21e0e4f59860/a94657d9-b71f-4341-90f5-9ebcfd650e2e.png"
    ],
@@ -39,11 +39,11 @@
   }
  },
  {
-  "id": "g9_saturno_longe",
+  "id": "g9_saturno_longe3",
   "model": "xai/grok-imagine-image-2.0",
   "variations": 2,
   "input": {
-   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 70 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only deep dark outer space with small stars, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 60 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only deep dark outer space with small stars, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
    "image_urls": [
     "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215c5-2884-7cc1-ab32-427304b21fb5/5479d3b4-2811-4647-8e9a-17d590531be3.png"
    ],
@@ -52,11 +52,11 @@
   }
  },
  {
-  "id": "g9_gelatina_longe",
+  "id": "g9_gelatina_longe3",
   "model": "xai/grok-imagine-image-2.0",
   "variations": 2,
   "input": {
-   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 70 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only deep dark outer space with small stars, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 60 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only deep dark outer space with small stars, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
    "image_urls": [
     "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215c6-9d91-749f-acc5-f24939c18473/494f64df-addb-4fa6-8ff5-c6a3e2723c86.png"
    ],
@@ -65,13 +65,65 @@
   }
  },
  {
-  "id": "g9_galaxia_longe",
+  "id": "g9_galaxia_longe3",
   "model": "xai/grok-imagine-image-2.0",
   "variations": 2,
   "input": {
-   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 70 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only deep dark outer space with small stars, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 60 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only deep dark outer space with small stars, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
    "image_urls": [
     "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215c8-9a18-7c14-b88a-1853008589ab/bbfcfb0f-a6c1-48a6-b36d-e0e62f418abf.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_atlantida_longe3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 60 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only open underwater turquoise ocean with soft light rays, bubbles and a sandy sea floor, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215bb-f7ad-788a-ab00-31d3da55563a/9a545f2a-b0da-4477-8141-2d35245af4c8.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_porto_longe3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 60 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only calm open turquoise sea with gentle small waves, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215b2-65ff-79c9-8ffa-24cd260360f9/b43f95d3-03f5-4379-a747-8313d38f5877.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_doces_longe3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 60 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only a calm sea of pink strawberry milk, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215bf-4a3f-7b3a-94c8-3f8e94ce237c/0caa0a9f-d13b-4716-84b8-b8f0241069a4.png"
+   ],
+   "aspect_ratio": "3:4",
+   "resolution": "2k"
+  }
+ },
+ {
+  "id": "g9_marte_longe3",
+  "model": "xai/grok-imagine-image-2.0",
+  "variations": 2,
+  "input": {
+   "prompt": "Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 60 percent of the image width, centered, COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. All around the island, on every side and up to all four image edges, there is only a flat red martian desert plain with small rocks, uniform and continuous, with no horizon, no sky, no far objects, no ships, no planets, no mountains and no other islands. Keep the same glossy cartoon mobile city-builder art style, the same isometric camera angle, the same roads with crosswalks, the same twelve large EMPTY flat building lots (plain light concrete plazas, nothing on them) in the same arrangement and the same decorations on the island. No buildings on the lots. No people, no cars, no text, no letters, no numbers, no logos, no flags, no UI.",
+   "image_urls": [
+    "https://d3u0tzju9qaucj.cloudfront.net/e5fad75c-993f-4fb8-b3a6-e491ac8a1ee2/01a215c2-1978-7cec-a19f-71420f65c6c4/a30dc5de-8d5e-4dbf-bd31-40de34a6a01a.png"
    ],
    "aspect_ratio": "3:4",
    "resolution": "2k"

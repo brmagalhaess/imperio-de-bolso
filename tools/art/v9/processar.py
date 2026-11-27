@@ -33,7 +33,10 @@ CACHE = json.loads(CACHE_FILE.read_text()) if CACHE_FILE.exists() else {}
 
 def variations(d: str) -> list[Path]:
     # Sem a versão "de longe" (créditos do Higgsfield acabaram em 2026-11-26): usa a da 1ª passada.
-    return sorted((SRC / f"g9_{d}_longe").glob("*.png")) or sorted((SRC / f"g9_{d}_ilha").glob("*.png"))
+    # A 3ª passada (g9_<mapa>_longe3, mais afastada) vale sobre a 2ª.
+    # g9_<mapa>_largo = 3ª passada com as bordas expandidas (outpaint), quando ela encostava nos lados.
+    return (sorted((SRC / f"g9_{d}_largo").glob("*.png")) or sorted((SRC / f"g9_{d}_longe3").glob("*.png")) or sorted((SRC / f"g9_{d}_longe").glob("*.png"))
+            or sorted((SRC / f"g9_{d}_ilha").glob("*.png")))
 
 
 def detect(path: Path) -> dict:

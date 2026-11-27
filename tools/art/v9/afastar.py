@@ -28,7 +28,7 @@ def url(tag: str) -> str:
 def job(d: str) -> dict:
     around = AROUND.get(d, SEA)
     n = "six" if d == "praia" else "twelve"
-    prompt = (f"Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 70 percent of the image width, centered, "
+    prompt = (f"Zoom the camera out. Show the SAME island exactly as it is, but smaller: the island takes about 60 percent of the image width, centered, "
               "COMPLETELY visible with all four corners of the island inside the picture and nothing cut by the image edges. "
               f"All around the island, on every side and up to all four image edges, there is only {around}, uniform and continuous, with no horizon, no sky, "
               "no far objects, no ships, no planets, no mountains and no other islands. "
